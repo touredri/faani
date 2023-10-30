@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "224443279523",
+    "project_id": "faani-afrique",
+    "storage_bucket": "faani-afrique.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224443279523:android:1f419ea002b244e6ff7716",
+        "android_client_info": {
+          "package_name": "com.faani.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBE6w2YtJ_jjYoEVm5XWXpKP8b52byE1bY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
