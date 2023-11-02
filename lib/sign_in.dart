@@ -22,12 +22,18 @@ class _SignInPageState extends State<SignInPage> {
   String phoneNumber = '';
   void errorAlert() {
     if(phoneNumber.length < 7) {
-      const AlertDialog.adaptive(
-        title: Text('Erreur'),
-        content: Text("enter valid number"),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const AlertDialog(
+            title: Text('Erreur'),
+            content: Text("enter valid number"),
+          );
+        }
       );
     }
   }
+  
   void sendOtpCode() {
     loading = true;
     setState(() {});
@@ -166,7 +172,7 @@ class _SignInPageState extends State<SignInPage> {
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 18),
                     ),
-                    onPressed: loading ? errorAlert : sendOtpCode,
+                    onPressed: loading ? null : sendOtpCode,
                     child: loading
                           ? const CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation(Colors.white),

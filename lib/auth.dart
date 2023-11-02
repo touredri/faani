@@ -17,9 +17,9 @@ void authWithPhoneNumber(String phone,
 }
 
 Future<void> validateOtp(String smsCode, String verificationId) async {
-  final _credential = PhoneAuthProvider.credential(
+  final credential = PhoneAuthProvider.credential(
       verificationId: verificationId, smsCode: smsCode);
-  await _auth.signInWithCredential(_credential);
+  await _auth.signInWithCredential(credential);
   return;
 }
 
