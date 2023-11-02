@@ -1,18 +1,62 @@
 // import 'dart:ffi';
 
+import 'package:faani/auth.dart';
 import 'package:faani/my_theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'sms_page.dart';
 // import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 
-// import 'my_theme.dart';
+class SignInPage extends StatefulWidget {
+  const SignInPage({Key? key}) : super(key: key);
 
-class SingnInPage extends StatelessWidget {
-  const SingnInPage({Key? key}) : super(key: key);
+  @override
+  State<SignInPage> createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  bool loading = false;
+  String phoneNumber = '';
+  void errorAlert() {
+    if(phoneNumber.length < 7) {
+      const AlertDialog.adaptive(
+        title: Text('Erreur'),
+        content: Text("enter valid number"),
+      );
+    }
+  }
+  void sendOtpCode() {
+    loading = true;
+    setState(() {});
+    final auth = FirebaseAuth.instance;
+    if (phoneNumber.isNotEmpty) {
+      authWithPhoneNumber(phoneNumber, onCodeSend: (verificationId, v) {
+        loading = false;
+        if (mounted) {
+          setState(() {});
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (c) => Verification(
+                    verificationId: verificationId,
+                    phoneNumber: phoneNumber,
+                  )));
+        }
+      }, onAutoVerify: (v) async {
+        await auth.signInWithCredential(v);
+        if (mounted && Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
+      }, onFailed: (e) {
+        loading = false;
+        if (mounted) {
+          setState(() {});
+        }
+        print("Le code est erroné");
+      }, autoRetrieval: (v) {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +125,9 @@ class SingnInPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   IntlPhoneField(
+                    cursorColor: Theme.of(context).colorScheme.primary,
+                    // searchText: 'Chercher par nom',
+                    invalidNumberMessage: 'Numéro invalide',
                     decoration: InputDecoration(
                       labelStyle: TextStyle(
                         color: Colors.black.withOpacity(0.5),
@@ -112,20 +159,19 @@ class SingnInPage extends StatelessWidget {
                     ),
                     initialCountryCode: 'ML',
                     onChanged: (phone) {
-                      // print(phone.completeNumber);
+                      phoneNumber = phone.completeNumber;
                     },
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 18),
                     ),
-                    onPressed: () {
-                      Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                          return const Verification();
-                        }));
-                    },
-                    child: const Text('Créer un compte'),
+                    onPressed: loading ? errorAlert : sendOtpCode,
+                    child: loading
+                          ? const CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            )
+                          : const Text('Créer un compte'),
                   ),
                   const SizedBox(height: 16),
                   OutlinedButton(

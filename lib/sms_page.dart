@@ -1,8 +1,81 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
-class Verification extends StatelessWidget {
-  const Verification({super.key});
+import 'auth.dart';
+
+class Verification extends StatefulWidget {
+  const Verification(
+      {Key? key, required this.verificationId, required this.phoneNumber})
+      : super(key: key);
+  final String verificationId;
+  final String phoneNumber;
+
+  @override
+  State<Verification> createState() => _VerificationState();
+}
+
+class _VerificationState extends State<Verification> {
+  String smsCode = "";
+  bool loading = false;
+  bool resend = false;
+  int count = 20;
+
+  final _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    decompte();
+  }
+
+  late Timer timer;
+
+  void decompte() {
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (count < 1) {
+        timer.cancel();
+        count = 20;
+        resend = true;
+        setState(() {});
+        return;
+      }
+      count--;
+      setState(() {});
+    });
+  }
+
+  void onResendSmsCode() {
+    resend = false;
+    setState(() {});
+    authWithPhoneNumber(widget.phoneNumber, onCodeSend: (verificationId, v) {
+      loading = false;
+      decompte();
+      setState(() {});
+    }, onAutoVerify: (v) async {
+      await _auth.signInWithCredential(v);
+      Navigator.of(context).pop();
+    }, onFailed: (e) {
+      loading = false;
+      setState(() {});
+      print("Le code est erroné");
+    }, autoRetrieval: (v) {});
+  }
+
+void onVerifySmsCode() async {
+  loading = true;
+  if (mounted) setState(() {});
+  await validateOtp(smsCode, widget.verificationId);
+  loading = true;
+  if (mounted) {
+    setState(() {});
+    if (Navigator.canPop(context)) {
+      Navigator.of(context).pop();
+    }
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +121,9 @@ class Verification extends StatelessWidget {
                   ),
                 ),
               ),
-              onSubmitted: (String pin) {
-                print(pin);
+              onChanged: (value) {
+                smsCode = value;
+                setState(() {});
               },
             ),
             const SizedBox(height: 35),
@@ -57,8 +131,17 @@ class Verification extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(300, 50),
               ),
-              onPressed: () {},
-              child: const Text('Valider'),
+              onPressed: smsCode.length < 6 || loading
+                          ? null
+                          : onVerifySmsCode,
+              child: loading
+                          ? const CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            )
+                          : const Text(
+                              'Verify',
+                              style: TextStyle(fontSize: 20),
+                            ),
             ),
             const SizedBox(height: 10),
             Row(
@@ -74,10 +157,11 @@ class Verification extends StatelessWidget {
                   ),
                 ),
                 TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Envoyer encore',
-                      style: TextStyle(
+                    onPressed: !resend ? null : onResendSmsCode,
+                    child: Text(!resend
+                        ? "00:${count.toString().padLeft(2, "0")}"
+                        : 'Envoyer encore',
+                      style: const TextStyle(
                         color: Color(0xFFE64D59),
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
