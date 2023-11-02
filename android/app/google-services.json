@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:224443279523:android:1f419ea002b244e6ff7716",
+        "mobilesdk_app_id": "1:224443279523:android:bf0a981568089cf0ff7716",
         "android_client_info": {
-          "package_name": "com.faani.app"
+          "package_name": "com.faani.app.faani"
         }
       },
       "oauth_client": [],
