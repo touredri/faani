@@ -21,19 +21,18 @@ class _SignInPageState extends State<SignInPage> {
   bool loading = false;
   String phoneNumber = '';
   void errorAlert() {
-    if(phoneNumber.length < 7) {
+    if (phoneNumber.length < 7) {
       showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const AlertDialog(
-            title: Text('Erreur'),
-            content: Text("enter valid number"),
-          );
-        }
-      );
+          context: context,
+          builder: (BuildContext context) {
+            return const AlertDialog(
+              title: Text('Erreur'),
+              content: Text("enter valid number"),
+            );
+          });
     }
   }
-  
+
   void sendOtpCode() {
     loading = true;
     setState(() {});
@@ -60,6 +59,7 @@ class _SignInPageState extends State<SignInPage> {
           setState(() {});
         }
         print("Le code est erroné");
+        debugPrint(e.toString());
       }, autoRetrieval: (v) {});
     }
   }
@@ -174,10 +174,10 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     onPressed: loading ? null : sendOtpCode,
                     child: loading
-                          ? const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(Colors.white),
-                            )
-                          : const Text('Créer un compte'),
+                        ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          )
+                        : const Text('Se connecter'),
                   ),
                   const SizedBox(height: 16),
                   OutlinedButton(

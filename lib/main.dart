@@ -1,4 +1,5 @@
 import 'package:faani/sign_in.dart';
+import 'package:faani/sign_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,8 +18,7 @@ void main() async {
   runApp(ChangeNotifierProvider(
     create: (context) => ApplicationState(),
     builder: (context, _) => MyApp(),
-  )
-    );
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -27,16 +27,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: buildTheme(context),
-        home: StreamBuilder<User?>(
-        stream: _auth.authStateChanges(),
-        builder: (context, snapshot) {
-          return snapshot.data == null ? const SignInPage() : const HomePage();
-        },
-      ),
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: buildTheme(context),
+      home: const SignUp(),
     );
   }
 }
-
