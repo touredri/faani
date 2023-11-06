@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../modele/modele.dart';
 import '../my_theme.dart';
 
 InputDecoration myInputDecoration(String label) {
@@ -109,9 +110,6 @@ Container _myFilterContainer(String label, VoidCallback onPressed) {
       ),
     ),
     child: Row(
-      // mainAxisSize: MainAxisSize.min,
-      // mainAxisAlignment: MainAxisAlignment.center,
-      // crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         TextButton(
           onPressed: onPressed,
@@ -121,7 +119,6 @@ Container _myFilterContainer(String label, VoidCallback onPressed) {
             style: const TextStyle(
               color: Colors.black,
               fontSize: 15,
-              // fontFamily: 'Poppins',
               fontWeight: FontWeight.w300,
               height: 0,
             ),
@@ -132,8 +129,7 @@ Container _myFilterContainer(String label, VoidCallback onPressed) {
   );
 }
 
-TextButton myFilterContainer(
-    String label,  onPressed, String currentFilter) {
+TextButton myFilterContainer(String label, onPressed, String currentFilter) {
   bool v = currentFilter == label;
   return TextButton(
       onPressed: onPressed,
@@ -158,4 +154,56 @@ TextButton myFilterContainer(
           ),
         ),
       ));
+}
+
+Stack homeItem(Modele modele) {
+  return Stack(
+    children: [
+      Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              itemCount: modele.fichier.length,
+              itemBuilder: (context, imageIndex) {
+                return Image.network(
+                  modele.fichier[imageIndex]!,
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      Positioned(
+        right: 0,
+        bottom: 0,
+        top: 0,
+        // height: 130,
+        child: Container(
+          height: 130,
+          width: 100,
+          // alignment: Alignment.centerRight,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            ),
+            color: Colors.white.withOpacity(0.8),
+          ),
+          child: Column(
+            children: [
+              Text(
+                'Bazin',
+                style: TextStyle(
+                  color: Colors.black.withOpacity(0.6),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
 }
