@@ -2,8 +2,6 @@ import 'package:faani/home_page.dart';
 import 'package:faani/src/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:pinput/pinput.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'my_theme.dart';
@@ -77,7 +75,7 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       const SizedBox(
-                        height: 70,
+                        height: 50,
                       ),
                       TextField(
                         maxLength: 40,
@@ -103,7 +101,7 @@ class _SignUpState extends State<SignUp> {
                       Row(
                         children: [
                           const SizedBox(
-                            width: 60,
+                            width: 30,
                           ),
                           const Text(
                             'Etes-vous un tailleur ?',
@@ -163,11 +161,12 @@ class _SignUpState extends State<SignUp> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           maximumSize: const Size.fromWidth(350),
-                          minimumSize: const Size(320, 30),
-                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          minimumSize: const Size(300, 30),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
                         ),
                         onPressed: () {
-                          name.text.isEmpty || quartier.text.isEmpty
+                          name.text.isEmpty ||
+                                  (quartier.text.isEmpty && isChecked)
                               ? isNotFill()
                               : Navigator.of(context).push(MaterialPageRoute(
                                   builder: (c) => const HomePage()));
@@ -183,7 +182,7 @@ class _SignUpState extends State<SignUp> {
                       text: 'En continuant, vous acceptez nos \n',
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w100,
                       ),
                       children: <TextSpan>[
@@ -191,7 +190,7 @@ class _SignUpState extends State<SignUp> {
                             text: 'Conditions générales',
                             style: const TextStyle(
                               color: primaryColor,
-                              fontSize: 16,
+                              fontSize: 15,
                               fontWeight: FontWeight.w100,
                             ),
                             recognizer: TapGestureRecognizer()
@@ -203,14 +202,14 @@ class _SignUpState extends State<SignUp> {
                             text: ' et notre ',
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: FontWeight.w100,
                             )),
                         TextSpan(
                             text: 'Politique de confidentialité',
                             style: const TextStyle(
                               color: primaryColor,
-                              fontSize: 12,
+                              fontSize: 15,
                               fontWeight: FontWeight.w100,
                             ),
                             recognizer: TapGestureRecognizer()

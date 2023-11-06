@@ -26,7 +26,8 @@ class MyDropdownButton extends StatefulWidget {
   final ValueChanged<String?>? onChanged;
   final List<String> items;
 
-  MyDropdownButton({required this.value, required this.onChanged, required this.items});
+  MyDropdownButton(
+      {required this.value, required this.onChanged, required this.items});
 
   @override
   _MyDropdownButtonState createState() => _MyDropdownButtonState();
@@ -49,8 +50,7 @@ class _MyDropdownButtonState extends State<MyDropdownButton> {
           focusColor: inputBackgroundColor,
           dropdownColor: inputBackgroundColor,
           value: widget.value,
-          items: widget.items
-              .map<DropdownMenuItem<String>>((String value) {
+          items: widget.items.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(
@@ -95,4 +95,67 @@ InputDecoration myInputDecorationWithIcon(String label, IconData icon) {
       color: inputBorderColor,
     ),
   );
+}
+
+Container _myFilterContainer(String label, VoidCallback onPressed) {
+  return Container(
+    height: 30,
+    padding: const EdgeInsets.symmetric(horizontal: 10),
+    // margin: const EdgeInsets.only(top: 5),
+    decoration: ShapeDecoration(
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(width: 1, color: Color(0xFFA4CEFB)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+    ),
+    child: Row(
+      // mainAxisSize: MainAxisSize.min,
+      // mainAxisAlignment: MainAxisAlignment.center,
+      // crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        TextButton(
+          onPressed: onPressed,
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 15,
+              // fontFamily: 'Poppins',
+              fontWeight: FontWeight.w300,
+              height: 0,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+TextButton myFilterContainer(
+    String label,  onPressed, String currentFilter) {
+  bool v = currentFilter == label;
+  return TextButton(
+      onPressed: onPressed,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
+        decoration: ShapeDecoration(
+          color: v ? primaryColor : null,
+          shape: RoundedRectangleBorder(
+            side: const BorderSide(width: 1, color: Color(0xFFA4CEFB)),
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: v ? Colors.white : Colors.black,
+            fontSize: 15,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w400,
+            height: 0,
+          ),
+        ),
+      ));
 }

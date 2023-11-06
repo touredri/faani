@@ -17,6 +17,7 @@ ThemeData buildTheme(BuildContext context) {
     textTheme: GoogleFonts.poppinsTextTheme(
       Theme.of(context).textTheme,
     ),
+    fontFamily: fontFamily,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(primaryColor),
