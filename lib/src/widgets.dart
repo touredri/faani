@@ -174,23 +174,20 @@ Stack homeItem(Modele modele) {
           ),
         ],
       ),
-      Positioned(
-        right: 0,
-        bottom: 0,
-        top: 0,
-        // height: 130,
+      Container(
+        alignment: Alignment.centerRight,
         child: Container(
           height: 130,
           width: 100,
-          // alignment: Alignment.centerRight,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(10),
               bottomRight: Radius.circular(10),
             ),
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withOpacity(0.2),
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 'Bazin',
