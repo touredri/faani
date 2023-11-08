@@ -31,7 +31,7 @@ class _HomePAgeViewState extends State<HomePAgeView> {
   Widget build(BuildContext context) {
     final PageController controller = PageController(initialPage: 0);
     return Expanded(
-        child: PageView.builder(
+      child: PageView.builder(
       controller: controller,
       scrollDirection: Axis.vertical,
       itemCount: 10,

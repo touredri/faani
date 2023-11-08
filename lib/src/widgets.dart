@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../modele/modele.dart';
 import '../my_theme.dart';
@@ -177,24 +180,49 @@ Stack homeItem(Modele modele) {
       Container(
         alignment: Alignment.centerRight,
         child: Container(
-          height: 130,
-          width: 100,
+          height: 240,
+          width: 60,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(10),
               bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
             ),
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withOpacity(0.0),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Bazin',
-                style: TextStyle(
-                  color: Colors.black.withOpacity(0.6),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.shopping_cart_outlined,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
+              FavoriteIcone(docId: modele.id!),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      // Handle the button press
+                    },
+                    icon: const Icon(
+                      Icons.message_outlined,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                  Text('231', style: TextStyle(color: Colors.white)),
+                ],
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.more_horiz,
+                  color: Colors.white,
+                  size: 30,
                 ),
               ),
             ],
@@ -203,4 +231,120 @@ Stack homeItem(Modele modele) {
       ),
     ],
   );
+}
+
+class FavoriteIcone extends StatefulWidget {
+  final String docId;
+  const FavoriteIcone({super.key, required this.docId});
+
+  @override
+  State<FavoriteIcone> createState() => _FavoriteIconeState();
+}
+
+class _FavoriteIconeState extends State<FavoriteIcone> {
+  bool isFavorite = false;
+  int likes = 0;
+  int count = 0;
+  Stream<DocumentSnapshot>? likeSnapshotStream;
+  final streamController = StreamController<DocumentSnapshot>();
+
+  void onChange(QuerySnapshot snapshot) {
+    if (mounted) {
+      setState(() {
+        count = snapshot.docs.length;
+      });
+    }
+  }
+
+  void favorieInit() {
+    FirebaseFirestore.instance
+        .collection('favorie')
+        .where('idModele', isEqualTo: widget.docId)
+        .where('idUtilisateur', isEqualTo: 'idUtilisateur')
+        .get()
+        .then((value) {
+      if (value.docs.isNotEmpty) {
+        setState(() {
+          isFavorite = true;
+        });
+      }
+    });
+  }
+
+  // void dispose() {
+  //   streamController.close();
+  //   super.dispose();
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    favorieInit();
+    likeSnapshotStream = FirebaseFirestore.instance
+        .collection('modele')
+        .doc(widget.docId)
+        .snapshots();
+    FirebaseFirestore.instance
+        .collection('favorie')
+        .where('idModele', isEqualTo: widget.docId)
+        .snapshots()
+        .listen(onChange);
+  }
+
+  final firestore = FirebaseFirestore.instance;
+  void createFavorie() async {
+    final collection = firestore.collection('favorie');
+    final docRef = await collection
+        .add({'idModele': widget.docId, 'idUtilisateur': 'idUtilisateur'});
+    print(docRef.id);
+  }
+
+  void deleteFavorie() async {
+    final querySnapshot = await firestore
+        .collection('favorie')
+        .where('idModele', isEqualTo: widget.docId).where('idUtilisateur', isEqualTo: 'idUtilisateur')
+        .get();
+
+    for (var doc in querySnapshot.docs) {
+      await firestore.collection('favorie').doc(doc.id).delete();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        IconButton(
+            onPressed: () {
+              if (isFavorite) {
+                deleteFavorie();
+                setState(() {
+                  isFavorite = !isFavorite;
+                });
+              } else {
+                createFavorie();
+                setState(() {
+                  isFavorite = !isFavorite;
+                });
+              }
+            },
+            icon: const Icon(
+              Icons.favorite_border_outlined,
+              color: Colors.white,
+              size: 30,
+            ),
+            isSelected: isFavorite,
+            selectedIcon: const Icon(
+              semanticLabel: 'Remove from favorites',
+              textDirection: TextDirection.ltr,
+              Icons.favorite,
+              color: primaryColor,
+              size: 30,
+            )),
+        Text(count.toString(), style: const TextStyle(color: Colors.white)),
+      ],
+    );
+  }
 }

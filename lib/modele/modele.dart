@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Modele {
@@ -7,6 +9,7 @@ class Modele {
   final String genreHabit;
   final String idTailleur;
   final String? idCategorie;
+  final int? likeCounter;
 
   Modele({
     required this.id,
@@ -15,6 +18,7 @@ class Modele {
     required this.genreHabit,
     required this.idTailleur,
     required this.idCategorie,
+    required this.likeCounter,
   });
 
   factory Modele.fromMap(Map<String, dynamic> data, DocumentReference documentReference) {
@@ -24,6 +28,7 @@ class Modele {
     final genreHabit = data['genreHabit'] as String;
     final idTailleur = data['idTailleur'] as String;
     final idCategorie = data['idCategorie'] as String;
+    final likeCounter = data['likeCounter'] as int? ?? 0;
 
     return Modele(
       id: id,
@@ -32,6 +37,7 @@ class Modele {
       genreHabit: genreHabit,
       idTailleur: idTailleur,
       idCategorie: idCategorie,
+      likeCounter: likeCounter,
     );
   }
 

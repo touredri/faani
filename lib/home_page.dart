@@ -1,7 +1,7 @@
 import 'package:faani/src/widgets.dart';
 import 'package:flutter/material.dart';
 
-import 'src/home_item_list.dart';
+// import 'src/home_item_list.dart';
 import 'src/test.dart';
 
 class HomePage extends StatefulWidget {
@@ -128,8 +128,6 @@ class _nameState extends State<HomePage> {
               ),
             )
           ]),
-          // HomeItemList(),
-          // Expanded(child: TikTokScrollEffect())
           const HomePAgeView()
         ],
       ),
