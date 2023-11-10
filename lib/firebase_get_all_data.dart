@@ -2,19 +2,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'modele/modele.dart';
 
-Future<List<Modele>> getAllModeles() async {
+Stream<List<Modele>> getAllModeles() {
   final firestore = FirebaseFirestore.instance;
   final collection = firestore.collection('modele');
-  final querySnapshot = await collection.get();
 
-  final modeles = <Modele>[];
+  return collection.snapshots().map((querySnapshot) {
+    return querySnapshot.docs.map((doc) {
+      return Modele.fromMap(doc.data(), doc.reference);
+    }).toList();
+  });
+}
 
-  for (final doc in querySnapshot.docs) {
-    print("suis dedans");
-    print(doc.data());
-    final modele = Modele.fromMap(doc.data(), doc.reference);
-    modeles.add(modele);
+class CategoryService {
+  static Future<Map<String, String>> fetchCategories() async {
+    final categoriesData = <String, String>{};
+    final snapshot =
+        await FirebaseFirestore.instance.collection('categorie').get();
+
+    for (var doc in snapshot.docs) {
+      final categoryId = doc.id;
+      final libelle = doc.get('libelle') as String;
+      categoriesData[categoryId] = libelle;
+    }
+    return categoriesData;
   }
-
-  return modeles;
 }

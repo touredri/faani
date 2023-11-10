@@ -40,9 +40,9 @@ class Commande {
   void changeDateRecuperation() {}
 }
 
-class Modele {
+// class Modele {
   
-}
+// }
 
 class Mesure {
   

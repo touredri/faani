@@ -4,30 +4,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Favorie {
   late final String? id;
   final String? idModele;
-  final String? idUser;
+  final String? idUtilisateur;
 
   Favorie({
     required this.id,
     required this.idModele,
-    required this.idUser,
+    required this.idUtilisateur,
   });
 
   factory Favorie.fromMap(Map<String, dynamic> data, DocumentReference documentReference) {
     final id = documentReference.id;
     final idModele = data['idModele'] as String;
-    final idUser = data['idUser'] as String;
+    final idUtilisateur = data['idUtilisateur'] as String;
 
     return Favorie(
       id: id,
       idModele: idModele,
-      idUser: idUser,
+      idUtilisateur: idUtilisateur,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'idModele': idModele,
-      'idUser': idUser,
+      'idUser': idUtilisateur,
     };
   }
 

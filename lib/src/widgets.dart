@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/src/tailleur_modeles.dart';
 import 'package:flutter/material.dart';
+import '../home_page.dart';
 import '../modele/modele.dart';
 import '../my_theme.dart';
 
@@ -69,7 +71,7 @@ class _MyDropdownButtonState extends State<MyDropdownButton> {
           icon: const Icon(Icons.keyboard_arrow_down),
           iconSize: 24,
           elevation: 16,
-          style: const TextStyle(color: Colors.deepPurple),
+          style: const TextStyle(color: primaryColor),
           onChanged: widget.onChanged,
         ),
       ),
@@ -271,11 +273,6 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
     });
   }
 
-  // void dispose() {
-  //   streamController.close();
-  //   super.dispose();
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -302,7 +299,8 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
   void deleteFavorie() async {
     final querySnapshot = await firestore
         .collection('favorie')
-        .where('idModele', isEqualTo: widget.docId).where('idUtilisateur', isEqualTo: 'idUtilisateur')
+        .where('idModele', isEqualTo: widget.docId)
+        .where('idUtilisateur', isEqualTo: 'idUtilisateur')
         .get();
 
     for (var doc in querySnapshot.docs) {
@@ -347,4 +345,39 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
       ],
     );
   }
+}
+
+void showSuccessDialog(BuildContext context, String text) {
+  showGeneralDialog(
+    context: context,
+    pageBuilder: (BuildContext buildContext, Animation<double> animation,
+        Animation<double> secondaryAnimation) {
+      return AlertDialog(
+        title: const Text('Parfait!'),
+        content: Text(text.toString()),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (BuildContext context) => const TailleurModeles()),
+                (Route<dynamic> route) => route.isFirst,
+              );
+            },
+          ),
+        ],
+      );
+    },
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black45,
+    transitionDuration: const Duration(milliseconds: 500),
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: animation,
+        child: child,
+      );
+    },
+  );
 }

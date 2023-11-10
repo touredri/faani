@@ -1,14 +1,18 @@
 import 'package:faani/sign_in.dart';
 import 'package:faani/sign_up.dart';
+import 'package:faani/src/ajout_modele.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
+import 'commande_page.dart';
+import 'favorie_page.dart';
 import 'firebase_options.dart';
 
 import 'home_page.dart';
 import 'my_theme.dart';
+import 'profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,12 +91,13 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-        controller: _pageController, // Utilise le contrôleur de la page
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
         children: const <Widget>[
           HomePage(), // Page d'accueil
-          //   MessagesPage(), // Page de messages
-          // FavorisPage(), // Page de favoris
-          //  ProfilePage(), // Page de profil
+          CommandePage(), // Page de commande
+          FavoriesPage(), // Page de favories
+          ProfilePage(), // Page de profile
         ],
         onPageChanged: (index) {
           _onItemTapped(
@@ -107,36 +112,44 @@ class _HomeState extends State<Home> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home, color: Color(0xFF898888)),
             label: 'Accueil',
+            activeIcon: Icon(Icons.home, color: primaryColor),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat, color: Color(0xFF898888)),
-            label: 'Messages',
+            icon: Icon(Icons.shopping_cart, color: Color(0xFF898888)),
+            label: 'Commandes',
+            activeIcon: Icon(Icons.shopping_cart, color: primaryColor),
           ),
+          // BottomNavigationBarItem(
+          //     icon: SizedBox(width: 24, height: 24), label: ''),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite, color: Color(0xFF898888)),
             label: 'Favoris',
+            activeIcon: Icon(Icons.favorite, color: primaryColor),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person, color: Color(0xFF898888)),
             label: 'Profile',
+            activeIcon: Icon(Icons.person, color: primaryColor),
           ),
         ],
         currentIndex: _selectedIndex, // Index de l'élément sélectionné
         selectedItemColor:
-            Colors.amber[800], // Couleur de l'élément sélectionné
+            Colors.amber[800],
         onTap:
-            _onItemTapped, // Appelé lorsque l'utilisateur appuie sur un élément de la barre de navigation
+            _onItemTapped,
       ),
       floatingActionButton: isTailleur
           ? FloatingActionButton(
               onPressed: () {
-                // Action à effectuer lorsque l'utilisateur appuie sur le bouton d'ajout
-                // show();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AjoutModele()),
+                );
               },
-              backgroundColor: primaryColor, // Couleur de fond du bouton
+              backgroundColor: primaryColor,
               child: const Icon(
                 Icons.add,
-                color: Colors.white, // Couleur de l'icône du bouton
+                color: Colors.white,
               ),
             )
           : SizedBox.shrink(),

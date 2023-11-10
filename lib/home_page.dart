@@ -2,6 +2,8 @@ import 'package:faani/src/widgets.dart';
 import 'package:flutter/material.dart';
 
 // import 'src/home_item_list.dart';
+import 'firebase_get_all_data.dart';
+import 'modele/modele.dart';
 import 'src/test.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,11 +16,48 @@ class HomePage extends StatefulWidget {
 class _nameState extends State<HomePage> {
   bool isHommeSelected = true;
   bool isFemmeSelected = false;
-  String currentFilterSelected = 'Bazin';
+  String currentFilterSelected = 'Tous';
+  Map<String, String> categorieList = {};
+  List<Modele> modeles = [];
+
+  String getKeyFromValue(Map<String, String> map, String value) {
+    return map.keys.firstWhere((key) => map[key] == value, orElse: () => '');
+  }
 
   void changeFilter(String newFilter) {
     setState(() {
       currentFilterSelected = newFilter;
+      getAllModeles().listen((event) {
+        setState(() {
+          modeles = event.where((modele) {
+            if (currentFilterSelected == 'Tous') {
+              return true;
+            } else {
+              print(getKeyFromValue(categorieList, currentFilterSelected));
+              return modele.idCategorie ==
+                  getKeyFromValue(categorieList, currentFilterSelected);
+            }
+          }).toList();
+        });
+      });
+    });
+  }
+
+  void fetchCategories() async {
+    final data = await CategoryService.fetchCategories();
+    setState(() {
+      categorieList = data;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCategories();
+    getAllModeles().listen((event) {
+      setState(() {
+        modeles = event;
+      });
     });
   }
 
@@ -114,21 +153,18 @@ class _nameState extends State<HomePage> {
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
                 children: [
-                  myFilterContainer('Bazin', () => changeFilter('Bazin'),
+                  myFilterContainer('Tous', () => changeFilter('Tous'),
                       currentFilterSelected),
-                  myFilterContainer('Tissu', () => changeFilter('Tissu'),
-                      currentFilterSelected),
-                  myFilterContainer(
-                      'Wax', () => changeFilter('Wax'), currentFilterSelected),
-                  myFilterContainer('Satin', () => changeFilter('Satin'),
-                      currentFilterSelected),
-                  myFilterContainer('Soie', () => changeFilter('Soie'),
-                      currentFilterSelected),
+                  for (var categorie in categorieList.values)
+                    myFilterContainer(categorie, () => changeFilter(categorie),
+                        currentFilterSelected),
                 ],
               ),
             )
           ]),
-          const HomePAgeView()
+          HomePAgeView(
+            modeles: modeles,
+          ),
         ],
       ),
     );

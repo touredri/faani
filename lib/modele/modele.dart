@@ -3,13 +3,13 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Modele {
-  late final String? id;
+  String? id;
   final String? detail;
   final List<String?> fichier;
   final String genreHabit;
   final String idTailleur;
   final String? idCategorie;
-  final int? likeCounter;
+  final bool? isPublic;
 
   Modele({
     required this.id,
@@ -18,17 +18,18 @@ class Modele {
     required this.genreHabit,
     required this.idTailleur,
     required this.idCategorie,
-    required this.likeCounter,
+    this.isPublic,
   });
 
-  factory Modele.fromMap(Map<String, dynamic> data, DocumentReference documentReference) {
+  factory Modele.fromMap(
+      Map<String, dynamic> data, DocumentReference documentReference) {
     final id = documentReference.id;
     final detail = data['detail'] as String;
-    final fichier = List<String>.from(data['fichier'] as List) ;
+    final fichier = List<String>.from(data['fichier'] as List);
     final genreHabit = data['genreHabit'] as String;
     final idTailleur = data['idTailleur'] as String;
     final idCategorie = data['idCategorie'] as String;
-    final likeCounter = data['likeCounter'] as int? ?? 0;
+    final isPublic = data['isPublic'] as bool? ?? false;
 
     return Modele(
       id: id,
@@ -37,7 +38,7 @@ class Modele {
       genreHabit: genreHabit,
       idTailleur: idTailleur,
       idCategorie: idCategorie,
-      likeCounter: likeCounter,
+      isPublic: isPublic,
     );
   }
 
@@ -47,8 +48,11 @@ class Modele {
       'fichier': fichier,
       'genreHabit': genreHabit,
       'idTailleur': idTailleur,
+      'idCategorie': idCategorie,
+      'isPublic': isPublic,
     };
   }
+
   final firestore = FirebaseFirestore.instance;
 
   // Crée un nouveau document dans la collection "modele"
@@ -56,6 +60,7 @@ class Modele {
     final collection = firestore.collection('modele');
     final docRef = await collection.add(toMap());
     id = docRef.id;
+    print('succes');
   }
 
   // Met à jour le document dans la collection "modele"
