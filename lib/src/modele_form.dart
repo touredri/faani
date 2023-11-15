@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:faani/src/tailleur_modeles.dart';
 import 'package:faani/src/widgets.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -32,8 +33,8 @@ class _ModeleFormState extends State<ModeleForm> {
     fetchCategories();
   }
 
-  Future<List<String>> uploadImages(List<File> image) async {
-    List<String> downloadUrls = [];
+  Future<List<Map<String, String>>> uploadImages(List<File> image) async {
+    List<Map<String, String>> imageInfo = [];
     for (var image in image) {
       final ref = FirebaseStorage.instance
           .ref()
@@ -41,23 +42,27 @@ class _ModeleFormState extends State<ModeleForm> {
           .child(image.path.split('/').last);
       await ref.putFile(image);
       final url = await ref.getDownloadURL();
-      downloadUrls.add(url);
+      imageInfo.add({
+        'downloadUrl': url,
+        'path': ref.fullPath,
+      });
     }
-    return downloadUrls;
+    return imageInfo;
   }
 
   void createModel() async {
     List<File> imageFiles = widget._images.map((e) => File(e.path)).toList();
-    List<String> downloadUrls = await uploadImages(imageFiles);
+    List<Map<String, String>> imageInfo = await uploadImages(imageFiles);
     final Modele modele = Modele(
         id: '',
         detail: _detailController.text,
-        fichier: downloadUrls,
+        fichier: imageInfo.map((info) => info['downloadUrl']).toList(),
+        imagePath: imageInfo.map((info) => info['path']).toList(),
         genreHabit: _selectedGender ?? '',
-        idTailleur: 'test id tailleur',
-        idCategorie: selectedCategoryId);
+        idTailleur: 'test id tailleur',// YclYUCHrpriv4RbAfMLu/ 30Y6Kdx7dZPPoFgsdGoY
+        idCategorie: selectedCategoryId,
+        isPublic: _isPublic);
     modele.create();
-        isPublic: _isPublic;
   }
 
   void fetchCategories() async {
@@ -71,8 +76,14 @@ class _ModeleFormState extends State<ModeleForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         centerTitle: true,
-        toolbarHeight: 80,
+        toolbarHeight: 50,
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
@@ -206,17 +217,11 @@ class _ModeleFormState extends State<ModeleForm> {
                     ),
                   ),
                 ),
-                // const TextField(
-                //   decoration: InputDecoration(
-                //     labelText: 'Nom du modèle',
-                //     border: OutlineInputBorder(),
-                //   ),
-                // ),
                 SwitchListTile(
                   activeColor: primaryColor,
                   title: const Text(
-                    'Public ?',
-                    style: TextStyle(fontSize: 17),
+                    'Public',
+                    style: TextStyle(fontSize: 10),
                   ),
                   value: _isPublic,
                   onChanged: (bool value) {
@@ -238,8 +243,8 @@ class _ModeleFormState extends State<ModeleForm> {
                 ),
                 onPressed: () {
                   createModel();
-                  // Navigator.pop(context);
-                  showSuccessDialog(context, 'Modèle ajouté avec succès');
+                  showSuccessDialog(context, 'Modèle ajouté avec succès',
+                      const TailleurModeles());
                 },
                 child: Text(
                   _isPublic ? '   Publier    ' : 'Enregistrer',

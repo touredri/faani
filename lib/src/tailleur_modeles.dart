@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/firebase_get_all_data.dart';
+import 'package:faani/src/detail_modele.dart';
 import 'package:flutter/material.dart';
 
 import '../modele/modele.dart';
+import '../my_theme.dart';
 
 class TailleurModeles extends StatefulWidget {
   const TailleurModeles({super.key});
@@ -28,13 +31,24 @@ class _TailleurModelesState extends State<TailleurModeles> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mes modeles'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          'Mes modèles',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        backgroundColor: primaryColor,
+        toolbarHeight: 40,
       ),
       body: GridView.builder(
         itemCount: modeles.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount:
-              2,
+          crossAxisCount: 2,
           childAspectRatio: MediaQuery.of(context).size.width /
               (MediaQuery.of(context).size.height / 1.2),
         ),
@@ -42,9 +56,19 @@ class _TailleurModelesState extends State<TailleurModeles> {
           final modele = modeles[index];
           return Card(
             clipBehavior: Clip.antiAlias,
-            child: Image.network(
-              modele.fichier[0]!,
-              fit: BoxFit.cover,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        DetailModele(modele: modele)));
+              },
+              child: CachedNetworkImage(
+                imageUrl: modele.fichier[0]!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Center(
+                  child: Image.asset('assets/images/loading.gif'),
+                ),
+              ),
             ),
           );
         },

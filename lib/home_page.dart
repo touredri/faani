@@ -1,3 +1,4 @@
+import 'package:faani/src/explore.dart';
 import 'package:faani/src/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +34,6 @@ class _nameState extends State<HomePage> {
             if (currentFilterSelected == 'Tous') {
               return true;
             } else {
-              print(getKeyFromValue(categorieList, currentFilterSelected));
               return modele.idCategorie ==
                   getKeyFromValue(categorieList, currentFilterSelected);
             }
@@ -130,7 +130,8 @@ class _nameState extends State<HomePage> {
               margin: const EdgeInsets.only(left: 5),
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/search');
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => const ExplorePage()));
                 },
                 icon: const Icon(Icons.explore_rounded, size: 20),
                 label: const Text('Explore'),

@@ -1,4 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/modele/commande.dart';
+import 'package:faani/src/detail_commande.dart';
+import 'package:faani/src/new_commande.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import 'firebase_get_all_data.dart';
+import 'my_theme.dart';
 
 class CommandePage extends StatefulWidget {
   const CommandePage({super.key});
@@ -8,10 +16,194 @@ class CommandePage extends StatefulWidget {
 }
 
 class _CommandePageState extends State<CommandePage> {
+  final TextEditingController _filter = TextEditingController();
+  String _searchText = "";
+  // List<CommandeAnonyme> commande = [];
+  @override
+  void initState() {
+    super.initState();
+    _filter.addListener(() => setState(() {}));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: const Center(child: Text('Commande')),
+    return Scaffold(
+      appBar: AppBar(
+          title: PreferredSize(
+            preferredSize: const Size.fromHeight(40),
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              child: const Text(
+                'Commandes',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          backgroundColor: primaryColor,
+          toolbarHeight: 50,
+          centerTitle: true,
+          titleTextStyle: const TextStyle(
+            fontSize: 22,
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          )),
+      body: Container(
+        color: Color.fromARGB(255, 250, 248, 248),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextField(
+                controller: _filter,
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.all(10),
+                  floatingLabelStyle: TextStyle(
+                    color: Colors.black,
+                  ),
+                  labelText: 'Chercher par nom',
+                  prefixIcon: Icon(Icons.search, color: primaryColor),
+                  fillColor: inputBackgroundColor,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    borderSide: BorderSide(
+                      color: inputBorderColor,
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    borderSide: BorderSide(
+                      color: inputBorderColor,
+                      width: 1,
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    borderSide: BorderSide(
+                      color: inputBorderColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: StreamBuilder(
+                  stream: getAllCommandeAnnonyme('YclYUCHrpriv4RbAfMLu'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<CommandeAnonyme> commande =
+                          snapshot.data as List<CommandeAnonyme>;
+                      if (_filter.text.isNotEmpty) {
+                        commande = commande
+                            .where((element) => element.nomClient!
+                                .toLowerCase()
+                                .contains(_filter.text.toLowerCase()))
+                            .toList();
+                      }
+                      return ListView.builder(
+                          itemCount: commande.length,
+                          itemBuilder: (context, index) {
+                            final currentCommande = commande[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        DetailCommande(
+                                          commande: currentCommande,
+                                        )));
+                              },
+                              child: Container(
+                                // color: Colors.white,
+                                padding: const EdgeInsets.all(10),
+                                height: 140,
+                                child: Card(
+                                  color: Colors.white,
+                                  child: Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: SizedBox(
+                                          width: 120,
+                                          height: 180,
+                                          child: CachedNetworkImage(
+                                            fit: BoxFit.fill,
+                                            imageUrl:
+                                                currentCommande.image ?? "",
+                                            placeholder: (context, url) =>
+                                                Placeholder(),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Placeholder(),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(currentCommande
+                                                      .nomClient!),
+                                                  TextButton(
+                                                    onPressed: () {},
+                                                    child:
+                                                        const Text('Annuler'),
+                                                  ),
+                                                ],
+                                              ),
+                                              Text(DateFormat('dd-MM-yyyy')
+                                                  .format(currentCommande
+                                                      .dateCommande!)
+                                                  .toString()),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        child: Text('En cours'),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          });
+                    }
+                  }),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => const NouvelleCommande(),
+            settings: RouteSettings(name: 'CommandePage'),
+          ));
+        },
+        backgroundColor: Colors.grey,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }

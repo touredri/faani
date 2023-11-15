@@ -48,31 +48,32 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0; // Index de l'onglet sélectionné
-  PageController _pageController = PageController(); // Contrôleur de la page
+
   bool isTailleur = false;
-  @override
-  void dispose() {
-    _pageController
-        .dispose(); // Libère le contrôleur de la page lorsque le widget est supprimé
-    super.dispose();
-  }
 
   @override
   void initState() {
-    super.initState();
     show();
+    _pages = [
+      const HomePage(), // Page d'accueil
+      const CommandePage(), // Page de commande
+      const AjoutModele(), // Page ajout
+      const FavoriesPage(), // Page de favories
+      const ProfilePage(), // Page de profile
+    ];
+    super.initState();
   }
 
-  final Map<String, dynamic> user = {
+  final Map<String, dynamic> _user = {
     'name': 'John Doe',
     'email': 'dt@gmail.com',
     'profileImageUrl':
         'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png',
-    'isTailleur': true,
+    'isCertify': true,
   };
 
   void show() {
-    if (user.containsKey('isTailleur')) {
+    if (_user.containsKey('isCertify')) {
       setState(() {
         isTailleur = true;
       });
@@ -82,78 +83,68 @@ class _HomeState extends State<Home> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index; // Met à jour l'index de l'onglet sélectionné
-      _pageController.jumpToPage(
-          index); // Fait glisser le PageView à la page correspondante
     });
   }
+
+  List<Widget> _pages = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        children: const <Widget>[
-          HomePage(), // Page d'accueil
-          CommandePage(), // Page de commande
-          FavoriesPage(), // Page de favories
-          ProfilePage(), // Page de profile
-        ],
-        onPageChanged: (index) {
-          _onItemTapped(
-              index); // Met à jour l'index lorsqu'une nouvelle page est affichée
-        },
-      ),
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        selectedLabelStyle: const TextStyle(height: 0),
+        // landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
+        showSelectedLabels: true,
+        showUnselectedLabels: false,
         type: BottomNavigationBarType
             .fixed, // Affiche tous les éléments en permanence
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           // Définit les éléments de la barre de navigation
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home, color: Color(0xFF898888)),
             label: 'Accueil',
             activeIcon: Icon(Icons.home, color: primaryColor),
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart, color: Color(0xFF898888)),
-            label: 'Commandes',
+            label: 'Achats',
             activeIcon: Icon(Icons.shopping_cart, color: primaryColor),
           ),
-          // BottomNavigationBarItem(
-          //     icon: SizedBox(width: 24, height: 24), label: ''),
           BottomNavigationBarItem(
+            icon: Transform.translate(
+              offset: const Offset(0, -10),
+              child: const Icon(
+                Icons.add_circle_rounded,
+                color: primaryColor,
+                size: 45,
+              ),
+            ),
+            label: 'Modele',
+            activeIcon: Transform.translate(
+              offset: const Offset(0, -10),
+              child: const Icon(
+                Icons.add_circle_rounded,
+                color: primaryColor,
+                size: 45,
+              ),
+            ),
+          ),
+          const BottomNavigationBarItem(
             icon: Icon(Icons.favorite, color: Color(0xFF898888)),
             label: 'Favoris',
             activeIcon: Icon(Icons.favorite, color: primaryColor),
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person, color: Color(0xFF898888)),
             label: 'Profile',
             activeIcon: Icon(Icons.person, color: primaryColor),
           ),
         ],
         currentIndex: _selectedIndex, // Index de l'élément sélectionné
-        selectedItemColor:
-            Colors.amber[800],
-        onTap:
-            _onItemTapped,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
       ),
-      floatingActionButton: isTailleur
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AjoutModele()),
-                );
-              },
-              backgroundColor: primaryColor,
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
-              ),
-            )
-          : SizedBox.shrink(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

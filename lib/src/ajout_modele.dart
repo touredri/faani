@@ -19,14 +19,10 @@ class _AjoutModeleState extends State<AjoutModele> {
   void _pickImages() async {
     // Open the image picker
     final ImagePicker picker = ImagePicker();
-    // final XFile? image = await picker.pickImage(
-    //   source: ImageSource.gallery,
-    // );
     final List<XFile> image = await picker.pickMultiImage();
     // Add the selected image to the list
     if (image.isNotEmpty) {
       setState(() {
-        // image.map((e) => _images.add(e));
         _images.addAll(image.take(2));
       });
     }

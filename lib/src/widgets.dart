@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/src/tailleur_modeles.dart';
 import 'package:flutter/material.dart';
@@ -170,9 +170,13 @@ Stack homeItem(Modele modele) {
             child: PageView.builder(
               itemCount: modele.fichier.length,
               itemBuilder: (context, imageIndex) {
-                return Image.network(
-                  modele.fichier[imageIndex]!,
+                return CachedNetworkImage(
+                  imageUrl: modele.fichier[imageIndex]!,
                   fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 );
               },
             ),
@@ -198,7 +202,7 @@ Stack homeItem(Modele modele) {
                 onPressed: () {},
                 icon: const Icon(
                   Icons.shopping_cart_outlined,
-                  color: Colors.white,
+                  color: Colors.grey,
                   size: 30,
                 ),
               ),
@@ -212,18 +216,18 @@ Stack homeItem(Modele modele) {
                     },
                     icon: const Icon(
                       Icons.message_outlined,
-                      color: Colors.white,
+                      color: Colors.grey,
                       size: 30,
                     ),
                   ),
-                  Text('231', style: TextStyle(color: Colors.white)),
+                  const Text('231', style: TextStyle(color: Colors.grey)),
                 ],
               ),
               IconButton(
                 onPressed: () {},
                 icon: const Icon(
                   Icons.more_horiz,
-                  color: Colors.white,
+                  color: Colors.grey,
                   size: 30,
                 ),
               ),
@@ -291,9 +295,9 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
   final firestore = FirebaseFirestore.instance;
   void createFavorie() async {
     final collection = firestore.collection('favorie');
-    final docRef = await collection
+    await collection
         .add({'idModele': widget.docId, 'idUtilisateur': 'idUtilisateur'});
-    print(docRef.id);
+    // print(docRef.id);
   }
 
   void deleteFavorie() async {
@@ -330,7 +334,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
             },
             icon: const Icon(
               Icons.favorite_border_outlined,
-              color: Colors.white,
+              color: Colors.grey,
               size: 30,
             ),
             isSelected: isFavorite,
@@ -341,13 +345,13 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
               color: primaryColor,
               size: 30,
             )),
-        Text(count.toString(), style: const TextStyle(color: Colors.white)),
+        Text(count.toString(), style: const TextStyle(color: Colors.grey)),
       ],
     );
   }
 }
 
-void showSuccessDialog(BuildContext context, String text) {
+void showSuccessDialog(BuildContext context, String text, Widget page) {
   showGeneralDialog(
     context: context,
     pageBuilder: (BuildContext buildContext, Animation<double> animation,
@@ -360,8 +364,7 @@ void showSuccessDialog(BuildContext context, String text) {
             child: const Text('OK'),
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (BuildContext context) => const TailleurModeles()),
+                MaterialPageRoute(builder: (BuildContext context) => page),
                 (Route<dynamic> route) => route.isFirst,
               );
             },
@@ -378,6 +381,18 @@ void showSuccessDialog(BuildContext context, String text) {
         opacity: animation,
         child: child,
       );
+    },
+  );
+}
+
+Widget BackButton(BuildContext context) {
+  return IconButton(
+    icon: const Icon(
+      Icons.arrow_back_ios,
+      color: Colors.white,
+    ),
+    onPressed: () {
+      Navigator.pop(context);
     },
   );
 }

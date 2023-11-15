@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/src/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -14,16 +11,10 @@ class HomePAgeView extends StatefulWidget {
 }
 
 class _HomePAgeViewState extends State<HomePAgeView> {
-  // List<Modele> modeles = [];
 
   @override
   void initState() {
     super.initState();
-    // getAllModeles().listen((event) {
-    //   setState(() {
-    //     modeles = event;
-    //   });
-    // });
   }
 
   @override
