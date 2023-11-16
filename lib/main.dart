@@ -1,5 +1,6 @@
 import 'package:faani/sign_in.dart';
 import 'package:faani/sign_up.dart';
+import 'package:faani/src/ajout_mesure.dart';
 import 'package:faani/src/ajout_modele.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,8 @@ class _HomeState extends State<Home> {
     _pages = [
       const HomePage(), // Page d'accueil
       const CommandePage(), // Page de commande
-      const AjoutModele(), // Page ajout
+      // const AjoutModele(), // Page ajout
+      const AjoutMesure(),
       const FavoriesPage(), // Page de favories
       const ProfilePage(), // Page de profile
     ];

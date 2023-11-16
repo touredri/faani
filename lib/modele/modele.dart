@@ -1,4 +1,4 @@
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -21,7 +21,7 @@ class Modele {
     required this.genreHabit,
     required this.idTailleur,
     required this.idCategorie,
-    this.isPublic,
+    required this.isPublic,
   });
 
   factory Modele.fromMap(

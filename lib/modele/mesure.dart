@@ -1,13 +1,17 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Measure {
-  final int? bras;
-  final int? epaule;
-  final int? hanche;
-  final String? idUser;
-  final int? longueur;
-  final int? poitrine;
-  final String? nom;
+  int? bras;
+  int? epaule;
+  int? hanche;
+  String? idUser;
+  int? longueur;
+  int? poitrine;
+  String? nom;
+  String? id;
+  int? taille;
+  int? ventre;
+  int? poignet;
 
   Measure({
     required this.bras,
@@ -17,6 +21,10 @@ class Measure {
     required this.longueur,
     required this.poitrine,
     required this.nom,
+    required this.id,
+    required this.taille,
+    required this.ventre,
+    required this.poignet,
   });
 
   Map<String, dynamic> toMap() {
@@ -31,7 +39,8 @@ class Measure {
     };
   }
 
-  factory Measure.fromMap(Map<String, dynamic> map) {
+  factory Measure.fromMap(
+      Map<String, dynamic> map, DocumentReference reference) {
     return Measure(
       bras: map['bras'],
       epaule: map['epaule'],
@@ -40,7 +49,18 @@ class Measure {
       longueur: map['longueur'],
       poitrine: map['poitrine'],
       nom: map['nom'],
+      id: reference.id,
+      taille: map['taille'],
+      ventre: map['ventre'],
+      poignet: map['poignet'],
     );
   }
-}
 
+  final firestore = FirebaseFirestore.instance;
+
+  Future<void> create() async {
+    final collection = firestore.collection('mesure');
+    final docRef = await collection.add(toMap());
+    id = docRef.id;
+  }
+}

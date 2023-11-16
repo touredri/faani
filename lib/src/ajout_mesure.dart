@@ -3,7 +3,10 @@ import 'dart:math';
 import 'package:faani/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
+import '../app_state.dart';
+import '../modele/mesure.dart';
 import '../my_theme.dart';
 // import '../my_theme.dart';
 
@@ -121,13 +124,56 @@ class MesurePaveView extends StatefulWidget {
 
 class _MesurePaveViewState extends State<MesurePaveView> {
   final PageController _pageController = PageController(initialPage: 0);
-  TextEditingController _epauleController = TextEditingController();
-  TextEditingController _coudController = TextEditingController();
-  TextEditingController _poitrineController = TextEditingController();
-  TextEditingController _longeurController = TextEditingController();
-  TextEditingController _hancheController = TextEditingController();
-  TextEditingController _brasController = TextEditingController();
-  int _currentValue = 0;
+  final TextEditingController _epauleController = TextEditingController();
+  final TextEditingController _ventreController = TextEditingController();
+  final TextEditingController _poitrineController = TextEditingController();
+  final TextEditingController _longeurController = TextEditingController();
+  final TextEditingController _hancheController = TextEditingController();
+  final TextEditingController _brasController = TextEditingController();
+  final TextEditingController _tailleController = TextEditingController();
+  final TextEditingController _poignetController = TextEditingController();
+
+  void onChnageEpaule(String value) {
+    _epauleController.text = value;
+    setState(() {});
+  }
+
+  void onChangeVentre(String value) {
+    _ventreController.text = value;
+    setState(() {});
+  }
+
+  void onChangePoitrine(String value) {
+    _poitrineController.text = value;
+    setState(() {});
+  }
+
+  void onChangeLongueur(String value) {
+    _longeurController.text = value;
+    setState(() {});
+  }
+
+  void onChangeHanche(String value) {
+    _hancheController.text = value;
+    setState(() {});
+    print('hanche: $value');
+  }
+
+  void onChangeBras(String value) {
+    _brasController.text = value;
+    setState(() {});
+    print('bras: $value');
+  }
+
+  void onChangeTaille(String value) {
+    _tailleController.text = value;
+    setState(() {});
+  }
+
+  void onChangePoignet(String value) {
+    _poignetController.text = value;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -158,771 +204,123 @@ class _MesurePaveViewState extends State<MesurePaveView> {
       ),
       body: Container(
         color: const Color.fromARGB(255, 240, 236, 236),
-        child: Container(
-          child: PageView(
-            controller: _pageController,
+        child: SingleChildScrollView(
+          child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
-                child: Column(children: [
-                  const Text('1/6',
-                      style: TextStyle(fontSize: 20, color: primaryColor)),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset('assets/images/epaules.jpg')),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 58.0),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'Epaules',
-                          style: TextStyle(
-                            fontSize: 17,
-                          ),
-                        ),
-                        Spacer(),
-                        Container(
-                          width: 100,
-                          height: 40,
-                          child: TextField(
-                            controller: _epauleController,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ], // Allow only digits
-                            onChanged: (value) {
-                              _currentValue = int.tryParse(value) ?? 0;
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                                // )),
-                              )),
-                              suffixIcon: SizedBox(
-                                height: 24,
-                                width: 50,
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue++;
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child: const Icon(Icons.arrow_drop_up),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue =
-                                                max(0, _currentValue - 1);
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child:
-                                            const Icon(Icons.arrow_drop_down),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const Text('Cm'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 200,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: inputBorderColor, width: 1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                        ),
-                        child: const Text(
-                          'Continuer',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ))
-                ]),
+                height: MediaQuery.of(context).size.height * 0.8,
+                child: PageView(
+                  onPageChanged: (index) {
+                    if (index == 7) {
+                      Provider.of<ApplicationState>(context, listen: false)
+                          .lastPage = true;
+                    } else {
+                      Provider.of<ApplicationState>(context, listen: false)
+                          .lastPage = false;
+                    }
+                  },
+                  scrollBehavior: const ScrollBehavior(),
+                  controller: _pageController,
+                  children: [
+                    PageViewContent(
+                        text: 'Epaule',
+                        count: '1/8',
+                        imagePath: 'assets/images/epaules.jpg',
+                        controller: _epauleController,
+                        onChanged: onChnageEpaule),
+                    PageViewContent(
+                        text: 'Bras',
+                        count: '2/8',
+                        imagePath: 'assets/images/bras.jpg',
+                        controller: _brasController,
+                        onChanged: onChangeBras),
+                    PageViewContent(
+                        text: 'Hanche',
+                        count: '3/8',
+                        imagePath: 'assets/images/hanche.jpg',
+                        controller: _hancheController,
+                        onChanged: onChangeHanche),
+                    PageViewContent(
+                        text: 'Poitrine',
+                        count: '4/8',
+                        imagePath: 'assets/images/poitrine.jpg',
+                        controller: _poitrineController,
+                        onChanged: onChangePoitrine),
+                    PageViewContent(
+                        text: 'Taille',
+                        count: '5/8',
+                        imagePath: 'assets/images/taille.jpg',
+                        controller: _tailleController,
+                        onChanged: onChangeTaille),
+                    PageViewContent(
+                        text: 'Ventre',
+                        count: '6/8',
+                        imagePath: 'assets/images/ventre.jpg',
+                        controller: _ventreController,
+                        onChanged: onChangeVentre),
+                    PageViewContent(
+                        text: 'Longueur',
+                        count: '7/8',
+                        imagePath: 'assets/images/longueur.jpg',
+                        controller: _longeurController,
+                        onChanged: onChangeLongueur),
+                    PageViewContent(
+                        text: 'Poignet',
+                        count: '8/8',
+                        imagePath: 'assets/images/poignet.jpg',
+                        controller: _poignetController,
+                        onChanged: onChangePoignet),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 30,
               ),
               Container(
-                padding: const EdgeInsets.all(10),
-                child: Column(children: [
-                  const Text('2/6',
-                      style: TextStyle(fontSize: 20, color: primaryColor)),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset('assets/images/epaules.jpg')),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 58.0),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'Poitrine',
-                          style: TextStyle(
-                            fontSize: 17,
-                          ),
-                        ),
-                        Spacer(),
-                        Container(
-                          width: 100,
-                          height: 40,
-                          child: TextField(
-                            controller: _poitrineController,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ], // Allow only digits
-                            onChanged: (value) {
-                              _currentValue = int.tryParse(value) ?? 0;
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                                // )),
-                              )),
-                              suffixIcon: SizedBox(
-                                height: 24,
-                                width: 50,
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue++;
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child: const Icon(Icons.arrow_drop_up),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue =
-                                                max(0, _currentValue - 1);
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child:
-                                            const Icon(Icons.arrow_drop_down),
-                                      ),
-                                    ),
-                                  ],
+                alignment: Alignment.bottomCenter,
+                child: TextButton(
+                    onPressed: () {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                      Provider.of<ApplicationState>(context, listen: false)
+                          .reset();
+                    },
+                    child: Container(
+                      height: 40,
+                      width: 200,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: inputBorderColor, width: 1),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: context.watch<ApplicationState>().isLastPage
+                          ? TextButton(
+                              onPressed: () {
+                                
+                              },
+                              child: const Text(
+                                'Enregistrer',
+                                // textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: primaryColor,
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        const Text('Cm'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 200,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: inputBorderColor, width: 1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                        ),
-                        child: const Text(
-                          'Continuer',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ))
-                ]),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Column(children: [
-                  const Text('3/6',
-                      style: TextStyle(fontSize: 20, color: primaryColor)),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset('assets/images/epaules.jpg')),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 58.0),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'Coude',
-                          style: TextStyle(
-                            fontSize: 17,
-                          ),
-                        ),
-                        Spacer(),
-                        Container(
-                          width: 100,
-                          height: 40,
-                          child: TextField(
-                            controller: _coudController,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ], // Allow only digits
-                            onChanged: (value) {
-                              _currentValue = int.tryParse(value) ?? 0;
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                                // )),
-                              )),
-                              suffixIcon: SizedBox(
-                                height: 24,
-                                width: 50,
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue++;
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child: const Icon(Icons.arrow_drop_up),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue =
-                                                max(0, _currentValue - 1);
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child:
-                                            const Icon(Icons.arrow_drop_down),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                            )
+                          : const Text(
+                              'Continuer',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: primaryColor,
                               ),
                             ),
-                          ),
-                        ),
-                        const Text('Cm'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 200,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: inputBorderColor, width: 1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                        ),
-                        child: const Text(
-                          'Continuer',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ))
-                ]),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Column(children: [
-                  const Text('4/6',
-                      style: TextStyle(fontSize: 20, color: primaryColor)),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset('assets/images/epaules.jpg')),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 58.0),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'Longueur',
-                          style: TextStyle(
-                            fontSize: 17,
-                          ),
-                        ),
-                        Spacer(),
-                        Container(
-                          width: 100,
-                          height: 40,
-                          child: TextField(
-                            controller: _longeurController,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ], // Allow only digits
-                            onChanged: (value) {
-                              _currentValue = int.tryParse(value) ?? 0;
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                                // )),
-                              )),
-                              suffixIcon: SizedBox(
-                                height: 24,
-                                width: 50,
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue++;
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child: const Icon(Icons.arrow_drop_up),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue =
-                                                max(0, _currentValue - 1);
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child:
-                                            const Icon(Icons.arrow_drop_down),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const Text('Cm'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 200,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: inputBorderColor, width: 1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                        ),
-                        child: const Text(
-                          'Continuer',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ))
-                ]),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Column(children: [
-                  const Text('5/6',
-                      style: TextStyle(fontSize: 20, color: primaryColor)),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset('assets/images/epaules.jpg')),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 58.0),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'Hanche',
-                          style: TextStyle(
-                            fontSize: 17,
-                          ),
-                        ),
-                        Spacer(),
-                        Container(
-                          width: 100,
-                          height: 40,
-                          child: TextField(
-                            controller: _hancheController,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ], // Allow only digits
-                            onChanged: (value) {
-                              _currentValue = int.tryParse(value) ?? 0;
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                                // )),
-                              )),
-                              suffixIcon: SizedBox(
-                                height: 24,
-                                width: 50,
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue++;
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child: const Icon(Icons.arrow_drop_up),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue =
-                                                max(0, _currentValue - 1);
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child:
-                                            const Icon(Icons.arrow_drop_down),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const Text('Cm'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 200,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: inputBorderColor, width: 1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                        ),
-                        child: const Text(
-                          'Continuer',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ))
-                ]),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Column(children: [
-                  const Text('6/6',
-                      style: TextStyle(fontSize: 20, color: primaryColor)),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset('assets/images/epaules.jpg')),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 58.0),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'Bras',
-                          style: TextStyle(
-                            fontSize: 17,
-                          ),
-                        ),
-                        Spacer(),
-                        Container(
-                          width: 100,
-                          height: 40,
-                          child: TextField(
-                            controller: _brasController,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ], // Allow only digits
-                            onChanged: (value) {
-                              _currentValue = int.tryParse(value) ?? 0;
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: inputBorderColor,
-                                width: 1,
-                                // )),
-                              )),
-                              suffixIcon: SizedBox(
-                                height: 24,
-                                width: 50,
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue++;
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child: const Icon(Icons.arrow_drop_up),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _currentValue =
-                                                max(0, _currentValue - 1);
-                                            _epauleController.text =
-                                                _currentValue.toString();
-                                          });
-                                        },
-                                        child:
-                                            const Icon(Icons.arrow_drop_down),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const Text('Cm'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 200,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: inputBorderColor, width: 1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                        ),
-                        child: const Text(
-                          'Continuer',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ))
-                ]),
+                    )),
               ),
             ],
           ),
@@ -931,3 +329,126 @@ class _MesurePaveViewState extends State<MesurePaveView> {
     );
   }
 }
+
+class PageViewContent extends StatelessWidget {
+  final String text;
+  final String imagePath;
+  final String count;
+  final TextEditingController controller;
+  final Function onChanged;
+  PageViewContent({
+    required this.text,
+    required this.imagePath,
+    required this.controller,
+    required this.count,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    controller.text = context.watch<ApplicationState>().currentValue.toString();
+    return Container(
+      padding: const EdgeInsets.all(10),
+      child: Column(children: [
+        Text(count, style: const TextStyle(fontSize: 20, color: primaryColor)),
+        const SizedBox(
+          height: 20,
+        ),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.4,
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(imagePath)),
+        ),
+        const SizedBox(
+          height: 40,
+        ),
+        Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            children: [
+              Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 17,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                width: 207,
+                height: 40,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove),
+                      onPressed: () {
+                        Provider.of<ApplicationState>(context, listen: false)
+                            .decrement();
+                      },
+                    ),
+                    Expanded(
+                      // flex: 2,
+                      // child: SizedBox(
+                      // height: 40,
+                      child: TextField(
+                        controller: controller,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        onChanged: (value) {
+                          Provider.of<ApplicationState>(context, listen: false)
+                              .currentValue = int.tryParse(value) ?? 0;
+                          onChanged(value);
+                        },
+                        // maxLength: 3,
+                        style: const TextStyle(
+                          // height: 3,
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                        decoration: InputDecoration(
+                          // counter: const Text(''),
+                          labelText: 'mésure',
+                          labelStyle: const TextStyle(color: Colors.blue),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                                color: inputBorderColor, width: 2),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: primaryColor, width: 2),
+                          ),
+                        ),
+                      ),
+                      // ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        Provider.of<ApplicationState>(context, listen: false)
+                            .increment();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const Text('Cm'),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+
+// Row(
+  
+// )

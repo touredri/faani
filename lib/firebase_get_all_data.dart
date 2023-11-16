@@ -92,7 +92,7 @@ Stream<List<Measure>> getAllTailleurMesure(String idTailleur) {
       .where('idUser', isEqualTo: idTailleur)
       .snapshots()
       .map((querySnapshot) => querySnapshot.docs
-          .map((doc) => Measure.fromMap(doc.data()))
+          .map((doc) => Measure.fromMap(doc.data(), doc.reference))
           .toList());
 }
 
