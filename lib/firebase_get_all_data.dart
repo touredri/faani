@@ -80,16 +80,6 @@ class FirestoreService {
         .map((querySnapshot) =>
             querySnapshot.docs.map((doc) => doc.data()).toList());
   }
-
-  //get all mesure for a user
-  Stream<List<Map<String, dynamic>>> getAllClientMesure(String idClient) {
-    return firestore
-        .collection('mesure')
-        .where('idClient', isEqualTo: idClient)
-        .snapshots()
-        .map((querySnapshot) =>
-            querySnapshot.docs.map((doc) => doc.data()).toList());
-  }
 }
 
 //get all mesure for a user

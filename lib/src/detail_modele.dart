@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:faani/modele/modele.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/src/form_comm_tailleur.dart';
 import 'package:faani/src/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -220,8 +222,31 @@ class DetailModele extends StatelessWidget {
                         Column(
                           children: [
                             IconButton(
-                              onPressed: () {
-                                // Handle the button press
+                              onPressed: () async {
+                                // Download the image
+                                final dio = Dio();
+                                final dir =
+                                    await getApplicationDocumentsDirectory();
+                                var filePath =
+                                    modele.fichier[0]!.split('/').last;
+                                if (!filePath.contains('.')) {
+                                  filePath +=
+                                      '.jpg'; // Add a default extension if there isn't one
+                                }
+                                final path = '${dir.path}/$filePath';
+                                print(
+                                    'Downloading from: ${modele.fichier[0]!}');
+                                print('Saving to: $path');
+                                try {
+                                  await dio.download(modele.fichier[0]!, path);
+                                  print('Download completed');
+                                  // Save the image to the device gallery
+                                  final result =
+                                      await ImageGallerySaver.saveFile(path);
+                                  print('Image saved to gallery: $result');
+                                } catch (e) {
+                                  print('Download failed with error: $e');
+                                }
                               },
                               icon: const Icon(
                                 Icons.download,
