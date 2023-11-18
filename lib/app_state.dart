@@ -1,34 +1,19 @@
-import 'dart:math';
-
+import 'package:faani/modele/mesure.dart';
 import 'package:flutter/material.dart';
 
 class ApplicationState extends ChangeNotifier {
-  int _currentValue = 0;
-  bool isLastPage = false; 
-  int get currentValue => _currentValue;
-
-  set currentValue(int value) {
-    _currentValue = value;
-    notifyListeners();
-  }
+  bool isLastPage = false;
+  Measure? _measure;
 
   set lastPage(bool value) {
     isLastPage = value;
     notifyListeners();
   }
 
-  void increment() {
-    _currentValue++;
-    notifyListeners();
-  }
+  Measure? get measure => _measure;
 
-  void decrement() {
-    _currentValue = max(1, _currentValue - 1);
-    notifyListeners();
-  }
-
-  void reset() {
-    _currentValue = 0;
+  set mesure(Measure? value) {
+    _measure = value;
     notifyListeners();
   }
 }

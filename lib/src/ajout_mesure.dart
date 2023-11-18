@@ -278,49 +278,119 @@ class _MesurePaveViewState extends State<MesurePaveView> {
               ),
               Container(
                 alignment: Alignment.bottomCenter,
-                child: TextButton(
-                    onPressed: () {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                      Provider.of<ApplicationState>(context, listen: false)
-                          .reset();
-                    },
-                    child: Container(
-                      height: 40,
-                      width: 200,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: inputBorderColor, width: 1),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                      ),
-                      child: context.watch<ApplicationState>().isLastPage
-                          ? TextButton(
-                              onPressed: () {
-                                
-                              },
-                              child: const Text(
-                                'Enregistrer',
-                                // textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: primaryColor,
+                child: context.watch<ApplicationState>().isLastPage
+                    ? TextButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              TextEditingController _nameController =
+                                  TextEditingController();
+                              return AlertDialog(
+                                title: Text('Entrer un nom pour la mesure'),
+                                content: TextField(
+                                  controller: _nameController,
+                                  decoration: InputDecoration(hintText: "Name"),
                                 ),
-                              ),
-                            )
-                          : const Text(
-                              'Continuer',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: primaryColor,
-                              ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Soumettre'),
+                                    onPressed: () {
+                                      String name = _nameController.text;
+                                      Measure newMeasure = Measure(
+                                        bras: int.tryParse(
+                                                _brasController.text) ??
+                                            0,
+                                        epaule: int.tryParse(
+                                                _epauleController.text) ??
+                                            0,
+                                        hanche: int.tryParse(
+                                                _hancheController.text) ??
+                                            0,
+                                        idUser: '1',
+                                        longueur: int.tryParse(
+                                                _longeurController.text) ??
+                                            0,
+                                        poitrine: int.tryParse(
+                                                _poitrineController.text) ??
+                                            0,
+                                        nom: name,
+                                        taille: int.tryParse(
+                                                _tailleController.text) ??
+                                            0,
+                                        ventre: int.tryParse(
+                                                _ventreController.text) ??
+                                            0,
+                                        poignet: int.tryParse(
+                                                _poignetController.text) ??
+                                            0,
+                                        id: '',
+                                        date: DateTime.now(),
+                                      );
+                                      newMeasure.create();
+                                      Provider.of<ApplicationState>(context,
+                                              listen: false)
+                                          .lastPage = false;
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: Container(
+                          height: 40,
+                          width: 200,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            border:
+                                Border.all(color: inputBorderColor, width: 1),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: const Text(
+                            'Enregistrer',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: primaryColor,
                             ),
-                    )),
+                          ),
+                        ))
+                    : TextButton(
+                        onPressed: () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                          
+                        },
+                        child: Container(
+                          height: 40,
+                          width: 200,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            border:
+                                Border.all(color: inputBorderColor, width: 1),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: const Text(
+                            'Continuer',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: primaryColor,
+                            ),
+                          ),
+                        )),
               ),
             ],
           ),
@@ -346,7 +416,7 @@ class PageViewContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    controller.text = context.watch<ApplicationState>().currentValue.toString();
+    // controller.text = context.watch<ApplicationState>().currentValue.toString();
     return Container(
       padding: const EdgeInsets.all(10),
       child: Column(children: [
@@ -357,8 +427,11 @@ class PageViewContent extends StatelessWidget {
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.4,
           child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(imagePath)),
+              borderRadius: BorderRadius.circular(15),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+              )),
         ),
         const SizedBox(
           height: 40,
@@ -384,24 +457,24 @@ class PageViewContent extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.remove),
                       onPressed: () {
-                        Provider.of<ApplicationState>(context, listen: false)
-                            .decrement();
+                        int currentValue = int.tryParse(controller.text) ?? 0;
+                        if (currentValue > 0) {
+                          controller.text = (currentValue - 1).toString();
+                        }
                       },
                     ),
                     Expanded(
-                      // flex: 2,
-                      // child: SizedBox(
-                      // height: 40,
                       child: TextField(
+                        autofocus: true,
                         controller: controller,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],
                         onChanged: (value) {
-                          Provider.of<ApplicationState>(context, listen: false)
-                              .currentValue = int.tryParse(value) ?? 0;
-                          onChanged(value);
+                          // Provider.of<ApplicationState>(context, listen: false)
+                          //     .currentValue = int.tryParse(value) ?? 0;
+                          // onChanged(value);
                         },
                         // maxLength: 3,
                         style: const TextStyle(
@@ -432,8 +505,8 @@ class PageViewContent extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.add),
                       onPressed: () {
-                        Provider.of<ApplicationState>(context, listen: false)
-                            .increment();
+                        int currentValue = int.tryParse(controller.text) ?? 0;
+                        controller.text = (currentValue + 1).toString();
                       },
                     ),
                   ],
@@ -447,8 +520,3 @@ class PageViewContent extends StatelessWidget {
     );
   }
 }
-
-
-// Row(
-  
-// )

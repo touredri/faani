@@ -112,4 +112,16 @@ class CommandeAnonyme {
     final docRef = await collection.add(toMap());
     id = docRef.id;
   }
+
+  Future<void> update() async {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('commandeAnomyme');
+    await collection.doc(id).update(toMap());
+  }
+
+  Future<void> delete() async {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('commandeAnomyme');
+    await collection.doc(id).delete();
+  }
 }

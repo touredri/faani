@@ -48,7 +48,6 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
   void fetchMesure() async {
     getAllTailleurMesure('YclYUCHrpriv4RbAfMLu').listen((event) {
       setState(() {
-        print(event);
         mesureData = event;
       });
     });
@@ -181,7 +180,8 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
                         print(value);
                         setState(() {
                           selectedCategoryId =
-                              value ?? ""; // Update the selected category ID
+                              value ?? "";
+                               // Update the selected category ID
                         });
                       },
                     ),

@@ -36,6 +36,14 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: buildTheme(context),
       home: const Home(),
+      // initialRoute: '/',
+      routes: {
+        // '/': (context) =>
+        //     _auth.currentUser != null ? const Home() : const SignInPage(),
+        '/sign_in': (context) => const SignInPage(),
+        '/sign_up': (context) => const SignUp(),
+        // '/commande': (context) => const CommandePage(),
+      },
     );
   }
 }
@@ -58,8 +66,7 @@ class _HomeState extends State<Home> {
     _pages = [
       const HomePage(), // Page d'accueil
       const CommandePage(), // Page de commande
-      // const AjoutModele(), // Page ajout
-      const AjoutMesure(),
+      const AjoutModele(), // Page ajout
       const FavoriesPage(), // Page de favories
       const ProfilePage(), // Page de profile
     ];

@@ -86,10 +86,10 @@ class FirestoreService {
   }
 }
 
-Stream<List<Measure>> getAllTailleurMesure(String idTailleur) {
+Stream<List<Measure>> getAllTailleurMesure(String idUser) {
   return firestore
       .collection('mesure')
-      .where('idUser', isEqualTo: idTailleur)
+      .where('idUser', isEqualTo: idUser)
       .snapshots()
       .map((querySnapshot) => querySnapshot.docs
           .map((doc) => Measure.fromMap(doc.data(), doc.reference))

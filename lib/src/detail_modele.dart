@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/modele/modele.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/src/form_comm_tailleur.dart';
@@ -56,15 +57,22 @@ class DetailModele extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 30),
             child: Column(children: [
               SizedBox(
-                height: 550,
+                height: 450,
                 child: Stack(
                   children: [
                     PageView(
                       children: [
                         for (var image in modele.fichier)
-                          Image.network(
-                            image!,
-                            fit: BoxFit.fill,
+                          ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20)),
+                            child: CachedNetworkImage(
+                              imageUrl: image!,
+                              fit: BoxFit.fill,
+                              errorWidget: (context, url, error) =>
+                                  Image.asset('assets/images/loading.gif'),
+                            ),
                           ),
                       ],
                     ),

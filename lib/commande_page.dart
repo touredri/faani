@@ -162,7 +162,10 @@ class _CommandePageState extends State<CommandePage> {
                                                   Text(currentCommande
                                                       .nomClient!),
                                                   TextButton(
-                                                    onPressed: () {},
+                                                    onPressed: () {
+                                                      currentCommande.delete();
+                                                      setState(() {});
+                                                    },
                                                     child:
                                                         const Text('Annuler'),
                                                   ),

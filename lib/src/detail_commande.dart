@@ -200,7 +200,11 @@ class _DetailCommandeState extends State<DetailCommande> {
                                             MaterialPageRoute(
                                                 builder:
                                                     (BuildContext context) =>
-                                                        const DetailMesure()));
+                                                        DetailMesure(
+                                                          mesure: widget
+                                                              .commande
+                                                              .idMesure!,
+                                                        )));
                                       },
                                       child: const Row(
                                         children: [
