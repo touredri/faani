@@ -258,7 +258,6 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
                     dateCommande: DateTime.now(),
                     image: widget.modele.fichier[0],
                   );
-
                   commandeAnonyme.create();
                   // ignore: use_build_context_synchronously
                   showSuccessDialog(context, 'Commande ajoutée avec succès',

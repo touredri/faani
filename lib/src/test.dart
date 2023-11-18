@@ -11,7 +11,6 @@ class HomePAgeView extends StatefulWidget {
 }
 
 class _HomePAgeViewState extends State<HomePAgeView> {
-
   @override
   void initState() {
     super.initState();
@@ -28,7 +27,7 @@ class _HomePAgeViewState extends State<HomePAgeView> {
       itemBuilder: (context, index) {
         if (widget.modeles.isNotEmpty && index < widget.modeles.length) {
           final modele = widget.modeles[index];
-          return homeItem(modele);
+          return homeItem(modele, context);
         } else {
           return const SizedBox.shrink();
         }

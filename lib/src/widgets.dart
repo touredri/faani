@@ -3,9 +3,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/src/tailleur_modeles.dart';
 import 'package:flutter/material.dart';
+import '../firebase_get_all_data.dart';
 import '../home_page.dart';
 import '../modele/modele.dart';
 import '../my_theme.dart';
+import 'form_comm_tailleur.dart';
+import 'message_modal.dart';
 
 InputDecoration myInputDecoration(String label) {
   return InputDecoration(
@@ -161,7 +164,7 @@ TextButton myFilterContainer(String label, onPressed, String currentFilter) {
       ));
 }
 
-Stack homeItem(Modele modele) {
+Stack homeItem(Modele modele, BuildContext context) {
   return Stack(
     children: [
       Column(
@@ -186,7 +189,7 @@ Stack homeItem(Modele modele) {
       Container(
         alignment: Alignment.centerRight,
         child: Container(
-          height: 240,
+          height: 261,
           width: 60,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
@@ -199,7 +202,19 @@ Stack homeItem(Modele modele) {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  showModalBottomSheet(
+                      backgroundColor: const Color.fromARGB(255, 252, 248, 248),
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          height: 670,
+                          padding:
+                              const EdgeInsets.only(top: 20, left: 8, right: 8),
+                          child: TailleurCommandeForm(modele: modele),
+                        );
+                      });
+                },
                 icon: const Icon(
                   Icons.shopping_cart_outlined,
                   color: Colors.grey,
@@ -207,21 +222,47 @@ Stack homeItem(Modele modele) {
                 ),
               ),
               FavoriteIcone(docId: modele.id!),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      // Handle the button press
-                    },
-                    icon: const Icon(
-                      Icons.message_outlined,
-                      color: Colors.grey,
-                      size: 30,
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    IconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                            // isScrollControlled: true,
+                            backgroundColor:
+                                const Color.fromARGB(255, 252, 248, 248),
+                            context: context,
+                            builder: (context) {
+                              return Container(
+                                height: 600,
+                                padding: const EdgeInsets.only(
+                                    top: 20, left: 8, right: 8),
+                                child: MessageModal(
+                                  idModele: modele.id!,
+                                ),
+                              );
+                            });
+                      },
+                      icon: const Icon(
+                        Icons.message_outlined,
+                        color: Colors.grey,
+                        size: 30,
+                      ),
                     ),
-                  ),
-                  const Text('231', style: TextStyle(color: Colors.grey)),
-                ],
+                    StreamBuilder<int>(
+                      stream: getNombreMessage(modele.id!),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text('${snapshot.data}',
+                              style: TextStyle(color: Colors.grey));
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
               IconButton(
                 onPressed: () {},

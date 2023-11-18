@@ -1,6 +1,11 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/modele/classes.dart';
 import 'package:faani/modele/commande.dart';
 import 'package:faani/modele/favorie.dart';
+import 'package:faani/modele/message.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'modele/mesure.dart';
 import 'modele/modele.dart';
@@ -76,6 +81,7 @@ class FirestoreService {
             querySnapshot.docs.map((doc) => doc.data()).toList());
   }
 
+  //get all mesure for a user
   Stream<List<Map<String, dynamic>>> getAllClientMesure(String idClient) {
     return firestore
         .collection('mesure')
@@ -86,6 +92,7 @@ class FirestoreService {
   }
 }
 
+//get all mesure for a user
 Stream<List<Measure>> getAllTailleurMesure(String idUser) {
   return firestore
       .collection('mesure')
@@ -96,6 +103,7 @@ Stream<List<Measure>> getAllTailleurMesure(String idUser) {
           .toList());
 }
 
+//get all commande for a user
 Stream<List<CommandeAnonyme>> getAllCommandeAnnonyme(String idTailleur) {
   return firestore
       .collection('commandeAnomyme')
@@ -108,13 +116,10 @@ Stream<List<CommandeAnonyme>> getAllCommandeAnnonyme(String idTailleur) {
 
 Future<Modele> getModele(String id) async {
   final doc = await firestore.collection('modele').doc(id).get();
-  // if (doc.exists) {
-    return Modele.fromMap(doc.data()!, doc.reference);
-  // } else {
-    // return null;
-  // }
+  return Modele.fromMap(doc.data()!, doc.reference);
 }
 
+//get all favorie for a user
 Stream<List<Favorie>> getAllFavorie(String idUtilisateur) {
   return firestore
       .collection('favorie')
@@ -123,4 +128,42 @@ Stream<List<Favorie>> getAllFavorie(String idUtilisateur) {
       .map((querySnapshot) => querySnapshot.docs
           .map((doc) => Favorie.fromMap(doc.data(), doc.reference))
           .toList());
+}
+
+//get all message for a user and a modele
+Stream<List<Message>> getAllMessage(String idModele) {
+  return firestore
+      .collection('message')
+      .where('idModele', isEqualTo: idModele)
+      .snapshots()
+      .map((querySnapshot) => querySnapshot.docs
+          .map((doc) => Message.fromMap(doc.data(), doc.reference))
+          .toList());
+}
+
+//number of message for a modele
+Stream<int> getNombreMessage(String idModele) {
+  return firestore
+      .collection('message')
+      .where('idModele', isEqualTo: idModele)
+      .snapshots()
+      .map((querySnapshot) => querySnapshot.docs.length);
+}
+
+// get user client by id
+Future<Client> getClient(String id) async {
+  final doc = await firestore.collection('client').doc(id).get();
+  return Client.fromMap(doc.data()!, doc.reference);
+}
+
+// get user tailleur by id
+Future<Tailleur> getTailleur(String id) async {
+  final doc = await firestore.collection('Tailleur').doc(id).get();
+  return Tailleur.fromMap(doc.data()!, doc.reference);
+}
+
+// photo url
+String getRandomProfileImageUrl() {
+  var randomId = Random().nextInt(1000);
+  return 'https://robohash.org/$randomId';
 }
