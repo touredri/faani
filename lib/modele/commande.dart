@@ -9,6 +9,7 @@ class Commande {
   String idModele;
   String idTailleur;
   int prix;
+  String? idCategorie;
 
   Commande({
     required this.id,
@@ -19,11 +20,13 @@ class Commande {
     required this.idModele,
     required this.idTailleur,
     required this.prix,
+    required this.idCategorie,
   });
 
-  factory Commande.fromMap(Map<String, dynamic> data, String id) {
+  factory Commande.fromMap(
+      Map<String, dynamic> data, DocumentReference docRef) {
     return Commande(
-      id: id,
+      id: docRef.id,
       dateCommande: (data['dateCommande'] as Timestamp).toDate(),
       dateRecuperation: (data['dateRecuperation'] as Timestamp).toDate(),
       idClient: data['idClient'],
@@ -31,6 +34,7 @@ class Commande {
       idModele: data['idModele'],
       idTailleur: data['idTailleur'],
       prix: data['prix'],
+      idCategorie: data['idCategorie'],
     );
   }
 
@@ -43,7 +47,40 @@ class Commande {
       'idModele': idModele,
       'idTailleur': idTailleur,
       'prix': prix,
+      'idCategorie': idCategorie,
     };
+  }
+
+  // create
+  Future<void> create() async {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('commande');
+    final docRef = await collection.add(toMap());
+    id = docRef.id;
+  }
+
+  // update
+  Future<void> update() async {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('commande');
+    await collection.doc(id).update(toMap());
+  }
+
+  // delete
+  Future<void> delete() async {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('commande');
+    await collection.doc(id).delete();
+  }
+
+  static Future<bool> isAlreadyOrdered(String clientId, String modelId) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('commande')
+        .where('idClient', isEqualTo: clientId)
+        .where('idModele', isEqualTo: modelId)
+        .get();
+
+    return snapshot.docs.isNotEmpty;
   }
 }
 

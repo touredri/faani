@@ -50,18 +50,15 @@ class _VerificationState extends State<Verification> {
   void onResendSmsCode() {
     resend = false;
     setState(() {});
-    authWithPhoneNumber(widget.phoneNumber, onCodeSend: (verificationId, v) {
-      loading = false;
-      decompte();
-      setState(() {});
-    }, onAutoVerify: (v) async {
-      await _auth.signInWithCredential(v);
-      Navigator.of(context).pop();
-    }, onFailed: (e) {
-      loading = false;
-      setState(() {});
-      print("Le code est erroné");
-    }, autoRetrieval: (v) {});
+    // authWithPhoneNumber(widget.phoneNumber, onCodeSend: (verificationId, v) {
+    //   loading = false;
+    //   decompte();
+    //   setState(() {});
+    // }, onFailed: (e) {
+    //   loading = false;
+    //   setState(() {});
+    //   print("Le code est erroné");
+    // }, autoRetrieval: (v) {});
   }
 
 void onVerifySmsCode() async {

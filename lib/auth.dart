@@ -3,16 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 final _auth = FirebaseAuth.instance;
 void authWithPhoneNumber(String phone,
     {required Function(String value, int? value1) onCodeSend,
-    required Function(PhoneAuthCredential value) onAutoVerify,
+    // required Function(PhoneAuthCredential value) onAutoVerify,
     required Function(FirebaseAuthException value) onFailed,
     required Function(String value) autoRetrieval}) async {
   _auth.verifyPhoneNumber(
     phoneNumber: phone,
     timeout: const Duration(seconds: 20),
-    verificationCompleted: onAutoVerify,
+    // verificationCompleted: onAutoVerify,
     verificationFailed: onFailed,
     codeSent: onCodeSend,
-    codeAutoRetrievalTimeout: autoRetrieval,
+    codeAutoRetrievalTimeout: autoRetrieval, verificationCompleted: (PhoneAuthCredential phoneAuthCredential) {  },
   );
 }
 

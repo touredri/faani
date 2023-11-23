@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: buildTheme(context),
-      home: const Home(),
+      home: const SignInPage(),
       // initialRoute: '/',
       routes: {
         // '/': (context) =>

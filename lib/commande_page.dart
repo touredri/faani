@@ -28,6 +28,7 @@ class _CommandePageState extends State<CommandePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
           title: PreferredSize(
             preferredSize: const Size.fromHeight(40),

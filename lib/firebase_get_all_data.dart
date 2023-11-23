@@ -5,10 +5,10 @@ import 'package:faani/modele/classes.dart';
 import 'package:faani/modele/commande.dart';
 import 'package:faani/modele/favorie.dart';
 import 'package:faani/modele/message.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'modele/mesure.dart';
 import 'modele/modele.dart';
+import 'modele/tendance.dart';
 
 final firestore = FirebaseFirestore.instance;
 
@@ -20,6 +20,34 @@ Stream<List<Modele>> getAllModeles() {
       return Modele.fromMap(doc.data(), doc.reference);
     }).toList();
   });
+}
+
+// get all modele by categorie
+Stream<List<Modele>> getAllModelesByCategorie(String idCategorie) {
+  final collection = firestore.collection('modele');
+
+  return collection
+      .where('idCategorie', isEqualTo: idCategorie)
+      .snapshots()
+      .map((querySnapshot) {
+    return querySnapshot.docs.map((doc) {
+      return Modele.fromMap(doc.data(), doc.reference);
+    }).toList();
+  });
+}
+
+Stream<List<Modele>> getAllModeleByTailleurId(String id) {
+  final collection = firestore.collection('modele');
+
+  return collection
+      .where('idTailleur', isEqualTo: id)
+      .snapshots()
+      .map((querySnapshot) {
+    return querySnapshot.docs.map((doc) {
+      return Modele.fromMap(doc.data(), doc.reference);
+    }).toList();
+  });
+
 }
 
 class CategoryService {
@@ -60,15 +88,15 @@ class FirestoreService {
     await firestore.collection(collection).doc(id).update(data);
   }
 
-  Stream<List<Map<String, dynamic>>> getAllCommande(
-      String collection, String idTailleur) {
-    return firestore
-        .collection(collection)
-        .where('idTailleur', isEqualTo: idTailleur)
-        .snapshots()
-        .map((querySnapshot) =>
-            querySnapshot.docs.map((doc) => doc.data()).toList());
-  }
+  // Stream<List<Map<String, dynamic>>> getAllCommande(
+  //     String collection, String idTailleur) {
+  //   return firestore
+  //       .collection(collection)
+  //       .where('idTailleur', isEqualTo: idTailleur)
+  //       .snapshots()
+  //       .map((querySnapshot) =>
+  //           querySnapshot.docs.map((doc) => doc.data()).toList());
+  // }
 
   Stream<List<Map<String, dynamic>>> getAllCommandeByStatus(
       String collection, String idTailleur, String status) {
@@ -156,4 +184,25 @@ Future<Tailleur> getTailleur(String id) async {
 String getRandomProfileImageUrl() {
   var randomId = Random().nextInt(1000);
   return 'https://robohash.org/$randomId';
+}
+
+// get all commande
+Stream<List<Commande>> getAllCommande(String idUser) {
+  return firestore
+      .collection('commande')
+      .where('idUser', isEqualTo: idUser)
+      .snapshots()
+      .map((querySnapshot) => querySnapshot.docs
+          .map((doc) => Commande.fromMap(doc.data(), doc.reference))
+          .toList());
+}
+
+// get all tentance
+Stream<List<Tendance>> getAllTendance() {
+  return firestore
+      .collection('tendance')
+      .snapshots()
+      .map((querySnapshot) => querySnapshot.docs
+          .map((doc) => Tendance.fromMap(doc.data(), doc.reference))
+          .toList());
 }

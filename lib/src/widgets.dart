@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/src/form_client_modele.dart';
 import 'package:faani/src/tailleur_modeles.dart';
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../firebase_get_all_data.dart';
 import '../home_page.dart';
 import '../modele/modele.dart';
@@ -165,6 +167,7 @@ TextButton myFilterContainer(String label, onPressed, String currentFilter) {
 }
 
 Stack homeItem(Modele modele, BuildContext context) {
+  final PageController _controller = PageController();
   return Stack(
     children: [
       Column(
@@ -183,6 +186,28 @@ Stack homeItem(Modele modele, BuildContext context) {
                 );
               },
             ),
+          ),
+          Container(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+                height: 20,
+                width: 200,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SmoothPageIndicator(
+                      controller: _controller,
+                      count: modele.fichier.length,
+                      effect: const ExpandingDotsEffect(
+                        dotColor: Colors.grey,
+                        activeDotColor: primaryColor,
+                        dotHeight: 8,
+                        dotWidth: 8,
+                        expansionFactor: 4,
+                      ),
+                    ),
+                  ],
+                )),
           ),
         ],
       ),
@@ -203,17 +228,26 @@ Stack homeItem(Modele modele, BuildContext context) {
             children: [
               IconButton(
                 onPressed: () {
-                  showModalBottomSheet(
-                      backgroundColor: const Color.fromARGB(255, 252, 248, 248),
-                      context: context,
-                      builder: (context) {
-                        return Container(
-                          height: 670,
-                          padding:
-                              const EdgeInsets.only(top: 20, left: 8, right: 8),
-                          child: TailleurCommandeForm(modele: modele),
-                        );
-                      });
+                  // showModalBottomSheet(
+                  //     isScrollControlled: true,
+                  //     backgroundColor: const Color.fromARGB(255, 252, 248, 248),
+                  //     context: context,
+                  //     builder: (context) {
+                  //       return Container(
+                  //         height: 670,
+                  //         padding:
+                  //             const EdgeInsets.only(top: 20, left: 8, right: 8),
+                  //         child: TailleurCommandeForm(modele: modele),
+                  //       );
+                  //     });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ClientCommande(
+                        modele: modele,
+                      ),
+                    ),
+                  );
                 },
                 icon: const Icon(
                   Icons.shopping_cart_outlined,
@@ -294,6 +328,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
   int count = 0;
   Stream<DocumentSnapshot>? likeSnapshotStream;
   final streamController = StreamController<DocumentSnapshot>();
+  final firestore = FirebaseFirestore.instance;
 
   void onChange(QuerySnapshot snapshot) {
     if (mounted) {
@@ -304,7 +339,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
   }
 
   void favorieInit() {
-    FirebaseFirestore.instance
+    firestore
         .collection('favorie')
         .where('idModele', isEqualTo: widget.docId)
         .where('idUtilisateur', isEqualTo: 'idUtilisateur')
@@ -322,18 +357,15 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
   void initState() {
     super.initState();
     favorieInit();
-    likeSnapshotStream = FirebaseFirestore.instance
-        .collection('modele')
-        .doc(widget.docId)
-        .snapshots();
-    FirebaseFirestore.instance
+    likeSnapshotStream =
+        firestore.collection('modele').doc(widget.docId).snapshots();
+    firestore
         .collection('favorie')
         .where('idModele', isEqualTo: widget.docId)
         .snapshots()
         .listen(onChange);
   }
 
-  final firestore = FirebaseFirestore.instance;
   void createFavorie() async {
     final collection = firestore.collection('favorie');
     await collection

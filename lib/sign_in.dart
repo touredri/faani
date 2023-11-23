@@ -1,12 +1,13 @@
 // import 'dart:ffi';
 
-import 'package:faani/auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:faani/auth.dart';
 import 'package:faani/my_theme.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'dart:math';
 import 'sms_page.dart';
 // import 'package:firebase_core/firebase_core.dart';
 
@@ -33,34 +34,55 @@ class _SignInPageState extends State<SignInPage> {
     }
   }
 
+  String generateSixDigitCode() {
+    var rng = new Random();
+    var code = '';
+    for (var i = 0; i < 6; i++) {
+      code += rng.nextInt(10).toString();
+    }
+    return code;
+  }
+
   void sendOtpCode() {
-    loading = true;
-    setState(() {});
-    final auth = FirebaseAuth.instance;
+    // loading = true;
+    // setState(() {});
+    final firestore = FirebaseFirestore.instance;
     if (phoneNumber.isNotEmpty) {
-      authWithPhoneNumber(phoneNumber, onCodeSend: (verificationId, v) {
-        loading = false;
-        if (mounted) {
-          setState(() {});
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (c) => Verification(
-                    verificationId: verificationId,
-                    phoneNumber: phoneNumber,
-                  )));
-        }
-      }, onAutoVerify: (v) async {
-        await auth.signInWithCredential(v);
-        if (mounted && Navigator.canPop(context)) {
-          Navigator.of(context).pop();
-        }
-      }, onFailed: (e) {
-        loading = false;
-        if (mounted) {
-          setState(() {});
-        }
-        print("Le code est erroné");
-        debugPrint(e.toString());
-      }, autoRetrieval: (v) {});
+      // authWithPhoneNumber(phoneNumber, onCodeSend: (verificationId, v) {
+      //   loading = false;
+      //   if (mounted) {
+      //     setState(() {});
+      //     Navigator.of(context).push(MaterialPageRoute(
+      //         builder: (c) => Verification(
+      //               verificationId: verificationId,
+      //               phoneNumber: phoneNumber,
+      //             )));
+      //   }
+      // }, onFailed: (e) {
+      //   loading = false;
+      //   if (mounted) {
+      //     setState(() {});
+      //   }
+      //   print("Le code est erroné ffffffffffffffffffffffffffffffffffffffffffffff");
+      //   debugPrint(e.toString());
+      // }, autoRetrieval: (v) {});
+
+      // take generated code
+      final code = generateSixDigitCode();
+      // save code in firestore
+      firestore.collection('OTP').add({
+        'code': code,
+        'numero': phoneNumber,
+      });
+      loading = false;
+      if (mounted) {
+        // setState(() {});
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (c) => Verification(
+                  verificationId: code,
+                  phoneNumber: phoneNumber,
+                )));
+      }
     }
   }
 
@@ -165,7 +187,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     initialCountryCode: 'ML',
                     onChanged: (phone) {
-                      phoneNumber = phone.completeNumber;
+                      phoneNumber = phone.number;
                     },
                   ),
                   ElevatedButton(

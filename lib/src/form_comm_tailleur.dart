@@ -154,6 +154,7 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
                   child: SizedBox(
                     height: 45,
                     child: DropdownButtonFormField<String>(
+                      isExpanded: true,
                       decoration: InputDecoration(
                         enabledBorder: const OutlineInputBorder(
                             borderSide:
@@ -177,11 +178,9 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
                         );
                       }).toList(),
                       onChanged: (value) {
-                        print(value);
                         setState(() {
-                          selectedCategoryId =
-                              value ?? "";
-                               // Update the selected category ID
+                          selectedCategoryId = value ?? "";
+                          // Update the selected category ID
                         });
                       },
                     ),

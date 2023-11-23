@@ -59,7 +59,8 @@ class _ModeleFormState extends State<ModeleForm> {
         fichier: imageInfo.map((info) => info['downloadUrl']).toList(),
         imagePath: imageInfo.map((info) => info['path']).toList(),
         genreHabit: _selectedGender ?? '',
-        idTailleur: 'test id tailleur',// YclYUCHrpriv4RbAfMLu/ 30Y6Kdx7dZPPoFgsdGoY
+        idTailleur:
+            'test id tailleur', // YclYUCHrpriv4RbAfMLu/ 30Y6Kdx7dZPPoFgsdGoY
         idCategorie: selectedCategoryId,
         isPublic: _isPublic);
     modele.create();

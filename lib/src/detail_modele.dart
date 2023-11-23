@@ -38,6 +38,11 @@ class DetailModele extends StatelessWidget {
     }
   }
 
+  Future<void> updateDetail(String docId, String newDetail) async {
+    final docRef = firestore.collection('modele').doc(docId);
+    await docRef.update({'detail': newDetail});
+  }
+
   void onCommande() {}
 
   @override
@@ -280,17 +285,48 @@ class DetailModele extends StatelessWidget {
                                     side: const BorderSide(
                                         color: inputBorderColor, width: 1),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          TextEditingController
+                                              _textFieldController =
+                                              TextEditingController();
+                                          return AlertDialog(
+                                            title: Text('Changer le detail'),
+                                            content: TextField(
+                                              controller: _textFieldController,
+                                              decoration: const InputDecoration(
+                                                  hintText: "Nouveau detail"),
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: const Text('CANCEL'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: const Text('OK'),
+                                                onPressed: () {
+                                                  // Do something with the text
+                                                  String text =
+                                                      _textFieldController.text;
+                                                  // change the detail of the modele
+                                                  updateDetail(
+                                                      modele.id!, text);
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  },
                                   child: const Row(
                                     children: [
                                       Icon(Icons.edit,
                                           color:
                                               Color.fromARGB(255, 59, 59, 59)),
-                                      Text('Modifier',
-                                          style: TextStyle(
-                                            color:
-                                                Color.fromARGB(255, 20, 20, 20),
-                                          )),
                                     ],
                                   )),
                               TextButton(
@@ -332,11 +368,6 @@ class DetailModele extends StatelessWidget {
                                       Icon(Icons.delete,
                                           color:
                                               Color.fromARGB(255, 202, 3, 3)),
-                                      Text('Supprimer',
-                                          style: TextStyle(
-                                            color:
-                                                Color.fromARGB(255, 12, 12, 12),
-                                          )),
                                     ],
                                   )),
                               TextButton(
@@ -347,6 +378,7 @@ class DetailModele extends StatelessWidget {
                                   ),
                                   onPressed: () {
                                     showModalBottomSheet(
+                                      isScrollControlled: true,
                                         backgroundColor: const Color.fromARGB(
                                             255, 252, 248, 248),
                                         context: context,
@@ -363,7 +395,7 @@ class DetailModele extends StatelessWidget {
                                   child: const Row(
                                     children: [
                                       Icon(Icons.add, color: Colors.grey),
-                                      Text('',
+                                      Text('Commande',
                                           style: TextStyle(
                                             color: Colors.grey,
                                           ))

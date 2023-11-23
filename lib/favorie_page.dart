@@ -34,6 +34,7 @@ class _FavoriesPageState extends State<FavoriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.grey[200],
         appBar: AppBar(
           title:
               const Text('Mes favoris', style: TextStyle(color: Colors.white)),

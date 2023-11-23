@@ -1,8 +1,18 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/firebase_get_all_data.dart';
+import 'package:faani/modele/commande.dart';
 import 'package:faani/my_theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'mesure_page.dart';
+import 'src/detail_modele.dart';
+import 'src/tailleur_modeles.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -14,6 +24,11 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   List<String> languages = ['Français', 'Anglais'];
   String selectedLanguage = 'Français';
+  bool isEditedVisible = false;
+  TextEditingController nameController = TextEditingController();
+  TextEditingController quartierController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+
   void openUrl(String link) async {
     Uri url = Uri.parse(link);
     if (await canLaunchUrl(url)) {
@@ -23,8 +38,60 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  String count = '0';
+
+  void coutFavorie() {
+    getAllFavorie('user.id').listen((event) {
+      setState(() {
+        count = event.length.toString();
+      });
+    });
+  }
+
+  void changeProfileImage() async {
+    // Get the URL of the current profile image
+    User user = FirebaseAuth.instance.currentUser!;
+    String? oldImageUrl = user.photoURL;
+
+    // Open the image picker
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      // Create a reference to the location you want to upload to in Firebase Storage
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('profile_images')
+          .child(image.path.split('/').last);
+
+      // Upload the file to Firebase Storage
+      UploadTask uploadTask = storageReference.putFile(File(image.path));
+
+      // Get the URL of the uploaded image
+      TaskSnapshot taskSnapshot = await uploadTask;
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      // Update the user's profile with the new image URL
+      await user.updatePhotoURL(imageUrl);
+
+      // Delete the old image from Firebase Storage
+      if (oldImageUrl != null) {
+        Reference oldImageRef =
+            FirebaseStorage.instance.refFromURL(oldImageUrl);
+        await oldImageRef.delete();
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    coutFavorie();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final String imgUrl = getRandomProfileImageUrl();
     return Scaffold(
         backgroundColor: Colors.grey[100],
         appBar: AppBar(
@@ -63,20 +130,22 @@ class _ProfilePageState extends State<ProfilePage> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(100),
                             border: Border.all(color: primaryColor, width: 2)),
-                        child: const Text('data')),
+                        child: Image.network(imgUrl)),
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: Container(
+                        alignment: Alignment.center,
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(100),
                             border: Border.all(color: primaryColor, width: 2),
                             color: primaryColor),
-                        child: const Icon(
-                          Icons.camera_alt,
+                        child: IconButton(
+                          icon: const Icon(Icons.camera_alt),
                           color: Colors.white,
+                          onPressed: changeProfileImage,
                         ),
                       ),
                     )
@@ -92,11 +161,36 @@ class _ProfilePageState extends State<ProfilePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('data'),
+                    Column(
+                      children: [
+                        const Icon(
+                          Icons.favorite,
+                          color: primaryColor,
+                        ),
+                        Text(count),
+                      ],
+                    ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.4,
                     ),
-                    Text('data'),
+                    Column(
+                      children: [
+                        const Icon(
+                          Icons.shopping_cart,
+                          color: primaryColor,
+                        ),
+                        StreamBuilder<List<Commande>>(
+                          stream: getAllCommande('idUser'),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return Text('${snapshot.data!.length}');
+                            } else {
+                              return const Text('10');
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
                 const SizedBox(
@@ -131,18 +225,109 @@ class _ProfilePageState extends State<ProfilePage> {
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.3,
                     ),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: inputBackgroundColor,
-                        side:
-                            const BorderSide(color: inputBorderColor, width: 1),
-                      ),
-                      onPressed: () {},
-                      child: const Text('Modifier',
-                          style: TextStyle(color: primaryColor)),
-                    ),
+                    !isEditedVisible
+                        ? TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: inputBackgroundColor,
+                              side: const BorderSide(
+                                  color: inputBorderColor, width: 1),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                isEditedVisible = !isEditedVisible;
+                              });
+                            },
+                            child: const Text('Modifier',
+                                style: TextStyle(color: primaryColor)),
+                          )
+                        : TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: inputBackgroundColor,
+                              side: const BorderSide(
+                                  color: inputBorderColor, width: 1),
+                            ),
+                            onPressed: () {
+                              if(nameController.text.isNotEmpty){
+                                // update user name
+                              }
+                              if(quartierController.text.isNotEmpty){
+                                // update user quartier
+                              }
+                              if(phoneController.text.isNotEmpty){
+                                // update user phone
+                              }
+                              setState(() {
+                                isEditedVisible = !isEditedVisible;
+                              });
+                            },
+                            child: const Text('Enregistrer',
+                                style: TextStyle(color: primaryColor)),
+                          )
                   ],
                 ),
+                // show when user click on modifier
+                Visibility(
+                    visible: isEditedVisible,
+                    child: AnimatedOpacity(
+                      opacity: isEditedVisible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 500),
+                      child: Column(children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          height: 45,
+                          decoration: BoxDecoration(
+                              color: inputBackgroundColor,
+                              border: Border.all(color: inputBorderColor),
+                              borderRadius: BorderRadius.circular(15)),
+                          child: TextField(
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              hintText: 'Nom Prenom',
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          height: 45,
+                          decoration: BoxDecoration(
+                              color: inputBackgroundColor,
+                              border: Border.all(color: inputBorderColor),
+                              borderRadius: BorderRadius.circular(15)),
+                          child: TextField(
+                            controller: quartierController,
+                            decoration: const InputDecoration(
+                              hintText: 'quartier',
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          height: 45,
+                          decoration: BoxDecoration(
+                              color: inputBackgroundColor,
+                              border: Border.all(color: inputBorderColor),
+                              borderRadius: BorderRadius.circular(15)),
+                          child: TextField(
+                            controller: phoneController,
+                            decoration: const InputDecoration(
+                              hintText: 'numero de telephone',
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ]),
+                    )),
                 // go to my measure pages
                 const SizedBox(
                   height: 10,
@@ -155,13 +340,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Padding(
                     padding: EdgeInsets.only(
                       left: MediaQuery.of(context).size.width * 0.1,
-                      right: MediaQuery.of(context).size.width * 0.1,
+                      // right: MediaQuery.of(context).size.width * 0.1,
                     ),
                     child: Row(
                       children: [
                         const Text('Mes Mésures',
-                            style:
-                                TextStyle(fontSize: 18, color: primaryColor)),
+                            style: TextStyle(
+                              fontSize: 18,
+                            )),
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.3,
                         ),
@@ -172,6 +358,52 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width * 0.1,
+                    // right: MediaQuery.of(context).size.width * 0.1,
+                  ),
+                  child: Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text('Mes Modèles',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
+                            )),
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.4,
+                      ),
+                      const Icon(
+                        Icons.open_in_new,
+                        color: primaryColor,
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 600,
+                  child: StreamBuilder(
+                      stream: getAllModeleByTailleurId('test id tailleur'),
+                      builder: (context, snpashot) {
+                        if (snpashot.hasData) {
+                          final modele = snpashot.data!;
+                          return MyListModele(modeles: modele);
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      }),
                 ),
               ],
             ),

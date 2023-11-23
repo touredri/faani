@@ -60,7 +60,10 @@ class _AjoutModeleState extends State<AjoutModele> {
         physics: const NeverScrollableScrollPhysics(),
         children: [
           Container(
-              margin: const EdgeInsets.only(top: 20), child: Gallery(_images))
+              margin: const EdgeInsets.only(top: 20),
+              child: _images.isNotEmpty
+                  ? Gallery(_images)
+                  : Center(child: Image.asset('assets/images/coudre.png')))
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
