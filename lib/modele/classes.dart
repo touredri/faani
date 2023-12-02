@@ -135,3 +135,18 @@ Future<void> updateProfile(
     updateUserName(value);
   }
 }
+
+// get a tailleur by Id
+Future<Tailleur> getTailleurById(String id) async {
+  final documentReference = firestore.collection('Tailleur').doc(id);
+  final snapshot = await documentReference.get();
+  return Tailleur.fromMap(snapshot.data() as Map<String, dynamic>,
+      firestore.collection('Tailleur').doc(id));
+}
+
+Future<Tailleur> getTailleurByRef(DocumentReference docRef) async {
+  final snapshot = await docRef.get();
+  Tailleur tailleur =
+      Tailleur.fromMap(snapshot.data() as Map<String, dynamic>, docRef);
+  return tailleur;
+}

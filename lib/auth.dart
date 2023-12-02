@@ -168,3 +168,17 @@ Future<Object?> loadObject(String key) async {
   String? jsonString = prefs.getString(key);
   return jsonString != null ? jsonDecode(jsonString) : null;
 }
+
+// auth anonymous
+Future<User?> signInAnonymously() async {
+  try {
+    final result = await _auth.signInAnonymously();
+    if (result.user != null) {
+      print('User created successfully');
+      return result.user;
+    }
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+  return null;
+}

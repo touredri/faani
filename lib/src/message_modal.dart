@@ -137,10 +137,12 @@ class _MessageModalState extends State<MessageModal> {
                       message.createMessage();
                       _controller.clear();
                     },
-                    icon: const Icon(
-                      Icons.send,
-                      color: primaryColor,
-                    ),
+                    icon: user!.isAnonymous
+                        ? const Text('')
+                        : const Icon(
+                            Icons.send,
+                            color: primaryColor,
+                          ),
                   ),
                 ],
               ),

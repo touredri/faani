@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:faani/app_state.dart';
 import 'package:faani/modele/modele.dart';
 import 'package:faani/my_theme.dart';
+import 'package:faani/sign_in.dart';
 import 'package:faani/src/form_comm_tailleur.dart';
 import 'package:faani/src/widgets.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +20,23 @@ import '../firebase_get_all_data.dart';
 import '../modele/classes.dart';
 import 'message_modal.dart';
 
-class DetailModele extends StatelessWidget {
+class DetailModele extends StatefulWidget {
   final Modele modele;
   DetailModele({super.key, required this.modele});
+
+  @override
+  State<DetailModele> createState() => _DetailModeleState();
+}
+
+class _DetailModeleState extends State<DetailModele> {
   final PageController _controller = PageController();
+
   bool isAuthor = false;
+
+  Tailleur? modeleOwner;
+
   late Tailleur currentTailleur;
+
   late Client currentClient;
 
   Future<void> updateDetail(String docId, String newDetail) async {
@@ -32,15 +44,36 @@ class DetailModele extends StatelessWidget {
     await docRef.update({'detail': newDetail});
   }
 
+  void getTailleur() async {
+    print(widget.modele.idTailleur);
+    final docRef = FirebaseFirestore.instance
+        .collection('Tailleur')
+        .doc(widget.modele.idTailleur);
+    modeleOwner = await getTailleurByRef(docRef);
+    setState(() {});
+  }
+
   void onCommande() {}
+
+  @override
+  void initState() {
+    getTailleur();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isTaileur = Provider.of<ApplicationState>(context).isTailleur;
-    if (isTaileur) {
+    bool isTaileur = false;
+    if (!user!.isAnonymous) {
+      isTaileur = Provider.of<ApplicationState>(context).isTailleur;
+    }
+    if (isTaileur && !user!.isAnonymous) {
       currentTailleur = Provider.of<ApplicationState>(context).currentTailleur;
-      isAuthor = currentTailleur.id == modele.idTailleur;
+      isAuthor = currentTailleur.id == widget.modele.idTailleur;
     } else {
-      currentClient = Provider.of<ApplicationState>(context).currentClient;
+      user!.isAnonymous
+          ? currentClient = Provider.of<ApplicationState>(context).currentClient
+          : '';
     }
     return Scaffold(
         appBar: AppBar(
@@ -70,7 +103,7 @@ class DetailModele extends StatelessWidget {
                   children: [
                     PageView(
                       children: [
-                        for (var image in modele.fichier)
+                        for (var image in widget.modele.fichier)
                           ClipRRect(
                             borderRadius: const BorderRadius.only(
                                 bottomLeft: Radius.circular(20),
@@ -94,7 +127,7 @@ class DetailModele extends StatelessWidget {
                             children: [
                               SmoothPageIndicator(
                                 controller: _controller,
-                                count: modele.fichier.length,
+                                count: widget.modele.fichier.length,
                                 effect: const ExpandingDotsEffect(
                                   dotColor: Colors.grey,
                                   activeDotColor: primaryColor,
@@ -114,14 +147,14 @@ class DetailModele extends StatelessWidget {
                   child: Column(children: [
                     const SizedBox(height: 10),
                     Text(
-                      user!.displayName!,
+                      modeleOwner!.nomPrenom,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      currentTailleur.quartier,
+                      modeleOwner!.quartier,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w400,
@@ -132,7 +165,7 @@ class DetailModele extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(
-                          modele.detail!,
+                          widget.modele.detail!,
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w400,
@@ -140,7 +173,7 @@ class DetailModele extends StatelessWidget {
                         ),
                         const SizedBox(width: 5),
                         Text(
-                          modele.genreHabit,
+                          widget.modele.genreHabit,
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w400,
@@ -167,7 +200,7 @@ class DetailModele extends StatelessWidget {
                                         padding: const EdgeInsets.only(
                                             top: 20, left: 8, right: 8),
                                         child: MessageModal(
-                                          idModele: modele.id!,
+                                          idModele: widget.modele.id!,
                                         ),
                                       );
                                     });
@@ -179,7 +212,7 @@ class DetailModele extends StatelessWidget {
                               ),
                             ),
                             StreamBuilder<int>(
-                              stream: getNombreMessage(modele.id!),
+                              stream: getNombreMessage(widget.modele.id!),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   return Text('${snapshot.data}',
@@ -192,13 +225,14 @@ class DetailModele extends StatelessWidget {
                             ),
                           ],
                         ),
-                        FavoriteIcone(docId: modele.id!),
+                        FavoriteIcone(docId: widget.modele.id!),
                         Column(
                           children: [
                             IconButton(
                               onPressed: () async {
                                 // share on social media
-                                final uri = Uri.parse(modele.fichier[0]!);
+                                final uri =
+                                    Uri.parse(widget.modele.fichier[0]!);
                                 final bytes = await http.readBytes(uri);
                                 // final bytes = res.bodyBytes;
                                 final temp = await getTemporaryDirectory();
@@ -227,17 +261,18 @@ class DetailModele extends StatelessWidget {
                                 final dir =
                                     await getApplicationDocumentsDirectory();
                                 var filePath =
-                                    modele.fichier[0]!.split('/').last;
+                                    widget.modele.fichier[0]!.split('/').last;
                                 if (!filePath.contains('.')) {
                                   filePath +=
                                       '.jpg'; // Add a default extension if there isn't one
                                 }
                                 final path = '${dir.path}/$filePath';
                                 print(
-                                    'Downloading from: ${modele.fichier[0]!}');
+                                    'Downloading from: ${widget.modele.fichier[0]!}');
                                 print('Saving to: $path');
                                 try {
-                                  await dio.download(modele.fichier[0]!, path);
+                                  await dio.download(
+                                      widget.modele.fichier[0]!, path);
                                   print('Download completed');
                                   // Save the image to the device gallery
                                   final result =
@@ -265,6 +300,13 @@ class DetailModele extends StatelessWidget {
                         ? ElevatedButton(
                             onPressed: () {
                               // Handle the button press
+                              if (user!.isAnonymous) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (c) => const SignInPage()),
+                                );
+                                return;
+                              }
                             },
                             child: const Text('Commander',
                                 style: TextStyle(
@@ -291,9 +333,12 @@ class DetailModele extends StatelessWidget {
                                             return AlertDialog(
                                               title: Text('Changer le detail'),
                                               content: TextField(
-                                                controller: _textFieldController,
-                                                decoration: const InputDecoration(
-                                                    hintText: "Nouveau detail"),
+                                                controller:
+                                                    _textFieldController,
+                                                decoration:
+                                                    const InputDecoration(
+                                                        hintText:
+                                                            "Nouveau detail"),
                                               ),
                                               actions: <Widget>[
                                                 TextButton(
@@ -307,10 +352,12 @@ class DetailModele extends StatelessWidget {
                                                   onPressed: () {
                                                     // Do something with the text
                                                     String text =
-                                                        _textFieldController.text;
+                                                        _textFieldController
+                                                            .text;
                                                     // change the detail of the modele
                                                     updateDetail(
-                                                        modele.id!, text);
+                                                        widget.modele.id!,
+                                                        text);
                                                     Navigator.of(context).pop();
                                                   },
                                                 ),
@@ -321,8 +368,8 @@ class DetailModele extends StatelessWidget {
                                     child: const Row(
                                       children: [
                                         Icon(Icons.edit,
-                                            color:
-                                                Color.fromARGB(255, 59, 59, 59)),
+                                            color: Color.fromARGB(
+                                                255, 59, 59, 59)),
                                       ],
                                     )),
                               ),
@@ -352,7 +399,7 @@ class DetailModele extends StatelessWidget {
                                               TextButton(
                                                 child: const Text('Oui'),
                                                 onPressed: () {
-                                                  modele.delete();
+                                                  widget.modele.delete();
                                                   Navigator.pop(context);
                                                   Navigator.pop(context);
                                                 },
@@ -388,7 +435,7 @@ class DetailModele extends StatelessWidget {
                                             padding: const EdgeInsets.only(
                                                 top: 20, left: 8, right: 8),
                                             child: TailleurCommandeForm(
-                                                modele: modele),
+                                                modele: widget.modele),
                                           );
                                         });
                                   },

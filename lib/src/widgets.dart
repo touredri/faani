@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/anonyme_profile.dart';
 import 'package:faani/app_state.dart';
 import 'package:faani/auth.dart';
 import 'package:faani/src/form_client_modele.dart';
@@ -169,7 +170,6 @@ TextButton myFilterContainer(String label, onPressed, String currentFilter) {
 
 Stack homeItem(Modele modele, BuildContext context) {
   final bool isTailleur = Provider.of<ApplicationState>(context).isTailleur;
-  print('isTailleur: $isTailleur');
   final PageController _controller = PageController();
   return Stack(
     children: [
@@ -369,13 +369,26 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
   }
 
   void createFavorie() async {
+    if (user!.isAnonymous) {
+      showSuccessDialog(
+          context,
+          'Vous devez vous connecter pour ajouter ce modèle à vos favoris',
+          AnonymeProfile());
+      return;
+    }
     final collection = firestore.collection('favorie');
     await collection
         .add({'idModele': widget.docId, 'idUtilisateur': user!.uid});
-    // print(docRef.id);
   }
 
   void deleteFavorie() async {
+    if (user!.isAnonymous) {
+      showSuccessDialog(
+          context,
+          'Vous devez vous connecter pour ajouter ce modèle à vos favoris',
+          AnonymeProfile());
+      return;
+    }
     final querySnapshot = await firestore
         .collection('favorie')
         .where('idModele', isEqualTo: widget.docId)

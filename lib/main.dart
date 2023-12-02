@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/anonyme_profile.dart';
 import 'package:faani/auth.dart';
 import 'package:faani/sign_in.dart';
 import 'package:faani/sign_up.dart';
@@ -66,37 +68,59 @@ class _HomeState extends State<Home> {
 
   // get isTailleur value from shared preferences
   void getIsTailleur() async {
+    if (user!.isAnonymous) {
+      return;
+    }
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       isTailleur = prefs.getBool('isTailleur') ?? false;
     });
-    if(isTailleur == true) {
+    if (isTailleur == true) {
       Provider.of<ApplicationState>(context, listen: false).changeTailleur =
-            true;
+          true;
+    }
   }
-}
 
   // setup user variable to get user data from shared preferences
   void getUser() async {
-  _user = await loadObject('user');
-  if(isTailleur == true) {
-    Tailleur tailleur = Tailleur.fromMap(_user);
+    if (user!.isAnonymous) {
+      return;
+    }
+    _user = await loadObject('user');
+    if (isTailleur == true) {
+      DocumentReference<Object?> docRef = FirebaseFirestore.instance
+          .collection('Tailleur')
+          .doc(FirebaseAuth.instance.currentUser!.uid);
+      Tailleur tailleur = Tailleur.fromMap(_user, docRef);
+      Provider.of<ApplicationState>(context, listen: false)
+          .changeCurrentTailleur = tailleur;
+    } else {
+      DocumentReference<Object?> docRef = FirebaseFirestore.instance
+          .collection('client')
+          .doc(FirebaseAuth.instance.currentUser!.uid);
+      Client client = Client.fromMap(_user, docRef);
+      Provider.of<ApplicationState>(context, listen: false)
+          .changeCurrentClient = client;
+    }
+    setState(() {});
   }
-  setState(() {});
-}
 
   @override
   void initState() {
     getIsTailleur();
-    getUser();
     _pages = [
       const HomePage(), // Page d'accueil
       const CommandePage(), // Page de commande
-      const AjoutModele(), // Page ajout
+      user!.isAnonymous
+          ? const AnonymeProfile()
+          : const AjoutModele(), // Page ajout
       const FavoriesPage(), // Page de favories
-      const ProfilePage(), // Page de profile
+      user!.isAnonymous
+          ? const AnonymeProfile()
+          : const ProfilePage(), // Page de profile
     ];
     super.initState();
+    getUser();
   }
 
   void _onItemTapped(int index) {
@@ -104,8 +128,6 @@ class _HomeState extends State<Home> {
       _selectedIndex = index; // Met à jour l'index de l'onglet sélectionné
     });
   }
-
-  
 
   @override
   Widget build(BuildContext context) {

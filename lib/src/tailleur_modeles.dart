@@ -21,9 +21,8 @@ class _TailleurModelesState extends State<TailleurModeles> {
     super.initState();
     getAllModeles().listen((event) {
       setState(() {
-        modeles = event
-            .where((modele) => modele.idTailleur == user!.uid)
-            .toList();
+        modeles =
+            event.where((modele) => modele.idTailleur == user!.uid).toList();
       });
     });
   }

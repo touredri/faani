@@ -1,3 +1,5 @@
+import 'package:faani/auth.dart';
+import 'package:faani/main.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/sign_up.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +16,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   bool loading = false;
   String phoneNumber = '';
-  
+
   void errorAlert() {
     if (phoneNumber.length < 7) {
       showDialog(
@@ -25,7 +27,7 @@ class _SignInPageState extends State<SignInPage> {
               content: Text("enter valid number"),
             );
           });
-          return;
+      return;
     }
   }
 
@@ -155,7 +157,19 @@ class _SignInPageState extends State<SignInPage> {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      setState(() {
+                        loading = true;
+                      });
+                      await signInAnonymously();
+                      setState(() {
+                        loading = false;
+                      });
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (c) => const Home()),
+                        (route) => false,
+                      );
+                    },
                     child: const Text('Continuer sans compte'),
                   ),
                 ],

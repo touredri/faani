@@ -256,37 +256,43 @@ class _MyFormState extends State<MyForm> {
             ],
           ),
         ),
-        ElevatedButton(
-          onPressed: () async {
-            if (_nameController.text.isNotEmpty &&
-                _numeroController.text.isNotEmpty &&
-                _prixController.text.isNotEmpty &&
-                selectedDate != null &&
-                selectedCategoryId.isNotEmpty &&
-                selectedMeasureId != null) {
-              await uploadeImage();
-              CommandeAnonyme commandeAnonyme = CommandeAnonyme(
-                id: '',
-                idModele: '',
-                nomClient: _nameController.text,
-                numeroClient: int.parse(_numeroController.text),
-                prix: int.parse(_prixController.text),
-                dateRecuperation: selectedDate,
-                idCategorie: selectedCategoryId,
-                idMesure: selectedMeasureId,
-                idTailleur: user!.uid,
-                dateCommande: DateTime.now(),
-                image: imagePath,
-              );
+        !user!.isAnonymous
+            ? ElevatedButton(
+                onPressed: () async {
+                  if (_nameController.text.isNotEmpty &&
+                      _numeroController.text.isNotEmpty &&
+                      _prixController.text.isNotEmpty &&
+                      selectedDate != null &&
+                      selectedCategoryId.isNotEmpty &&
+                      selectedMeasureId != null) {
+                    await uploadeImage();
+                    CommandeAnonyme commandeAnonyme = CommandeAnonyme(
+                      id: '',
+                      idModele: '',
+                      nomClient: _nameController.text,
+                      numeroClient: int.parse(_numeroController.text),
+                      prix: int.parse(_prixController.text),
+                      dateRecuperation: selectedDate,
+                      idCategorie: selectedCategoryId,
+                      idMesure: selectedMeasureId,
+                      idTailleur: user!.uid,
+                      dateCommande: DateTime.now(),
+                      image: imagePath,
+                    );
 
-              commandeAnonyme.create();
-              // ignore: use_build_context_synchronously
-              showSuccessDialog(context, 'Commande ajoutée avec succès',
-                  const CommandePage());
-            }
-          },
-          child: const Text('Enregistrer'),
-        ),
+                    commandeAnonyme.create();
+                    // ignore: use_build_context_synchronously
+                    showSuccessDialog(context, 'Commande ajoutée avec succès',
+                        const CommandePage());
+                  }
+                },
+                child: const Text('Enregistrer'),
+              )
+            : ElevatedButton(
+                child: const Text('Se connecter'),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/sign_in');
+                })
       ],
     );
   }
