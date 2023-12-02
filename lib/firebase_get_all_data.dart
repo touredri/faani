@@ -47,7 +47,6 @@ Stream<List<Modele>> getAllModeleByTailleurId(String id) {
       return Modele.fromMap(doc.data(), doc.reference);
     }).toList();
   });
-
 }
 
 class CategoryService {
@@ -87,16 +86,6 @@ class FirestoreService {
       String collection, String id, Map<String, dynamic> data) async {
     await firestore.collection(collection).doc(id).update(data);
   }
-
-  // Stream<List<Map<String, dynamic>>> getAllCommande(
-  //     String collection, String idTailleur) {
-  //   return firestore
-  //       .collection(collection)
-  //       .where('idTailleur', isEqualTo: idTailleur)
-  //       .snapshots()
-  //       .map((querySnapshot) =>
-  //           querySnapshot.docs.map((doc) => doc.data()).toList());
-  // }
 
   Stream<List<Map<String, dynamic>>> getAllCommandeByStatus(
       String collection, String idTailleur, String status) {

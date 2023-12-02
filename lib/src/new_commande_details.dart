@@ -2,6 +2,7 @@ import 'dart:io';
 // import 'dart:js_interop';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/auth.dart';
 import 'package:faani/commande_page.dart';
 import 'package:faani/modele/mesure.dart';
 import 'package:faani/my_theme.dart';
@@ -106,7 +107,7 @@ class _MyFormState extends State<MyForm> {
 
   List<Measure> mesureData = [];
   void fetchMesure() async {
-    getAllTailleurMesure('YclYUCHrpriv4RbAfMLu').listen((event) {
+    getAllTailleurMesure(user!.uid).listen((event) {
       setState(() {
         print(event);
         mesureData = event;
@@ -273,7 +274,7 @@ class _MyFormState extends State<MyForm> {
                 dateRecuperation: selectedDate,
                 idCategorie: selectedCategoryId,
                 idMesure: selectedMeasureId,
-                idTailleur: 'YclYUCHrpriv4RbAfMLu',
+                idTailleur: user!.uid,
                 dateCommande: DateTime.now(),
                 image: imagePath,
               );
@@ -283,28 +284,6 @@ class _MyFormState extends State<MyForm> {
               showSuccessDialog(context, 'Commande ajoutée avec succès',
                   const CommandePage());
             }
-            //else {
-            //   MaterialBanner mat = MaterialBanner(
-            //     backgroundColor: primaryColor,
-            //     content: const Text(
-            //       'Veuillez remplir tous les champs',
-            //       style: TextStyle(color: Colors.white),
-            //     ),
-            //     leading: const Icon(Icons.info, color: Colors.white),
-            //     actions: [
-            //       TextButton(
-            //         onPressed: () {
-            //           ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-            //         },
-            //         child: const Text(
-            //           'OK',
-            //           style: TextStyle(color: Colors.white),
-            //         ),
-            //       )
-            //     ],
-            //   );
-            //   ScaffoldMessenger.of(context).showMaterialBanner(mat);
-            // }
           },
           child: const Text('Enregistrer'),
         ),
@@ -371,7 +350,7 @@ class _MeasureDialogState extends State<MeasureDialog> {
               onPressed: () {
                 // Navigate to measure page
               },
-              child: const Text('Add new measure'),
+              child: const Text('Ajouter une mesure'),
             ),
           ],
         ),

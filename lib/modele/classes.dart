@@ -1,12 +1,16 @@
-
 import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../app_state.dart';
+import '../auth.dart';
 
 final firestore = FirebaseFirestore.instance;
 
 class Tailleur {
-  String? id;
+  String id;
   String quartier;
   String genreHabit;
   bool isVerify;
@@ -14,17 +18,23 @@ class Tailleur {
   int telephone;
   String genre;
 
-  Tailleur({required this.quartier, required this.genreHabit, required this.isVerify, required this.nomPrenom, required this.telephone,
-      required this.genre, required this.id});
+  Tailleur(
+      {required this.quartier,
+      required this.genreHabit,
+      required this.isVerify,
+      required this.nomPrenom,
+      required this.telephone,
+      required this.genre,
+      required this.id});
 
-  // factory constructor fromMap 
+  // factory constructor fromMap
   factory Tailleur.fromMap(Map<String, dynamic> map, DocumentReference docRef) {
     return Tailleur(
       quartier: map['quartier'] as String,
       genreHabit: map['genreHabit'] as String,
       isVerify: map['isVerify'] as bool,
       nomPrenom: map['nomPrenom'] as String,
-      telephone: map['telephone'] as int, 
+      telephone: map['telephone'] as int,
       genre: map['genre'] as String,
       id: docRef.id,
     );
@@ -44,9 +54,8 @@ class Tailleur {
 
   // method create
   Future<void> create() async {
-    final collection = firestore.collection('tailleur');
-    final docRef = await collection.add(toMap());
-    id = docRef.id;
+    final collection = firestore.collection('Tailleur');
+    await collection.doc(id).set(toMap());
   }
 
   // method delete
@@ -60,19 +69,24 @@ class Tailleur {
     final documentReference = firestore.collection('tailleur').doc(id);
     await documentReference.update(toMap());
   }
-
 }
 
 class Client {
+  String id;
   String nomPrenom;
   int telephone;
   String genre;
 
-  Client({required this.nomPrenom, required this.telephone, required this.genre});
+  Client(
+      {required this.id,
+      required this.nomPrenom,
+      required this.telephone,
+      required this.genre});
 
   // factory constructor fromMap
   factory Client.fromMap(Map<String, dynamic> map, DocumentReference docRef) {
     return Client(
+      id: docRef.id,
       nomPrenom: map['nomPrenom'] as String,
       telephone: map['telephone'] as int,
       genre: map['genre'] as String,
@@ -92,7 +106,7 @@ class Client {
   // method create
   Future<void> create() async {
     final collection = firestore.collection('client');
-    final docRef = await collection.add(toMap());
+    await collection.doc(id).set(toMap());
   }
 
   // method delete
@@ -105,5 +119,19 @@ class Client {
   Future<void> update() async {
     final documentReference = firestore.collection('client').doc();
     await documentReference.update(toMap());
+  }
+}
+
+// method update for client
+Future<void> updateProfile(
+    String id, BuildContext context, String propertyName, dynamic value) async {
+  final collection =
+      Provider.of<ApplicationState>(context, listen: false).isTailleur
+          ? 'Tailleur'
+          : 'client';
+  final documentReference = firestore.collection(collection).doc(id);
+  await documentReference.update({propertyName: value});
+  if (propertyName == 'nomPrenom') {
+    updateUserName(value);
   }
 }

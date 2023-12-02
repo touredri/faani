@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/auth.dart';
 import 'package:faani/modele/modele.dart';
 import 'package:faani/my_theme.dart';
-import 'package:faani/src/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -46,7 +46,7 @@ class _ClientCommandeState extends State<ClientCommande> {
 
   List<Measure> mesureData = [];
   void fetchMesure() async {
-    getAllTailleurMesure('YclYUCHrpriv4RbAfMLu').listen((event) {
+    getAllTailleurMesure(user!.uid).listen((event) {
       setState(() {
         mesureData = event;
       });
@@ -71,7 +71,6 @@ class _ClientCommandeState extends State<ClientCommande> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: Text(widget.modele.libelle),
         toolbarHeight: 0,
       ),
       body: SingleChildScrollView(

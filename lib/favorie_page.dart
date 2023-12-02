@@ -1,3 +1,4 @@
+import 'package:faani/auth.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/modele/favorie.dart';
 import 'package:faani/modele/modele.dart';
@@ -21,7 +22,7 @@ class _FavoriesPageState extends State<FavoriesPage> {
   }
 
   Stream<List<Modele>> _loadData() async* {
-    await for (var event in getAllFavorie('idUtilisateur')) {
+    await for (var event in getAllFavorie(user!.uid)) {
       var modeles = <Modele>[];
       for (Favorie fav in event) {
         var modele = await getModele(fav.idModele!);

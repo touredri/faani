@@ -1,13 +1,20 @@
+import 'package:faani/auth.dart';
 import 'package:faani/home_page.dart';
+import 'package:faani/modele/classes.dart';
 import 'package:faani/src/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'app_state.dart';
+import 'main.dart';
 import 'my_theme.dart';
 
 class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+  final String? phoneNumber;
+  const SignUp({super.key, this.phoneNumber});
 
   @override
   State<SignUp> createState() => _SignUpState();
@@ -34,6 +41,48 @@ class _SignUpState extends State<SignUp> {
       await launchUrl(url);
     } else {
       throw 'Could not launch $url';
+    }
+  }
+
+  void create_acount() async {
+    final String email = '${widget.phoneNumber!}@faani.com';
+    final String password = widget.phoneNumber! + name.text;
+    User? user = await signUpWithEmailPassword(email, password);
+    if (user != null) {
+      if (isChecked) {
+        Tailleur tailleur = Tailleur(
+          quartier: quartier.text,
+          genreHabit: typeHabit!,
+          isVerify: false,
+          nomPrenom: name.text,
+          telephone: int.parse(widget.phoneNumber!),
+          genre: value!,
+          id: user.uid,
+        );
+        await tailleur.create();
+        updateUserName(name.text);
+        await saveObject('user', tailleur);
+        await saveBoolean('isTailleur', true);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (c) => const Home()),
+          (route) => false,
+        );
+      } else {
+        Client client = Client(
+          nomPrenom: name.text,
+          telephone: int.parse(widget.phoneNumber!),
+          genre: value!,
+          id: user.uid,
+        );
+        await client.create();
+        updateUserName(name.text);
+        await saveObject('user', client);
+        await saveBoolean('isTailleur', false);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (c) => const Home()),
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -127,37 +176,38 @@ class _SignUpState extends State<SignUp> {
                           ),
                         ],
                       ),
-                      isChecked
-                          ? Column(
-                              children: [
-                                TextField(
-                                  maxLength: 40,
-                                  controller: quartier,
-                                  decoration: myInputDecoration('Quartier')
-                                      .copyWith(counterText: ''),
-                                ),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                MyDropdownButton(
-                                  value: typeHabit!,
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      typeHabit = newValue!;
-                                    });
-                                  },
-                                  items: const [
-                                    'Pour Homme',
-                                    'Pour Femme',
-                                    'Les deux'
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 15,
-                                ),
+                      Visibility(
+                        visible: isChecked,
+                        child: Column(
+                          children: [
+                            TextField(
+                              maxLength: 40,
+                              controller: quartier,
+                              decoration: myInputDecoration('Quartier')
+                                  .copyWith(counterText: ''),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            MyDropdownButton(
+                              value: typeHabit!,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  typeHabit = newValue!;
+                                });
+                              },
+                              items: const [
+                                'Pour Homme',
+                                'Pour Femme',
+                                'Les deux'
                               ],
-                            )
-                          : const SizedBox(),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                          ],
+                        ),
+                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           maximumSize: const Size.fromWidth(350),
@@ -165,11 +215,12 @@ class _SignUpState extends State<SignUp> {
                           padding: const EdgeInsets.symmetric(vertical: 15),
                         ),
                         onPressed: () {
-                          name.text.isEmpty ||
-                                  (quartier.text.isEmpty && isChecked)
-                              ? isNotFill()
-                              : Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (c) => const HomePage()));
+                          if (name.text.isEmpty ||
+                              (quartier.text.isEmpty && isChecked)) {
+                            isNotFill();
+                          } else {
+                            create_acount();
+                          }
                         },
                         child: const Text('Enregistrer'),
                       ),

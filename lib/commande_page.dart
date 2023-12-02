@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/auth.dart';
 import 'package:faani/modele/commande.dart';
 import 'package:faani/src/detail_commande.dart';
 import 'package:faani/src/new_commande.dart';
@@ -17,7 +18,7 @@ class CommandePage extends StatefulWidget {
 
 class _CommandePageState extends State<CommandePage> {
   final TextEditingController _filter = TextEditingController();
-  String _searchText = "";
+  // String _searchText = "";
   // List<CommandeAnonyme> commande = [];
   @override
   void initState() {
@@ -94,7 +95,7 @@ class _CommandePageState extends State<CommandePage> {
             ),
             Expanded(
               child: StreamBuilder(
-                  stream: getAllCommandeAnnonyme('YclYUCHrpriv4RbAfMLu'),
+                  stream: getAllCommandeAnnonyme(user!.uid),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());

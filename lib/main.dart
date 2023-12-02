@@ -1,3 +1,4 @@
+import 'package:faani/auth.dart';
 import 'package:faani/sign_in.dart';
 import 'package:faani/sign_up.dart';
 import 'package:faani/src/ajout_mesure.dart';
@@ -6,12 +7,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'app_state.dart';
 import 'commande_page.dart';
 import 'favorie_page.dart';
 import 'firebase_options.dart';
 
 import 'home_page.dart';
+import 'modele/classes.dart';
 import 'my_theme.dart';
 import 'profile_page.dart';
 
@@ -35,14 +38,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: buildTheme(context),
-      home: const SignInPage(),
-      // initialRoute: '/',
+      // home: const Home(),
+      initialRoute: '/',
       routes: {
-        // '/': (context) =>
-        //     _auth.currentUser != null ? const Home() : const SignInPage(),
+        '/': (context) =>
+            _auth.currentUser != null ? const Home() : const SignInPage(),
         '/sign_in': (context) => const SignInPage(),
         '/sign_up': (context) => const SignUp(),
-        // '/commande': (context) => const CommandePage(),
+        '/commande': (context) => const CommandePage(),
       },
     );
   }
@@ -57,12 +60,35 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0; // Index de l'onglet sélectionné
-
+  late var _user;
   bool isTailleur = false;
+  List<Widget> _pages = [];
+
+  // get isTailleur value from shared preferences
+  void getIsTailleur() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isTailleur = prefs.getBool('isTailleur') ?? false;
+    });
+    if(isTailleur == true) {
+      Provider.of<ApplicationState>(context, listen: false).changeTailleur =
+            true;
+  }
+}
+
+  // setup user variable to get user data from shared preferences
+  void getUser() async {
+  _user = await loadObject('user');
+  if(isTailleur == true) {
+    Tailleur tailleur = Tailleur.fromMap(_user);
+  }
+  setState(() {});
+}
 
   @override
   void initState() {
-    show();
+    getIsTailleur();
+    getUser();
     _pages = [
       const HomePage(), // Page d'accueil
       const CommandePage(), // Page de commande
@@ -73,29 +99,13 @@ class _HomeState extends State<Home> {
     super.initState();
   }
 
-  final Map<String, dynamic> _user = {
-    'name': 'John Doe',
-    'email': 'dt@gmail.com',
-    'profileImageUrl':
-        'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png',
-    'isCertify': true,
-  };
-
-  void show() {
-    if (_user.containsKey('isCertify')) {
-      setState(() {
-        isTailleur = true;
-      });
-    }
-  }
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index; // Met à jour l'index de l'onglet sélectionné
     });
   }
 
-  List<Widget> _pages = [];
+  
 
   @override
   Widget build(BuildContext context) {

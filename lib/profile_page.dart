@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app_state.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/modele/commande.dart';
 import 'package:faani/my_theme.dart';
@@ -8,9 +10,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'auth.dart';
 import 'mesure_page.dart';
+import 'modele/classes.dart';
 import 'src/detail_modele.dart';
 import 'src/tailleur_modeles.dart';
 
@@ -28,6 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController quartierController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  User user = FirebaseAuth.instance.currentUser!;
 
   void openUrl(String link) async {
     Uri url = Uri.parse(link);
@@ -40,8 +46,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String count = '0';
 
-  void coutFavorie() {
-    getAllFavorie('user.id').listen((event) {
+  void countFavorie() {
+    getAllFavorie(user.uid).listen((event) {
       setState(() {
         count = event.length.toString();
       });
@@ -50,7 +56,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void changeProfileImage() async {
     // Get the URL of the current profile image
-    User user = FirebaseAuth.instance.currentUser!;
     String? oldImageUrl = user.photoURL;
 
     // Open the image picker
@@ -81,25 +86,72 @@ class _ProfilePageState extends State<ProfilePage> {
         await oldImageRef.delete();
       }
     }
+    setState(() {});
   }
 
   @override
   void initState() {
-    coutFavorie();
+    countFavorie();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentUsers = Provider.of<ApplicationState>(context).currentUsers;
     final String imgUrl = getRandomProfileImageUrl();
+    final profileImage = user.photoURL != null
+        ? CachedNetworkImage(
+            imageUrl: user.photoURL!,
+            imageBuilder: (context, imageProvider) => Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(color: primaryColor, width: 2),
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            placeholder: (context, url) => const CircularProgressIndicator(),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          )
+        : Container(
+            width: 150,
+            height: 150,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(color: primaryColor, width: 2)),
+            child: Image.network(imgUrl));
     return Scaffold(
         backgroundColor: Colors.grey[100],
         appBar: AppBar(
           backgroundColor: Colors.grey[100],
-          centerTitle: true,
           title: Row(
             children: [
-              const Text('      '),
+              IconButton(
+                  onPressed: () async {
+                    if (Provider.of<ApplicationState>(context, listen: false)
+                        .isTailleur) {
+                      FirebaseFirestore.instance
+                          .collection('Tailleur')
+                          .doc(user.uid)
+                          .delete();
+                    } else {
+                      FirebaseFirestore.instance
+                          .collection('client')
+                          .doc(user.uid)
+                          .delete();
+                    }
+                    await disconnect();
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/sign_in', (Route<dynamic> route) => false);
+                  },
+                  icon: Icon(
+                    Icons.logout,
+                    color: primaryColor,
+                  )),
               const Spacer(),
               const Text('Profile'),
               const Spacer(),
@@ -130,7 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(100),
                             border: Border.all(color: primaryColor, width: 2)),
-                        child: Image.network(imgUrl)),
+                        child: profileImage),
                     Positioned(
                       bottom: 0,
                       right: 0,
@@ -154,7 +206,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(
                   height: 10,
                 ),
-                const Text('John Doe', style: TextStyle(fontSize: 20)),
+                Text(
+                    // currentUsers!.nom!.isEmpty ? 'John Doe' : currentUsers.nom!,
+                    user.displayName!,
+                    style: TextStyle(fontSize: 20)),
                 const SizedBox(
                   height: 10,
                 ),
@@ -180,7 +235,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: primaryColor,
                         ),
                         StreamBuilder<List<Commande>>(
-                          stream: getAllCommande('idUser'),
+                          stream: getAllCommande(user.uid),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return Text('${snapshot.data!.length}');
@@ -247,14 +302,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: inputBorderColor, width: 1),
                             ),
                             onPressed: () {
-                              if(nameController.text.isNotEmpty){
+                              if (nameController.text.isNotEmpty) {
                                 // update user name
+                                updateProfile(user.uid, context, 'nomPrenom',
+                                    nameController.text);
                               }
-                              if(quartierController.text.isNotEmpty){
+                              if (quartierController.text.isNotEmpty) {
                                 // update user quartier
+                                updateProfile(user.uid, context, 'quartier',
+                                    quartierController.text);
                               }
-                              if(phoneController.text.isNotEmpty){
+                              if (phoneController.text.isNotEmpty) {
                                 // update user phone
+                                updateProfile(user.uid, context, 'telephone',
+                                    int.parse(phoneController.text));
                               }
                               setState(() {
                                 isEditedVisible = !isEditedVisible;
@@ -393,11 +454,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 Container(
                   height: 600,
                   child: StreamBuilder(
-                      stream: getAllModeleByTailleurId('test id tailleur'),
+                      stream: getAllModeleByTailleurId(user.uid),
                       builder: (context, snpashot) {
                         if (snpashot.hasData) {
                           final modele = snpashot.data!;
                           return MyListModele(modeles: modele);
+                        } else if (!snpashot.hasData) {
+                          return const Center(
+                              child: Text(
+                            'Vous n\'avez pas encore de modele',
+                            style: TextStyle(color: Colors.black),
+                          ));
                         } else {
                           return const Center(
                             child: CircularProgressIndicator(),

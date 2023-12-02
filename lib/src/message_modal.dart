@@ -1,6 +1,6 @@
+import 'package:faani/auth.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/my_theme.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../modele/message.dart';
@@ -129,7 +129,7 @@ class _MessageModalState extends State<MessageModal> {
                   IconButton(
                     onPressed: () {
                       final Message message = Message(
-                          idUser: 'nrEBxV2l8LnHhPxBNgwW',
+                          idUser: user!.uid,
                           idModele: widget.idModele,
                           message: _controller.text,
                           userType: 'client',

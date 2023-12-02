@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/modele/modele.dart';
 import 'package:faani/src/ajout_mesure.dart';
-import 'package:faani/src/ajout_modele.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../auth.dart';
 import '../commande_page.dart';
 import '../firebase_get_all_data.dart';
 import '../modele/commande.dart';
@@ -46,7 +46,7 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
 
   List<Measure> mesureData = [];
   void fetchMesure() async {
-    getAllTailleurMesure('YclYUCHrpriv4RbAfMLu').listen((event) {
+    getAllTailleurMesure(user!.uid).listen((event) {
       setState(() {
         mesureData = event;
       });
@@ -356,7 +356,7 @@ class _MeasureDialogState extends State<MeasureDialog> {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (BuildContext context) => const AjoutMesure()));
               },
-              child: const Text('Add new measure'),
+              child: const Text('Ajouter une mesure'),
             ),
           ],
         ),

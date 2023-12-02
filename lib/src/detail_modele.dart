@@ -1,7 +1,8 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:faani/app_state.dart';
 import 'package:faani/modele/modele.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/src/form_comm_tailleur.dart';
@@ -9,45 +10,38 @@ import 'package:faani/src/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:http/http.dart' as http;
+import '../auth.dart';
 import '../firebase_get_all_data.dart';
+import '../modele/classes.dart';
 import 'message_modal.dart';
 
 class DetailModele extends StatelessWidget {
   final Modele modele;
   DetailModele({super.key, required this.modele});
   final PageController _controller = PageController();
-  final bool isAuthor = false;
-  final Map<String, dynamic> user = {
-    'id': 'test id tailleur',
-    'name': 'John Doe',
-    'quartier': 'korofina-sud',
-    'email': 'dt@gmail.com',
-    'profileImageUrl':
-        'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png',
-    'isCertify': true,
-  };
-
-  bool userCheck() {
-    if (modele.idTailleur == user['id']) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  bool isAuthor = false;
+  late Tailleur currentTailleur;
+  late Client currentClient;
 
   Future<void> updateDetail(String docId, String newDetail) async {
-    final docRef = firestore.collection('modele').doc(docId);
+    final docRef = FirebaseFirestore.instance.collection('modele').doc(docId);
     await docRef.update({'detail': newDetail});
   }
 
   void onCommande() {}
-
   @override
   Widget build(BuildContext context) {
-    final check = userCheck();
+    final isTaileur = Provider.of<ApplicationState>(context).isTailleur;
+    if (isTaileur) {
+      currentTailleur = Provider.of<ApplicationState>(context).currentTailleur;
+      isAuthor = currentTailleur.id == modele.idTailleur;
+    } else {
+      currentClient = Provider.of<ApplicationState>(context).currentClient;
+    }
     return Scaffold(
         appBar: AppBar(
             leading: IconButton(
@@ -120,14 +114,14 @@ class DetailModele extends StatelessWidget {
                   child: Column(children: [
                     const SizedBox(height: 10),
                     Text(
-                      user['name'],
+                      user!.displayName!,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      user['quartier'],
+                      currentTailleur.quartier,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w400,
@@ -267,7 +261,7 @@ class DetailModele extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 30),
-                    !check
+                    !isTaileur
                         ? ElevatedButton(
                             onPressed: () {
                               // Handle the button press
@@ -279,97 +273,103 @@ class DetailModele extends StatelessWidget {
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              TextButton(
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: inputBackgroundColor,
-                                    side: const BorderSide(
-                                        color: inputBorderColor, width: 1),
-                                  ),
-                                  onPressed: () {
-                                    showDialog(
+                              Visibility(
+                                visible: isAuthor,
+                                child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: inputBackgroundColor,
+                                      side: const BorderSide(
+                                          color: inputBorderColor, width: 1),
+                                    ),
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            TextEditingController
+                                                _textFieldController =
+                                                TextEditingController();
+                                            return AlertDialog(
+                                              title: Text('Changer le detail'),
+                                              content: TextField(
+                                                controller: _textFieldController,
+                                                decoration: const InputDecoration(
+                                                    hintText: "Nouveau detail"),
+                                              ),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  child: const Text('CANCEL'),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                                TextButton(
+                                                  child: const Text('OK'),
+                                                  onPressed: () {
+                                                    // Do something with the text
+                                                    String text =
+                                                        _textFieldController.text;
+                                                    // change the detail of the modele
+                                                    updateDetail(
+                                                        modele.id!, text);
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          });
+                                    },
+                                    child: const Row(
+                                      children: [
+                                        Icon(Icons.edit,
+                                            color:
+                                                Color.fromARGB(255, 59, 59, 59)),
+                                      ],
+                                    )),
+                              ),
+                              Visibility(
+                                visible: isAuthor,
+                                child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: inputBackgroundColor,
+                                      side: const BorderSide(
+                                          color: inputBorderColor, width: 1),
+                                    ),
+                                    onPressed: () {
+                                      showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
-                                          TextEditingController
-                                              _textFieldController =
-                                              TextEditingController();
                                           return AlertDialog(
-                                            title: Text('Changer le detail'),
-                                            content: TextField(
-                                              controller: _textFieldController,
-                                              decoration: const InputDecoration(
-                                                  hintText: "Nouveau detail"),
-                                            ),
+                                            title: const Text('Confirmer'),
+                                            content: const Text(
+                                                'Etes-vous sur de vouloir le suprimer?'),
                                             actions: <Widget>[
                                               TextButton(
-                                                child: const Text('CANCEL'),
+                                                child: const Text('Non'),
                                                 onPressed: () {
                                                   Navigator.of(context).pop();
                                                 },
                                               ),
                                               TextButton(
-                                                child: const Text('OK'),
+                                                child: const Text('Oui'),
                                                 onPressed: () {
-                                                  // Do something with the text
-                                                  String text =
-                                                      _textFieldController.text;
-                                                  // change the detail of the modele
-                                                  updateDetail(
-                                                      modele.id!, text);
-                                                  Navigator.of(context).pop();
+                                                  modele.delete();
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
                                                 },
                                               ),
                                             ],
                                           );
-                                        });
-                                  },
-                                  child: const Row(
-                                    children: [
-                                      Icon(Icons.edit,
-                                          color:
-                                              Color.fromARGB(255, 59, 59, 59)),
-                                    ],
-                                  )),
-                              TextButton(
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: inputBackgroundColor,
-                                    side: const BorderSide(
-                                        color: inputBorderColor, width: 1),
-                                  ),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Confirmer'),
-                                          content: const Text(
-                                              'Etes-vous sur de vouloir le suprimer?'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              child: const Text('Non'),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
-                                            TextButton(
-                                              child: const Text('Oui'),
-                                              onPressed: () {
-                                                modele.delete();
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: const Row(
-                                    children: [
-                                      Icon(Icons.delete,
-                                          color:
-                                              Color.fromARGB(255, 202, 3, 3)),
-                                    ],
-                                  )),
+                                        },
+                                      );
+                                    },
+                                    child: const Row(
+                                      children: [
+                                        Icon(Icons.delete,
+                                            color:
+                                                Color.fromARGB(255, 202, 3, 3)),
+                                      ],
+                                    )),
+                              ),
                               TextButton(
                                   style: TextButton.styleFrom(
                                     backgroundColor: inputBackgroundColor,
@@ -378,7 +378,7 @@ class DetailModele extends StatelessWidget {
                                   ),
                                   onPressed: () {
                                     showModalBottomSheet(
-                                      isScrollControlled: true,
+                                        isScrollControlled: true,
                                         backgroundColor: const Color.fromARGB(
                                             255, 252, 248, 248),
                                         context: context,

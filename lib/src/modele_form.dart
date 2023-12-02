@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:faani/auth.dart';
 import 'package:faani/src/tailleur_modeles.dart';
 import 'package:faani/src/widgets.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -60,7 +61,7 @@ class _ModeleFormState extends State<ModeleForm> {
         imagePath: imageInfo.map((info) => info['path']).toList(),
         genreHabit: _selectedGender ?? '',
         idTailleur:
-            'test id tailleur', // YclYUCHrpriv4RbAfMLu/ 30Y6Kdx7dZPPoFgsdGoY
+            user!.uid,
         idCategorie: selectedCategoryId,
         isPublic: _isPublic);
     modele.create();

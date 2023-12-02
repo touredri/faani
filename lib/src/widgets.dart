@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app_state.dart';
+import 'package:faani/auth.dart';
 import 'package:faani/src/form_client_modele.dart';
-import 'package:faani/src/tailleur_modeles.dart';
+import 'package:faani/src/form_comm_tailleur.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../firebase_get_all_data.dart';
-import '../home_page.dart';
 import '../modele/modele.dart';
 import '../my_theme.dart';
-import 'form_comm_tailleur.dart';
 import 'message_modal.dart';
 
 InputDecoration myInputDecoration(String label) {
@@ -167,6 +168,8 @@ TextButton myFilterContainer(String label, onPressed, String currentFilter) {
 }
 
 Stack homeItem(Modele modele, BuildContext context) {
+  final bool isTailleur = Provider.of<ApplicationState>(context).isTailleur;
+  print('isTailleur: $isTailleur');
   final PageController _controller = PageController();
   return Stack(
     children: [
@@ -228,26 +231,25 @@ Stack homeItem(Modele modele, BuildContext context) {
             children: [
               IconButton(
                 onPressed: () {
-                  // showModalBottomSheet(
-                  //     isScrollControlled: true,
-                  //     backgroundColor: const Color.fromARGB(255, 252, 248, 248),
-                  //     context: context,
-                  //     builder: (context) {
-                  //       return Container(
-                  //         height: 670,
-                  //         padding:
-                  //             const EdgeInsets.only(top: 20, left: 8, right: 8),
-                  //         child: TailleurCommandeForm(modele: modele),
-                  //       );
-                  //     });
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ClientCommande(
-                        modele: modele,
+                  if (!isTailleur) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ClientCommande(
+                          modele: modele,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TailleurCommandeForm(
+                          modele: modele,
+                        ),
+                      ),
+                    );
+                  }
                 },
                 icon: const Icon(
                   Icons.shopping_cart_outlined,
@@ -342,7 +344,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
     firestore
         .collection('favorie')
         .where('idModele', isEqualTo: widget.docId)
-        .where('idUtilisateur', isEqualTo: 'idUtilisateur')
+        .where('idUtilisateur', isEqualTo: user!.uid)
         .get()
         .then((value) {
       if (value.docs.isNotEmpty) {
@@ -369,7 +371,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
   void createFavorie() async {
     final collection = firestore.collection('favorie');
     await collection
-        .add({'idModele': widget.docId, 'idUtilisateur': 'idUtilisateur'});
+        .add({'idModele': widget.docId, 'idUtilisateur': user!.uid});
     // print(docRef.id);
   }
 
@@ -377,7 +379,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
     final querySnapshot = await firestore
         .collection('favorie')
         .where('idModele', isEqualTo: widget.docId)
-        .where('idUtilisateur', isEqualTo: 'idUtilisateur')
+        .where('idUtilisateur', isEqualTo: user!.uid)
         .get();
 
     for (var doc in querySnapshot.docs) {

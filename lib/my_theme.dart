@@ -7,6 +7,7 @@ const inputBorderColor = Color(0xFFA4CEFB);
 const blackColor = Colors.black;
 var subtextColor = const Color(0xFF000000).withOpacity(0.65);
 const fontFamily = 'Poppins';
+var scaffoldBack = Colors.grey[200];
 
 ThemeData buildTheme(BuildContext context) {
   return ThemeData(

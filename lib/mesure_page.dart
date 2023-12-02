@@ -1,3 +1,4 @@
+import 'package:faani/auth.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/src/mesure_detail.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class MeasurePage extends StatelessWidget {
         ),
       ),
       body: StreamBuilder<List<Measure>>(
-        stream: getAllTailleurMesure('YclYUCHrpriv4RbAfMLu'),
+        stream: getAllTailleurMesure(user!.uid),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Text('Une erreur est survenue');

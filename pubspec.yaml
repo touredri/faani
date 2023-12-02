@@ -60,6 +60,7 @@ dependencies:
   share_plus: ^7.2.1
   dio: ^5.3.3
   image_gallery_saver: '^2.0.3'
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
