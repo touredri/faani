@@ -32,16 +32,43 @@ class _nameState extends State<HomePage> {
         setState(() {
           modeles = event.where((modele) {
             if (currentFilterSelected == 'Tous') {
+              isHommeSelected = false;
+              isFemmeSelected = false;
               return true;
+            } else if (isHommeSelected) {
+              return modele.idCategorie ==
+                      getKeyFromValue(categorieList, currentFilterSelected) &&
+                  modele.genreHabit == 'Homme';
             } else {
               return modele.idCategorie ==
-                  getKeyFromValue(categorieList, currentFilterSelected);
+                      getKeyFromValue(categorieList, currentFilterSelected) &&
+                  modele.genreHabit == 'Femme';
             }
           }).toList();
         });
       });
     });
   }
+
+  // void changeFilterHomme() {
+  //   setState(() {
+  //     isHommeSelected = true;
+  //     isFemmeSelected = false;
+  //     getAllModeles().listen((event) {
+  //       setState(() {
+  //         modeles = event.where((modele) {
+  //           if (currentFilterSelected == 'Tous') {
+  //             return modele.genreHabit == 'Homme';
+  //           } else {
+  //             return modele.idCategorie ==
+  //                     getKeyFromValue(categorieList, currentFilterSelected) &&
+  //                 modele.genreHabit == 'Homme';
+  //           }
+  //         }).toList();
+  //       });
+  //     });
+  //   });
+  // }
 
   void fetchCategories() async {
     final data = await CategoryService.fetchCategories();

@@ -97,7 +97,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUsers = Provider.of<ApplicationState>(context).currentUsers;
+    // final currentUsers = Provider.of<ApplicationState>(context).currentUsers;
+    final isTaiileur = Provider.of<ApplicationState>(context).isTailleur;
     final String imgUrl = getRandomProfileImageUrl();
     final profileImage = user.photoURL != null
         ? CachedNetworkImage(
@@ -132,17 +133,19 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               IconButton(
                   onPressed: () async {
-                    if (Provider.of<ApplicationState>(context, listen: false)
-                        .isTailleur) {
-                      FirebaseFirestore.instance
-                          .collection('Tailleur')
-                          .doc(user.uid)
-                          .delete();
-                    } else {
-                      FirebaseFirestore.instance
-                          .collection('client')
-                          .doc(user.uid)
-                          .delete();
+                    if (!user.isAnonymous) {
+                      if (Provider.of<ApplicationState>(context, listen: false)
+                          .isTailleur) {
+                        FirebaseFirestore.instance
+                            .collection('Tailleur')
+                            .doc(user.uid)
+                            .delete();
+                      } else {
+                        FirebaseFirestore.instance
+                            .collection('client')
+                            .doc(user.uid)
+                            .delete();
+                      }
                     }
                     await disconnect();
                     Navigator.of(context).pushNamedAndRemoveUntil(
@@ -218,10 +221,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Column(
                       children: [
-                        const Icon(
+                        isTaiileur ? const Icon(
                           Icons.favorite,
                           color: primaryColor,
-                        ),
+                        ) : const Icon(Icons.message, color:  primaryColor,),
                         Text(count),
                       ],
                     ),

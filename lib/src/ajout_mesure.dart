@@ -368,7 +368,6 @@ class _MesurePaveViewState extends State<MesurePaveView> {
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
                           );
-                          
                         },
                         child: Container(
                           height: 40,
@@ -465,7 +464,6 @@ class PageViewContent extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextField(
-                        autofocus: true,
                         controller: controller,
                         keyboardType: TextInputType.number,
                         inputFormatters: [

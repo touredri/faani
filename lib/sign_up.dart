@@ -86,8 +86,17 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
+  bool checkEmpty() {
+    print('checking');
+    if (name.text.isEmpty || (isChecked && quartier.text.isEmpty)) {
+      return true;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    // bool checkEmpt = checkEmpty();
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -209,21 +218,24 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          maximumSize: const Size.fromWidth(350),
-                          minimumSize: const Size(300, 30),
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                        ),
-                        onPressed: () {
-                          if (name.text.isEmpty ||
-                              (quartier.text.isEmpty && isChecked)) {
-                            isNotFill();
-                          } else {
-                            create_acount();
-                          }
-                        },
-                        child: const Text('Enregistrer'),
-                      ),
+                          style: ElevatedButton.styleFrom(
+                            maximumSize: const Size.fromWidth(350),
+                            minimumSize: const Size(300, 30),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          onPressed: () {
+                            if (name.text.isEmpty ||
+                                (quartier.text.isEmpty && isChecked)) {
+                              isNotFill();
+                            } else {
+                              create_acount();
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(builder: (c) => const Home()),
+                                (route) => false,
+                              );
+                            }
+                          },
+                          child: const Text('Enregistrer')),
                     ],
                   ),
                 ),

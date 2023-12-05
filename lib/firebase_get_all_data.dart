@@ -195,3 +195,14 @@ Stream<List<Tendance>> getAllTendance() {
           .map((doc) => Tendance.fromMap(doc.data(), doc.reference))
           .toList());
 }
+
+// get All modele by genre
+Stream<List<Modele>> getAllModeleByGenre(String genre) {
+          return firestore
+              .collection('modele')
+              .where('genreHabit', isEqualTo: genre)
+              .snapshots()
+              .map((querySnapshot) => querySnapshot.docs
+                  .map((doc) => Modele.fromMap(doc.data(), doc.reference))
+                  .toList());
+}

@@ -253,7 +253,7 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
                     dateRecuperation: selectedDate,
                     idCategorie: selectedCategoryId,
                     idMesure: selectedMeasureId,
-                    idTailleur: 'YclYUCHrpriv4RbAfMLu',
+                    idTailleur: user!.uid,
                     dateCommande: DateTime.now(),
                     image: widget.modele.fichier[0],
                   );

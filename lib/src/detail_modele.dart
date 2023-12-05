@@ -234,7 +234,6 @@ class _DetailModeleState extends State<DetailModele> {
                                 final uri =
                                     Uri.parse(widget.modele.fichier[0]!);
                                 final bytes = await http.readBytes(uri);
-                                // final bytes = res.bodyBytes;
                                 final temp = await getTemporaryDirectory();
                                 final path = '${temp.path}/modele.png';
                                 await File(path).writeAsBytes(bytes);
