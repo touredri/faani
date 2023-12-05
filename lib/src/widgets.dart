@@ -244,9 +244,11 @@ Stack homeItem(Modele modele, BuildContext context) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TailleurCommandeForm(
-                          modele: modele,
-                        ),
+                        builder: (context) => isTailleur
+                            ? TailleurCommandeForm(
+                                modele: modele,
+                              )
+                            : ClientCommande(modele: modele),
                       ),
                     );
                   }

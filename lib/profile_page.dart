@@ -30,6 +30,7 @@ class _ProfilePageState extends State<ProfilePage> {
   List<String> languages = ['Français', 'Anglais'];
   String selectedLanguage = 'Français';
   bool isEditedVisible = false;
+  bool isTailleur = false;
   TextEditingController nameController = TextEditingController();
   TextEditingController quartierController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -92,12 +93,13 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     countFavorie();
+    isTailleur =
+        Provider.of<ApplicationState>(context, listen: false).isTailleur;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentUsers = Provider.of<ApplicationState>(context).currentUsers;
     final String imgUrl = getRandomProfileImageUrl();
     final profileImage = user.photoURL != null
         ? CachedNetworkImage(
@@ -132,23 +134,11 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               IconButton(
                   onPressed: () async {
-                    if (Provider.of<ApplicationState>(context, listen: false)
-                        .isTailleur) {
-                      FirebaseFirestore.instance
-                          .collection('Tailleur')
-                          .doc(user.uid)
-                          .delete();
-                    } else {
-                      FirebaseFirestore.instance
-                          .collection('client')
-                          .doc(user.uid)
-                          .delete();
-                    }
                     await disconnect();
                     Navigator.of(context).pushNamedAndRemoveUntil(
                         '/sign_in', (Route<dynamic> route) => false);
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.logout,
                     color: primaryColor,
                   )),
@@ -235,7 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: primaryColor,
                         ),
                         StreamBuilder<List<Commande>>(
-                          stream: getAllCommande(user.uid),
+                          stream: getAllCommande(context),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return Text('${snapshot.data!.length}');
@@ -428,24 +418,27 @@ class _ProfilePageState extends State<ProfilePage> {
                     left: MediaQuery.of(context).size.width * 0.1,
                     // right: MediaQuery.of(context).size.width * 0.1,
                   ),
-                  child: Row(
-                    children: [
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text('Mes Modèles',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                            )),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.4,
-                      ),
-                      const Icon(
-                        Icons.open_in_new,
-                        color: primaryColor,
-                      )
-                    ],
+                  child: Visibility(
+                    visible: isTailleur,
+                    child: Row(
+                      children: [
+                        TextButton(
+                          onPressed: () {},
+                          child: const Text('Mes Modèles',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.black,
+                              )),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                        ),
+                        const Icon(
+                          Icons.open_in_new,
+                          color: primaryColor,
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(

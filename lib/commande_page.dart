@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/app_state.dart';
 import 'package:faani/auth.dart';
 import 'package:faani/modele/commande.dart';
 import 'package:faani/src/detail_commande.dart';
 import 'package:faani/src/new_commande.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import 'firebase_get_all_data.dart';
 import 'my_theme.dart';
@@ -18,8 +20,6 @@ class CommandePage extends StatefulWidget {
 
 class _CommandePageState extends State<CommandePage> {
   final TextEditingController _filter = TextEditingController();
-  // String _searchText = "";
-  // List<CommandeAnonyme> commande = [];
   @override
   void initState() {
     super.initState();
@@ -28,6 +28,7 @@ class _CommandePageState extends State<CommandePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isTailleur = Provider.of<ApplicationState>(context).isTailleur;
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -101,6 +102,9 @@ class _CommandePageState extends State<CommandePage> {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
+                    } else if (!snapshot.hasData) {
+                      return const Center(
+                          child: Text('Aucune commande pour le moment'));
                     } else {
                       List<CommandeAnonyme> commande =
                           snapshot.data as List<CommandeAnonyme>;
@@ -196,17 +200,20 @@ class _CommandePageState extends State<CommandePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => const NouvelleCommande(),
-            settings: RouteSettings(name: 'CommandePage'),
-          ));
-        },
-        backgroundColor: Colors.grey,
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
+      floatingActionButton: Visibility(
+        visible: isTailleur,
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => const NouvelleCommande(),
+              settings: RouteSettings(name: 'CommandePage'),
+            ));
+          },
+          backgroundColor: Colors.grey,
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
         ),
       ),
     );

@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/auth.dart';
 import 'package:faani/main.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/sign_up.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +18,17 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   bool loading = false;
   String phoneNumber = '';
+
+  Future<String?> getNomIfExists(String docId) async {
+    DocumentSnapshot docSnapshot =
+        await FirebaseFirestore.instance.collection('users').doc(docId).get();
+    if (docSnapshot.exists) {
+      Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+      return data['nom'] as String?;
+    } else {
+      return null;
+    }
+  }
 
   void errorAlert() {
     if (phoneNumber.length < 7) {
@@ -139,12 +152,37 @@ class _SignInPageState extends State<SignInPage> {
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 18),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       errorAlert();
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (c) => SignUp(
-                                phoneNumber: phoneNumber,
-                              )));
+                      String? nom = await getNomIfExists(phoneNumber);
+                      print(nom);
+                      if (nom != null) {
+                        try {
+                          final String emailAddress = '$phoneNumber@faani.com';
+                          final String password = '${phoneNumber}223@faani';
+                          await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(
+                                  email: emailAddress, password: password);
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (c) => const Home()),
+                            (route) => false,
+                          );
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'user-not-found') {
+                            print('No user found for that email.');
+                          } else if (e.code == 'wrong-password') {
+                            print('Wrong password provided for that user.');
+                          }
+                        }
+                      } else {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (c) => SignUp(
+                              phoneNumber: phoneNumber,
+                            ),
+                          ),
+                        );
+                      }
                     },
                     child: loading
                         ? const CircularProgressIndicator(

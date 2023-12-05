@@ -1,10 +1,14 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app_state.dart';
+import 'package:faani/auth.dart';
 import 'package:faani/modele/classes.dart';
 import 'package:faani/modele/commande.dart';
 import 'package:faani/modele/favorie.dart';
 import 'package:faani/modele/message.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'modele/mesure.dart';
 import 'modele/modele.dart';
@@ -176,10 +180,22 @@ String getRandomProfileImageUrl() {
 }
 
 // get all commande
-Stream<List<Commande>> getAllCommande(String idUser) {
+Stream<List<Commande>> getAllCommande(BuildContext context) {
+  bool isTailleur =
+      Provider.of<ApplicationState>(context, listen: false).isTailleur;
+  if (isTailleur) {
+    return firestore
+        .collection('commande')
+        .where('idTailleur', isEqualTo: user!.uid)
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs
+            .map((doc) => Commande.fromMap(doc.data(), doc.reference))
+            .toList());
+  }
+  print(user!.uid);
   return firestore
       .collection('commande')
-      .where('idUser', isEqualTo: idUser)
+      .where('idClient', isEqualTo: user!.uid)
       .snapshots()
       .map((querySnapshot) => querySnapshot.docs
           .map((doc) => Commande.fromMap(doc.data(), doc.reference))
@@ -188,10 +204,8 @@ Stream<List<Commande>> getAllCommande(String idUser) {
 
 // get all tentance
 Stream<List<Tendance>> getAllTendance() {
-  return firestore
-      .collection('tendance')
-      .snapshots()
-      .map((querySnapshot) => querySnapshot.docs
+  return firestore.collection('tendance').snapshots().map((querySnapshot) =>
+      querySnapshot.docs
           .map((doc) => Tendance.fromMap(doc.data(), doc.reference))
           .toList());
 }

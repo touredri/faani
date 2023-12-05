@@ -165,7 +165,7 @@ class _ClientCommandeState extends State<ClientCommande> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(16))),
                                 fillColor: inputBackgroundColor,
-                                labelText: '56335544',
+                                labelText: '64886765',
                                 border: OutlineInputBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(16)),
@@ -266,7 +266,7 @@ class _ClientCommandeState extends State<ClientCommande> {
                       onPressed: () async {
                         // check if the user has already order this modele
                         if (await Commande.isAlreadyOrdered(
-                            'nFtBNysvloenbt2K6irQ', widget.modele.id!)) {
+                            user!.uid, widget.modele.id!)) {
                           print('already ordered');
                           // ignore: use_build_context_synchronously
                           showDialog(
@@ -292,7 +292,7 @@ class _ClientCommandeState extends State<ClientCommande> {
                             selectedCategoryId.isNotEmpty) {
                           Commande commande = Commande(
                             id: '',
-                            idClient: 'nFtBNysvloenbt2K6irQ',
+                            idClient: user!.uid,
                             idModele: widget.modele.id!,
                             dateRecuperation: selectedDate!,
                             idCategorie: selectedCategoryId,

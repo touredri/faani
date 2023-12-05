@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/anonyme_profile.dart';
 import 'package:faani/auth.dart';
+import 'package:faani/client_commande_page.dart';
 import 'package:faani/sign_in.dart';
 import 'package:faani/sign_up.dart';
 import 'package:faani/src/ajout_mesure.dart';
@@ -65,6 +66,7 @@ class _HomeState extends State<Home> {
   late var _user;
   bool isTailleur = false;
   List<Widget> _pages = [];
+  List<Widget> _clientPageList = [];
 
   // get isTailleur value from shared preferences
   void getIsTailleur() async {
@@ -113,7 +115,15 @@ class _HomeState extends State<Home> {
       const CommandePage(), // Page de commande
       user!.isAnonymous
           ? const AnonymeProfile()
-          : const AjoutModele(), // Page ajout
+          : (isTailleur ? const AjoutModele() : Container()), // Page ajout
+      const FavoriesPage(), // Page de favories
+      user!.isAnonymous
+          ? const AnonymeProfile()
+          : const ProfilePage(), // Page de profile
+    ];
+    _clientPageList = [
+      const HomePage(), // Page d'accueil
+      const ClientCommandePage(), // Page de commande
       const FavoriesPage(), // Page de favories
       user!.isAnonymous
           ? const AnonymeProfile()
@@ -131,8 +141,73 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    List<BottomNavigationBarItem> clientitems = [
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.home, color: Color(0xFF898888)),
+        label: 'Accueil',
+        activeIcon: Icon(Icons.home, color: primaryColor),
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.shopping_cart, color: Color(0xFF898888)),
+        label: 'Achats',
+        activeIcon: Icon(Icons.shopping_cart, color: primaryColor),
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.favorite, color: Color(0xFF898888)),
+        label: 'Favoris',
+        activeIcon: Icon(Icons.favorite, color: primaryColor),
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.person, color: Color(0xFF898888)),
+        label: 'Profile',
+        activeIcon: Icon(Icons.person, color: primaryColor),
+      ),
+    ];
+    List<BottomNavigationBarItem> items = [
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.home, color: Color(0xFF898888)),
+        label: 'Accueil',
+        activeIcon: Icon(Icons.home, color: primaryColor),
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.shopping_cart, color: Color(0xFF898888)),
+        label: 'Achats',
+        activeIcon: Icon(Icons.shopping_cart, color: primaryColor),
+      ),
+      BottomNavigationBarItem(
+        icon: Transform.translate(
+          offset: const Offset(0, -10),
+          child: const Icon(
+            Icons.add_circle_rounded,
+            color: primaryColor,
+            size: 45,
+          ),
+        ),
+        label: 'Modele',
+        activeIcon: Transform.translate(
+          offset: const Offset(0, -10),
+          child: const Icon(
+            Icons.add_circle_rounded,
+            color: primaryColor,
+            size: 45,
+          ),
+        ),
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.favorite, color: Color(0xFF898888)),
+        label: 'Favoris',
+        activeIcon: Icon(Icons.favorite, color: primaryColor),
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.person, color: Color(0xFF898888)),
+        label: 'Profile',
+        activeIcon: Icon(Icons.person, color: primaryColor),
+      ),
+    ];
+
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body:
+          isTailleur ? _pages[_selectedIndex] : _clientPageList[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         selectedLabelStyle: const TextStyle(height: 0),
         // landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
@@ -140,48 +215,7 @@ class _HomeState extends State<Home> {
         showUnselectedLabels: false,
         type: BottomNavigationBarType
             .fixed, // Affiche tous les éléments en permanence
-        items: <BottomNavigationBarItem>[
-          // Définit les éléments de la barre de navigation
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Color(0xFF898888)),
-            label: 'Accueil',
-            activeIcon: Icon(Icons.home, color: primaryColor),
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart, color: Color(0xFF898888)),
-            label: 'Achats',
-            activeIcon: Icon(Icons.shopping_cart, color: primaryColor),
-          ),
-          BottomNavigationBarItem(
-            icon: Transform.translate(
-              offset: const Offset(0, -10),
-              child: const Icon(
-                Icons.add_circle_rounded,
-                color: primaryColor,
-                size: 45,
-              ),
-            ),
-            label: 'Modele',
-            activeIcon: Transform.translate(
-              offset: const Offset(0, -10),
-              child: const Icon(
-                Icons.add_circle_rounded,
-                color: primaryColor,
-                size: 45,
-              ),
-            ),
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.favorite, color: Color(0xFF898888)),
-            label: 'Favoris',
-            activeIcon: Icon(Icons.favorite, color: primaryColor),
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Color(0xFF898888)),
-            label: 'Profile',
-            activeIcon: Icon(Icons.person, color: primaryColor),
-          ),
-        ],
+        items: isTailleur ? items : clientitems,
         currentIndex: _selectedIndex, // Index de l'élément sélectionné
         selectedItemColor: Colors.amber[800],
         onTap: _onItemTapped,

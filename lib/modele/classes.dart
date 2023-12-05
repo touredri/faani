@@ -150,3 +150,8 @@ Future<Tailleur> getTailleurByRef(DocumentReference docRef) async {
       Tailleur.fromMap(snapshot.data() as Map<String, dynamic>, docRef);
   return tailleur;
 }
+
+// add to collection users
+Future<void> addUserWithCustomId(String id, Map<String, dynamic> userData) async {
+  await FirebaseFirestore.instance.collection('users').doc(id).set(userData);
+}
