@@ -465,7 +465,7 @@ class PageViewContent extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextField(
-                        autofocus: true,
+                        autofocus: false,
                         controller: controller,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
