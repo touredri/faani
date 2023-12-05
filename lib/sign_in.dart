@@ -37,7 +37,7 @@ class _SignInPageState extends State<SignInPage> {
           builder: (BuildContext context) {
             return const AlertDialog(
               title: Text('Erreur'),
-              content: Text("enter valid number"),
+              content: Text("Entrer numero valid"),
             );
           });
       return;

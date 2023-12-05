@@ -208,10 +208,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Column(
                       children: [
-                        const Icon(
+                        isTaiileur ? const Icon(
                           Icons.favorite,
                           color: primaryColor,
-                        ),
+                        ) : const Icon(Icons.message, color:  primaryColor,),
                         Text(count),
                       ],
                     ),

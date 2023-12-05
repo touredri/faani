@@ -110,6 +110,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     getIsTailleur();
+    getUser();
     _pages = [
       const HomePage(), // Page d'accueil
       const CommandePage(), // Page de commande
@@ -130,7 +131,6 @@ class _HomeState extends State<Home> {
           : const ProfilePage(), // Page de profile
     ];
     super.initState();
-    getUser();
   }
 
   void _onItemTapped(int index) {
