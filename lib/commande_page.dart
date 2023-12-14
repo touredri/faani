@@ -36,13 +36,9 @@ class _CommandePageState extends State<CommandePage> {
             preferredSize: const Size.fromHeight(40),
             child: Container(
               alignment: Alignment.bottomCenter,
-              child: const Text(
+              child: Text(
                 'Commandes',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(context).textTheme.displayMedium,
               ),
             ),
           ),
@@ -55,36 +51,39 @@ class _CommandePageState extends State<CommandePage> {
             fontWeight: FontWeight.w600,
           )),
       body: Container(
-        color: Color.fromARGB(255, 250, 248, 248),
+        color: const Color.fromARGB(255, 250, 248, 248),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               child: TextField(
                 controller: _filter,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.all(10),
-                  floatingLabelStyle: TextStyle(
-                    color: Colors.black,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(10),
+                  floatingLabelStyle: const TextStyle(
+                    color: primaryColor,
                   ),
                   labelText: 'Chercher par nom',
-                  prefixIcon: Icon(Icons.search, color: primaryColor),
+                  prefixIcon: const Icon(Icons.search, color: primaryColor),
                   fillColor: inputBackgroundColor,
-                  enabledBorder: OutlineInputBorder(
+                  labelStyle: TextStyle(
+                    color: subtextColor,
+                  ),
+                  enabledBorder: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(25.0)),
                     borderSide: BorderSide(
                       color: inputBorderColor,
                       width: 1,
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(25.0)),
                     borderSide: BorderSide(
                       color: inputBorderColor,
                       width: 1,
                     ),
                   ),
-                  border: OutlineInputBorder(
+                  border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(25.0)),
                     borderSide: BorderSide(
                       color: inputBorderColor,
@@ -145,10 +144,10 @@ class _CommandePageState extends State<CommandePage> {
                                             imageUrl:
                                                 currentCommande.image ?? "",
                                             placeholder: (context, url) =>
-                                                Placeholder(),
+                                                const Placeholder(),
                                             errorWidget:
                                                 (context, url, error) =>
-                                                    Placeholder(),
+                                                    const Placeholder(),
                                           ),
                                         ),
                                       ),
@@ -206,7 +205,7 @@ class _CommandePageState extends State<CommandePage> {
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
               builder: (BuildContext context) => const NouvelleCommande(),
-              settings: RouteSettings(name: 'CommandePage'),
+              settings: const RouteSettings(name: 'CommandePage'),
             ));
           },
           backgroundColor: Colors.grey,

@@ -32,9 +32,11 @@ void main() async {
   ));
 }
 
+final _auth = FirebaseAuth.instance;
+
 class MyApp extends StatelessWidget {
   MyApp({super.key});
-  final _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -85,8 +87,10 @@ class _HomeState extends State<Home> {
 
   // setup user variable to get user data from shared preferences
   void getUser() async {
+    // if(user != null) {
     if (user!.isAnonymous) {
       return;
+      // }
     }
     _user = await loadObject('user');
     if (isTailleur == true) {
@@ -109,14 +113,13 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    getIsTailleur();
-    getUser();
+    super.initState();
     _pages = [
       const HomePage(), // Page d'accueil
       const CommandePage(), // Page de commande
       user!.isAnonymous
           ? const AnonymeProfile()
-          : (isTailleur ? const AjoutModele() : Container()), // Page ajout
+          : const AjoutModele(), // Page ajout
       const FavoriesPage(), // Page de favories
       user!.isAnonymous
           ? const AnonymeProfile()
@@ -130,7 +133,8 @@ class _HomeState extends State<Home> {
           ? const AnonymeProfile()
           : const ProfilePage(), // Page de profile
     ];
-    super.initState();
+    getUser();
+    getIsTailleur();
   }
 
   void _onItemTapped(int index) {

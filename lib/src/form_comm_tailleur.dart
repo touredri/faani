@@ -84,16 +84,7 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
                       maxLength: 30,
                       decoration: const InputDecoration(
                         counterText: '',
-                        enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: inputBorderColor, width: 1),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(16))),
-                        fillColor: inputBackgroundColor,
                         labelText: 'Prénom Nom',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(16)),
-                        ),
                       ),
                     ),
                   ),
@@ -107,16 +98,8 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
                       maxLength: 8,
                       controller: _numeroController,
                       decoration: const InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: inputBorderColor, width: 1),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(16))),
                         labelText: 'Numéro',
                         counterText: '',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(16)),
-                        ),
                       ),
                     ),
                   ),
@@ -135,16 +118,7 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
                       maxLength: 6,
                       decoration: const InputDecoration(
                         counterText: '',
-                        enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: inputBorderColor, width: 1),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(16))),
-                        fillColor: inputBackgroundColor,
                         labelText: 'Prix',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(16)),
-                        ),
                       ),
                     ),
                   ),
@@ -155,16 +129,8 @@ class _TailleurCommandeFormState extends State<TailleurCommandeForm> {
                     height: 45,
                     child: DropdownButtonFormField<String>(
                       isExpanded: true,
-                      decoration: InputDecoration(
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: inputBorderColor, width: 1),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(16))),
-                        fillColor: inputBackgroundColor,
+                      decoration: const InputDecoration(
                         labelText: 'Type habit',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16)),
                       ),
                       value: selectedCategoryId.isEmpty
                           ? null

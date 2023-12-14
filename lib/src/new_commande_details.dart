@@ -160,9 +160,9 @@ class _MyFormState extends State<MyForm> {
               decoration: const InputDecoration(
                 fillColor: inputBackgroundColor,
                 labelText: 'Prénom Nom',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
-                ),
+                // border: OutlineInputBorder(
+                //   borderRadius: BorderRadius.all(Radius.circular(16)),
+                // ),
               ),
             ),
             TextField(
@@ -172,9 +172,9 @@ class _MyFormState extends State<MyForm> {
               decoration: const InputDecoration(
                 labelText: 'Numéro',
                 counterText: '',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
-                ),
+                // border: OutlineInputBorder(
+                //   borderRadius: BorderRadius.all(Radius.circular(16)),
+                // ),
               ),
             ),
             TextField(
@@ -185,9 +185,9 @@ class _MyFormState extends State<MyForm> {
                 counterText: '',
                 fillColor: inputBackgroundColor,
                 labelText: 'Prix en Fcfa',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
-                ),
+                // border: OutlineInputBorder(
+                //   borderRadius: BorderRadius.all(Radius.circular(16)),
+                // ),
               ),
             ),
             DropdownButtonFormField<String>(
@@ -207,7 +207,6 @@ class _MyFormState extends State<MyForm> {
                 );
               }).toList(),
               onChanged: (value) {
-                print(value);
                 setState(() {
                   selectedCategoryId =
                       value ?? ""; // Update the selected category ID

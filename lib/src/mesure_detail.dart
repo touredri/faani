@@ -331,8 +331,8 @@ class ModifyMesure extends StatelessWidget {
                   ),
                   const Spacer(),
                   SizedBox(
-                    width: 207,
-                    height: 40,
+                    width: 200,
+                    height: 35,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -350,32 +350,16 @@ class ModifyMesure extends StatelessWidget {
                           child: TextField(
                             controller: controller,
                             keyboardType: TextInputType.number,
-                            // inputFormatters: [
-                            //   // FilteringTextInputFormatter.digitsOnly
-                            // ],
                             onChanged: (value) {},
-                            // maxLength: 3,
+                            maxLength: 3,
                             style: const TextStyle(
-                              // height: 3,
                               color: Colors.black,
                               fontSize: 18,
                             ),
                             decoration: InputDecoration(
-                              // counter: const Text(''),
+                              counterText: '',
                               labelText: value,
-                              labelStyle: const TextStyle(color: Colors.blue),
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(
-                                    color: inputBorderColor, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(
-                                    color: primaryColor, width: 2),
-                              ),
+                              labelStyle: const TextStyle(color: primaryColor),
                             ),
                           ),
                           // ),

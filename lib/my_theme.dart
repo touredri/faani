@@ -8,19 +8,121 @@ const blackColor = Colors.black;
 var subtextColor = const Color(0xFF000000).withOpacity(0.65);
 const fontFamily = 'Poppins';
 var scaffoldBack = Colors.grey[200];
+const subTextColor = Color(0xFF898888);
 
 ThemeData buildTheme(BuildContext context) {
   return ThemeData(
+    buttonTheme: const ButtonThemeData(
+      textTheme: ButtonTextTheme.primary,
+    ),
+    scaffoldBackgroundColor: Colors.grey[100],
+    dialogTheme: const DialogTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(15)),
+      ),
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      titleTextStyle: TextStyle(
+        color: Colors.black,
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.w600,
+        fontSize: 18,
+      ),
+      contentTextStyle: TextStyle(
+        color: Colors.black,
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+    ),
     colorScheme: const ColorScheme.light(
       background: Colors.white,
+      primary: primaryColor,
+      onPrimary: Colors.white,
     ),
     primaryColor: primaryColor,
-    textTheme: GoogleFonts.poppinsTextTheme(
-      Theme.of(context).textTheme,
+    splashColor: Colors.transparent,
+    textButtonTheme: TextButtonThemeData(
+      style: ButtonStyle(
+        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+          const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        ),
+        splashFactory: InkSplash.splashFactory,
+        foregroundColor: MaterialStateProperty.all<Color>(primaryColor),
+        overlayColor: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) {
+            if (states.contains(MaterialState.pressed)) {
+              return primaryColor.withOpacity(0.1);
+            } // The splash color when the button is pressed
+            return primaryColor; // Use the component's default.
+          },
+        ),
+        textStyle: MaterialStateProperty.all<TextStyle>(
+          const TextStyle(
+            fontFamily: fontFamily,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    ),
+    // textTheme: GoogleFonts.poppinsTextTheme(
+    //   Theme.of(context).textTheme,
+    // ),
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.w700,
+        fontSize: 30,
+        color: primaryColor,
+        height: 0,
+      ),
+      displayMedium: TextStyle(
+        fontFamily: fontFamily,
+        fontSize: 20,
+        color: Colors.white,
+        fontWeight: FontWeight.w600,
+        height: 0,
+      ),
+      displaySmall: TextStyle(
+        fontFamily: fontFamily,
+        fontSize: 16,
+        color: Colors.white,
+        fontWeight: FontWeight.w600,
+        height: 0,
+      ),
+      titleLarge: TextStyle(
+        fontFamily: fontFamily,
+        fontSize: 18,
+        color: Colors.black,
+        fontWeight: FontWeight.w500,
+      ),
+      bodyMedium: TextStyle(
+        fontFamily: fontFamily,
+        fontSize: 16,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+    ),
+    datePickerTheme: const DatePickerThemeData(
+      dividerColor: primaryColor,
+      headerHeadlineStyle: TextStyle(
+        color: Colors.black,
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.normal,
+        fontSize: 20,
+      ),
     ),
     fontFamily: fontFamily,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
+        overlayColor: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) {
+            if (states.contains(MaterialState.pressed)) {
+              return blackColor.withOpacity(0.3);
+            } // The splash color when the button is pressed
+            return primaryColor; // Use the component's default.
+          },
+        ),
         backgroundColor: MaterialStateProperty.all<Color>(primaryColor),
         foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
         textStyle: MaterialStateProperty.all<TextStyle>(
@@ -48,13 +150,23 @@ ThemeData buildTheme(BuildContext context) {
         ),
       ),
     ),
-    inputDecorationTheme: const InputDecorationTheme(
-      filled: true,
-      fillColor: inputBackgroundColor,
-      border: OutlineInputBorder(
+    inputDecorationTheme: InputDecorationTheme(
+      labelStyle: TextStyle(
+        color: subtextColor,
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.normal,
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 10),
+      floatingLabelStyle: const TextStyle(
+        color: primaryColor,
+      ),
+      border: const OutlineInputBorder(
         borderSide: BorderSide(color: inputBorderColor, width: 1),
         borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
+      enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: inputBorderColor, width: 1),
+          borderRadius: BorderRadius.all(Radius.circular(8))),
     ),
     textSelectionTheme: const TextSelectionThemeData(
       cursorColor: primaryColor,

@@ -176,18 +176,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     Positioned(
                       bottom: 0,
                       right: 0,
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(color: primaryColor, width: 2),
-                            color: primaryColor),
-                        child: IconButton(
-                          icon: const Icon(Icons.camera_alt),
-                          color: Colors.white,
-                          onPressed: changeProfileImage,
+                      child: Center(
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              border: Border.all(color: primaryColor, width: 2),
+                              color: primaryColor),
+                          child: IconButton(
+                            icon: const Icon(Icons.camera_alt),
+                            color: Colors.white,
+                            onPressed: changeProfileImage,
+                          ),
                         ),
                       ),
                     )
@@ -208,10 +210,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Column(
                       children: [
-                        isTaiileur ? const Icon(
-                          Icons.favorite,
-                          color: primaryColor,
-                        ) : const Icon(Icons.message, color:  primaryColor,),
+                        isTailleur
+                            ? const Icon(
+                                Icons.favorite,
+                                color: primaryColor,
+                              )
+                            : const Icon(
+                                Icons.message,
+                                color: primaryColor,
+                              ),
                         Text(count),
                       ],
                     ),
@@ -273,6 +280,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     !isEditedVisible
                         ? TextButton(
                             style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 20),
                               backgroundColor: inputBackgroundColor,
                               side: const BorderSide(
                                   color: inputBorderColor, width: 1),
@@ -329,15 +338,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         Container(
                           width: MediaQuery.of(context).size.width * 0.8,
                           height: 45,
-                          decoration: BoxDecoration(
-                              color: inputBackgroundColor,
-                              border: Border.all(color: inputBorderColor),
-                              borderRadius: BorderRadius.circular(15)),
                           child: TextField(
                             controller: nameController,
                             decoration: const InputDecoration(
                               hintText: 'Nom Prenom',
-                              border: InputBorder.none,
                             ),
                           ),
                         ),
@@ -347,15 +351,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         Container(
                           width: MediaQuery.of(context).size.width * 0.8,
                           height: 45,
-                          decoration: BoxDecoration(
-                              color: inputBackgroundColor,
-                              border: Border.all(color: inputBorderColor),
-                              borderRadius: BorderRadius.circular(15)),
                           child: TextField(
                             controller: quartierController,
                             decoration: const InputDecoration(
                               hintText: 'quartier',
-                              border: InputBorder.none,
                             ),
                           ),
                         ),
@@ -365,15 +364,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         Container(
                           width: MediaQuery.of(context).size.width * 0.8,
                           height: 45,
-                          decoration: BoxDecoration(
-                              color: inputBackgroundColor,
-                              border: Border.all(color: inputBorderColor),
-                              borderRadius: BorderRadius.circular(15)),
                           child: TextField(
                             controller: phoneController,
                             decoration: const InputDecoration(
                               hintText: 'numero de telephone',
-                              border: InputBorder.none,
                             ),
                           ),
                         ),

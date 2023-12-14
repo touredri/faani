@@ -49,6 +49,9 @@ class _SignUpState extends State<SignUp> {
     final String password = '${widget.phoneNumber!}223@faani';
     User? user = await signUpWithEmailPassword(email, password);
     if (user != null) {
+      await addUserWithCustomId(widget.phoneNumber!, {
+        'nom': name.text,
+      });
       if (isChecked) {
         Tailleur tailleur = Tailleur(
           quartier: quartier.text,
@@ -63,10 +66,12 @@ class _SignUpState extends State<SignUp> {
         updateUserName(name.text);
         await saveObject('user', tailleur.toMap());
         await saveBoolean('isTailleur', true);
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (c) => const Home()),
-          (route) => false,
-        );
+        if (mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (c) => const Home()),
+            (route) => false,
+          );
+        }
       } else {
         Client client = Client(
           nomPrenom: name.text,
@@ -82,9 +87,6 @@ class _SignUpState extends State<SignUp> {
           MaterialPageRoute(builder: (c) => const Home()),
           (route) => false,
         );
-        await addUserWithCustomId(widget.phoneNumber!, {
-          'nom': name.text,
-        });
       }
     }
   }

@@ -157,13 +157,11 @@ class _MesurePaveViewState extends State<MesurePaveView> {
   void onChangeHanche(String value) {
     _hancheController.text = value;
     setState(() {});
-    print('hanche: $value');
   }
 
   void onChangeBras(String value) {
     _brasController.text = value;
     setState(() {});
-    print('bras: $value');
   }
 
   void onChangeTaille(String value) {
@@ -416,7 +414,6 @@ class PageViewContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // controller.text = context.watch<ApplicationState>().currentValue.toString();
     return Container(
       padding: const EdgeInsets.all(10),
       child: Column(children: [
@@ -448,9 +445,9 @@ class PageViewContent extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Container(
+              SizedBox(
                 width: 207,
-                height: 40,
+                height: 35,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -465,42 +462,23 @@ class PageViewContent extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextField(
-                        autofocus: false,
                         controller: controller,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],
-                        onChanged: (value) {
-                          // Provider.of<ApplicationState>(context, listen: false)
-                          //     .currentValue = int.tryParse(value) ?? 0;
-                          // onChanged(value);
-                        },
-                        // maxLength: 3,
+                        onChanged: (value) {},
+                        maxLength: 3,
                         style: const TextStyle(
-                          // height: 3,
                           color: Colors.black,
                           fontSize: 18,
                         ),
-                        decoration: InputDecoration(
-                          // counter: const Text(''),
+                        decoration: const InputDecoration(
+                          counterText: '',
                           labelText: 'mésure',
-                          labelStyle: const TextStyle(color: Colors.blue),
-                          filled: true,
-                          fillColor: Colors.grey[200],
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                                color: inputBorderColor, width: 2),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                const BorderSide(color: primaryColor, width: 2),
-                          ),
+                          labelStyle: TextStyle(color: primaryColor),
                         ),
                       ),
-                      // ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.add),

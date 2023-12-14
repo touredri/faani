@@ -37,8 +37,8 @@ class _FavoriesPageState extends State<FavoriesPage> {
     return Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
-          title:
-              const Text('Mes favoris', style: TextStyle(color: Colors.white)),
+          title: Text('Mes favoris',
+              style: Theme.of(context).textTheme.displayMedium),
           centerTitle: true,
           backgroundColor: primaryColor,
           toolbarHeight: 40,

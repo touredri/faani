@@ -98,14 +98,9 @@ class _nameState extends State<HomePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Faani',
-              style: TextStyle(
-                color: Color(0xFFF3755F),
-                fontSize: 25,
-                fontWeight: FontWeight.w700,
-                height: 0,
-              ),
+              style: Theme.of(context).textTheme.displayLarge,
             ),
             Row(
               children: [

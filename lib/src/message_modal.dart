@@ -113,15 +113,8 @@ class _MessageModalState extends State<MessageModal> {
                       height: 50,
                       child: TextField(
                         controller: _controller,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Votre commentaire',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: primaryColor),
-                          ),
                         ),
                       ),
                     ),
