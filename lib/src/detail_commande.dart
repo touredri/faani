@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../firebase_get_all_data.dart';
-import '../modele/modele.dart';
+import '../models/modele_model.dart';
 import 'mesure_detail.dart';
 
 class DetailCommande extends StatefulWidget {

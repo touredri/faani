@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:faani/auth.dart';
+import 'package:faani/helpers/authentification.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/src/detail_modele.dart';
 import 'package:flutter/material.dart';
 
-import '../modele/modele.dart';
+import '../models/modele_model.dart';
 import '../my_theme.dart';
 
 class TailleurModeles extends StatefulWidget {

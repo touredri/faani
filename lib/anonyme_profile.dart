@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app_state.dart';
-import 'package:faani/auth.dart';
+import 'package:faani/helpers/authentification.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/src/explore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'modele/modele.dart';
+import 'models/modele_model.dart';
 import 'my_theme.dart';
 import 'src/tailleur_modeles.dart';
 

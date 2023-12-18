@@ -1,9 +1,9 @@
-import 'package:faani/auth.dart';
+import 'package:faani/helpers/authentification.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/my_theme.dart';
 import 'package:flutter/material.dart';
 
-import '../modele/message.dart';
+import '../models/message.dart';
 
 class MessageModal extends StatefulWidget {
   final String idModele;

@@ -3,16 +3,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/anonyme_profile.dart';
 import 'package:faani/app_state.dart';
-import 'package:faani/auth.dart';
+import 'package:faani/helpers/authentification.dart';
 import 'package:faani/src/form_client_modele.dart';
 import 'package:faani/src/form_comm_tailleur.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../firebase_get_all_data.dart';
-import '../modele/modele.dart';
+import '../models/modele_model.dart';
 import '../my_theme.dart';
-import 'message_modal.dart';
+import '../src/message_modal.dart';
 
 InputDecoration myInputDecoration(String label) {
   return InputDecoration(
@@ -34,13 +34,17 @@ InputDecoration myInputDecoration(String label) {
   );
 }
 
+// personalize dropdown button //////////////////////////////////////////////////
 class MyDropdownButton extends StatefulWidget {
   final String value;
   final ValueChanged<String?>? onChanged;
   final List<String> items;
 
-  MyDropdownButton(
-      {required this.value, required this.onChanged, required this.items});
+  const MyDropdownButton(
+      {super.key,
+      required this.value,
+      required this.onChanged,
+      required this.items});
 
   @override
   _MyDropdownButtonState createState() => _MyDropdownButtonState();
@@ -51,15 +55,14 @@ class _MyDropdownButtonState extends State<MyDropdownButton> {
   Widget build(BuildContext context) {
     return Container(
       width: double.maxFinite,
+      height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       decoration: BoxDecoration(
-        color: inputBackgroundColor,
         border: Border.all(color: inputBorderColor),
-        borderRadius: BorderRadius.circular(15.0),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
           focusColor: inputBackgroundColor,
           dropdownColor: inputBackgroundColor,
           value: widget.value,
@@ -68,17 +71,16 @@ class _MyDropdownButtonState extends State<MyDropdownButton> {
               value: value,
               child: Text(
                 value,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                ),
               ),
             );
           }).toList(),
-          icon: const Icon(Icons.keyboard_arrow_down),
+          icon: const Icon(
+            Icons.keyboard_arrow_down,
+            color: primaryColor,
+          ),
           iconSize: 24,
           elevation: 16,
-          style: const TextStyle(color: primaryColor),
+          style: const TextStyle(fontFamily: fontFamily, color: Colors.black),
           onChanged: widget.onChanged,
         ),
       ),
@@ -141,182 +143,8 @@ Container _myFilterContainer(String label, VoidCallback onPressed) {
   );
 }
 
-TextButton myFilterContainer(String label, onPressed, String currentFilter) {
-  bool v = currentFilter == label;
-  return TextButton(
-      onPressed: onPressed,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
-        decoration: ShapeDecoration(
-          color: v ? primaryColor : null,
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(width: 1, color: Color(0xFFA4CEFB)),
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: v ? Colors.white : Colors.black,
-            fontSize: 15,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w400,
-            height: 0,
-          ),
-        ),
-      ));
-}
 
-Stack homeItem(Modele modele, BuildContext context) {
-  final bool isTailleur = Provider.of<ApplicationState>(context).isTailleur;
-  final PageController _controller = PageController();
-  return Stack(
-    children: [
-      Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              itemCount: modele.fichier.length,
-              itemBuilder: (context, imageIndex) {
-                return CachedNetworkImage(
-                  imageUrl: modele.fichier[imageIndex]!,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                );
-              },
-            ),
-          ),
-          Container(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-                height: 20,
-                width: 200,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SmoothPageIndicator(
-                      controller: _controller,
-                      count: modele.fichier.length,
-                      effect: const ExpandingDotsEffect(
-                        dotColor: Colors.grey,
-                        activeDotColor: primaryColor,
-                        dotHeight: 8,
-                        dotWidth: 8,
-                        expansionFactor: 4,
-                      ),
-                    ),
-                  ],
-                )),
-          ),
-        ],
-      ),
-      Container(
-        alignment: Alignment.centerRight,
-        child: Container(
-          height: 261,
-          width: 60,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-            ),
-            color: Colors.white.withOpacity(0.0),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                onPressed: () {
-                  if (!isTailleur) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ClientCommande(
-                          modele: modele,
-                        ),
-                      ),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => isTailleur
-                            ? TailleurCommandeForm(
-                                modele: modele,
-                              )
-                            : ClientCommande(modele: modele),
-                      ),
-                    );
-                  }
-                },
-                icon: const Icon(
-                  Icons.shopping_cart_outlined,
-                  color: Colors.grey,
-                  size: 30,
-                ),
-              ),
-              FavoriteIcone(docId: modele.id!),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    IconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                            // isScrollControlled: true,
-                            backgroundColor:
-                                const Color.fromARGB(255, 252, 248, 248),
-                            context: context,
-                            builder: (context) {
-                              return Container(
-                                height: 600,
-                                padding: const EdgeInsets.only(
-                                    top: 20, left: 8, right: 8),
-                                child: MessageModal(
-                                  idModele: modele.id!,
-                                ),
-                              );
-                            });
-                      },
-                      icon: const Icon(
-                        Icons.message_outlined,
-                        color: Colors.grey,
-                        size: 30,
-                      ),
-                    ),
-                    StreamBuilder<int>(
-                      stream: getNombreMessage(modele.id!),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Text('${snapshot.data}',
-                              style: TextStyle(color: Colors.grey));
-                        } else {
-                          return const CircularProgressIndicator();
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.more_horiz,
-                  color: Colors.grey,
-                  size: 30,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ],
-  );
-}
+
 
 class FavoriteIcone extends StatefulWidget {
   final String docId;

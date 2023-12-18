@@ -1,7 +1,8 @@
-import 'package:faani/src/widgets.dart';
+import 'package:faani/pages/home/widget/home_view.dart';
+import 'package:faani/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
-import '../modele/modele.dart';
+import '../../../models/modele_model.dart';
 
 class HomePAgeView extends StatefulWidget {
   final List<Modele> modeles;

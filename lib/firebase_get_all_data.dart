@@ -2,16 +2,16 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app_state.dart';
-import 'package:faani/auth.dart';
+import 'package:faani/helpers/authentification.dart';
 import 'package:faani/modele/classes.dart';
 import 'package:faani/modele/commande.dart';
 import 'package:faani/modele/favorie.dart';
-import 'package:faani/modele/message.dart';
+import 'package:faani/models/message.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'modele/mesure.dart';
-import 'modele/modele.dart';
+import 'models/modele_model.dart';
 import 'modele/tendance.dart';
 
 final firestore = FirebaseFirestore.instance;

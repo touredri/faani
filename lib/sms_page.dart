@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
-import 'auth.dart';
+import 'helpers/authentification.dart';
 
 class Verification extends StatefulWidget {
   const Verification(

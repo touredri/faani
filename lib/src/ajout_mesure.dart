@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:faani/auth.dart';
+import 'package:faani/helpers/authentification.dart';
 import 'package:faani/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

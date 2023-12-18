@@ -1,4 +1,6 @@
 import 'package:faani/modele/mesure.dart';
+import 'package:faani/models/categorie_model.dart';
+import 'package:faani/models/modele_model.dart';
 import 'package:flutter/material.dart';
 import 'modele/classes.dart';
 
@@ -17,13 +19,28 @@ class CurrentUsers {
   }
 }
 
-
 class ApplicationState extends ChangeNotifier {
   bool isLastPage = false;
   Measure? _measure;
   bool isTailleur = false;
-
   CurrentUsers? currentUsers;
+  bool isLoading = false;
+  List<Categorie> categorie = <Categorie>[];
+  List<Modele> listModeles = <Modele>[];
+
+  set loadingState(bool load) {
+    isLoading = load;
+    ChangeNotifier();
+  }
+  set categories(List<Categorie> cat) {
+    categorie = cat;
+    ChangeNotifier();
+  }
+
+  set modeles(List<Modele> modele) {
+    listModeles = modele;
+    ChangeNotifier();
+  }
 
   Tailleur currentTailleur = Tailleur(
     quartier: '',

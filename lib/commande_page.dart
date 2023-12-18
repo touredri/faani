@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app_state.dart';
-import 'package:faani/auth.dart';
+import 'package:faani/helpers/authentification.dart';
 import 'package:faani/modele/commande.dart';
 import 'package:faani/src/detail_commande.dart';
 import 'package:faani/src/new_commande.dart';

@@ -13,7 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'auth.dart';
+import 'helpers/authentification.dart';
 import 'mesure_page.dart';
 import 'modele/classes.dart';
 import 'src/detail_modele.dart';

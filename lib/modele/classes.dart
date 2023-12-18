@@ -1,11 +1,9 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
-import '../auth.dart';
+import '../helpers/authentification.dart';
 
 final firestore = FirebaseFirestore.instance;
 

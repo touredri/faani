@@ -1,4 +1,4 @@
-import 'package:faani/auth.dart';
+import 'package:faani/helpers/authentification.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/src/ajout_mesure.dart';
 import 'package:faani/src/mesure_detail.dart';

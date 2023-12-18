@@ -1,16 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faani/modele/modele.dart';
+import 'package:faani/models/modele_model.dart';
 import 'package:faani/src/ajout_mesure.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../auth.dart';
+import '../helpers/authentification.dart';
 import '../commande_page.dart';
 import '../firebase_get_all_data.dart';
 import '../modele/commande.dart';
 import '../modele/mesure.dart';
 import '../my_theme.dart';
-import 'widgets.dart';
+import '../widgets/widgets.dart';
 
 class TailleurCommandeForm extends StatefulWidget {
   final Modele modele;

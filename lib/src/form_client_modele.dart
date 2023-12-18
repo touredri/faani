@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faani/auth.dart';
-import 'package:faani/modele/modele.dart';
+import 'package:faani/helpers/authentification.dart';
+import 'package:faani/models/modele_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

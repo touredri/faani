@@ -96,6 +96,12 @@ ThemeData buildTheme(BuildContext context) {
         color: Colors.black,
         fontWeight: FontWeight.w500,
       ),
+      titleMedium: TextStyle(
+        fontFamily: fontFamily,
+        fontSize: 17,
+        color: subTextColor,
+        fontWeight: FontWeight.w400,
+      ),
       bodyMedium: TextStyle(
         fontFamily: fontFamily,
         fontSize: 16,
@@ -153,6 +159,7 @@ ThemeData buildTheme(BuildContext context) {
     inputDecorationTheme: InputDecorationTheme(
       labelStyle: TextStyle(
         color: subtextColor,
+        fontSize: 14,
         fontFamily: fontFamily,
         fontWeight: FontWeight.normal,
       ),
@@ -167,6 +174,13 @@ ThemeData buildTheme(BuildContext context) {
       enabledBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: inputBorderColor, width: 1),
           borderRadius: BorderRadius.all(Radius.circular(8))),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(
+          color: inputBorderColor,
+          width: 1,
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(15)),
+      ),
     ),
     textSelectionTheme: const TextSelectionThemeData(
       cursorColor: primaryColor,
