@@ -4,8 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app_state.dart';
 import 'package:faani/firebase_get_all_data.dart';
-import 'package:faani/modele/commande.dart';
+import 'package:faani/models/commande_model.dart';
 import 'package:faani/my_theme.dart';
+import 'package:faani/services/commande_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'helpers/authentification.dart';
 import 'mesure_page.dart';
 import 'modele/classes.dart';
-import 'src/detail_modele.dart';
+import 'pages/modele/detail_modele.dart';
 import 'src/tailleur_modeles.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -35,6 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController quartierController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   User user = FirebaseAuth.instance.currentUser!;
+  CommandeService commandeService = CommandeService();
 
   void openUrl(String link) async {
     Uri url = Uri.parse(link);
@@ -232,7 +234,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: primaryColor,
                         ),
                         StreamBuilder<List<Commande>>(
-                          stream: getAllCommande(context),
+                          stream: commandeService.getAllCommande(isTailleur),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return Text('${snapshot.data!.length}');
@@ -373,14 +375,14 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ]),
                     )),
-                // go to my measure pages
+                // go to my mesure pages
                 const SizedBox(
                   height: 10,
                 ),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const MeasurePage()));
+                        builder: (context) => const MesurePage()));
                   },
                   child: Padding(
                     padding: EdgeInsets.only(

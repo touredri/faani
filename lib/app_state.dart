@@ -1,8 +1,9 @@
-import 'package:faani/modele/mesure.dart';
+import 'package:faani/models/client_model.dart';
+import 'package:faani/models/mesure_model.dart';
 import 'package:faani/models/categorie_model.dart';
 import 'package:faani/models/modele_model.dart';
+import 'package:faani/models/tailleur_model.dart';
 import 'package:flutter/material.dart';
-import 'modele/classes.dart';
 
 class CurrentUsers {
   final String uid;
@@ -21,17 +22,19 @@ class CurrentUsers {
 
 class ApplicationState extends ChangeNotifier {
   bool isLastPage = false;
-  Measure? _measure;
+  Mesure? mesures;
   bool isTailleur = false;
   CurrentUsers? currentUsers;
   bool isLoading = false;
   List<Categorie> categorie = <Categorie>[];
   List<Modele> listModeles = <Modele>[];
+  List<Mesure> listMesures = <Mesure>[];
 
   set loadingState(bool load) {
     isLoading = load;
     ChangeNotifier();
   }
+
   set categories(List<Categorie> cat) {
     categorie = cat;
     ChangeNotifier();
@@ -39,6 +42,11 @@ class ApplicationState extends ChangeNotifier {
 
   set modeles(List<Modele> modele) {
     listModeles = modele;
+    ChangeNotifier();
+  }
+
+  set mesuresList(List<Mesure> mesure) {
+    listMesures = mesure;
     ChangeNotifier();
   }
 
@@ -64,10 +72,10 @@ class ApplicationState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Measure? get measure => _measure;
+  // Mesure? get mesure => _mesure;
 
-  set mesure(Measure? value) {
-    _measure = value;
+  set mesure(Mesure? value) {
+    mesures = value;
     notifyListeners();
   }
 

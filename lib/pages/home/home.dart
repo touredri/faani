@@ -1,15 +1,15 @@
 import 'package:faani/app_state.dart';
 import 'package:faani/controllers/categorie_controller.dart';
+import 'package:faani/controllers/mesure_controller.dart';
 import 'package:faani/controllers/modele_controller.dart';
 import 'package:faani/models/categorie_model.dart';
 import 'package:faani/pages/home/widget/filtered_container.dart';
+import 'package:faani/services/modele_service.dart';
 import 'package:faani/src/explore.dart';
-import 'package:faani/widgets/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// import 'src/home_item_list.dart';
-import '../../firebase_get_all_data.dart';
 import '../../models/modele_model.dart';
 import 'widget/home_pageView.dart';
 
@@ -21,13 +21,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _homeState extends State<HomePage> {
-  bool isHommeSelected = true;
+  bool isHommeSelected = false;
   bool isFemmeSelected = false;
   String currentFilterSelected = 'Tous';
   List<Modele> modeles = <Modele>[];
   List<Categorie> listCategorie = <Categorie>[];
   CategorieController category = CategorieController();
-  ModeleController modeleController = ModeleController(); 
+  ModeleController modeleController = ModeleController();
+  ModeleService modeleService = ModeleService();
+  MesureController mesureController = MesureController();
 
   // filter modele by category
   void changeFilter(String newFilter) {
@@ -35,7 +37,7 @@ class _homeState extends State<HomePage> {
         Provider.of<ApplicationState>(context, listen: false).categorie;
     setState(() {
       currentFilterSelected = newFilter;
-      getAllModeles().listen((event) {
+      modeleService.getAllModeles().listen((event) {
         setState(() {
           modeles = event.where((modele) {
             if (currentFilterSelected == 'Tous') {
@@ -68,30 +70,19 @@ class _homeState extends State<HomePage> {
     });
   }
 
-  // change filter homme/femme
-  void genreFilter() {
-    setState(() {
-      if (isHommeSelected) {
-        modeles =
-            modeles.where((modele) => modele.genreHabit == 'Homme').toList();
-      } else if (isFemmeSelected) {
-        modeles =
-            modeles.where((modele) => modele.genreHabit == 'Femme').toList();
-      }
-      changeFilter(currentFilterSelected);
-    });
-  }
-
   @override
   void initState() {
     super.initState();
     category.getCategorie(context);
     modeleController.getAllModeles(context);
-    getAllModeles().listen((event) {
+    modeleService.getAllModeles().listen((event) {
       setState(() {
         modeles = event;
       });
     });
+    if(Provider.of<ApplicationState>(context, listen: false).listMesures.isEmpty){
+      mesureController.getAllUserModele(context, FirebaseAuth.instance.currentUser!.uid);
+    }
   }
 
   @override
@@ -116,7 +107,9 @@ class _homeState extends State<HomePage> {
                   onPressed: () {
                     isHommeSelected = true;
                     isFemmeSelected = false;
-                    genreFilter();
+                    setState(() {
+                      changeFilter(currentFilterSelected);
+                    });
                   },
                   child: Text('Homme',
                       style: TextStyle(
@@ -137,7 +130,9 @@ class _homeState extends State<HomePage> {
                   onPressed: () {
                     isHommeSelected = false;
                     isFemmeSelected = true;
-                    genreFilter();
+                    setState(() {
+                      changeFilter(currentFilterSelected);
+                    });
                   },
                   child: Text('Femme',
                       style: TextStyle(
@@ -156,7 +151,6 @@ class _homeState extends State<HomePage> {
           Row(children: [
             Container(
               height: 30,
-              width: 120,
               margin: const EdgeInsets.only(left: 5),
               child: ElevatedButton.icon(
                 onPressed: () {

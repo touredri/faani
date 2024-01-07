@@ -1,6 +1,7 @@
 import 'package:faani/helpers/authentification.dart';
 import 'package:faani/main.dart';
 import 'package:faani/my_theme.dart';
+import 'package:faani/navigation.dart';
 import 'package:faani/pages/authentification/sign_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -106,6 +107,7 @@ class SignInPage extends StatelessWidget {
                         try {
                           final String emailAddress = '$phoneNumber@faani.com';
                           final String password = '${phoneNumber}223@faani';
+                          await updateStateValues(phoneNumber, context);
                           await FirebaseAuth.instance
                               .signInWithEmailAndPassword(
                                   email: emailAddress, password: password);

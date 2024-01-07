@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
-import '../modele/mesure.dart';
+import '../models/mesure_model.dart';
 import '../my_theme.dart';
 // import '../my_theme.dart';
 
@@ -27,7 +27,7 @@ class AjoutMesure extends StatelessWidget {
           children: [
             SizedBox(
                 height: MediaQuery.of(context).size.height * 0.6,
-                child: Image.asset('assets/images/measurement.png')),
+                child: Image.asset('assets/images/mesurement.png')),
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
               child: Column(
@@ -49,7 +49,7 @@ class AjoutMesure extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              'assets/images/manual_measurements.png',
+                              'assets/images/manual_mesurements.png',
                               width: 35,
                             ),
                             const SizedBox(
@@ -296,7 +296,7 @@ class _MesurePaveViewState extends State<MesurePaveView> {
                                     child: Text('Soumettre'),
                                     onPressed: () {
                                       String name = _nameController.text;
-                                      Measure newMeasure = Measure(
+                                      Mesure newMesure = Mesure(
                                         bras: int.tryParse(
                                                 _brasController.text) ??
                                             0,
@@ -326,7 +326,7 @@ class _MesurePaveViewState extends State<MesurePaveView> {
                                         id: '',
                                         date: DateTime.now(),
                                       );
-                                      newMeasure.create();
+                                      newMesure.create();
                                       Provider.of<ApplicationState>(context,
                                               listen: false)
                                           .lastPage = false;

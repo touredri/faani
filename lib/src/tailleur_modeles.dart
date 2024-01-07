@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/helpers/authentification.dart';
 import 'package:faani/firebase_get_all_data.dart';
-import 'package:faani/src/detail_modele.dart';
+import 'package:faani/services/modele_service.dart';
+import 'package:faani/pages/modele/detail_modele.dart';
 import 'package:flutter/material.dart';
 
 import '../models/modele_model.dart';
@@ -16,10 +17,11 @@ class TailleurModeles extends StatefulWidget {
 
 class _TailleurModelesState extends State<TailleurModeles> {
   List<Modele> modeles = [];
+  ModeleService modeleService = ModeleService();
   @override
   void initState() {
     super.initState();
-    getAllModeles().listen((event) {
+    modeleService.getAllModeles().listen((event) {
       setState(() {
         modeles =
             event.where((modele) => modele.idTailleur == user!.uid).toList();
@@ -59,6 +61,8 @@ class MyListModele extends StatelessWidget {
       itemCount: modeles.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 13,
         childAspectRatio: MediaQuery.of(context).size.width /
             (MediaQuery.of(context).size.height / 1.2),
       ),

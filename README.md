@@ -1,6 +1,6 @@
 # faani
 
-An application to connect tailor and customer, it promite traditionnal suit. We can book inside and follow best tailor
+An application to connect tailor and customer, it promote traditional suit. We can book inside and follow best tailor
 
 ## Getting Started
 

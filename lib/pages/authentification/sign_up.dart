@@ -1,6 +1,9 @@
 import 'package:faani/helpers/authentification.dart';
 import 'package:faani/constants/styles.dart';
 import 'package:faani/modele/classes.dart';
+import 'package:faani/models/client_model.dart';
+import 'package:faani/models/tailleur_model.dart';
+import 'package:faani/navigation.dart';
 import 'package:faani/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';

@@ -1,6 +1,10 @@
 import 'dart:math';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app_state.dart';
+import 'package:faani/models/client_model.dart';
+import 'package:faani/models/tailleur_model.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -137,7 +141,8 @@ Future<void> updateUserName(String displayName) async {
 
 Future<bool> isEmailAlreadyInUse(String email) async {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final List<String> signInMethods = await _auth.fetchSignInMethodsForEmail(email);
+  final List<String> signInMethods =
+      await _auth.fetchSignInMethodsForEmail(email);
   return signInMethods.isNotEmpty;
 }
 
@@ -152,7 +157,6 @@ Future<bool?> loadBoolean(String key) async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getBool(key);
 }
-
 
 // Save an object to shared preferences
 Future<void> saveObject(String key, Object value) async {
@@ -181,14 +185,50 @@ Future<User?> signInAnonymously() async {
   return null;
 }
 
+final firestore = FirebaseFirestore.instance;
 Future<String?> getNomIfExists(String docId) async {
-    DocumentSnapshot docSnapshot =
-        await FirebaseFirestore.instance.collection('users').doc(docId).get();
-    if (docSnapshot.exists) {
-      Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
-      return data['nom'] as String?;
-    } else {
-      return null;
-    }
+  DocumentSnapshot docSnapshot =
+      await firestore.collection('users').doc(docId).get();
+  if (docSnapshot.exists) {
+    Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+    return data['nom'] as String?;
+  } else {
+    return null;
   }
-  
+}
+
+// change the isTailleur value of a user
+Future<void> updateStateValues(String number, BuildContext context) async {
+  final appState = Provider.of<ApplicationState>(context, listen: false);
+  await firestore
+      .collection('Tailleur')
+      .where('telephone', isEqualTo: int.parse(number))
+      .get()
+      .then((value) {
+    if (value.docs.isNotEmpty) {
+      Tailleur tailleur =
+          Tailleur.fromMap(value.docs.first.data(), value.docs.first.reference);
+      saveObject('user', tailleur.toMap());
+      saveBoolean('isTailleur', true);
+      return;
+    }
+  });
+
+  await firestore
+      .collection('client')
+      .where('telephone', isEqualTo: int.parse(number))
+      .get()
+      .then((value) {
+    if (value.docs.isNotEmpty) {
+      Client client =
+          Client.fromMap(value.docs.first.data(), value.docs.first.reference);
+      saveObject('user', client.toMap());
+      saveBoolean('isTailleur', false);
+      CurrentUsers currentUsers = CurrentUsers(
+          uid: client.id,
+          numero: client.telephone.toString(),
+          nom: client.nomPrenom);
+      appState.changeCurrentUser = currentUsers;
+    }
+  });
+}

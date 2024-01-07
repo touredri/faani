@@ -68,6 +68,11 @@ ThemeData buildTheme(BuildContext context) {
     // textTheme: GoogleFonts.poppinsTextTheme(
     //   Theme.of(context).textTheme,
     // ),
+    bottomSheetTheme: const BottomSheetThemeData(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(color: inputBorderColor),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)))),
     textTheme: const TextTheme(
       displayLarge: TextStyle(
         fontFamily: fontFamily,

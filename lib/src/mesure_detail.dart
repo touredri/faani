@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../modele/mesure.dart';
+import '../models/mesure_model.dart';
 
 class DetailMesure extends StatefulWidget {
   final String mesure;
@@ -36,13 +36,13 @@ class _DetailMesureState extends State<DetailMesure> {
               return Center(
                   child: Text('Une erreur est survenue ${snapshot.error}'));
             } else {
-              final Measure mesure = snapshot.data!;
+              final Mesure mesure = snapshot.data!;
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Provider.of<ApplicationState>(context, listen: false).mesure =
                     mesure;
               });
 
-              // final mesure = context.watch<ApplicationState>().measure!;
+              // final mesure = context.watch<ApplicationState>().mesure!;
               return Container(
                 padding: const EdgeInsets.only(left: 9, right: 9),
                 child: Column(
@@ -223,7 +223,7 @@ class _DetailMesureState extends State<DetailMesure> {
 class CustomListTile extends StatelessWidget {
   final String name;
   final String value;
-  // final Measure measure;
+  // final Mesure mesure;
   const CustomListTile({super.key, required this.name, required this.value});
 
   @override
@@ -236,7 +236,7 @@ class CustomListTile extends StatelessWidget {
                 builder: (context) => ModifyMesure(
                       name: name,
                       value: value,
-                      // measure: measure,
+                      // mesure: mesure,
                     )));
       },
       child: Column(
@@ -267,7 +267,7 @@ class CustomListTile extends StatelessWidget {
 class ModifyMesure extends StatelessWidget {
   final String name;
   final String value;
-  // final Measure measure;
+  // final Mesure mesure;
   ModifyMesure({
     super.key,
     required this.name,
@@ -390,12 +390,12 @@ class ModifyMesure extends StatelessWidget {
                   onPressed: () {
                     if (controller.text.isNotEmpty) {
                       // final String fieldN = name.toLowerCase();
-                      final Measure measure =
-                          context.read<ApplicationState>().measure!;
-                      measure.updateField(
+                      final Mesure mesure =
+                          context.read<ApplicationState>().mesures!;
+                      mesure.updateField(
                           name.toLowerCase(), int.tryParse(controller.text));
                       Provider.of<ApplicationState>(context, listen: false)
-                          .mesure = measure;
+                          .mesure = mesure;
                     }
                     Navigator.pop(context);
                   },

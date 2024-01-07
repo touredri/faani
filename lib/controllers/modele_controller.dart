@@ -26,13 +26,11 @@ class ModeleController {
 
   // get all modele
   void getAllModeles(BuildContext context) {
-    Provider.of<ApplicationState>(context, listen: false).loadingState = true;
     ModeleService().getAllModeles().listen((event) {
       if (event.isNotEmpty) {
         Provider.of<ApplicationState>(context, listen: false).modeles = event;
       }
     });
-    Provider.of<ApplicationState>(context, listen: false).loadingState = false;
   }
 
 // get all modele by categorie

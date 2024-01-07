@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'firebase_get_all_data.dart';
-import 'modele/mesure.dart';
+import 'models/mesure_model.dart';
 
-class MeasurePage extends StatelessWidget {
-  const MeasurePage({super.key});
+class MesurePage extends StatelessWidget {
+  const MesurePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class MeasurePage extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        body: StreamBuilder<List<Measure>>(
+        body: StreamBuilder<List<Mesure>>(
           stream: getAllTailleurMesure(user!.uid),
           builder: (context, snapshot) {
             if (snapshot.hasError) {

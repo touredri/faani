@@ -203,7 +203,7 @@ class _ModeleFormState extends State<ModeleForm> {
                     );
                   }).toList(),
                   onChanged: (value) {
-                    print(value);
+                    // print(value);
                     setState(() {
                       selectedCategoryId =
                           value ?? ""; // Update the selected category ID

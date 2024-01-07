@@ -45,4 +45,22 @@ class Tailleur {
       'genre': genre,
     };
   }
+
+    // method create
+  Future<void> create() async {
+    final collection = firestore.collection('Tailleur');
+    await collection.doc(id).set(toMap());
+  }
+
+  // method delete
+  Future<void> delete() async {
+    final documentReference = firestore.collection('tailleur').doc(id);
+    await documentReference.delete();
+  }
+
+  // method update
+  Future<void> update() async {
+    final documentReference = firestore.collection('tailleur').doc(id);
+    await documentReference.update(toMap());
+  }
 }

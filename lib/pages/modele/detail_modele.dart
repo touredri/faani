@@ -1,24 +1,26 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:faani/app_state.dart';
+import 'package:faani/models/client_model.dart';
 import 'package:faani/models/modele_model.dart';
+import 'package:faani/models/tailleur_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/pages/authentification/sign_in.dart';
-import 'package:faani/src/form_comm_tailleur.dart';
+import 'package:faani/pages/commande/widget/form_client_modele.dart';
+import 'package:faani/pages/commande/widget/form_comm_tailleur.dart';
+import 'package:faani/widgets/image_display.dart';
 import 'package:faani/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:http/http.dart' as http;
-import '../helpers/authentification.dart';
-import '../firebase_get_all_data.dart';
-import '../modele/classes.dart';
-import 'message_modal.dart';
+import '../../helpers/authentification.dart';
+import '../../firebase_get_all_data.dart';
+import '../../modele/classes.dart';
+import '../../src/message_modal.dart';
 
 class DetailModele extends StatefulWidget {
   final Modele modele;
@@ -29,14 +31,9 @@ class DetailModele extends StatefulWidget {
 }
 
 class _DetailModeleState extends State<DetailModele> {
-  final PageController _controller = PageController();
-
   bool isAuthor = false;
-
   Tailleur? modeleOwner;
-
   late Tailleur currentTailleur;
-
   late Client currentClient;
 
   Future<void> updateDetail(String docId, String newDetail) async {
@@ -45,7 +42,7 @@ class _DetailModeleState extends State<DetailModele> {
   }
 
   void getTailleur() async {
-    print(widget.modele.idTailleur);
+    // print(widget.modele.idTailleur);
     final docRef = FirebaseFirestore.instance
         .collection('Tailleur')
         .doc(widget.modele.idTailleur);
@@ -97,51 +94,7 @@ class _DetailModeleState extends State<DetailModele> {
         body: SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 30),
             child: Column(children: [
-              SizedBox(
-                height: 450,
-                child: Stack(
-                  children: [
-                    PageView(
-                      children: [
-                        for (var image in widget.modele.fichier)
-                          ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(20),
-                                bottomRight: Radius.circular(20)),
-                            child: CachedNetworkImage(
-                              imageUrl: image!,
-                              fit: BoxFit.fill,
-                              errorWidget: (context, url, error) =>
-                                  Image.asset('assets/images/loading.gif'),
-                            ),
-                          ),
-                      ],
-                    ),
-                    Container(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                          height: 20,
-                          width: 200,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SmoothPageIndicator(
-                                controller: _controller,
-                                count: widget.modele.fichier.length,
-                                effect: const ExpandingDotsEffect(
-                                  dotColor: Colors.grey,
-                                  activeDotColor: primaryColor,
-                                  dotHeight: 8,
-                                  dotWidth: 8,
-                                  expansionFactor: 4,
-                                ),
-                              ),
-                            ],
-                          )),
-                    ),
-                  ],
-                ),
-              ),
+              DisplayImage(modele: widget.modele),
               Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(children: [
@@ -266,9 +219,9 @@ class _DetailModeleState extends State<DetailModele> {
                                       '.jpg'; // Add a default extension if there isn't one
                                 }
                                 final path = '${dir.path}/$filePath';
-                                print(
-                                    'Downloading from: ${widget.modele.fichier[0]!}');
-                                print('Saving to: $path');
+                                // print(
+                                //     'Downloading from: ${widget.modele.fichier[0]!}');
+                                // print('Saving to: $path');
                                 try {
                                   await dio.download(
                                       widget.modele.fichier[0]!, path);
@@ -276,9 +229,9 @@ class _DetailModeleState extends State<DetailModele> {
                                   // Save the image to the device gallery
                                   final result =
                                       await ImageGallerySaver.saveFile(path);
-                                  print('Image saved to gallery: $result');
+                                  // print('Image saved to gallery: $result');
                                 } catch (e) {
-                                  print('Download failed with error: $e');
+                                  // print('Download failed with error: $e');
                                 }
                               },
                               icon: const Icon(
@@ -306,6 +259,22 @@ class _DetailModeleState extends State<DetailModele> {
                                 );
                                 return;
                               }
+                              showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return Scaffold(
+                                      body: SingleChildScrollView(
+                                        child: Center(
+                                          child: Container(
+                                            padding: const EdgeInsets.only(
+                                                top: 20, left: 8, right: 8),
+                                            child: ClientCommandeForm(
+                                                modele: widget.modele),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  });
                             },
                             child: const Text('Commander',
                                 style: TextStyle(
@@ -424,17 +393,22 @@ class _DetailModeleState extends State<DetailModele> {
                                   ),
                                   onPressed: () {
                                     showModalBottomSheet(
-                                        isScrollControlled: true,
-                                        backgroundColor: const Color.fromARGB(
-                                            255, 252, 248, 248),
                                         context: context,
                                         builder: (context) {
-                                          return Container(
-                                            height: 650,
-                                            padding: const EdgeInsets.only(
-                                                top: 20, left: 8, right: 8),
-                                            child: TailleurCommandeForm(
-                                                modele: widget.modele),
+                                          return Scaffold(
+                                            body: SingleChildScrollView(
+                                              child: Center(
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 20,
+                                                          left: 8,
+                                                          right: 8),
+                                                  child: TailleurCommandeForm(
+                                                      modele: widget.modele),
+                                                ),
+                                              ),
+                                            ),
                                           );
                                         });
                                   },

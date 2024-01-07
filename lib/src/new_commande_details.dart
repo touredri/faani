@@ -3,15 +3,16 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/helpers/authentification.dart';
-import 'package:faani/commande_page.dart';
-import 'package:faani/modele/mesure.dart';
+// import 'package:faani/commande_page.dart';
+import 'package:faani/models/mesure_model.dart';
 import 'package:faani/my_theme.dart';
+import 'package:faani/pages/commande/commande.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../firebase_get_all_data.dart';
-import '../modele/commande.dart';
+import '../models/commande_model.dart';
 import '../widgets/widgets.dart';
 
 class NouvelleCommandeDetails extends StatelessWidget {
@@ -105,26 +106,26 @@ class _MyFormState extends State<MyForm> {
     });
   }
 
-  List<Measure> mesureData = [];
+  List<Mesure> mesureData = [];
   void fetchMesure() async {
     getAllTailleurMesure(user!.uid).listen((event) {
       setState(() {
-        print(event);
+        // print(event);
         mesureData = event;
       });
     });
   }
 
-  String? selectedMeasureId;
-  void onMeasureSelected(String nom) async {
+  String? selectedMesureId;
+  void onMesureSelected(String nom) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     QuerySnapshot querySnapshot =
         await firestore.collection('mesure').where('nom', isEqualTo: nom).get();
     if (querySnapshot.docs.isNotEmpty) {
-      DocumentSnapshot selectedMeasure = querySnapshot.docs.first;
+      DocumentSnapshot selectedMesure = querySnapshot.docs.first;
       setState(() {
-        selectedMeasureId = selectedMeasure.id;
+        selectedMesureId = selectedMesure.id;
       });
     }
   }
@@ -251,7 +252,7 @@ class _MyFormState extends State<MyForm> {
                 ),
               ),
               const SizedBox(width: 10),
-              joinMeasure(context, mesureData, onMeasureSelected)
+              joinMesure(context, mesureData, onMesureSelected)
             ],
           ),
         ),
@@ -263,7 +264,7 @@ class _MyFormState extends State<MyForm> {
                       _prixController.text.isNotEmpty &&
                       selectedDate != null &&
                       selectedCategoryId.isNotEmpty &&
-                      selectedMeasureId != null) {
+                      selectedMesureId != null) {
                     await uploadeImage();
                     CommandeAnonyme commandeAnonyme = CommandeAnonyme(
                       id: '',
@@ -273,7 +274,7 @@ class _MyFormState extends State<MyForm> {
                       prix: int.parse(_prixController.text),
                       dateRecuperation: selectedDate,
                       idCategorie: selectedCategoryId,
-                      idMesure: selectedMeasureId,
+                      idMesure: selectedMesureId,
                       idTailleur: user!.uid,
                       dateCommande: DateTime.now(),
                       image: imagePath,
@@ -297,23 +298,23 @@ class _MyFormState extends State<MyForm> {
   }
 }
 
-class MeasureDialog extends StatefulWidget {
-  final List<Measure> measures;
+class MesureDialog extends StatefulWidget {
+  final List<Mesure> mesures;
 
-  MeasureDialog({required this.measures});
+  MesureDialog({required this.mesures});
 
   @override
-  _MeasureDialogState createState() => _MeasureDialogState();
+  _MesureDialogState createState() => _MesureDialogState();
 }
 
-class _MeasureDialogState extends State<MeasureDialog> {
+class _MesureDialogState extends State<MesureDialog> {
   String searchTerm = '';
-  List<Measure> filteredMeasures = [];
+  List<Mesure> filteredMesures = [];
 
   @override
   void initState() {
     super.initState();
-    filteredMeasures = widget.measures;
+    filteredMesures = widget.mesures;
   }
 
   @override
@@ -328,8 +329,8 @@ class _MeasureDialogState extends State<MeasureDialog> {
               onChanged: (value) {
                 setState(() {
                   searchTerm = value;
-                  filteredMeasures = widget.measures.where((measure) {
-                    return measure.nom!.contains(searchTerm);
+                  filteredMesures = widget.mesures.where((mesure) {
+                    return mesure.nom!.contains(searchTerm);
                   }).toList();
                 });
               },
@@ -340,12 +341,12 @@ class _MeasureDialogState extends State<MeasureDialog> {
             Expanded(
               child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: filteredMeasures.length,
+                itemCount: filteredMesures.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(filteredMeasures[index].nom!),
+                    title: Text(filteredMesures[index].nom!),
                     onTap: () {
-                      Navigator.pop(context, filteredMeasures[index].nom!);
+                      Navigator.pop(context, filteredMesures[index].nom!);
                     },
                   );
                 },
@@ -353,7 +354,7 @@ class _MeasureDialogState extends State<MeasureDialog> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Navigate to measure page
+                // Navigate to mesure page
               },
               child: const Text('Ajouter une mesure'),
             ),
@@ -364,23 +365,23 @@ class _MeasureDialogState extends State<MeasureDialog> {
   }
 }
 
-TextButton joinMeasure(BuildContext context, List<Measure> measures,
-    Function(String) onMeasureSelected) {
-  String? selectedMeasure = '';
+TextButton joinMesure(BuildContext context, List<Mesure> mesures,
+    Function(String) onMesureSelected) {
+  String? selectedMesure = '';
   return TextButton(
     onPressed: () async {
-      selectedMeasure = await showDialog<String>(
+      selectedMesure = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
-          return MeasureDialog(measures: measures);
+          return MesureDialog(mesures: mesures);
         },
       );
-      if (selectedMeasure != null) {
-        onMeasureSelected(selectedMeasure!);
+      if (selectedMesure != null) {
+        onMesureSelected(selectedMesure!);
       }
     },
-    child: selectedMeasure == ''
+    child: selectedMesure == ''
         ? const Text('Joindre une mésure')
-        : Text(selectedMeasure),
+        : Text(selectedMesure),
   );
 }

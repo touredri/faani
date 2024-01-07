@@ -10,5 +10,6 @@ const inputBackgroundColor = Color(0xFFEEF4FC);
 const inputBorderColor = Color(0xFFA4CEFB);
 const blackColor = Colors.black;
 var subtextColor = const Color(0xFF000000).withOpacity(0.65);
+var labelColor = const Color(0xFF000000).withOpacity(0.8);
 const fontFamily = 'Poppins';
 var scaffoldBack = Colors.grey[200];

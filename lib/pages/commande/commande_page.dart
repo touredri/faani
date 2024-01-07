@@ -1,15 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app_state.dart';
+import 'package:faani/constants/styles.dart';
 import 'package:faani/helpers/authentification.dart';
-import 'package:faani/modele/commande.dart';
+import 'package:faani/models/commande_model.dart';
+import 'package:faani/services/commande_service.dart';
 import 'package:faani/src/detail_commande.dart';
 import 'package:faani/src/new_commande.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import 'firebase_get_all_data.dart';
-import 'my_theme.dart';
+// import 'firebase_get_all_data.dart';
+// import 'my_theme.dart';
 
 class CommandePage extends StatefulWidget {
   const CommandePage({super.key});
@@ -20,6 +22,7 @@ class CommandePage extends StatefulWidget {
 
 class _CommandePageState extends State<CommandePage> {
   final TextEditingController _filter = TextEditingController();
+  CommandeAnonymeService commandeService = CommandeAnonymeService();
   @override
   void initState() {
     super.initState();
@@ -56,46 +59,11 @@ class _CommandePageState extends State<CommandePage> {
           children: [
             Container(
               padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: _filter,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(10),
-                  floatingLabelStyle: const TextStyle(
-                    color: primaryColor,
-                  ),
-                  labelText: 'Chercher par nom',
-                  prefixIcon: const Icon(Icons.search, color: primaryColor),
-                  fillColor: inputBackgroundColor,
-                  labelStyle: TextStyle(
-                    color: subtextColor,
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                    borderSide: BorderSide(
-                      color: inputBorderColor,
-                      width: 1,
-                    ),
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                    borderSide: BorderSide(
-                      color: inputBorderColor,
-                      width: 1,
-                    ),
-                  ),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                    borderSide: BorderSide(
-                      color: inputBorderColor,
-                      width: 1,
-                    ),
-                  ),
-                ),
-              ),
+              child: SearchBar(controller: _filter),
             ),
             Expanded(
               child: StreamBuilder(
-                  stream: getAllCommandeAnnonyme(user!.uid),
+                  stream: commandeService.getAllCommandeAnnonyme(user!.uid),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());

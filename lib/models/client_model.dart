@@ -35,4 +35,22 @@ class Client {
       'quartier': quartier?? '',
     };
   }
+
+    // method create
+  Future<void> create() async {
+    final collection = firestore.collection('client');
+    await collection.doc(id).set(toMap());
+  }
+
+  // method delete
+  Future<void> delete() async {
+    final documentReference = firestore.collection('client').doc();
+    await documentReference.delete();
+  }
+
+  // method update
+  Future<void> update() async {
+    final documentReference = firestore.collection('client').doc();
+    await documentReference.update(toMap());
+  }
 }

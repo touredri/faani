@@ -2,7 +2,8 @@
 // import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faani/modele/classes.dart';
+import 'package:faani/models/client_model.dart';
+import 'package:faani/models/tailleur_model.dart';
 
 class Message {
   String? idUser;
