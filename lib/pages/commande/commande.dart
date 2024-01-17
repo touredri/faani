@@ -1,8 +1,7 @@
 import 'package:faani/app_state.dart';
 import 'package:faani/constants/styles.dart';
 import 'package:faani/pages/commande/widget/circle_indicator.dart';
-import 'package:faani/pages/commande/widget/finish.dart';
-import 'package:faani/pages/commande/widget/receive.dart';
+import 'package:faani/pages/commande/widget/list_commande.dart';
 import 'package:faani/pages/commande/widget/save.dart';
 import 'package:faani/pages/commande/widget/tailleurs.dart';
 import 'package:flutter/material.dart';
@@ -109,9 +108,13 @@ class _CommandePageState extends State<CommandePage>
         body: TabBarView(
           controller: _tabController,
           children: [
-            const ReceivedCommande(),
-            isTailleur ? const SavedCommande() : const ListTailleur(),
-            const CommandeLivrer(),
+            const ListCommande(
+              status: 'receive',
+            ),
+            isTailleur ? const SavedCommande(number: 1,) : const ListTailleur(),
+            const ListCommande(
+              status: 'finish',
+            ),
           ],
         ));
   }

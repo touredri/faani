@@ -21,16 +21,6 @@ class SuiviEtatService {
   }
 
   //get etat by commande id
-  // Future<SuiviEtat> getSuiviEtatByCommandeId(String id) async {
-  //   final doc = await collection.where('idCommande', isEqualTo: id).snapshots().first;
-  //   if (doc. == null) {
-  //     throw Exception('Document does not exist!');
-  //   } else {
-  //     return SuiviEtat.fromJson(doc.data()!, doc.reference);
-  //   }
-  // }
-
-  //get etat by commande id
   Future<SuiviEtat> getSuiviEtatByCommandeId(String id) async {
     final doc = await collection.where('idCommande', isEqualTo: id).get();
     if (doc.docs.isEmpty) {
@@ -62,12 +52,12 @@ class SuiviEtatService {
   // update
 
   //get suivietat by id commande
-  Stream<List<SuiviEtat>> getSuiviEtatByIdCommande(String idCommande) {
-    return collection
-        .where('idCommande', isEqualTo: idCommande)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => SuiviEtat.fromJson(doc.data(), doc.reference))
-            .toList());
-  }
+  // Stream<List<SuiviEtat>> getSuiviEtatByIdCommande(String idCommande) {
+  //   return collection
+  //       .where('idCommande', isEqualTo: idCommande)
+  //       .snapshots()
+  //       .map((snapshot) => snapshot.docs
+  //           .map((doc) => SuiviEtat.fromJson(doc.data(), doc.reference))
+  //           .toList());
+  // }
 }

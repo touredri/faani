@@ -1,9 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/anonyme_profile.dart';
 import 'package:faani/helpers/authentification.dart';
-// import 'package:faani/client_commande_page.dart';
 import 'package:faani/helpers/functions.dart';
-import 'package:faani/pages/commande/client_commande_page.dart';
 import 'package:faani/pages/commande/commande.dart';
 import 'package:faani/src/ajout_modele.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,10 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_state.dart';
-// import 'commande_page.dart';
 import 'favorie_page.dart';
 import 'pages/home/home.dart';
-import 'modele/classes.dart';
 import 'my_theme.dart';
 import 'profile_page.dart';
 

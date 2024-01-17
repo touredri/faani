@@ -1,10 +1,10 @@
 import 'package:faani/app_state.dart';
+import 'package:faani/models/mesure_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-import '../models/mesure_model.dart';
+import 'widget/mesure_list_tile.dart';
 
 class DetailMesure extends StatefulWidget {
   final String mesure;
@@ -41,8 +41,6 @@ class _DetailMesureState extends State<DetailMesure> {
                 Provider.of<ApplicationState>(context, listen: false).mesure =
                     mesure;
               });
-
-              // final mesure = context.watch<ApplicationState>().mesure!;
               return Container(
                 padding: const EdgeInsets.only(left: 9, right: 9),
                 child: Column(
@@ -175,35 +173,35 @@ class _DetailMesureState extends State<DetailMesure> {
                         child: SizedBox(
                           height: 600,
                           child: Column(children: [
-                            CustomListTile(
+                            MesureListTile(
                               name: 'Epaule',
                               value: mesure.epaule.toString(),
                             ),
-                            CustomListTile(
+                            MesureListTile(
                               name: 'Bras',
                               value: mesure.bras.toString(),
                             ),
-                            CustomListTile(
+                            MesureListTile(
                               name: 'Poignet',
                               value: mesure.poignet.toString(),
                             ),
-                            CustomListTile(
+                            MesureListTile(
                               name: 'Poitrine',
                               value: mesure.poitrine.toString(),
                             ),
-                            CustomListTile(
+                            MesureListTile(
                               name: 'Taille',
                               value: mesure.taille.toString(),
                             ),
-                            CustomListTile(
+                            MesureListTile(
                               name: 'Hanche',
                               value: mesure.hanche.toString(),
                             ),
-                            CustomListTile(
+                            MesureListTile(
                               name: 'Ventre',
                               value: mesure.ventre.toString(),
                             ),
-                            CustomListTile(
+                            MesureListTile(
                               name: 'Longueur',
                               value: mesure.longueur.toString(),
                             ),
@@ -216,202 +214,6 @@ class _DetailMesureState extends State<DetailMesure> {
               );
             }
           }),
-    );
-  }
-}
-
-class CustomListTile extends StatelessWidget {
-  final String name;
-  final String value;
-  // final Mesure mesure;
-  const CustomListTile({super.key, required this.name, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ModifyMesure(
-                      name: name,
-                      value: value,
-                      // mesure: mesure,
-                    )));
-      },
-      child: Column(
-        children: [
-          ListTile(
-            title: Text(name, style: const TextStyle(fontSize: 18)),
-            trailing: SizedBox(
-              width: 110,
-              child: Row(
-                children: [
-                  Text('$value cm', style: const TextStyle(fontSize: 18)),
-                  const Spacer(),
-                  const Icon(Icons.arrow_forward_ios, size: 20),
-                ],
-              ),
-            ),
-          ),
-          Divider(
-            thickness: 0.3,
-            color: Colors.orange[800],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ModifyMesure extends StatelessWidget {
-  final String name;
-  final String value;
-  // final Mesure mesure;
-  ModifyMesure({
-    super.key,
-    required this.name,
-    required this.value,
-  });
-
-  final TextEditingController controller = TextEditingController();
-  final Map<String, String> mesure = {
-    'Epaule': 'assets/images/epaules.jpg',
-    'Bras': 'assets/images/bras.jpg',
-    'Poignet': 'assets/images/poignet.jpg',
-    'Poitrine': 'assets/images/poitrine.jpg',
-    'Taille': 'assets/images/taille.jpg',
-    'Hanche': 'assets/images/hanche.jpg',
-    'Ventre': 'assets/images/ventre.jpg',
-    'Longueur': 'assets/images/longueur.jpg',
-  };
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(name, style: const TextStyle(color: Colors.white)),
-        centerTitle: true,
-        leading: const BackButton(
-          color: Colors.white,
-        ),
-        backgroundColor: primaryColor,
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          child: Column(children: [
-            const SizedBox(
-              height: 20,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.4,
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.asset(
-                    mesure[name]!,
-                    fit: BoxFit.cover,
-                  )),
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 17,
-                    ),
-                  ),
-                  const Spacer(),
-                  SizedBox(
-                    width: 200,
-                    height: 35,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed: () {
-                            int currentValue =
-                                int.tryParse(controller.text) ?? 0;
-                            if (currentValue > 0) {
-                              controller.text = (currentValue - 1).toString();
-                            }
-                          },
-                        ),
-                        Expanded(
-                          child: TextField(
-                            controller: controller,
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) {},
-                            maxLength: 3,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                            ),
-                            decoration: InputDecoration(
-                              counterText: '',
-                              labelText: value,
-                              labelStyle: const TextStyle(color: primaryColor),
-                            ),
-                          ),
-                          // ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () {
-                            int currentValue =
-                                int.tryParse(controller.text) ?? 0;
-                            controller.text = (currentValue + 1).toString();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Text('Cm'),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 60,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              height: 50,
-              child: Material(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (controller.text.isNotEmpty) {
-                      // final String fieldN = name.toLowerCase();
-                      final Mesure mesure =
-                          context.read<ApplicationState>().mesures!;
-                      mesure.updateField(
-                          name.toLowerCase(), int.tryParse(controller.text));
-                      Provider.of<ApplicationState>(context, listen: false)
-                          .mesure = mesure;
-                    }
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    // primary: primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text('Enregistrer'),
-                ),
-              ),
-            ),
-          ]),
-        ),
-      ),
     );
   }
 }

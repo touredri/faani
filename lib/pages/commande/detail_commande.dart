@@ -1,14 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/models/commande_model.dart';
+import 'package:faani/models/modele_model.dart';
 import 'package:faani/my_theme.dart';
+import 'package:faani/pages/mesure/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-import '../firebase_get_all_data.dart';
-import '../models/modele_model.dart';
-import 'mesure_detail.dart';
 
 class DetailCommande extends StatefulWidget {
   final CommandeAnonyme commande;
@@ -32,7 +31,6 @@ class _DetailCommandeState extends State<DetailCommande> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          // title: Text('Détail de la commande'),
           centerTitle: true,
           toolbarHeight: 0,
           backgroundColor: primaryColor,
@@ -41,10 +39,9 @@ class _DetailCommandeState extends State<DetailCommande> {
           future: getModele(widget.commande.idModele!),
           builder: (BuildContext context, AsyncSnapshot<Modele> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(
-                  alignment: Alignment.center,
+              return const Center(
                   child:
-                      const CircularProgressIndicator()); // Show loading spinner while waiting
+                      CircularProgressIndicator()); // Show loading spinner while waiting
             } else if (snapshot.hasError) {
               return Text(
                   'Error: ${snapshot.error}'); // Show error message if something went wrong
@@ -287,6 +284,7 @@ class _DetailCommandeState extends State<DetailCommande> {
                                         );
                                         if (pickedDate != null) {
                                           final localContext = context;
+                                          // ignore: use_build_context_synchronously
                                           showDialog(
                                             context: localContext,
                                             builder: (BuildContext context) {

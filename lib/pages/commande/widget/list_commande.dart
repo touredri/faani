@@ -1,34 +1,55 @@
-import 'package:faani/helpers/authentification.dart';
+import 'package:faani/app_state.dart';
+import 'package:faani/models/client_model.dart';
 import 'package:faani/models/commande_model.dart';
 import 'package:faani/models/modele_model.dart';
+import 'package:faani/models/tailleur_model.dart';
+import 'package:faani/pages/commande/widget/save.dart';
+import 'package:faani/services/client_service.dart';
 import 'package:faani/services/commande_service.dart';
 import 'package:faani/services/modele_service.dart';
 import 'package:faani/services/suivi_etat_service.dart';
+import 'package:faani/services/tailleur_service.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'commande_container.dart';
 
-class SavedCommande extends StatefulWidget {
-  final int number;
-  const SavedCommande({super.key, required this.number});
+class ListCommande extends StatefulWidget {
+  final String status;
+  const ListCommande({super.key, required this.status});
 
   @override
-  State<SavedCommande> createState() => _SavedCommandeState();
+  State<ListCommande> createState() => _ListCommandeState();
 }
 
-class _SavedCommandeState extends State<SavedCommande> {
-  CommandeAnonymeService commandeService = CommandeAnonymeService();
+class _ListCommandeState extends State<ListCommande> {
+  CommandeService commandeService = CommandeService();
+  ClientService clientService = ClientService();
+  TailleurService tailleurService = TailleurService();
   ModeleService modeleService = ModeleService();
   SuiviEtatService suiviEtatService = SuiviEtatService();
+  late bool isTailleur;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isTailleur = Provider.of<ApplicationState>(context).isTailleur;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10),
-      child: Column(children: [
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
         Flexible(
             child: FutureBuilder(
-                future: commandeService.getAllCommandeAnonymeByEtat(widget.number),
+                future: widget.status == "receive"
+                    ? commandeService.getAllCommandeByEtat(isTailleur, 1)
+                    : commandeService.getAllCommandeByEtat(isTailleur, 2),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -42,8 +63,7 @@ class _SavedCommandeState extends State<SavedCommande> {
                       ],
                     ));
                   } else {
-                    List<CommandeAnonyme> commande =
-                        snapshot.data as List<CommandeAnonyme>;
+                    List<Commande> commande = snapshot.data as List<Commande>;
                     return GridView.builder(
                         itemCount: commande.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -56,10 +76,14 @@ class _SavedCommandeState extends State<SavedCommande> {
                         itemBuilder: (context, index) {
                           return FutureBuilder(
                               future: Future.wait([
+                                tailleurService.getTailleurById(
+                                    commande[index].idTailleur),
+                                clientService
+                                    .getClientById(commande[index].idClient),
                                 modeleService
-                                    .getModeleById(commande[index].idModele!),
+                                    .getModeleById(commande[index].idModele),
                                 suiviEtatService
-                                    .getEtatLibelle(commande[index].id!)
+                                    .getEtatLibelle(commande[index].id)
                               ]),
                               builder: (context, result) {
                                 if (result.connectionState ==
@@ -69,11 +93,17 @@ class _SavedCommandeState extends State<SavedCommande> {
                                 } else if (result.hasError) {
                                   return Text('Error2: ${result.error}');
                                 } else {
-                                  Modele modele = result.data![0] as Modele;
-                                  String etat = result.data![1] as String;
+                                  Modele modele = result.data![2] as Modele;
+                                  Tailleur tailleur =
+                                      result.data![0] as Tailleur;
+                                  Client client = result.data![1] as Client;
+                                  String etat = result.data![3] as String;
+                                  final String nomPrenom = isTailleur
+                                      ? client.nomPrenom
+                                      : tailleur.nomPrenom;
                                   return CommandeContainer(
                                     imageUrl: modele.fichier[0]!,
-                                    nomPrenom: user!.displayName!,
+                                    nomPrenom: nomPrenom,
                                     dateCommande:
                                         commande[index].dateCommande.toString(),
                                     etat: etat,

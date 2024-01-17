@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app_state.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/models/commande_model.dart';
@@ -13,11 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import 'helpers/authentification.dart';
-import 'mesure_page.dart';
 import 'modele/classes.dart';
-import 'pages/modele/detail_modele.dart';
+import 'pages/mesure/mesure.dart';
 import 'src/tailleur_modeles.dart';
 
 class ProfilePage extends StatefulWidget {
