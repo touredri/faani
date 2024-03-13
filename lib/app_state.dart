@@ -58,6 +58,7 @@ class ApplicationState extends ChangeNotifier {
     telephone: 0,
     genre: '',
     id: '',
+    profile: ''
   );
 
   Client currentClient = Client(

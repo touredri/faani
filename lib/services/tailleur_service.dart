@@ -22,8 +22,10 @@ class TailleurService {
     await documentReference.update(tailleur.toMap());
   }
 
+  
+
   //get all tailleur
-  Stream<List<Tailleur>> getTailleur() {
+  Stream<List<Tailleur>> getAllTailleur() {
     return collection.snapshots().map((snapshot) => snapshot.docs
         .map((doc) => Tailleur.fromMap(doc.data(), doc.reference))
         .toList());

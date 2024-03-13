@@ -3,9 +3,14 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app_state.dart';
 import 'package:faani/firebase_get_all_data.dart';
+import 'package:faani/helpers/functions.dart';
+import 'package:faani/models/client_model.dart';
 import 'package:faani/models/commande_model.dart';
+import 'package:faani/models/tailleur_model.dart';
 import 'package:faani/my_theme.dart';
+import 'package:faani/services/client_service.dart';
 import 'package:faani/services/commande_service.dart';
+import 'package:faani/services/tailleur_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +39,8 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController phoneController = TextEditingController();
   User user = FirebaseAuth.instance.currentUser!;
   CommandeService commandeService = CommandeService();
+  TailleurService tailleurService = TailleurService();
+  ClientService clientService = ClientService();
 
   void openUrl(String link) async {
     Uri url = Uri.parse(link);
@@ -78,15 +85,31 @@ class _ProfilePageState extends State<ProfilePage> {
 
       // Update the user's profile with the new image URL
       await user.updatePhotoURL(imageUrl);
-
+      updateUserProfile(imageUrl);
       // Delete the old image from Firebase Storage
       if (oldImageUrl != null) {
         Reference oldImageRef =
             FirebaseStorage.instance.refFromURL(oldImageUrl);
-        await oldImageRef.delete();
+        try {
+          await oldImageRef.delete();
+        } catch (e) {
+          // Handle the error here
+          print('Failed to delete the image: $e');
+        }
       }
     }
     setState(() {});
+  }
+
+  void updateUserProfile(String url) async {
+    if (isTailleur) {
+      final Tailleur tailleur = await tailleurService.getTailleurById(user.uid);
+      tailleur.profile = url;
+      updateUserProfileImage(user.uid, tailleur.toMap(), 'Tailleur');
+    }
+    final Client client = await clientService.getClientById(user.uid);
+    client.profile = url;
+    updateUserProfileImage(user.uid, client.toMap(), 'client');
   }
 
   @override

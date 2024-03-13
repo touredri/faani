@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 
 const primaryColor = Color(0xFFF3755F);
 const inputBackgroundColor = Color(0xFFEEF4FC);

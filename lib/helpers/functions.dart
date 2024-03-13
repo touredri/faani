@@ -36,3 +36,18 @@ void definedCurrentUser(dynamic user, BuildContext context) {
     appState.changeCurrentClient = client;
     definedCurrentUser(client, context);
   }
+
+    //update user profile image
+  Future<void> updateUserProfileImage(
+      String clientId, Map<String, dynamic> data, String collection) async {
+    final docRef = firestore.collection(collection).doc(clientId);
+    final docSnapshot = await docRef.get();
+
+    if (docSnapshot.exists) {
+      // The document exists, update it
+      await docRef.update(data);
+    } else {
+      // The document does not exist, create it
+      await docRef.set(data);
+    }
+  }

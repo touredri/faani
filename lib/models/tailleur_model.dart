@@ -11,6 +11,7 @@ class Tailleur {
   String nomPrenom;
   int telephone;
   String genre;
+  String profile;
 
   Tailleur(
       {required this.quartier,
@@ -19,7 +20,8 @@ class Tailleur {
       required this.nomPrenom,
       required this.telephone,
       required this.genre,
-      required this.id});
+      required this.id,
+      this.profile = ""});
 
   // factory constructor fromMap
   factory Tailleur.fromMap(Map<String, dynamic> map, DocumentReference docRef) {
@@ -30,6 +32,7 @@ class Tailleur {
       nomPrenom: map['nomPrenom'] as String,
       telephone: map['telephone'] as int,
       genre: map['genre'] as String,
+      profile: map['profile'],
       id: docRef.id,
     );
   }
@@ -43,6 +46,7 @@ class Tailleur {
       'nomPrenom': nomPrenom,
       'telephone': telephone,
       'genre': genre,
+      'profile': profile
     };
   }
 

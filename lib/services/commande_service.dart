@@ -7,6 +7,13 @@ class CommandeAnonymeService {
   final collection = FirebaseFirestore.instance.collection('commandeAnomyme');
   SuiviEtatService suiviEtatService = SuiviEtatService();
 
+  // get a commande
+  Future<CommandeAnonyme> getCommandeAnonyme(String id) async {
+    DocumentSnapshot doc = await collection.doc(id).get();
+    return CommandeAnonyme.fromMap(
+        doc.data()! as Map<String, dynamic>, doc.reference);
+  }
+
   //get all commande for a user
   Stream<List<CommandeAnonyme>> getAllCommandeAnnonyme(String idTailleur) {
     return collection
@@ -41,6 +48,12 @@ class CommandeAnonymeService {
 class CommandeService {
   final collection = FirebaseFirestore.instance.collection('commande');
   SuiviEtatService suiviEtatService = SuiviEtatService();
+
+  // get a commande
+  Future<Commande> getCommande(String id) async {
+    DocumentSnapshot doc = await collection.doc(id).get();
+    return Commande.fromMap(doc.data()! as Map<String, dynamic>, doc.reference);
+  }
 
   // get all commande
   Stream<List<Commande>> getAllCommande(bool isTailleur) {

@@ -7,7 +7,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
-// import 'commande_page.dart';
 import 'firebase_options.dart';
 import 'my_theme.dart';
 import 'pages/authentification/sign_in.dart';
@@ -29,7 +28,7 @@ void main() async {
 final _auth = FirebaseAuth.instance;
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

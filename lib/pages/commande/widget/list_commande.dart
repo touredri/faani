@@ -3,6 +3,7 @@ import 'package:faani/models/client_model.dart';
 import 'package:faani/models/commande_model.dart';
 import 'package:faani/models/modele_model.dart';
 import 'package:faani/models/tailleur_model.dart';
+import 'package:faani/pages/commande/detail_commande.dart';
 import 'package:faani/pages/commande/widget/save.dart';
 import 'package:faani/services/client_service.dart';
 import 'package:faani/services/commande_service.dart';
@@ -14,30 +15,31 @@ import 'package:provider/provider.dart';
 import 'commande_container.dart';
 
 class ListCommande extends StatefulWidget {
-  final String status;
   const ListCommande({super.key, required this.status});
+
+  final String status;
 
   @override
   State<ListCommande> createState() => _ListCommandeState();
 }
 
 class _ListCommandeState extends State<ListCommande> {
-  CommandeService commandeService = CommandeService();
   ClientService clientService = ClientService();
-  TailleurService tailleurService = TailleurService();
+  CommandeService commandeService = CommandeService();
+  late bool isTailleur;
   ModeleService modeleService = ModeleService();
   SuiviEtatService suiviEtatService = SuiviEtatService();
-  late bool isTailleur;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  TailleurService tailleurService = TailleurService();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     isTailleur = Provider.of<ApplicationState>(context).isTailleur;
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -101,12 +103,44 @@ class _ListCommandeState extends State<ListCommande> {
                                   final String nomPrenom = isTailleur
                                       ? client.nomPrenom
                                       : tailleur.nomPrenom;
-                                  return CommandeContainer(
-                                    imageUrl: modele.fichier[0]!,
-                                    nomPrenom: nomPrenom,
-                                    dateCommande:
-                                        commande[index].dateCommande.toString(),
-                                    etat: etat,
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // if (commande[index].idCategorie == null){
+                                      //   Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //       builder: (context) => SaveCommande(
+                                      //         idCommande: commande[index].id,
+                                      //         idClient: client.id,
+                                      //         idTailleur: tailleur.id,
+                                      //         idModele: modele.id,
+                                      //         isTailleur: isTailleur,
+                                      //       ),
+                                      //     ),
+                                      //   );}
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DetailCommande(
+                                            commandeId: commande[index].id,
+                                            isAnnonyme: true,
+                                            modele: modele,
+                                            idCategorie:
+                                                commande[index].idCategorie!,
+                                            tailleur: tailleur,
+                                            client: client,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: CommandeContainer(
+                                      imageUrl: modele.fichier[0]!,
+                                      nomPrenom: nomPrenom,
+                                      dateCommande: commande[index]
+                                          .dateCommande
+                                          .toString(),
+                                      etat: etat,
+                                    ),
                                   );
                                 }
                               });
