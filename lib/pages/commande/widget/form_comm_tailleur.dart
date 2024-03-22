@@ -1,6 +1,6 @@
 import 'package:faani/app_state.dart';
-import 'package:faani/models/categorie_model.dart';
-import 'package:faani/models/modele_model.dart';
+import 'package:faani/app/data/models/categorie_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/pages/commande/widget/alert_box.dart';
 import 'package:faani/pages/commande/widget/date_picker.dart';
 import 'package:faani/pages/commande/widget/join_measure.dart';
@@ -10,8 +10,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../helpers/authentification.dart';
-import '../../../models/commande_model.dart';
-import '../../../models/mesure_model.dart';
+import '../../../app/data/models/commande_model.dart';
+import '../../../app/data/models/mesure_model.dart';
 import '../../../my_theme.dart';
 
 class TailleurCommandeForm extends StatefulWidget {

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'models/modele_model.dart';
+import 'app/data/models/modele_model.dart';
 import 'my_theme.dart';
 import 'src/tailleur_modeles.dart';
 

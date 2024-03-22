@@ -1,17 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/firebase_get_all_data.dart';
-import 'package:faani/models/client_model.dart';
-import 'package:faani/models/commande_model.dart';
-import 'package:faani/models/modele_model.dart';
-import 'package:faani/models/tailleur_model.dart';
+import 'package:faani/app/data/models/client_model.dart';
+import 'package:faani/app/data/models/commande_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/models/tailleur_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/pages/mesure/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import '../../services/commande_service.dart';
+import '../../app/data/services/commande_service.dart';
 
 class DetailCommande extends StatefulWidget {
   final String commandeId;

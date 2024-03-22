@@ -2,15 +2,15 @@ import 'package:faani/app_state.dart';
 import 'package:faani/controllers/categorie_controller.dart';
 import 'package:faani/controllers/mesure_controller.dart';
 import 'package:faani/controllers/modele_controller.dart';
-import 'package:faani/models/categorie_model.dart';
+import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/pages/home/widget/filtered_container.dart';
-import 'package:faani/services/modele_service.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/src/explore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/modele_model.dart';
+import '../../app/data/models/modele_model.dart';
 import 'widget/home_pageView.dart';
 
 class HomePage extends StatefulWidget {

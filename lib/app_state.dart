@@ -1,8 +1,8 @@
-import 'package:faani/models/client_model.dart';
-import 'package:faani/models/mesure_model.dart';
-import 'package:faani/models/categorie_model.dart';
-import 'package:faani/models/modele_model.dart';
-import 'package:faani/models/tailleur_model.dart';
+import 'package:faani/app/data/models/client_model.dart';
+import 'package:faani/app/data/models/mesure_model.dart';
+import 'package:faani/app/data/models/categorie_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/models/tailleur_model.dart';
 import 'package:flutter/material.dart';
 
 class CurrentUsers {

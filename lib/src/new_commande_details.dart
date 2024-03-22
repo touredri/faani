@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/helpers/authentification.dart';
 // import 'package:faani/commande_page.dart';
-import 'package:faani/models/mesure_model.dart';
+import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/pages/commande/commande.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../firebase_get_all_data.dart';
-import '../models/commande_model.dart';
+import '../app/data/models/commande_model.dart';
 import '../widgets/widgets.dart';
 
 class NouvelleCommandeDetails extends StatelessWidget {

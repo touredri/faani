@@ -1,5 +1,5 @@
 import 'package:faani/app_state.dart';
-import 'package:faani/services/mesure_service.dart';
+import 'package:faani/app/data/services/mesure_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

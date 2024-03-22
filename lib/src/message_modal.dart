@@ -3,7 +3,7 @@ import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/my_theme.dart';
 import 'package:flutter/material.dart';
 
-import '../models/message.dart';
+import '../app/data/models/message.dart';
 
 class MessageModal extends StatefulWidget {
   final String idModele;

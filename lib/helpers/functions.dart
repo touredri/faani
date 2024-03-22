@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app_state.dart';
 // import 'package:faani/modele/classes.dart';
-import 'package:faani/models/client_model.dart';
-import 'package:faani/models/tailleur_model.dart';
+import 'package:faani/app/data/models/client_model.dart';
+import 'package:faani/app/data/models/tailleur_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

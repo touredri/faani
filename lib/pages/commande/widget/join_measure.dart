@@ -1,5 +1,5 @@
 import 'package:faani/constants/styles.dart';
-import 'package:faani/models/mesure_model.dart';
+import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/pages/commande/measure_dialog_box.dart';
 import 'package:flutter/material.dart';
 

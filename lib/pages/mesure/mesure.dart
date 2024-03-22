@@ -1,6 +1,6 @@
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/helpers/authentification.dart';
-import 'package:faani/models/mesure_model.dart';
+import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/pages/mesure/ajouter.dart';
 import 'package:flutter/material.dart';

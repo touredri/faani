@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:faani/app/modules/authentification/views/authentification_view.dart';
 import 'package:faani/app_state.dart';
-import 'package:faani/models/client_model.dart';
-import 'package:faani/models/modele_model.dart';
-import 'package:faani/models/tailleur_model.dart';
+import 'package:faani/app/data/models/client_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/models/tailleur_model.dart';
 import 'package:faani/my_theme.dart';
-import 'package:faani/pages/authentification/sign_in.dart';
 import 'package:faani/pages/commande/widget/form_client_modele.dart';
 import 'package:faani/pages/commande/widget/form_comm_tailleur.dart';
 import 'package:faani/widgets/image_display.dart';
@@ -255,7 +255,7 @@ class _DetailModeleState extends State<DetailModele> {
                               if (user!.isAnonymous) {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                      builder: (c) => const SignInPage()),
+                                      builder: (c) => const AuthView()),
                                 );
                                 return;
                               }

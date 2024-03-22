@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../firebase_get_all_data.dart';
-import '../models/modele_model.dart';
+import '../app/data/models/modele_model.dart';
 import '../my_theme.dart';
 import '../src/message_modal.dart';
 

@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/firebase_get_all_data.dart';
-import 'package:faani/models/modele_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/pages/commande/ajout.dart';
 import 'package:faani/src/message_modal.dart';
 import 'package:faani/widgets/widgets.dart';

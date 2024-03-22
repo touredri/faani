@@ -2,8 +2,8 @@
 
 import 'package:faani/app_state.dart';
 import 'package:faani/helpers/authentification.dart';
-import 'package:faani/models/categorie_model.dart';
-import 'package:faani/models/modele_model.dart';
+import 'package:faani/app/data/models/categorie_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/pages/commande/widget/date_picker.dart';
 import 'package:faani/pages/commande/widget/join_measure.dart';
@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/commande_model.dart';
-import '../../../models/mesure_model.dart';
+import '../../../app/data/models/commande_model.dart';
+import '../../../app/data/models/mesure_model.dart';
 import 'alert_box.dart';
 
 class ClientCommandeForm extends StatefulWidget {

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 const primaryColor = Color(0xFFF3755F);
 const inputBackgroundColor = Color(0xFFEEF4FC);
-const inputBorderColor = Color(0xFFA4CEFB);
+const inputBorderColor = Colors.grey;
 const blackColor = Colors.black;
 var subtextColor = const Color(0xFF000000).withOpacity(0.65);
-const fontFamily = 'Poppins';
+const fontFamily = 'Inter';
 var scaffoldBack = Colors.grey[200];
 const subTextColor = Color(0xFF898888);
 
@@ -15,7 +15,7 @@ ThemeData buildTheme(BuildContext context) {
     buttonTheme: const ButtonThemeData(
       textTheme: ButtonTextTheme.primary,
     ),
-    scaffoldBackgroundColor: Colors.grey[100],
+    scaffoldBackgroundColor: scaffoldBack,
     dialogTheme: const DialogTheme(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -65,9 +65,6 @@ ThemeData buildTheme(BuildContext context) {
         ),
       ),
     ),
-    // textTheme: GoogleFonts.poppinsTextTheme(
-    //   Theme.of(context).textTheme,
-    // ),
     bottomSheetTheme: const BottomSheetThemeData(
         shape: RoundedRectangleBorder(
             side: BorderSide(color: inputBorderColor),
@@ -168,7 +165,8 @@ ThemeData buildTheme(BuildContext context) {
         fontFamily: fontFamily,
         fontWeight: FontWeight.normal,
       ),
-      contentPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 10),
+      // filled: true,
+      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
       floatingLabelStyle: const TextStyle(
         color: primaryColor,
       ),

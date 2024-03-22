@@ -1,7 +1,7 @@
 import 'package:faani/helpers/authentification.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/modele/favorie.dart';
-import 'package:faani/models/modele_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:faani/src/tailleur_modeles.dart';
 import 'package:flutter/material.dart';

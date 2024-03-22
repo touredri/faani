@@ -1,9 +1,9 @@
 import 'package:faani/helpers/authentification.dart';
-import 'package:faani/models/commande_model.dart';
-import 'package:faani/models/modele_model.dart';
-import 'package:faani/services/commande_service.dart';
-import 'package:faani/services/modele_service.dart';
-import 'package:faani/services/suivi_etat_service.dart';
+import 'package:faani/app/data/models/commande_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/commande_service.dart';
+import 'package:faani/app/data/services/modele_service.dart';
+import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:flutter/material.dart';
 
 import 'commande_container.dart';

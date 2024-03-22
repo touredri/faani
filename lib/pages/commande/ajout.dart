@@ -1,9 +1,9 @@
 import 'package:faani/app_state.dart';
 import 'package:faani/constants/styles.dart';
-import 'package:faani/models/modele_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/pages/commande/widget/form_client_modele.dart';
 import 'package:faani/pages/commande/widget/form_comm_tailleur.dart';
-import 'package:faani/services/modele_service.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/src/tailleur_modeles.dart';
 import 'package:faani/widgets/image_display.dart';
 import 'package:flutter/material.dart';

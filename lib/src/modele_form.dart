@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:path/path.dart';
 import '../firebase_get_all_data.dart';
-import '../models/modele_model.dart';
+import '../app/data/models/modele_model.dart';
 import '../my_theme.dart';
 
 class ModeleForm extends StatefulWidget {

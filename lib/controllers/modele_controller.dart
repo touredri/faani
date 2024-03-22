@@ -1,6 +1,6 @@
 import 'package:faani/app_state.dart';
-import 'package:faani/models/modele_model.dart';
-import 'package:faani/services/modele_service.dart';
+import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

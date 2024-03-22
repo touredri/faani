@@ -1,7 +1,7 @@
 import 'package:faani/app_state.dart';
 import 'package:faani/constants/styles.dart';
 import 'package:faani/helpers/authentification.dart';
-import 'package:faani/models/mesure_model.dart';
+import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/pages/mesure/widget/page_view_content.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
