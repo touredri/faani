@@ -4,6 +4,7 @@ import 'package:faani/my_theme.dart';
 import 'package:flutter/material.dart';
 
 import '../app/data/models/message.dart';
+import '../app/firebase/global_function.dart';
 
 class MessageModal extends StatefulWidget {
   final String idModele;
@@ -122,7 +123,7 @@ class _MessageModalState extends State<MessageModal> {
                   IconButton(
                     onPressed: () {
                       final Message message = Message(
-                          idUser: user!.uid,
+                          idUser: auth.currentUser!.uid,
                           idModele: widget.idModele,
                           message: _controller.text,
                           userType: 'client',
@@ -130,7 +131,7 @@ class _MessageModalState extends State<MessageModal> {
                       message.createMessage();
                       _controller.clear();
                     },
-                    icon: user!.isAnonymous
+                    icon: auth.currentUser!.isAnonymous
                         ? const Text('')
                         : const Icon(
                             Icons.send,

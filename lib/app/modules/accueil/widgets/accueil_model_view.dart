@@ -5,87 +5,93 @@ import 'package:faani/pages/commande/ajout.dart';
 import 'package:faani/src/message_modal.dart';
 import 'package:faani/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import '../../globale_widgets/favorite_icon.dart';
 import '../controllers/accueil_controller.dart';
 
-Stack homeItem(Modele modele, BuildContext context) {
-  final AccueilController controller = Get.put(AccueilController());
-  return Stack(
-    children: [
-      Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              itemCount: 1,
-              itemBuilder: (context, imageIndex) {
-                return CachedNetworkImage(
-                  imageUrl: modele.fichier[0]!,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                );
-              },
+class HomeItem extends GetView<AccueilController> {
+  final Modele modele;
+  const HomeItem(this.modele, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final AccueilController controller = Get.put(AccueilController());
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Expanded(
+              child: CachedNetworkImage(
+                imageUrl: modele.fichier[0]!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+              ),
             ),
-          ),
-        ],
-      ),
-      Expanded(
-        child: GestureDetector(
-          onVerticalDragUpdate: (details) {
-            if (details.delta.dy > 0) {
-              controller.pageController.previousPage(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut);
-            } else if (details.delta.dy < 0) {
-              controller.pageController.nextPage(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut);
-            }
-          },
-          child: Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height,
-            color: Colors.black.withOpacity(0.8),
+          ],
+        ), // black colors with opacity on modele image
+        SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: GestureDetector(
+            onVerticalDragUpdate: (details) {
+              if (details.delta.dy > 0) {
+                controller.pageController.previousPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut);
+              } else if (details.delta.dy < 0) {
+                controller.pageController.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut);
+              }
+            },
+            child: Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height,
+              color: Colors.black.withOpacity(0.1),
+            ),
           ),
         ),
-      ),
-      Container(
-        alignment: Alignment.centerRight,
-        child: Container(
-          height: 261,
-          width: 60,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-            ),
-            color: Colors.white.withOpacity(0.0),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => AjoutCommande(
-                            modele: modele,
-                          )));
-                },
-                icon: const Icon(
-                  Icons.shopping_cart_outlined,
-                  color: Colors.grey,
-                  size: 30,
-                ),
+        Container(
+          alignment: Alignment.centerRight,
+          child: Container(
+            height: 261,
+            width: 60,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10),
+                bottomLeft: Radius.circular(10),
               ),
-              FavoriteIcone(docId: modele.id!),
-              Expanded(
-                child: Column(
+              color: Colors.white.withOpacity(0.0),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => AjoutCommande(
+                              modele: modele,
+                            )));
+                  },
+                  icon: const Icon(
+                    Icons.shopping_cart_outlined,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                ),
+                FavoriteIcone(
+                  docId: modele.id!,
+                  color: 'white',
+                ),
+                Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    IconButton(
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         showModalBottomSheet(
                             // isScrollControlled: true,
                             backgroundColor:
@@ -102,9 +108,9 @@ Stack homeItem(Modele modele, BuildContext context) {
                               );
                             });
                       },
-                      icon: const Icon(
+                      child: const Icon(
                         Icons.message_outlined,
-                        color: Colors.grey,
+                        color: Colors.white,
                         size: 30,
                       ),
                     ),
@@ -121,19 +127,19 @@ Stack homeItem(Modele modele, BuildContext context) {
                     ),
                   ],
                 ),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.info,
-                  color: Colors.grey,
-                  size: 30,
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.info,
+                    color: Colors.white,
+                    size: 30,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }

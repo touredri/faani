@@ -6,6 +6,7 @@ import 'package:faani/pages/modele/detail_modele.dart';
 import 'package:flutter/material.dart';
 
 import '../app/data/models/modele_model.dart';
+import '../app/modules/globale_widgets/modele_card.dart';
 import '../my_theme.dart';
 
 class TailleurModeles extends StatefulWidget {
@@ -47,45 +48,6 @@ class _TailleurModelesState extends State<TailleurModeles> {
           backgroundColor: primaryColor,
           toolbarHeight: 40,
         ),
-        body: MyListModele(modeles: modeles));
-  }
-}
-
-class MyListModele extends StatelessWidget {
-  final List<Modele> modeles;
-  const MyListModele({super.key, required this.modeles});
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      itemCount: modeles.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 13,
-        childAspectRatio: MediaQuery.of(context).size.width /
-            (MediaQuery.of(context).size.height / 1.2),
-      ),
-      itemBuilder: (context, index) {
-        final modele = modeles[index];
-        return Card(
-          clipBehavior: Clip.antiAlias,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      DetailModele(modele: modele)));
-            },
-            child: CachedNetworkImage(
-              imageUrl: modele.fichier[0]!,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Center(
-                child: Image.asset('assets/images/loading.gif'),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+        body: ModeleCard(modeles: modeles));
   }
 }

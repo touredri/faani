@@ -1,4 +1,4 @@
-import 'package:faani/navigation.dart';
+import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
@@ -96,7 +96,7 @@ class AuthView extends GetView<AuthController> {
                 onPressed: () async {
                   await signInAnonymously();
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (c) => const Home()),
+                    MaterialPageRoute(builder: (c) => HomeView()),
                     (route) => false,
                   );
                 },

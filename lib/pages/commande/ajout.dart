@@ -9,6 +9,8 @@ import 'package:faani/widgets/image_display.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../app/modules/globale_widgets/modele_card.dart';
+
 class AjoutCommande extends StatefulWidget {
   final Modele modele;
   const AjoutCommande({super.key, required this.modele});
@@ -75,7 +77,7 @@ class _AjoutCommandeState extends State<AjoutCommande> {
                                   );
                                 } else if (snapshot.hasData) {
                                   final List<Modele> modeles = snapshot.data!;
-                                  return MyListModele(
+                                  return ModeleCard(
                                     modeles: modeles,
                                   );
                                 }

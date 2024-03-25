@@ -1,3 +1,4 @@
+import 'package:faani/app/data/services/categorie_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/categorie_model.dart';
@@ -8,28 +9,46 @@ class AccueilController extends GetxController {
   RxBool isHommeSelected = true.obs;
   RxList<Modele> modeles = <Modele>[].obs;
   RxList<Categorie> listCategorie = <Categorie>[].obs;
-  final PageController pageController = PageController(initialPage: 0);
+  RxBool isFilterOpen = false.obs;
+  final PageController pageController =
+      PageController(initialPage: 0, viewportFraction: 0.87);
 
   // get ramdom model from modeles service
   final ModeleService modeleService = ModeleService();
-  void getRandomModele(int limit, String clientCible, String categorie) {
-    modeleService
+  Future<void> getRandomModele(
+      int limit, String clientCible, String categorie) {
+    return modeleService
         .getRandomModeles(limit, clientCible, categorie)
         .then((fetchedModeles) {
-      // modeles.value.add(fetchedModeles);
       fetchedModeles.forEach((element) {
         modeles.add(element);
       });
     });
   }
 
+  void getCategories() {
+    CategorieService().getCategorie().listen((event) {
+      if (event.isNotEmpty) {
+        listCategorie.value = event;
+      }
+    });
+  }
+
   void onCategorieSelected(Categorie categorie) {
     // getRandomModele(10, '', categorie.id);
+    // for (int i = 0; i < listCategorie.length; i++) {
+    //   listCategorie[i].isSelected = (i == int.parse(categorie.id) - 1);
+    // }
+  }
+
+  Future<void> init() async {
+    await getRandomModele(10, '', '');
   }
 
   @override
   void onInit() {
     super.onInit();
+    getCategories();
     getRandomModele(10, '', '');
   }
 

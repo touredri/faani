@@ -12,6 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../app/data/models/categorie_model.dart';
+import '../../app/data/services/categorie_service.dart';
+import '../../app/data/services/modele_service.dart';
+
 
 class DetailCommandeClient extends StatefulWidget {
   final Commande commande;
@@ -47,7 +51,7 @@ class _DetailCommandeClientState extends State<DetailCommandeClient> {
           backgroundColor: primaryColor,
         ),
         body: FutureBuilder<Modele>(
-          future: getModele(widget.commande.idModele!),
+          future: ModeleService().getModeleById(widget.commande.idModele!),
           builder: (BuildContext context, AsyncSnapshot<Modele> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Container(
@@ -59,10 +63,10 @@ class _DetailCommandeClientState extends State<DetailCommandeClient> {
                   'Error: ${snapshot.error}'); // Show error message if something went wrong
             } else {
               Modele modele = snapshot.data!;
-              return FutureBuilder<String>(
-                future: getCategorie(modele.idCategorie!),
+              return FutureBuilder<Categorie>(
+                future: CategorieService().getCategorieById(modele.idCategorie!),
                 builder:
-                    (BuildContext context, AsyncSnapshot<String> snapshot) {
+                    (BuildContext context, AsyncSnapshot<Categorie> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
                         alignment: Alignment.center,
@@ -70,7 +74,7 @@ class _DetailCommandeClientState extends State<DetailCommandeClient> {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {
-                    String categorie = snapshot.data!;
+                    String categorie = snapshot.data!.libelle;
                     return SingleChildScrollView(
                       child: Column(children: [
                         SizedBox(

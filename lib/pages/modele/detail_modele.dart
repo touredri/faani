@@ -10,13 +10,13 @@ import 'package:faani/my_theme.dart';
 import 'package:faani/pages/commande/widget/form_client_modele.dart';
 import 'package:faani/pages/commande/widget/form_comm_tailleur.dart';
 import 'package:faani/widgets/image_display.dart';
-import 'package:faani/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
+import '../../app/modules/globale_widgets/favorite_icon.dart';
 import '../../helpers/authentification.dart';
 import '../../firebase_get_all_data.dart';
 import '../../modele/classes.dart';
@@ -178,7 +178,10 @@ class _DetailModeleState extends State<DetailModele> {
                             ),
                           ],
                         ),
-                        FavoriteIcone(docId: widget.modele.id!),
+                        FavoriteIcone(
+                          docId: widget.modele.id!,
+                          color: '',
+                        ),
                         Column(
                           children: [
                             IconButton(

@@ -1,38 +1,20 @@
 import 'package:faani/app/data/services/categorie_service.dart';
+import 'package:faani/constants/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../data/models/categorie_model.dart';
+import '../accueil/controllers/accueil_controller.dart';
 
-class CategorieFiltre extends StatefulWidget {
-  final Function(Categorie) onCategorieSelected;
+class CategorieFiltre extends GetView {
+  CategorieFiltre({super.key});
 
-  const CategorieFiltre({
-    Key? key,
-    required this.onCategorieSelected,
-  }) : super(key: key);
-
-  @override
-  State<CategorieFiltre> createState() => _CategorieFiltreState();
-}
-
-class _CategorieFiltreState extends State<CategorieFiltre> {
   final ScrollController _scrollController = ScrollController();
   final double itemHeight = 50;
 
-  @override
-  void initState() {
-    super.initState();
-    // _scrollController = ScrollController();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _scrollToCenter(int selectedIndex) {
-    final itemWidth =
-        (context.findRenderObject() as RenderBox?)?.size.width ?? 0;
+  void _scrollToCenter(int selectedIndex, BuildContext context) {
+    // final itemWidth =
+    //     (context.findRenderObject() as RenderBox?)?.size.width ?? 0;
+    final itemWidth = 40;
     final scrollOffset = selectedIndex * itemWidth -
         (MediaQuery.of(context).size.width / 2 - itemWidth / 2);
 
@@ -47,54 +29,41 @@ class _CategorieFiltreState extends State<CategorieFiltre> {
 
   @override
   Widget build(BuildContext context) {
-    final CategorieService categorieService = CategorieService();
-    return StreamBuilder<List<Categorie>>(
-      stream: categorieService.getCategorie(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final categories = snapshot.data!;
-          categories[2].isSelected = true;
-          return ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final categorie = categories[index];
-              return GestureDetector(
-                onTap: () {
-                  // Mettre à jour la catégorie sélectionnée
-                  setState(() {
-                    for (int i = 0; i < categories.length; i++) {
-                      categories[i].isSelected = (i == index);
-                    }
-                  });
-                  _scrollToCenter(index);
-
-                  widget.onCategorieSelected(categorie);
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  height: itemHeight,
-                  child: Text(
-                    categorie.libelle,
-                    style: TextStyle(
-                      fontSize: categorie.isSelected ? 18 : 14,
-                      color: categorie.isSelected ? Colors.white : Colors.black,
-                      fontWeight: categorie.isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                    ),
-                  ),
+    final AccueilController controller = Get.put(AccueilController());
+    return Obx(() => ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: controller.listCategorie.length,
+          controller: _scrollController,
+          itemBuilder: (context, index) {
+            final categorie = controller.listCategorie[index];
+            return TextButton(
+              onPressed: () {
+                for (int i = 0; i < controller.listCategorie.length; i++) {
+                  controller.listCategorie[i].isSelected =
+                      (i == int.parse(categorie.id) - 1);
+                }
+                _scrollToCenter(index, context);
+                controller.isFilterOpen.value = false;
+                controller.onCategorieSelected(categorie);
+              },
+              child: Text(
+                categorie.libelle,
+                style: TextStyle(
+                  fontSize: categorie.isSelected ? 16 : 14,
+                  color: categorie.isSelected
+                      ? Colors.white
+                      : const Color.fromARGB(255, 231, 231, 231),
+                  decorationColor: primaryColor,
+                  decoration: categorie.isSelected
+                      ? TextDecoration.underline
+                      : TextDecoration.none,
+                  fontWeight: categorie.isSelected
+                      ? FontWeight.bold
+                      : FontWeight.normal,
                 ),
-              );
-            },
-          );
-        } else if (snapshot.hasError) {
-          return Text('${snapshot.error}');
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+              ),
+            );
+          },
+        ));
   }
 }

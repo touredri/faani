@@ -11,6 +11,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import '../app/data/models/categorie_model.dart';
+import '../app/data/services/categorie_service.dart';
+import '../app/data/services/mesure_service.dart';
 import '../firebase_get_all_data.dart';
 import '../app/data/models/commande_model.dart';
 import '../widgets/widgets.dart';
@@ -87,9 +90,9 @@ class _MyFormState extends State<MyForm> {
   TextEditingController _numeroController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
   DateTime? selectedDate;
-  String selectedCategoryId = '';
-  Map<String, String> categoriesData =
-      {}; // Store category data (ID and libelle)
+  String selectedCategoryId = ''; 
+   List<Categorie> categorieList = <Categorie>[];
+
   String imagePath = '';
 
   @override
@@ -100,17 +103,19 @@ class _MyFormState extends State<MyForm> {
   }
 
   void fetchCategories() async {
-    final data = await CategoryService.fetchCategories();
+    CategorieService().getCategorie().listen((event) {
+      for (var element in event) {
+        categorieList.add(element);
+      }
+    });
     setState(() {
-      categoriesData = data;
     });
   }
 
   List<Mesure> mesureData = [];
   void fetchMesure() async {
-    getAllTailleurMesure(user!.uid).listen((event) {
+    MesureService().getAllUserMesure(user!.uid).listen((event) {
       setState(() {
-        // print(event);
         mesureData = event;
       });
     });
@@ -199,9 +204,9 @@ class _MyFormState extends State<MyForm> {
                     OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
               ),
               value: selectedCategoryId.isEmpty ? null : selectedCategoryId,
-              items: categoriesData.entries.map((entry) {
-                final categoryId = entry.key;
-                final libelle = entry.value;
+              items: categorieList.map((entry) {
+                final categoryId = entry.id;
+                final libelle = entry.libelle;
                 return DropdownMenuItem<String>(
                   value: categoryId,
                   child: Text(libelle),

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../app/data/services/categorie_service.dart';
 import '../../app/data/services/commande_service.dart';
 
 class DetailCommande extends StatefulWidget {
@@ -58,7 +59,7 @@ class _DetailCommandeState extends State<DetailCommande> {
             widget.isAnnonyme
                 ? commandeAnonymeService.getCommandeAnonyme(widget.commandeId)
                 : commandeService.getCommande(widget.commandeId),
-            getCategorie(widget.idCategorie),
+            CategorieService().getCategorieById(widget.idCategorie),
           ]),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

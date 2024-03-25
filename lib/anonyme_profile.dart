@@ -3,13 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app_state.dart';
 import 'package:faani/helpers/authentification.dart';
 import 'package:faani/firebase_get_all_data.dart';
-import 'package:faani/src/explore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'app/data/models/modele_model.dart';
+import 'app/firebase/global_function.dart';
+import 'app/modules/globale_widgets/modele_card.dart';
 import 'my_theme.dart';
 import 'src/tailleur_modeles.dart';
 
@@ -37,9 +38,9 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
   Widget build(BuildContext context) {
     final currentUsers = Provider.of<ApplicationState>(context).currentUsers;
     final String imgUrl = getRandomProfileImageUrl();
-    final profileImage = user!.photoURL != null
+    final profileImage = auth.currentUser!.photoURL != null
         ? CachedNetworkImage(
-            imageUrl: user!.photoURL!,
+            imageUrl: auth.currentUser!.photoURL!,
             imageBuilder: (context, imageProvider) => Container(
               width: 150,
               height: 150,
@@ -71,16 +72,16 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
                 onPressed: () async {
                   if (Provider.of<ApplicationState>(context, listen: false)
                           .isTailleur &&
-                      !user!.isAnonymous) {
+                      !auth.currentUser!.isAnonymous) {
                     FirebaseFirestore.instance
                         .collection('Tailleur')
-                        .doc(user!.uid)
+                        .doc(auth.currentUser!.uid)
                         .delete();
                   } else {
-                    if (!user!.isAnonymous) {
+                    if (!auth.currentUser!.isAnonymous) {
                       FirebaseFirestore.instance
                           .collection('client')
-                          .doc(user!.uid)
+                          .doc(auth.currentUser!.uid)
                           .delete();
                     }
                   }
@@ -230,12 +231,12 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
                   ),
                   IconButton(
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              const ExplorePage(),
-                        ),
-                      );
+                      // Navigator.of(context).push(
+                      //   MaterialPageRoute(
+                      //     builder: (BuildContext context) =>
+                      //         const ExplorePage(),
+                      //   ),
+                      // );
                     },
                     icon: const Icon(
                       Icons.arrow_forward,
@@ -268,7 +269,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
                       return Text('Error: ${snapshot.error}');
                     } else {
                       List<Modele> modeles = snapshot.data!;
-                      return MyListModele(modeles: modeles);
+                      return ModeleCard(modeles: modeles);
                     }
                   },
                 ),

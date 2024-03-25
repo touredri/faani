@@ -17,6 +17,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'app/data/services/favorite_service.dart';
+import 'app/firebase/global_function.dart';
+import 'app/modules/globale_widgets/modele_card.dart';
 import 'helpers/authentification.dart';
 import 'modele/classes.dart';
 import 'pages/mesure/mesure.dart';
@@ -54,7 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String count = '0';
 
   void countFavorie() {
-    getAllFavorie(user.uid).listen((event) {
+    FavorieService().getAllFavorie(user.uid).listen((event) {
       setState(() {
         count = event.length.toString();
       });
@@ -467,7 +470,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       builder: (context, snpashot) {
                         if (snpashot.hasData) {
                           final modele = snpashot.data!;
-                          return MyListModele(modeles: modele);
+                          return ModeleCard(modeles: modele);
                         } else if (!snpashot.hasData) {
                           return const Center(
                               child: Text(
