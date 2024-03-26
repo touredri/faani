@@ -1,5 +1,5 @@
 import 'package:faani/app/data/models/mesure_model.dart';
-import 'package:faani/pages/mesure/ajouter.dart';
+import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:flutter/material.dart';
 
 class MesureDialog extends StatefulWidget {

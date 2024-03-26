@@ -1,14 +1,17 @@
+import 'package:faani/app/modules/mesures/controllers/mesures_controller.dart';
+import 'package:faani/app/modules/mesures/views/widgets/change_name.dart';
 import 'package:faani/app_state.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'widget/mesure_list_tile.dart';
+import '../../../data/services/mesure_service.dart';
+import 'widgets/mesure_list_tile.dart';
 
 class DetailMesure extends StatefulWidget {
-  final String mesure;
-  DetailMesure({super.key, required this.mesure});
+  final String id;
+  DetailMesure({super.key, required this.id});
 
   @override
   State<DetailMesure> createState() => _DetailMesureState();
@@ -28,7 +31,7 @@ class _DetailMesureState extends State<DetailMesure> {
         backgroundColor: primaryColor,
       ),
       body: StreamBuilder(
-          stream: getById(widget.mesure),
+          stream: MesureService().getById(widget.id),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -68,59 +71,9 @@ class _DetailMesureState extends State<DetailMesure> {
                                 onPressed: () {
                                   TextEditingController controller =
                                       TextEditingController();
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text('Modifier le nom'),
-                                        content: TextField(
-                                          controller: controller,
-                                          autofocus: true,
-                                          decoration: InputDecoration(
-                                            labelText: mesure.nom,
-                                            labelStyle: const TextStyle(
-                                                color: primaryColor),
-                                            filled: true,
-                                            fillColor: inputBackgroundColor,
-                                            enabledBorder:
-                                                const OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              borderSide: BorderSide(
-                                                  color: inputBorderColor,
-                                                  width: 2),
-                                            ),
-                                            focusedBorder:
-                                                const OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              borderSide: BorderSide(
-                                                  color: primaryColor,
-                                                  width: 2),
-                                            ),
-                                          ),
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                              onPressed: () {
-                                                if (controller
-                                                    .text.isNotEmpty) {
-                                                  mesure.nom = controller.text;
-                                                  mesure.update();
-                                                  setState(() {});
-                                                }
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('Ok')),
-                                          TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('Annuler')),
-                                        ],
-                                      );
-                                    },
-                                  );
+                                  setState(() {
+                                    changeName(mesure, context, controller);
+                                  });
                                 },
                                 icon: const Icon(
                                   Icons.edit,
@@ -134,18 +87,24 @@ class _DetailMesureState extends State<DetailMesure> {
                                     context: context,
                                     builder: (context) {
                                       return AlertDialog(
-                                        title: const Text('Supprimer'),
+                                        title: const Text('Supprimer ??'),
                                         content: const Text(
                                             'Voulez-vous vraiment supprimer cette mesure ?'),
                                         actions: [
                                           TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('Non')),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text(
+                                              'Non',
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
                                           TextButton(
                                               onPressed: () {
                                                 mesure.delete();
+                                                Navigator.pop(context);
                                                 Navigator.pop(context);
                                               },
                                               child: const Text('Oui')),

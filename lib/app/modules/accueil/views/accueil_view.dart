@@ -54,13 +54,12 @@ class AccueilView extends GetView<AccueilController> {
                           width: controller.isFilterOpen.value
                               ? MediaQuery.of(context).size.width * 0.8
                               : 0,
-                          // color: const Color.fromARGB(255, 240, 23, 23),
                           child: ClipRect(
                             child: Align(
                               alignment: Alignment.centerLeft,
                               widthFactor: controller.isFilterOpen.value
                                   ? 1
-                                  : 0, // Change la largeur en fonction de isFilterOpen
+                                  : 0,
                               child: CategorieFiltre(
                                   // onCategorieSelected:
                                   //     controller.onCategorieSelected,

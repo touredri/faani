@@ -21,7 +21,7 @@ class CurrentUsers {
 }
 
 class ApplicationState extends ChangeNotifier {
-  bool isLastPage = false;
+  // bool isLastPage = false;
   Mesure? mesures;
   bool isTailleur = false;
   CurrentUsers? currentUsers;
@@ -68,10 +68,10 @@ class ApplicationState extends ChangeNotifier {
     id: '',
   );
 
-  set lastPage(bool value) {
-    isLastPage = value;
-    notifyListeners();
-  }
+  // set lastPage(bool value) {
+  //   isLastPage = value;
+  //   notifyListeners();
+  // }
 
   // Mesure? get mesure => _mesure;
 

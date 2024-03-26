@@ -106,13 +106,13 @@ class Mesure {
   }
 }
 
-// get mesure by id
-Stream<Mesure> getById(String id) {
-  return FirebaseFirestore.instance
-      .collection('mesure')
-      .doc(id)
-      .snapshots()
-      .map((snapshot) {
-    return Mesure.fromMap(snapshot.data()!, snapshot.reference);
-  });
-}
+// // get mesure by id
+// Stream<Mesure> getById(String id) {
+//   return FirebaseFirestore.instance
+//       .collection('mesure')
+//       .doc(id)
+//       .snapshots()
+//       .map((snapshot) {
+//     return Mesure.fromMap(snapshot.data()!, snapshot.reference);
+//   });
+// }

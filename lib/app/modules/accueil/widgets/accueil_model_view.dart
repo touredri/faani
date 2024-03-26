@@ -87,6 +87,10 @@ class HomeItem extends GetView<AccueilController> {
                   docId: modele.id!,
                   color: 'white',
                 ),
+                // Column(
+                //   mainAxisSize: MainAxisSize.min,
+                //   children: [Icon(Icons.follow_the_signs)],
+                // ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[

@@ -13,9 +13,11 @@ class HomeView extends GetView<HomeController> {
         backgroundColor: scaffoldBack!,
         tabs: controller.tabs(),
         navBarBuilder: (navBarConfig) => Style6BottomNavBar(
-          navBarDecoration: NavBarDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+          navBarDecoration: const NavBarDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(18.0),
+                topRight: Radius.circular(18.0)),
+            padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           ),
           navBarConfig: navBarConfig,
         ),

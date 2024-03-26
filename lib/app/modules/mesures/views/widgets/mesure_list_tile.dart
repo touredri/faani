@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'modifier.dart';
 
 class MesureListTile extends StatelessWidget {
@@ -11,13 +12,19 @@ class MesureListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ModifyMesure(
-                      name: name,
-                      value: value,
-                    )));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => ModifyMesure(
+        //               name: name,
+        //               value: value,
+        //             )));
+        Get.to(
+            () => ModifyMesure(
+                  name: name,
+                  value: value,
+                ),
+            transition: Transition.rightToLeft);
       },
       child: Column(
         children: [
@@ -27,9 +34,13 @@ class MesureListTile extends StatelessWidget {
               width: 110,
               child: Row(
                 children: [
-                  Text('$value cm', style: const TextStyle(fontSize: 18)),
+                  Text('$value cm', style: const TextStyle(fontSize: 17)),
                   const Spacer(),
-                  const Icon(Icons.arrow_forward_ios, size: 20),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 20,
+                    color: Colors.grey,
+                  ),
                 ],
               ),
             ),

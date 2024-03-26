@@ -1,32 +1,35 @@
 import 'package:faani/my_theme.dart';
-import 'package:faani/pages/mesure/widget/mesure_page_view.dart';
+import 'package:faani/app/modules/mesures/views/widgets/mesure_page_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spacer/flutter_spacer.dart';
+import 'package:get/get.dart';
 
-class AjoutMesure extends StatelessWidget {
+class AjoutMesure extends GetView {
   const AjoutMesure({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 240, 236, 236),
+        backgroundColor: scaffoldBack,
       ),
-      body: Container(
-        color: const Color.fromARGB(255, 240, 236, 236),
+      body: SizedBox(
         height: double.infinity,
         child: Column(
           children: [
             SizedBox(
                 height: MediaQuery.of(context).size.height * 0.6,
-                child: Image.asset('../../../assets/images/measurement.png')),
+                child: Image.asset('/assets/images/measurement.png')),
             Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              padding: const EdgeInsets.all(
+                20,
+              ),
               child: Column(
                 children: [
                   TextButton(
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const MesurePaveView()));
+                            builder: (context) => MesurePaveView()));
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -40,12 +43,10 @@ class AjoutMesure extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              '../../../assets/images/manual_measurements.png',
+                              'assets/images/manual_measurements.png',
                               width: 35,
                             ),
-                            const SizedBox(
-                              width: 10,
-                            ),
+                            3.ws,
                             const Text(
                               'Ajout manuel',
                               style:
@@ -82,14 +83,13 @@ class AjoutMesure extends StatelessWidget {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(16)),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.camera_alt_sharp, color: primaryColor),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
+                            const Icon(Icons.camera_alt_sharp,
+                                color: primaryColor),
+                            3.ws,
+                            const Text(
                               'Par caméra',
                               style:
                                   TextStyle(fontSize: 18, color: primaryColor),

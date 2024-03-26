@@ -36,9 +36,6 @@ class AccueilController extends GetxController {
 
   void onCategorieSelected(Categorie categorie) {
     // getRandomModele(10, '', categorie.id);
-    // for (int i = 0; i < listCategorie.length; i++) {
-    //   listCategorie[i].isSelected = (i == int.parse(categorie.id) - 1);
-    // }
   }
 
   Future<void> init() async {

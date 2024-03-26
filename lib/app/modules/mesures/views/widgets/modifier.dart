@@ -2,6 +2,7 @@ import 'package:faani/app_state.dart';
 import 'package:faani/constants/styles.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class ModifyMesure extends StatelessWidget {
@@ -27,6 +28,7 @@ class ModifyMesure extends StatelessWidget {
   };
   @override
   Widget build(BuildContext context) {
+    controller.text = value;
     return Scaffold(
       appBar: AppBar(
         title: Text(name, style: const TextStyle(color: Colors.white)),
@@ -62,57 +64,42 @@ class ModifyMesure extends StatelessWidget {
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 17,
-                    ),
-                  ),
-                  const Spacer(),
                   SizedBox(
-                    width: 200,
-                    height: 35,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed: () {
-                            int currentValue =
-                                int.tryParse(controller.text) ?? 0;
-                            if (currentValue > 0) {
-                              controller.text = (currentValue - 1).toString();
-                            }
-                          },
-                        ),
-                        Expanded(
-                          child: TextField(
-                            controller: controller,
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) {},
-                            maxLength: 3,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                            ),
-                            decoration: InputDecoration(
-                              counterText: '',
-                              labelText: value,
-                              labelStyle: TextStyle(color: primaryColor),
-                            ),
-                          ),
-                          // ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () {
-                            int currentValue =
-                                int.tryParse(controller.text) ?? 0;
-                            controller.text = (currentValue + 1).toString();
-                          },
-                        ),
-                      ],
+                    width: 140,
+                    height: 45,
+                    child: TextField(
+                      controller: controller,
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {},
+                      maxLength: 3,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        height: 0.8,
+                        fontSize: 18,
+                      ),
+                      decoration: InputDecoration(
+                        prefixIcon: IconButton(
+                            onPressed: () {
+                              int currentValue =
+                                  int.tryParse(controller.text) ?? 0;
+                              if (currentValue > 0) {
+                                controller.text = (currentValue - 1).toString();
+                              }
+                            },
+                            icon: Icon(Icons.remove)),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              int currentValue =
+                                  int.tryParse(controller.text) ?? 0;
+                              controller.text = (currentValue + 1).toString();
+                            },
+                            icon: Icon(Icons.add)),
+                        counterText: '',
+                        labelText: value,
+                        labelStyle: TextStyle(color: primaryColor),
+                      ),
                     ),
                   ),
                   const Text('Cm'),

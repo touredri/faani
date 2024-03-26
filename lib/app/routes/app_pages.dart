@@ -58,10 +58,10 @@ class AppPages {
       binding: FavorieBinding(),
     ),
     GetPage(
-      name: _Paths.MESURES,
-      page: () => const MesuresView(),
-      binding: MesuresBinding(),
-    ),
+        name: _Paths.MESURES,
+        page: () => const MesuresView(),
+        binding: MesuresBinding(),
+        transition: Transition.rightToLeft),
     GetPage(
       name: _Paths.PROFILE,
       page: () => const ProfileView(),
