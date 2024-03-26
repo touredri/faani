@@ -12,13 +12,6 @@ class MesureListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) => ModifyMesure(
-        //               name: name,
-        //               value: value,
-        //             )));
         Get.to(
             () => ModifyMesure(
                   name: name,

@@ -21,8 +21,6 @@ class CurrentUsers {
 }
 
 class ApplicationState extends ChangeNotifier {
-  // bool isLastPage = false;
-  Mesure? mesures;
   bool isTailleur = false;
   CurrentUsers? currentUsers;
   bool isLoading = false;
@@ -51,15 +49,14 @@ class ApplicationState extends ChangeNotifier {
   }
 
   Tailleur currentTailleur = Tailleur(
-    quartier: '',
-    genreHabit: '',
-    isVerify: false,
-    nomPrenom: '',
-    telephone: 0,
-    genre: '',
-    id: '',
-    profile: ''
-  );
+      quartier: '',
+      genreHabit: '',
+      isVerify: false,
+      nomPrenom: '',
+      telephone: 0,
+      genre: '',
+      id: '',
+      profile: '');
 
   Client currentClient = Client(
     nomPrenom: '',
@@ -67,18 +64,6 @@ class ApplicationState extends ChangeNotifier {
     genre: '',
     id: '',
   );
-
-  // set lastPage(bool value) {
-  //   isLastPage = value;
-  //   notifyListeners();
-  // }
-
-  // Mesure? get mesure => _mesure;
-
-  set mesure(Mesure? value) {
-    mesures = value;
-    notifyListeners();
-  }
 
   set changeTailleur(bool value) {
     isTailleur = value;

@@ -11,6 +11,7 @@ import 'detail_mesure.dart';
 
 class MesuresView extends GetView<MesuresController> {
   const MesuresView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,8 +51,6 @@ class MesuresView extends GetView<MesuresController> {
                 final mesure = data[index];
                 return GestureDetector(
                   onTap: () {
-                    // Navigator.of(context).push(MaterialPageRoute(
-                    //     builder: (context) => DetailMesure(id: mesure.id!)));
                     Get.to(() => DetailMesure(id: mesure.id!),
                         transition: Transition.rightToLeft);
                   },

@@ -1,3 +1,4 @@
+import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -19,6 +20,8 @@ class MesuresController extends GetxController {
     longeurController.text = ''; hancheController.text = ''; brasController.text = '';
     tailleController.text = ''; poignetController.text = '';
   }
+
+  Mesure? currentMesure;
 
   @override
   void onInit() {

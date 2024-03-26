@@ -1,12 +1,11 @@
-import 'package:faani/app/modules/mesures/controllers/mesures_controller.dart';
 import 'package:faani/app/modules/mesures/views/widgets/change_name.dart';
-import 'package:faani/app_state.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/my_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import '../../../data/services/mesure_service.dart';
+import '../controllers/mesures_controller.dart';
 import 'widgets/mesure_list_tile.dart';
 
 class DetailMesure extends StatefulWidget {
@@ -20,6 +19,7 @@ class DetailMesure extends StatefulWidget {
 class _DetailMesureState extends State<DetailMesure> {
   @override
   Widget build(BuildContext context) {
+    final MesuresController mesureController = Get.put(MesuresController());
     return Scaffold(
       appBar: AppBar(
         title: const Text('Détail de la mesure',
@@ -40,14 +40,12 @@ class _DetailMesureState extends State<DetailMesure> {
                   child: Text('Une erreur est survenue ${snapshot.error}'));
             } else {
               final Mesure mesure = snapshot.data!;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Provider.of<ApplicationState>(context, listen: false).mesure =
-                    mesure;
-              });
+              mesureController.currentMesure = mesure; // update current mesure
               return Container(
                 padding: const EdgeInsets.only(left: 9, right: 9),
                 child: Column(
                   children: [
+                    // title & action button
                     Padding(
                       padding: const EdgeInsets.only(left: 3, right: 3),
                       child: Row(
@@ -127,6 +125,7 @@ class _DetailMesureState extends State<DetailMesure> {
                     const Divider(
                       color: primaryColor,
                     ),
+                    // list value of mesures
                     Expanded(
                       child: SingleChildScrollView(
                         child: SizedBox(

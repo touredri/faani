@@ -1,6 +1,4 @@
 import 'package:faani/constants/styles.dart';
-import 'package:faani/helpers/authentification.dart';
-import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/modules/mesures/views/widgets/page_view_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';

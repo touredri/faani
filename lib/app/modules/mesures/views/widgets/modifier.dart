@@ -1,9 +1,8 @@
-import 'package:faani/app_state.dart';
+import 'package:faani/app/modules/mesures/controllers/mesures_controller.dart';
 import 'package:faani/constants/styles.dart';
-import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_spacer/flutter_spacer.dart';
+import 'package:get/get.dart';
 
 class ModifyMesure extends StatelessWidget {
   final String name;
@@ -28,6 +27,7 @@ class ModifyMesure extends StatelessWidget {
   };
   @override
   Widget build(BuildContext context) {
+    final MesuresController mesuresController = Get.put(MesuresController());
     controller.text = value;
     return Scaffold(
       appBar: AppBar(
@@ -42,12 +42,7 @@ class ModifyMesure extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(10),
           child: Column(children: [
-            const SizedBox(
-              height: 20,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
+            5.hs, // example image display
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.4,
               child: ClipRRect(
@@ -57,9 +52,7 @@ class ModifyMesure extends StatelessWidget {
                     fit: BoxFit.cover,
                   )),
             ),
-            const SizedBox(
-              height: 40,
-            ),
+            5.hs, // input new mesure
             Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -102,13 +95,12 @@ class ModifyMesure extends StatelessWidget {
                       ),
                     ),
                   ),
+                  2.ws,
                   const Text('Cm'),
                 ],
               ),
             ),
-            const SizedBox(
-              height: 60,
-            ),
+            5.hs, // save button
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.7,
               height: 50,
@@ -116,12 +108,8 @@ class ModifyMesure extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     if (controller.text.isNotEmpty) {
-                      final Mesure mesure =
-                          context.read<ApplicationState>().mesures!;
-                      mesure.updateField(
+                      mesuresController.currentMesure!.updateField(
                           name.toLowerCase(), int.tryParse(controller.text));
-                      Provider.of<ApplicationState>(context, listen: false)
-                          .mesure = mesure;
                     }
                     Navigator.pop(context);
                   },
