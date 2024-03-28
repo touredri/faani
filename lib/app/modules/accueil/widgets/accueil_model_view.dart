@@ -33,6 +33,7 @@ class HomeItem extends GetView<AccueilController> {
             ),
           ],
         ), // black colors with opacity on modele image
+        // black opacity on model images
         SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
@@ -55,6 +56,7 @@ class HomeItem extends GetView<AccueilController> {
             ),
           ),
         ),
+        // actions icons bar
         Container(
           alignment: Alignment.centerRight,
           child: Container(

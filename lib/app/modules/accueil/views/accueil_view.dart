@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
@@ -8,7 +7,7 @@ import '../controllers/accueil_controller.dart';
 import '../widgets/accueil_page_view.dart';
 
 class AccueilView extends GetView<AccueilController> {
-  const AccueilView({Key? key}) : super(key: key);
+  const AccueilView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class AccueilView extends GetView<AccueilController> {
           SizedBox(
             width: double.infinity,
             height: MediaQuery.of(context).size.height * 0.92,
-            child: AccueilPAgeView(),
+            child: const AccueilPAgeView(),
           ),
           // filter and search icon
           Container(
@@ -37,45 +36,11 @@ class AccueilView extends GetView<AccueilController> {
             child: Obx(() => Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        IconButton(
+                    controller.isHommeSelected.value
+                        ? TextButton(
                             onPressed: () {
-                              controller.isFilterOpen.value =
-                                  !controller.isFilterOpen.value;
-                            },
-                            icon: const Icon(
-                              Icons.filter_list_alt,
-                              color: Colors.white,
-                              size: 30,
-                            )),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          width: controller.isFilterOpen.value
-                              ? MediaQuery.of(context).size.width * 0.8
-                              : 0,
-                          child: ClipRect(
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              widthFactor: controller.isFilterOpen.value
-                                  ? 1
-                                  : 0,
-                              child: CategorieFiltre(
-                                  // onCategorieSelected:
-                                  //     controller.onCategorieSelected,
-                                  ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Visibility(
-                      visible: !controller.isFilterOpen.value,
-                      child: Row(
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              controller.isHommeSelected.value = true;
+                              controller.isHommeSelected.value =
+                                  !controller.isHommeSelected.value;
                             },
                             child: Text('Homme',
                                 style: TextStyle(
@@ -88,18 +53,12 @@ class AccueilView extends GetView<AccueilController> {
                                     fontSize: controller.isHommeSelected.value
                                         ? 20
                                         : 15)),
-                          ),
-                          const Text(
-                            '|',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextButton(
+                          )
+                        :
+                        TextButton(
                             onPressed: () {
-                              controller.isHommeSelected.value = false;
+                              controller.isHommeSelected.value =
+                                  !controller.isHommeSelected.value;
                             },
                             child: Text('Femme',
                                 style: TextStyle(
@@ -114,19 +73,20 @@ class AccueilView extends GetView<AccueilController> {
                                         ? 20
                                         : 15)),
                           ),
-                        ],
-                      ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      child: CategorieFiltre(
+                          // onCategorieSelected:
+                          //     controller.onCategorieSelected,
+                          ),
                     ),
-                    Visibility(
-                      visible: !controller.isFilterOpen.value,
-                      child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.search,
-                            color: Colors.white,
-                            size: 30,
-                          )),
-                    ),
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.search,
+                          color: Colors.white,
+                          size: 30,
+                        )),
                   ],
                 )),
           ),

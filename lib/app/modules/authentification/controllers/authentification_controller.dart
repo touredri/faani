@@ -54,12 +54,15 @@ class AuthController extends GetxController {
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
           // Handle successful automatic verification
-          await auth.signInWithCredential(credential);
+          // await auth.signInWithCredential(credential);
+          await FirebaseAuth.instance.currentUser!
+              .linkWithCredential(credential);
           Get.snackbar(
             "Success",
             "Phone number verified!",
             snackPosition: SnackPosition.BOTTOM,
           );
+
           Get.to(() =>
               SignUpView()); // navigate to sign up view after successful verification
         },
@@ -85,6 +88,7 @@ class AuthController extends GetxController {
         },
       );
     } catch (e) {
+      loading.value = false;
       Get.snackbar(
         "Error",
         e.toString(),
@@ -129,7 +133,7 @@ class AuthController extends GetxController {
   }
 
   // create user with its information
-  void saveUserInFirestore() {
+  void saveUserInFirestore() async {
     if (nameController.text.isEmpty || nameController.text.length < 3) {
       Get.snackbar(
         "Error",
@@ -140,6 +144,10 @@ class AuthController extends GetxController {
       return;
     }
     loading.value = true;
+    // link the name to the phone number
+    await auth.currentUser!.updateDisplayName(
+      nameController.text,
+    );
     // Create a new user model
     final UserModel newUser = UserModel(
       id: auth.currentUser!.uid,
@@ -149,10 +157,10 @@ class AuthController extends GetxController {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-
     // Call the create user function from the users service
     final UserService usersService = UserService();
     usersService.createUser(newUser).then((value) {
+      // set the user to currentUser
       setUser();
       Get.snackbar(
         "Success",

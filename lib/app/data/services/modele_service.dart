@@ -1,16 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ModeleService {
-  final collection = FirebaseFirestore.instance.collection('modele');
-
-  static final ModeleService _singleton = ModeleService._internal();
   factory ModeleService() {
     return _singleton;
   }
+
   ModeleService._internal();
+
+  final collection = FirebaseFirestore.instance.collection('modele');
   DocumentSnapshot? lastDoc;
+
+  static final ModeleService _singleton = ModeleService._internal();
 
   // Crée un nouveau document dans la collection "modele"
   Future<void> create(Modele modele) async {
@@ -75,12 +78,12 @@ class ModeleService {
     });
   }
 
-  // DocumentSnapshot? lastDoc;
-
+  // get 10 random modele from the collection "modele"
   Future<List<Modele>> getRandomModeles(
       int limit, String clientCible, String categorie) async {
+    final prefs = await SharedPreferences.getInstance();
     // Set a reasonable page size (adjust based on your needs)
-    const pageSize = 10;
+    const pageSize = 3;
 
     // List to store all fetched models
     final models = <Modele>[];
@@ -109,8 +112,15 @@ class ModeleService {
             .limit(pageSize);
       }
 
+      // final lastDocId = prefs.getString('lastDocId');
+      // if (lastDocId != null) {
+      //   print('id*********************');
+      //   lastDoc = await FirebaseFirestore.instance.doc(lastDocId).get();
+      //   print('$lastDocId ***********************************');
+      // }
       if (lastDoc != null) {
         query.startAfterDocument(lastDoc!);
+        print(lastDoc!.id);
       }
 
       // Fetch a random page of documents with cursor
@@ -135,11 +145,15 @@ class ModeleService {
           }
         }
       }
-
       // Update lastDoc for next page
       lastDoc = querySnapshot.docs.last;
+      // await prefs.setString('lastDocId', lastDoc!.id);
     }
-
     return models;
+  }
+
+  isModeleExist(String? id) {
+    final doc = collection.doc(id);
+    return doc.get().then((value) => value.exists);
   }
 }

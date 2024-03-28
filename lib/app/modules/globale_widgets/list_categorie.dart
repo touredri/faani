@@ -5,10 +5,16 @@ import 'package:get/get.dart';
 import '../../data/models/categorie_model.dart';
 import '../accueil/controllers/accueil_controller.dart';
 
-class CategorieFiltre extends GetView {
+class CategorieFiltre extends StatefulWidget {
   CategorieFiltre({super.key});
 
+  @override
+  State<CategorieFiltre> createState() => _CategorieFiltreState();
+}
+
+class _CategorieFiltreState extends State<CategorieFiltre> {
   final ScrollController _scrollController = ScrollController();
+
   final double itemHeight = 50;
 
   void _scrollToCenter(int selectedIndex, BuildContext context) {
@@ -42,9 +48,11 @@ class CategorieFiltre extends GetView {
                   controller.listCategorie[i].isSelected =
                       (i == int.parse(categorie.id) - 1);
                 }
-                _scrollToCenter(index, context);
-                controller.isFilterOpen.value = false;
-                controller.onCategorieSelected(categorie);
+                setState(() {
+                  _scrollToCenter(index, context);
+                });
+                // controller.isFilterOpen.value = false;
+                // controller.onCategorieSelected(categorie);
               },
               child: Text(
                 categorie.libelle,
@@ -60,6 +68,7 @@ class CategorieFiltre extends GetView {
                   fontWeight: categorie.isSelected
                       ? FontWeight.bold
                       : FontWeight.normal,
+                  height: categorie.isSelected ? 1 : 0,
                 ),
               ),
             );
