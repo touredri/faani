@@ -8,6 +8,7 @@ import 'app/modules/home/controllers/user_controller.dart';
 import 'app/routes/app_pages.dart';
 import 'app_state.dart';
 import 'firebase_options.dart';
+import 'generated/locales.g.dart';
 import 'my_theme.dart';
 import 'package:get/get.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -49,6 +50,7 @@ class FaaniApp extends StatelessWidget {
           theme: buildTheme(context),
           initialRoute: AppPages.INITIAL,
           getPages: AppPages.routes,
+          translationsKeys: AppTranslation.translations,
         );
       },
     );

@@ -5,7 +5,6 @@ import 'package:faani/my_theme.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../firebase_get_all_data.dart';
 
 class ProfileImage extends StatelessWidget {
   final double width, height;
@@ -76,7 +75,7 @@ class _BuildProfileImageState extends State<BuildProfileImage> {
 
       // Update the user's profile with the new image URL
       await user!.updatePhotoURL(imageUrl);
-      
+
       // Delete the old image from Firebase Storage
       if (oldImageUrl != null) {
         Reference oldImageRef =
@@ -100,27 +99,28 @@ class _BuildProfileImageState extends State<BuildProfileImage> {
           width: widget.width,
           height: widget.height,
         ),
-        Positioned(
-          bottom: 0,
-          right: 0,
-          child: Container(
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              color: primaryColor,
-              borderRadius: BorderRadius.circular(70),
-            ),
-            child: IconButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all(const EdgeInsets.all(0)),
+        if (widget.width != 125)
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(70),
               ),
-              onPressed: changeProfileImage,
-              icon: const Icon(
-                Icons.camera_alt,
-                color: Colors.white,
+              child: IconButton(
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all(const EdgeInsets.all(0)),
+                ),
+                onPressed: changeProfileImage,
+                icon: const Icon(
+                  Icons.camera_alt,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

@@ -44,12 +44,12 @@ class ModifierProfileView extends GetView {
                     height: 55,
                     child: DropdownButtonFormField<String>(
                       decoration: InputDecoration(
-                        labelText: 'Client Cible',
+                        labelText: 'Genre',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      items: <String>['Homme', 'Femme', 'Garçon', 'Fille']
+                      items: <String>['Homme', 'Femme']
                           .map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,

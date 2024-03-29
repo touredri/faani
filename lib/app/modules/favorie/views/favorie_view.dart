@@ -12,15 +12,19 @@ class FavorieView extends GetView<FavorieController> {
   Widget build(BuildContext context) {
     final FavorieController controller = Get.put(FavorieController());
     return Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: AppBar(
-          title: Text('Mes favories',
-              style: Theme.of(context).textTheme.displayMedium),
-          centerTitle: true,
-          backgroundColor: primaryColor,
-          toolbarHeight: 40,
-        ),
-        body: StreamBuilder<List<Modele>>(
+        body: CustomScrollView(slivers: <Widget>[
+      SliverAppBar(
+        backgroundColor: primaryColor,
+        expandedHeight: 40.0,
+        floating: true,
+        snap: true,
+        title: Text('Mes favories',
+            style: Theme.of(context).textTheme.displayMedium),
+      ),
+      // SliverPersistentHeader(delegate: delegate)
+      SliverList(
+          delegate: SliverChildListDelegate([
+        StreamBuilder<List<Modele>>(
           stream: controller.loadData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -47,6 +51,8 @@ class FavorieView extends GetView<FavorieController> {
               return ModeleCard(modeles: snapshot.data!);
             }
           },
-        ));
+        ),
+      ]))
+    ]));
   }
 }

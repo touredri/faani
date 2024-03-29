@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AideView extends GetView {
-  const AideView({Key? key}) : super(key: key);
+  const AideView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

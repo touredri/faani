@@ -18,22 +18,26 @@ class CustomListTile extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(leadingIcon, color: leadingColor),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 15,
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(leadingIcon, color: leadingColor),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+            ),
+          ),
+          trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey[400]),
+          onTap: onTap,
         ),
-      ),
-      trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey[400]),
-      onTap: onTap,
+      ],
     );
   }
 }
 
 class CustomDivider extends StatelessWidget {
-  const CustomDivider({Key? key}) : super(key: key);
+  const CustomDivider({super.key});
 
   @override
   Widget build(BuildContext context) {
