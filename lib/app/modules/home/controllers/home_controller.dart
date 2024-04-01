@@ -3,7 +3,7 @@ import 'package:faani/app/modules/commande/views/commande_view.dart';
 import 'package:faani/app/modules/favorie/views/favorie_view.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/profile/views/profile_view.dart';
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
@@ -16,8 +16,6 @@ class HomeController extends GetxController {
   PersistentTabController tabController =
       PersistentTabController(initialIndex: 0);
   UserController userController = Get.find();
-  RxBool isTailleur = false.obs;
-  final currentUser = UserModel(nomPrenom: '', phoneNumber: '').obs;
 
   List<PersistentTabConfig> tabs() => [
         PersistentTabConfig(
@@ -36,7 +34,7 @@ class HomeController extends GetxController {
             title: "Couture",
           ),
         ),
-        if (userController.isTailleur.value)
+        // if (userController.isTailleur.value)
           PersistentTabConfig(
             screen: const AjoutModeleView(),
             item: ItemConfig(
@@ -45,7 +43,7 @@ class HomeController extends GetxController {
                 Icons.add,
                 size: 30,
               ),
-              title: "Modèle",
+              // title: "Modèle",
             ),
           ),
         PersistentTabConfig(

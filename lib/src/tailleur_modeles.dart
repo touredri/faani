@@ -6,8 +6,9 @@ import 'package:faani/pages/modele/detail_modele.dart';
 import 'package:flutter/material.dart';
 
 import '../app/data/models/modele_model.dart';
+import '../app/firebase/global_function.dart';
 import '../app/modules/globale_widgets/modele_card.dart';
-import '../my_theme.dart';
+import '../app/style/my_theme.dart';
 
 class TailleurModeles extends StatefulWidget {
   const TailleurModeles({super.key});
@@ -48,6 +49,6 @@ class _TailleurModelesState extends State<TailleurModeles> {
           backgroundColor: primaryColor,
           toolbarHeight: 40,
         ),
-        body: ModeleCard(modeles: modeles));
+        body: buildCard(modeles[0], context: context));
   }
 }

@@ -1,5 +1,5 @@
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';

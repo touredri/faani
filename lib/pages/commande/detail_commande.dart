@@ -5,7 +5,7 @@ import 'package:faani/app/data/models/client_model.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/tailleur_model.dart';
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:faani/app/modules/mesures/views/detail_mesure.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

@@ -1,4 +1,3 @@
-import 'package:faani/constants/styles.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/modules/mesures/views/widgets/measure_dialog_box.dart';
 import 'package:flutter/material.dart';
@@ -39,15 +38,15 @@ class _JoinMesureButtonState extends State<JoinMesureButton> {
               height: 45,
               width: 200,
               decoration: BoxDecoration(
-                border: Border.all(color: inputBorderColor, width: 1),
+                // border: Border.all(color: inputBorderColor, width: 1),
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.link, color: primaryColor),
+                  Icon(Icons.link, ),
                   const SizedBox(width: 5),
-                  Text('Mésure', style: TextStyle(color: labelColor)),
+                  Text('Mésure', style: TextStyle(color: Colors.black)),
                 ],
               ),
             )
@@ -55,7 +54,7 @@ class _JoinMesureButtonState extends State<JoinMesureButton> {
               height: 45,
               width: 200,
               decoration: BoxDecoration(
-                border: Border.all(color: inputBorderColor, width: 1),
+                // border: Border.all(color: inputBorderColor, width: 1),
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
               ),
               child: Center(

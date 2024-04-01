@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:faani/src/modele_form.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';

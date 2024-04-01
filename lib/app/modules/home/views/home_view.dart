@@ -1,11 +1,11 @@
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
-  HomeView({Key? key}) : super(key: key);
+  HomeView({super.key});
   final HomeController controller = Get.put(HomeController());
   @override
   Widget build(BuildContext context) => PersistentTabView(

@@ -1,4 +1,4 @@
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:faani/app/modules/mesures/views/widgets/mesure_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';

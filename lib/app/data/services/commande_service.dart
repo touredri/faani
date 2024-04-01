@@ -3,6 +3,8 @@ import 'package:faani/helpers/authentification.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/services/suivi_etat_service.dart';
 
+import '../../firebase/global_function.dart';
+
 class CommandeAnonymeService {
   final collection = FirebaseFirestore.instance.collection('commandeAnomyme');
   SuiviEtatService suiviEtatService = SuiviEtatService();

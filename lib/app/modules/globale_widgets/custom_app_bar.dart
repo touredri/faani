@@ -1,6 +1,7 @@
-import 'package:faani/constants/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../style/my_theme.dart';
 
 AppBar primaryBackAppBar(String text) {
   return AppBar(

@@ -2,8 +2,7 @@ import 'package:faani/app/modules/globale_widgets/profile_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import '../../../../constants/styles.dart';
-import '../../home/controllers/user_controller.dart';
+import '../../../style/my_theme.dart';
 import '../../mesures/views/mesures_view.dart';
 import '../controllers/profile_controller.dart';
 import '../widgets.dart/list_actions.dart';
@@ -20,28 +19,43 @@ class ProfileView extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     final ProfileController controller = Get.put(ProfileController());
     return Scaffold(
-      backgroundColor: primaryColor,
-      body: SingleChildScrollView(
-        child: Stack(
-          children: <Widget>[
-            Container(
-                alignment: Alignment.bottomCenter,
-                height: MediaQuery.of(context).size.height * 0.94,
-                transformAlignment: Alignment.bottomCenter,
-                child: Container(
-                  height: MediaQuery.of(context).size.height * 0.76,
-                  padding: const EdgeInsets.only(
-                      left: 7.0, right: 7, top: 55.0, bottom: 5),
+      // backgroundColor: primaryColor,
+      body: CustomScrollView(
+        slivers: <Widget>[
+          const SliverAppBar(
+            expandedHeight: 200.0,
+            pinned: true,
+            backgroundColor: primaryColor,
+            flexibleSpace: FlexibleSpaceBar(
+              // title: const Text('Drissa Touré'),
+              background: Padding(
+                padding: EdgeInsets.only(top: 98.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: BuildProfileImage(width: 125, height: 125),
+                ),
+              ),
+            ),
+          ),
+          // SliverPersistentHeader(delegate: SliverPersistentHeaderDelegate()),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                // SizedBox(
+                //   width: 125,
+                //   height: 125,
+                //   child: BuildProfileImage(width: 125, height: 125),
+                // ),
+                Container(
                   decoration: BoxDecoration(
-                    color: Colors.blueGrey[50],
+                    color: Color.fromARGB(255, 73, 144, 192),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(35),
                       topRight: Radius.circular(35),
                     ),
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
+                    children: [
                       CustomListTile(
                         leadingIcon: Icons.person,
                         title: 'Modifier le profile',
@@ -122,47 +136,29 @@ class ProfileView extends GetView<ProfileController> {
                           // Get.to(() => AidePage());
                         },
                       ),
-                    ],
-                  ),
-                )),
-            Positioned(
-              top: 70,
-              left: MediaQuery.of(context).size.width * 0.1,
-              child:
-                  // image et nom d'utilisateur
-                  Row(
-                children: <Widget>[
-                  const SizedBox(
-                      width: 125,
-                      height: 125,
-                      child: BuildProfileImage(width: 125, height: 125)),
-                  const SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // UserController().currentUser.value.nomPrenom!
-                      SizedBox(
-                        width: 190,
-                        child: Text('Drissa Touré',
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(color: Colors.white, fontSize: 22)),
+                      CustomListTile(
+                        leadingIcon: Icons.star_rate_sharp,
+                        title: 'Notez l\'Appli',
+                        leadingColor: Colors.yellow,
+                        onTap: () {
+                          // Get.to(() => AidePage());
+                        },
                       ),
-                      Text(
-                        '',
-                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                              color: Colors.white.withOpacity(0.8),
-                            ),
+                      CustomListTile(
+                        leadingIcon: Icons.share,
+                        title: 'Partager Faani App',
+                        leadingColor: Colors.grey,
+                        onTap: () {
+                          // Get.to(() => AidePage());
+                        },
                       ),
                     ],
                   ),
-                ],
-              ),
-            )
-          ],
-        ),
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

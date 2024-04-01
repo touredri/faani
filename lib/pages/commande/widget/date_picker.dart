@@ -1,6 +1,6 @@
-import 'package:faani/constants/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../app/style/my_theme.dart';
 
 class DatePickerWidget extends StatefulWidget {
   final Function(DateTime) onDateSelected;
@@ -44,7 +44,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
               )
             : Text(
                 'Date prévue',
-                style: TextStyle(color: labelColor),
+                style: TextStyle(color: Colors.black),
               ),
       ),
     );

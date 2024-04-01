@@ -1,4 +1,4 @@
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:faani/src/tailleur_modeles.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';

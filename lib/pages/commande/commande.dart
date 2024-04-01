@@ -1,11 +1,11 @@
 import 'package:faani/app_state.dart';
-import 'package:faani/constants/styles.dart';
 import 'package:faani/pages/commande/widget/circle_indicator.dart';
 import 'package:faani/pages/commande/widget/list_commande.dart';
 import 'package:faani/pages/commande/widget/save.dart';
 import 'package:faani/pages/commande/widget/tailleurs.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../app/style/my_theme.dart';
 
 class CommandePage extends StatefulWidget {
   const CommandePage({super.key});

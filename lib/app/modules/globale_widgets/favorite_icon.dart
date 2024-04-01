@@ -1,11 +1,10 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/services/favorite_service.dart';
 import 'package:flutter/material.dart';
 import '../../../anonyme_profile.dart';
-import '../../../constants/styles.dart';
 import '../../../widgets/widgets.dart';
 import '../../firebase/global_function.dart';
+import '../../style/my_theme.dart';
 
 class FavoriteIcone extends StatefulWidget {
   final String docId, color;
@@ -84,11 +83,11 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
             },
             icon: Icon(
               Icons.favorite_border_outlined,
-              color: widget.color == 'white' ?Colors.white : Colors.grey,
+              color: widget.color == 'white' ? Colors.white : primaryColor,
               size: 30,
             ),
             isSelected: isFavorite,
-            selectedIcon: Icon(
+            selectedIcon: const Icon(
               semanticLabel: 'Remove from favorites',
               textDirection: TextDirection.ltr,
               Icons.favorite,

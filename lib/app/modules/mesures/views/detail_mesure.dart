@@ -1,6 +1,6 @@
 import 'package:faani/app/modules/mesures/views/widgets/change_name.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

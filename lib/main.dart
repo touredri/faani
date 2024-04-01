@@ -9,7 +9,7 @@ import 'app/routes/app_pages.dart';
 import 'app_state.dart';
 import 'firebase_options.dart';
 import 'generated/locales.g.dart';
-import 'my_theme.dart';
+import 'app/style/my_theme.dart';
 import 'package:get/get.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 

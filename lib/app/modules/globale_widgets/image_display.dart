@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:faani/constants/styles.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import '../../style/my_theme.dart';
 
 class DisplayImage extends StatelessWidget {
   final Modele modele;
@@ -10,12 +11,13 @@ class DisplayImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PageController _controller = PageController();
+    PageController controller = PageController();
     return SizedBox(
       height: 350,
       child: Stack(
         children: [
           PageView(
+            controller: controller,
             children: [
               for (var image in modele.fichier)
                 ClipRRect(
@@ -33,16 +35,16 @@ class DisplayImage extends StatelessWidget {
           ),
           Container(
             alignment: Alignment.bottomCenter,
-            child: Container(
+            child: SizedBox(
                 height: 20,
                 width: 200,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SmoothPageIndicator(
-                      controller: _controller,
+                      controller: controller,
                       count: modele.fichier.length,
-                      effect: ExpandingDotsEffect(
+                      effect: const ExpandingDotsEffect(
                         dotColor: Colors.grey,
                         activeDotColor: primaryColor,
                         dotHeight: 8,

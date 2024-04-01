@@ -1,5 +1,4 @@
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
-import 'package:faani/constants/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 

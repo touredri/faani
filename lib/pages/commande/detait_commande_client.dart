@@ -6,7 +6,7 @@ import 'package:faani/modele/classes.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/tailleur_model.dart';
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:faani/app/modules/mesures/views/detail_mesure.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +15,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../app/data/models/categorie_model.dart';
 import '../../app/data/services/categorie_service.dart';
 import '../../app/data/services/modele_service.dart';
+import '../../app/firebase/global_function.dart';
 
 
 class DetailCommandeClient extends StatefulWidget {
@@ -38,7 +39,7 @@ class _DetailCommandeClientState extends State<DetailCommandeClient> {
   }
 
   void getTailleur() async{
-    tailleur = await getTailleurById(widget.commande.idTailleur);
+    // tailleur = await getTailleurById(widget.commande.idTailleur);
   }
 
   @override

@@ -1,18 +1,5 @@
-import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faani/anonyme_profile.dart';
-import 'package:faani/app_state.dart';
-import 'package:faani/helpers/authentification.dart';
-import 'package:faani/pages/commande/widget/form_client_modele.dart';
-import 'package:faani/pages/commande/widget/form_comm_tailleur.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import '../firebase_get_all_data.dart';
-import '../app/data/models/modele_model.dart';
-import '../my_theme.dart';
-import '../src/message_modal.dart';
+import '../app/style/my_theme.dart';
 
 InputDecoration myInputDecoration(String label) {
   return InputDecoration(
@@ -88,63 +75,6 @@ class _MyDropdownButtonState extends State<MyDropdownButton> {
   }
 }
 
-InputDecoration myInputDecorationWithIcon(String label, IconData icon) {
-  return InputDecoration(
-    labelStyle: TextStyle(
-      color: Colors.black.withOpacity(0.5),
-    ),
-    enabledBorder: const OutlineInputBorder(
-      borderSide: BorderSide(color: inputBorderColor),
-      borderRadius: BorderRadius.all(Radius.circular(15)),
-    ),
-    focusedBorder: const OutlineInputBorder(
-      borderSide: BorderSide(
-        color: inputBorderColor,
-        width: 2,
-      ),
-      borderRadius: BorderRadius.all(Radius.circular(15)),
-    ),
-    labelText: label,
-    prefixIcon: Icon(
-      icon,
-      color: inputBorderColor,
-    ),
-  );
-}
-
-Container _myFilterContainer(String label, VoidCallback onPressed) {
-  return Container(
-    height: 30,
-    padding: const EdgeInsets.symmetric(horizontal: 10),
-    // margin: const EdgeInsets.only(top: 5),
-    decoration: ShapeDecoration(
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Color(0xFFA4CEFB)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-    ),
-    child: Row(
-      children: [
-        TextButton(
-          onPressed: onPressed,
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 15,
-              fontWeight: FontWeight.w300,
-              height: 0,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-
-
 void showSuccessDialog(BuildContext context, String text, Widget page) {
   showGeneralDialog(
     context: context,
@@ -175,18 +105,6 @@ void showSuccessDialog(BuildContext context, String text, Widget page) {
         opacity: animation,
         child: child,
       );
-    },
-  );
-}
-
-Widget BackButton(BuildContext context) {
-  return IconButton(
-    icon: const Icon(
-      Icons.arrow_back_ios,
-      color: Colors.white,
-    ),
-    onPressed: () {
-      Navigator.pop(context);
     },
   );
 }

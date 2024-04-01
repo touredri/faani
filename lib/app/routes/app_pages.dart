@@ -9,8 +9,6 @@ import '../modules/authentification/bindings/authentification_binding.dart';
 import '../modules/authentification/views/authentification_view.dart';
 import '../modules/commande/bindings/commande_binding.dart';
 import '../modules/commande/views/commande_view.dart';
-import '../modules/detail_modele/bindings/detail_modele_binding.dart';
-import '../modules/detail_modele/views/detail_modele_view.dart';
 import '../modules/favorie/bindings/favorie_binding.dart';
 import '../modules/favorie/views/favorie_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -81,11 +79,6 @@ class AppPages {
       name: _Paths.MESSAGE,
       page: () => const MessageView(),
       binding: MessageBinding(),
-    ),
-    GetPage(
-      name: _Paths.DETAIL_MODELE,
-      page: () => const DetailModeleView(),
-      binding: DetailModeleBinding(),
     ),
   ];
 }

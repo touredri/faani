@@ -1,15 +1,13 @@
 import 'package:faani/app_state.dart';
-import 'package:faani/constants/styles.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/pages/commande/widget/form_client_modele.dart';
 import 'package:faani/pages/commande/widget/form_comm_tailleur.dart';
 import 'package:faani/app/data/services/modele_service.dart';
-import 'package:faani/src/tailleur_modeles.dart';
-import 'package:faani/widgets/image_display.dart';
+import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../app/modules/globale_widgets/modele_card.dart';
+import '../../app/style/my_theme.dart';
 
 class AjoutCommande extends StatefulWidget {
   final Modele modele;
@@ -77,8 +75,9 @@ class _AjoutCommandeState extends State<AjoutCommande> {
                                   );
                                 } else if (snapshot.hasData) {
                                   final List<Modele> modeles = snapshot.data!;
-                                  return ModeleCard(
-                                    modeles: modeles,
+                                  return buildCard(
+                                    modeles[0],
+                                    context: context
                                   );
                                 }
                                 return Container();

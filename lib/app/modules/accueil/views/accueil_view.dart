@@ -42,39 +42,25 @@ class AccueilView extends GetView<AccueilController> {
                               controller.isHommeSelected.value =
                                   !controller.isHommeSelected.value;
                             },
-                            child: Text('Homme',
+                            child: const Text('Homme',
                                 style: TextStyle(
-                                    color: controller.isHommeSelected.value
-                                        ? Colors.white
-                                        : Colors.white.withOpacity(0.6),
-                                    fontWeight: controller.isHommeSelected.value
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    fontSize: controller.isHommeSelected.value
-                                        ? 20
-                                        : 15)),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15)),
                           )
-                        :
-                        TextButton(
+                        : TextButton(
                             onPressed: () {
                               controller.isHommeSelected.value =
                                   !controller.isHommeSelected.value;
                             },
-                            child: Text('Femme',
+                            child: const Text('Femme',
                                 style: TextStyle(
-                                    color: !controller.isHommeSelected.value
-                                        ? Colors.white
-                                        : Colors.white.withOpacity(0.6),
-                                    fontWeight:
-                                        !controller.isHommeSelected.value
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                    fontSize: !controller.isHommeSelected.value
-                                        ? 20
-                                        : 15)),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15)),
                           ),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.6,
+                      width: MediaQuery.of(context).size.width * 0.66,
                       child: CategorieFiltre(
                           // onCategorieSelected:
                           //     controller.onCategorieSelected,

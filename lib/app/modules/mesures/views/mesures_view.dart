@@ -1,16 +1,16 @@
-import 'package:faani/helpers/authentification.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
-import 'package:faani/my_theme.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../data/services/mesure_service.dart';
+import '../../../firebase/global_function.dart';
 import '../controllers/mesures_controller.dart';
 import 'detail_mesure.dart';
 
 class MesuresView extends GetView<MesuresController> {
-  const MesuresView({Key? key}) : super(key: key);
+  const MesuresView({super.key});
 
   @override
   Widget build(BuildContext context) {

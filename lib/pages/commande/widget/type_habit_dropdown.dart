@@ -1,5 +1,4 @@
 import 'package:faani/app_state.dart';
-import 'package:faani/constants/styles.dart';
 import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +32,7 @@ class SelectCategoryState extends State<SelectCategory> {
     return DropdownButtonFormField<String>(
       isExpanded: true,
       decoration: InputDecoration(
-          labelText: 'Type habit', labelStyle: TextStyle(color: labelColor)),
+          labelText: 'Type habit', labelStyle: TextStyle(color: Colors.black)),
       value: selectedCategoryId.isEmpty ? null : selectedCategoryId,
       items: categories.map((categorie) {
         return DropdownMenuItem<String>(

@@ -1,9 +1,8 @@
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
-import 'package:faani/constants/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
-import '../../globale_widgets/client_cible_dropdown.dart';
+import '../../../style/my_theme.dart';
 import '../../globale_widgets/profile_image.dart';
 
 class ModifierProfileView extends GetView {

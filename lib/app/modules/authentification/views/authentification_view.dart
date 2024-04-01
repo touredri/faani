@@ -4,7 +4,7 @@ import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../../helpers/authentification.dart';
-import '../../../../my_theme.dart';
+import '../../../style/my_theme.dart';
 import '../../globale_widgets/circular_progress.dart';
 import '../controllers/authentification_controller.dart';
 
@@ -94,7 +94,7 @@ class AuthView extends GetView<AuthController> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () async {
-                  await signInAnonymously();
+                  // await signInAnonymously();
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (c) => HomeView()),
                     (route) => false,

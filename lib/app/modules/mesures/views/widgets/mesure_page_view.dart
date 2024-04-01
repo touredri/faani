@@ -1,8 +1,8 @@
-import 'package:faani/constants/styles.dart';
 import 'package:faani/app/modules/mesures/views/widgets/page_view_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
+import '../../../../style/my_theme.dart';
 import '../../controllers/mesures_controller.dart';
 import 'save_mesure.dart';
 
@@ -145,7 +145,7 @@ Container textContainer(String text) {
     child: Text(
       text,
       textAlign: TextAlign.center,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 20,
         color: primaryColor,
       ),

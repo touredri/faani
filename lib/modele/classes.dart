@@ -122,35 +122,35 @@ final firestore = FirebaseFirestore.instance;
 // }
 
 // method update for client
-Future<void> updateProfile(
-    String id, BuildContext context, String propertyName, dynamic value) async {
-  final collection =
-      Provider.of<ApplicationState>(context, listen: false).isTailleur
-          ? 'Tailleur'
-          : 'client';
-  final documentReference = firestore.collection(collection).doc(id);
-  await documentReference.update({propertyName: value});
-  if (propertyName == 'nomPrenom') {
-    updateUserName(value);
-  }
-}
+// Future<void> updateProfile(
+//     String id, BuildContext context, String propertyName, dynamic value) async {
+//   final collection =
+//       Provider.of<ApplicationState>(context, listen: false).isTailleur
+//           ? 'Tailleur'
+//           : 'client';
+//   final documentReference = firestore.collection(collection).doc(id);
+//   await documentReference.update({propertyName: value});
+//   if (propertyName == 'nomPrenom') {
+//     updateUserName(value);
+//   }
+// }
 
-// get a tailleur by Id
-Future<Tailleur> getTailleurById(String id) async {
-  final documentReference = firestore.collection('Tailleur').doc(id);
-  final snapshot = await documentReference.get();
-  return Tailleur.fromMap(snapshot.data() as Map<String, dynamic>,
-      firestore.collection('Tailleur').doc(id));
-}
+// // get a tailleur by Id
+// Future<Tailleur> getTailleurById(String id) async {
+//   final documentReference = firestore.collection('Tailleur').doc(id);
+//   final snapshot = await documentReference.get();
+//   return Tailleur.fromMap(snapshot.data() as Map<String, dynamic>,
+//       firestore.collection('Tailleur').doc(id));
+// }
 
-Future<Tailleur> getTailleurByRef(DocumentReference docRef) async {
-  final snapshot = await docRef.get();
-  Tailleur tailleur =
-      Tailleur.fromMap(snapshot.data() as Map<String, dynamic>, docRef);
-  return tailleur;
-}
+// Future<Tailleur> getTailleurByRef(DocumentReference docRef) async {
+//   final snapshot = await docRef.get();
+//   Tailleur tailleur =
+//       Tailleur.fromMap(snapshot.data() as Map<String, dynamic>, docRef);
+//   return tailleur;
+// }
 
-// add to collection users
-Future<void> addUserWithCustomId(String id, Map<String, dynamic> userData) async {
-  await FirebaseFirestore.instance.collection('users').doc(id).set(userData);
-}
+// // add to collection users
+// Future<void> addUserWithCustomId(String id, Map<String, dynamic> userData) async {
+//   await FirebaseFirestore.instance.collection('users').doc(id).set(userData);
+// }

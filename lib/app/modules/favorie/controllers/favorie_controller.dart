@@ -7,6 +7,8 @@ import '../../../firebase/global_function.dart';
 
 class FavorieController extends GetxController {
 
+  List<Modele?> modeles = [];
+
   Stream<List<Modele>> loadData() async* {
     await for (var event in FavorieService().getAllFavorie(user!.uid)) {
       var modeles = <Modele>[];

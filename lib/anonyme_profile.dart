@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'app/data/models/modele_model.dart';
 import 'app/firebase/global_function.dart';
 import 'app/modules/globale_widgets/modele_card.dart';
-import 'my_theme.dart';
+import 'app/style/my_theme.dart';
 import 'src/tailleur_modeles.dart';
 
 class AnonymeProfile extends StatefulWidget {
@@ -85,7 +85,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
                           .delete();
                     }
                   }
-                  await disconnect();
+                  // await disconnect();
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       '/sign_in', (Route<dynamic> route) => false);
                 },
@@ -269,7 +269,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
                       return Text('Error: ${snapshot.error}');
                     } else {
                       List<Modele> modeles = snapshot.data!;
-                      return ModeleCard(modeles: modeles);
+                      return buildCard(modeles[0], context: context);
                     }
                   },
                 ),
