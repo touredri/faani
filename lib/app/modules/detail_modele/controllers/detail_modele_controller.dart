@@ -8,19 +8,13 @@ class DetailModeleController extends GetxController {
   final modeleUser = UserModel(nomPrenom: '', phoneNumber: '').obs;
 
   // get modele owner
-  void getModeleOwner(String idUser) {
-    UserService().getUser(idUser).then((value) {
-      modeleUser.value = value;
-    });
-    // check if user is author
+  Future<void> getModeleOwner(String idUser) async {
+    final user = await UserService().getUser(idUser);
+    modeleUser.value = user;
     if (auth.currentUser!.uid == idUser) {
       isAuthor.value = true;
     }
   }
-
-  // Future<void> init() async {
-  //   await get
-  // }
 
   @override
   void onInit() {

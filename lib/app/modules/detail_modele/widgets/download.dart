@@ -4,6 +4,7 @@ import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -98,10 +99,19 @@ class IconDownloadState extends State<IconDownload> {
 
     bool isDownloaded = await saveFile(url, 'test.jpg');
     if (isDownloaded) {
-      print('The image is downloaded!');
+      // show snackbar
+      Get.snackbar(
+        "Success",
+        "Image sauvegarder dans galerie  !",
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } else {
-      print('The image is not downloaded!');
-    }
+      // show snackbar
+      Get.snackbar(
+        "Erreur",
+        "Erreur lors de la sauvegarde de l'image !",
+        snackPosition: SnackPosition.BOTTOM,
+      );}
 
     setState(() {
       isLoading = true;
@@ -115,7 +125,7 @@ class IconDownloadState extends State<IconDownload> {
         child: IconButton(
           icon: const Icon(
             Icons.download_rounded,
-            color: primaryColor,
+            color: Colors.grey,
             size: 30,
           ),
           color: primaryColor,

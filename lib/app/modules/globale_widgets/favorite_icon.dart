@@ -83,7 +83,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
             },
             icon: Icon(
               Icons.favorite_border_outlined,
-              color: widget.color == 'white' ? Colors.white : primaryColor,
+              color: widget.color == 'white' ? Colors.white : Colors.grey,
               size: 30,
             ),
             isSelected: isFavorite,

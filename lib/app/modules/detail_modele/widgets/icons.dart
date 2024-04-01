@@ -2,17 +2,10 @@ import 'package:faani/app/data/models/modele_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:faani/app/modules/globale_widgets/favorite_icon.dart';
-import 'package:faani/app/style/my_theme.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/src/message_modal.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
-import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../../data/models/modele_model.dart';
-import '../controllers/detail_modele_controller.dart';
 
 Widget iconShare(Modele modele) {
   return IconButton(
@@ -28,7 +21,7 @@ Widget iconShare(Modele modele) {
     },
     icon: const Icon(
       Icons.share,
-      color: primaryColor,
+      color: Colors.grey,
       size: 30,
     ),
   );
@@ -42,9 +35,9 @@ Widget iconMessage(Modele modele, BuildContext context) {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Text('${snapshot.data}',
-                style: const TextStyle(color: Colors.black));
+                style: const TextStyle(color: Colors.grey,));
           } else {
-            return const CircularProgressIndicator();
+            return const SizedBox();
           }
         },
       ),
@@ -66,7 +59,7 @@ Widget iconMessage(Modele modele, BuildContext context) {
         },
         icon: const Icon(
           Icons.message_outlined,
-          color: primaryColor,
+          color: Colors.grey,
           size: 30,
         ),
       ),
