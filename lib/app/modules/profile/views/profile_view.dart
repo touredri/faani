@@ -1,6 +1,8 @@
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
+import 'package:faani/app/modules/profile/widgets.dart/build_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import '../../../style/my_theme.dart';
 import '../../mesures/views/mesures_view.dart';
@@ -19,141 +21,137 @@ class ProfileView extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     final ProfileController controller = Get.put(ProfileController());
     return Scaffold(
-      // backgroundColor: primaryColor,
+      backgroundColor: primaryColor,
       body: CustomScrollView(
         slivers: <Widget>[
           const SliverAppBar(
-            expandedHeight: 200.0,
-            pinned: true,
             backgroundColor: primaryColor,
-            flexibleSpace: FlexibleSpaceBar(
-              // title: const Text('Drissa Touré'),
-              background: Padding(
-                padding: EdgeInsets.only(top: 98.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: BuildProfileImage(width: 125, height: 125),
-                ),
-              ),
-            ),
+            expandedHeight: 60.0,
+            toolbarHeight: 0,
+            floating: false,
+            pinned: false,
           ),
-          // SliverPersistentHeader(delegate: SliverPersistentHeaderDelegate()),
           SliverList(
             delegate: SliverChildListDelegate(
               [
-                // SizedBox(
-                //   width: 125,
-                //   height: 125,
-                //   child: BuildProfileImage(width: 125, height: 125),
-                // ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    3.ws,
+                    const BuildProfileImage(width: 120, height: 120),
+                    2.ws,
+                    Column(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${controller.userController.currentUser.value.nomPrenom}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            // 3.hs,
+                            const Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  color: Colors.white,
+                                  size: 15,
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  'Bamako, Mali',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            3.hs,
+                            // activity metrics
+                            Row(
+                              children: [
+                                const Column(
+                                  children: [
+                                    Text(
+                                      '21',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Suivie',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                5.ws,
+                                const Column(
+                                  children: [
+                                    Text(
+                                      '6',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Mesures',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                5.ws,
+                                const Column(
+                                  children: [
+                                    Text(
+                                      '10',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Modèles',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                1.hs,
                 Container(
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 73, 144, 192),
+                    color: Colors.blueGrey[50],
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(35),
                       topRight: Radius.circular(35),
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      CustomListTile(
-                        leadingIcon: Icons.person,
-                        title: 'Modifier le profile',
-                        leadingColor: Colors.blue,
-                        onTap: () => {
-                          Get.to(const ModifierProfileView(),
-                              transition: Transition.rightToLeft)
-                        },
-                      ),
-                      CustomListTile(
-                          leadingIcon: Icons.location_on,
-                          title: 'Mes Mesures',
-                          leadingColor: Colors.green,
-                          onTap: () => {
-                                Get.to(() => const MesuresView(),
-                                    transition: Transition.rightToLeft),
-                              }),
-                      // if (controller.isTailleur.value)
-                      CustomListTile(
-                        leadingIcon: Icons.store,
-                        title: 'Mes Modèles',
-                        leadingColor: primaryColor,
-                        onTap: () {
-                          Get.to(() => const MesModelesView(),
-                              transition: Transition.rightToLeft);
-                        },
-                      ),
-                      if (!controller.isTailleur.value)
-                        CustomListTile(
-                          leadingIcon: Icons.airline_seat_recline_normal,
-                          title: 'Devenir Tailleur',
-                          leadingColor: Colors.red,
-                          onTap: () {
-                            Get.to(() => DevenirTailleurView(),
-                                transition: Transition.rightToLeft);
-                          },
-                        ),
-                      CustomListTile(
-                        leadingIcon: Icons.settings,
-                        title: 'Paramètres',
-                        leadingColor: Colors.grey,
-                        onTap: () {
-                          Get.to(() => const ParametreView(),
-                              transition: Transition.rightToLeft);
-                        },
-                      ),
-                      CustomListTile(
-                        leadingIcon: Icons.help,
-                        title: 'Centre d\'aide',
-                        leadingColor: Colors.blue,
-                        onTap: () {
-                          Get.to(() => AideView(),
-                              transition: Transition.rightToLeft);
-                        },
-                      ),
-                      // const CustomDivider(), // Séparateur
-                      CustomListTile(
-                        leadingIcon: Icons.send,
-                        title: 'Laissez un commentaire',
-                        leadingColor: Colors.blueGrey,
-                        onTap: () {
-                          // Get.to(() => AidePage());
-                        },
-                      ),
-                      CustomListTile(
-                        leadingIcon: Icons.star_rate_sharp,
-                        title: 'Notez l\'Appli',
-                        leadingColor: Colors.yellow,
-                        onTap: () {
-                          // Get.to(() => AidePage());
-                        },
-                      ),
-                      CustomListTile(
-                        leadingIcon: Icons.share,
-                        title: 'Partager Faani App',
-                        leadingColor: Colors.grey,
-                        onTap: () {
-                          // Get.to(() => AidePage());
-                        },
-                      ),
-                      CustomListTile(
-                        leadingIcon: Icons.star_rate_sharp,
-                        title: 'Notez l\'Appli',
-                        leadingColor: Colors.yellow,
-                        onTap: () {
-                          // Get.to(() => AidePage());
-                        },
-                      ),
-                      CustomListTile(
-                        leadingIcon: Icons.share,
-                        title: 'Partager Faani App',
-                        leadingColor: Colors.grey,
-                        onTap: () {
-                          // Get.to(() => AidePage());
-                        },
-                      ),
-                    ],
-                  ),
+                  child: listBuild(controller),
                 )
               ],
             ),

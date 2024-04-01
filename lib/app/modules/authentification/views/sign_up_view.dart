@@ -32,7 +32,7 @@ class SignUpView extends GetView<AuthController> {
                 ),
               ),
               7.hs, // select image profile
-              const BuildProfileImage(width: 100, height: 100),
+              const BuildProfileImage(width: 100, height: 100, showIcon: true,),
               5.hs, // input name
               TextField(
                 controller: controller.nameController,

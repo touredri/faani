@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/favorite_icon.dart';
+import 'package:faani/app/modules/globale_widgets/floating_bottom_sheet.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +82,9 @@ class DetailModeleView extends GetView<DetailModeleController> {
                               trailing:
                                   controller.isAuthor.value // && isNotFollowed
                                       ? OutlinedButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            editModal(context);
+                                          },
                                           style: OutlinedButton.styleFrom(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 5, vertical: 0),
@@ -197,4 +200,40 @@ class DetailModeleView extends GetView<DetailModeleController> {
           }
         });
   }
+}
+
+Future editModal(BuildContext context) {
+  return showFloatingModalBottomSheet(
+    context: context,
+    builder: (context) => Container(
+      height: 100,
+      child: Column(
+        children: <Widget>[
+          TextButton.icon(
+            icon: const Icon(
+              Icons.edit,
+              color: Colors.grey,
+            ),
+            label: const Text(
+              'Modifier le modèle',
+              style: TextStyle(color: Colors.black),
+            ),
+            onPressed: () {
+              // Votre code ici
+            },
+          ),
+          TextButton.icon(
+            icon: const Icon(Icons.delete),
+            label: const Text(
+              'Supprimer le modèle',
+              style: TextStyle(color: Colors.black),
+            ),
+            onPressed: () {
+              // Votre code ici
+            },
+          ),
+        ],
+      ),
+    ),
+  );
 }

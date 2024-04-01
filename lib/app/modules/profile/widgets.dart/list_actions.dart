@@ -6,6 +6,7 @@ class CustomListTile extends GetView<ProfileController> {
   final IconData leadingIcon;
   final String title;
   final Color leadingColor;
+  final String subTitle;
   final void Function()? onTap;
 
   const CustomListTile({
@@ -13,6 +14,7 @@ class CustomListTile extends GetView<ProfileController> {
     required this.leadingIcon,
     required this.title,
     required this.leadingColor,
+    this.subTitle = '',
     required this.onTap,
   }) : super(key: key);
 
@@ -28,7 +30,11 @@ class CustomListTile extends GetView<ProfileController> {
               fontSize: 14,
             ),
           ),
-          trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey[400]),
+          subtitle: Text(
+            subTitle,
+            style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+          ),
+          trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey[500]),
           onTap: onTap,
         ),
       ],

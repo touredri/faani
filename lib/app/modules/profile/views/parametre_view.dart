@@ -20,6 +20,7 @@ class ParametreView extends GetView {
             //acount setting
             _Container(
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'Compte',
@@ -68,6 +69,7 @@ class ParametreView extends GetView {
             3.hs, // Contenue & Activité
             _Container(
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'Contenue & Activité',
@@ -142,6 +144,7 @@ class ParametreView extends GetView {
             // A propos
             _Container(
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'A propos de l\'app',

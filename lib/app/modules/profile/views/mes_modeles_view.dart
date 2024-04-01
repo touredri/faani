@@ -37,7 +37,7 @@ class MesModelesView extends GetView {
                     style: TextStyle(color: Colors.white),
                   ),
                   bottom: PreferredSize(
-                      preferredSize: Size(double.infinity, 40),
+                      preferredSize: const Size(double.infinity, 40),
                       child: Container(
                         color: primaryColor,
                         width: MediaQuery.of(context).size.width,
@@ -84,6 +84,7 @@ class MesModelesView extends GetView {
                 ),
                 SliverFillRemaining(
                   child: MasonryGridView.count(
+                    physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 2,
                     mainAxisSpacing: 4,
                     crossAxisSpacing: 4,

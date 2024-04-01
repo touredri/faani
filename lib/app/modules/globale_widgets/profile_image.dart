@@ -17,8 +17,8 @@ class ProfileImage extends StatelessWidget {
         ? CachedNetworkImage(
             imageUrl: user!.photoURL!,
             imageBuilder: (context, imageProvider) => Container(
-              width: 150,
-              height: 150,
+              width: width,
+              height: height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(100),
                 border: Border.all(color: primaryColor, width: 2),
@@ -32,8 +32,8 @@ class ProfileImage extends StatelessWidget {
             errorWidget: (context, url, error) => const Icon(Icons.error),
           )
         : Container(
-            width: 150,
-            height: 150,
+            width: width,
+            height: height,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(100),
                 border: Border.all(color: primaryColor, width: 2)),
@@ -43,8 +43,12 @@ class ProfileImage extends StatelessWidget {
 
 class BuildProfileImage extends StatefulWidget {
   final double width, height;
+  final bool showIcon;
   const BuildProfileImage(
-      {super.key, required this.width, required this.height});
+      {super.key,
+      required this.width,
+      required this.height,
+      this.showIcon = false});
 
   @override
   State<BuildProfileImage> createState() => _BuildProfileImageState();
@@ -99,7 +103,7 @@ class _BuildProfileImageState extends State<BuildProfileImage> {
           width: widget.width,
           height: widget.height,
         ),
-        if (widget.width != 125)
+        if (widget.showIcon)
           Positioned(
             bottom: 0,
             right: 0,

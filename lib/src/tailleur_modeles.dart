@@ -1,8 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:faani/helpers/authentification.dart';
-import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/app/data/services/modele_service.dart';
-import 'package:faani/pages/modele/detail_modele.dart';
 import 'package:flutter/material.dart';
 
 import '../app/data/models/modele_model.dart';
