@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import '../controllers/profile_controller.dart';
 
 class CustomListTile extends GetView<ProfileController> {
-  final IconData leadingIcon;
+  final Widget leadingIcon;
   final String title;
-  final Color leadingColor;
+  // final Color leadingColor;
   final String subTitle;
   final void Function()? onTap;
 
@@ -13,7 +13,7 @@ class CustomListTile extends GetView<ProfileController> {
     Key? key,
     required this.leadingIcon,
     required this.title,
-    required this.leadingColor,
+    // required this.leadingColor,
     this.subTitle = '',
     required this.onTap,
   }) : super(key: key);
@@ -23,7 +23,7 @@ class CustomListTile extends GetView<ProfileController> {
     return Column(
       children: [
         ListTile(
-          leading: Icon(leadingIcon, color: leadingColor),
+          leading: leadingIcon,
           title: Text(
             title,
             style: const TextStyle(

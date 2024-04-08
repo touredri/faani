@@ -74,10 +74,10 @@ class HomeItem extends GetView<AccueilController> {
               children: [
                 IconButton(
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => AjoutCommande(
-                              modele: modele,
-                            )));
+                    // Navigator.of(context).push(MaterialPageRoute(
+                    //     builder: (BuildContext context) => AjoutCommande(
+                    //           modele: modele,
+                    //         )));
                   },
                   icon: const Icon(
                     Icons.shopping_cart_outlined,

@@ -3,6 +3,7 @@ import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/favorite_icon.dart';
 import 'package:faani/app/modules/globale_widgets/floating_bottom_sheet.dart';
+import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
@@ -33,167 +34,130 @@ class DetailModeleView extends GetView<DetailModeleController> {
                 backgroundColor: primaryColor,
                 toolbarHeight: 1,
               ),
-              body: Stack(
-                children: [
-                  CustomScrollView(
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.70,
-                                child: PageView(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                          bottomLeft: Radius.circular(20),
-                                          bottomRight: Radius.circular(20)),
-                                      child: CachedNetworkImage(
-                                        imageUrl: modele.fichier[0]!,
-                                        fit: BoxFit.cover,
-                                        // errorWidget: Error,
-                                        placeholder: (context, url) =>
-                                            const Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
+              body: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                            height:
+                                MediaQuery.of(context).size.height * 0.70,
+                            child: DisplayImage(modele: modele)),
+                        0.5.hs,
+                        ListTile(
+                          leading: CircleAvatar(
+                            radius: 25,
+                            backgroundImage: CachedNetworkImageProvider(
+                                controller.modeleUser.value.profileImage!),
+                          ),
+                          title: Text(
+                            controller.modeleUser.value.nomPrenom!,
+                            style: const TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            modele.detail!,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          // follow if not author && not already followed
+                          trailing:
+                              controller.isAuthor.value // && isNotFollowed
+                                  ? OutlinedButton(
+                                      onPressed: () {
+                                        editModal(context);
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 0),
                                       ),
-                                    ),
-                                  ],
-                                )),
-                            0.5.hs,
-                            ListTile(
-                              leading: CircleAvatar(
-                                radius: 25,
-                                backgroundImage: CachedNetworkImageProvider(
-                                    controller.modeleUser.value.profileImage!),
-                              ),
-                              title: Text(
-                                controller.modeleUser.value.nomPrenom!,
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Text(
-                                modele.detail!,
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                              // follow if not author && not already followed
-                              trailing:
-                                  controller.isAuthor.value // && isNotFollowed
-                                      ? OutlinedButton(
-                                          onPressed: () {
-                                            editModal(context);
-                                          },
-                                          style: OutlinedButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 5, vertical: 0),
-                                          ),
-                                          child: const Icon(
-                                            Icons.more_horiz,
-                                            size: 30,
-                                          ),
-                                        )
-                                      : OutlinedButton(
-                                          onPressed: () {},
-                                          style: OutlinedButton.styleFrom(),
-                                          child: const Text(
-                                            'Suivre',
-                                            style: TextStyle(fontSize: 13),
-                                          )),
+                                      child: const Icon(
+                                        Icons.more_horiz,
+                                        size: 30,
+                                      ),
+                                    )
+                                  : OutlinedButton(
+                                      onPressed: () {},
+                                      style: OutlinedButton.styleFrom(),
+                                      child: const Text(
+                                        'Suivre',
+                                        style: TextStyle(fontSize: 13),
+                                      )),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            // commentaire
+                            iconMessage(modele, context),
+                            FavoriteIcone(
+                              docId: modele.id!,
+                              color: '',
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                // commentaire
-                                iconMessage(modele, context),
-                                FavoriteIcone(
-                                  docId: modele.id!,
-                                  color: '',
-                                ),
-                                // share
-                                iconShare(modele),
-                                // save
-                                SizedBox(
-                                  height: 50,
-                                  width: 50,
-                                  child: IconDownload(
-                                    modele: modele,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            // share
+                            iconShare(modele),
+                            // save
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              child: ElevatedButton(
-                                  onPressed: () {},
-                                  child: !controller.modeleUser.value.isTailleur
-                                      ? const Text('Faire pour un client')
-                                      : const Text('Envoyer à un tailleur')),
-                            ),
-                            0.5.hs,
-                            const ListTile(
-                              title: Text(
-                                'Autres modèles',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey),
-                              ),
-                              trailing: Icon(
-                                Icons.keyboard_arrow_down,
-                                color: Colors.grey,
+                              height: 50,
+                              width: 50,
+                              child: IconDownload(
+                                modele: modele,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      SliverFillRemaining(
-                        child: StreamBuilder(
-                            stream: ModeleService()
-                                .getAllModelesByCategorie(modele.idCategorie!),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              } else {
-                                return MasonryGridView.count(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 4,
-                                  crossAxisSpacing: 4,
-                                  itemCount: snapshot.data!.length,
-                                  itemBuilder: (context, index) {
-                                    // not include the current modele
-                                    if (snapshot.data![index].id == modele.id) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    return buildCard(snapshot.data![index],
-                                        context: context);
-                                  },
-                                );
-                              }
-                            }),
-                      )
-                    ],
-                  ),
-                  Container(
-                    width: 30,
-                    height: 30,
-                    alignment: Alignment.center,
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(40),
-                        color: Colors.black.withOpacity(0.5)),
-                    child: IconButton(
-                      padding: const EdgeInsets.all(0),
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () {
-                        Get.back();
-                      },
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          child: ElevatedButton(
+                              onPressed: () {},
+                              child: !controller.modeleUser.value.isTailleur
+                                  ? const Text('Faire pour un client')
+                                  : const Text('Envoyer à un tailleur')),
+                        ),
+                        0.5.hs,
+                        const ListTile(
+                          title: Text(
+                            'Autres modèles',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey),
+                          ),
+                          trailing: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  SliverFillRemaining(
+                    child: StreamBuilder(
+                        stream: ModeleService()
+                            .getAllModelesByCategorie(modele.idCategorie!),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else {
+                            return MasonryGridView.count(
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 4,
+                              crossAxisSpacing: 4,
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                // not include the current modele
+                                if (snapshot.data![index].id == modele.id) {
+                                  return const SizedBox.shrink();
+                                }
+                                return buildCard(snapshot.data![index],
+                                    context: context);
+                              },
+                            );
+                          }
+                        }),
+                  )
                 ],
               ),
             );

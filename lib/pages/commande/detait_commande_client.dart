@@ -250,7 +250,7 @@ class _DetailCommandeClientState extends State<DetailCommandeClient> {
                                       Text(
                                           DateFormat('dd-MM-yyyy')
                                               .format(
-                                                  widget.commande.dateCommande!)
+                                                  widget.commande.dateAjout!)
                                               .toString(),
                                           style: const TextStyle(fontSize: 15)),
                                     ],
@@ -263,7 +263,7 @@ class _DetailCommandeClientState extends State<DetailCommandeClient> {
                                       Text(
                                           DateFormat('dd-MM-yyyy')
                                               .format(widget
-                                                  .commande.dateRecuperation!)
+                                                  .commande.datePrevue!)
                                               .toString(),
                                           style: const TextStyle(
                                               color: primaryColor,

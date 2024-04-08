@@ -1,7 +1,7 @@
 name: faani
 version: 1.0.0+1
 publish_to: none
-description: An application to connect tailor and customer, it promote traditionnal suit. We can book inside and follow best tailor
+description: An application to connect tailor and customer, it promote traditional suit. We can book inside and follow best tailor
 environment: 
   sdk: '>=3.1.5 <4.0.0'
 
@@ -38,6 +38,7 @@ dependencies:
   flutter_staggered_grid_view: 0.7.0
   permission_handler: ^11.3.1
   modal_bottom_sheet: 3.0.0
+  flutter_svg: 2.0.10+1
   flutter: 
     sdk: flutter
 
@@ -56,7 +57,12 @@ flutter_launcher_icons:
 flutter: 
   assets: 
     - assets/images/
+    - assets/images/measurement.png
     - assets/locales/
+    - assets/svg/
+    - assets/svg/measurep.svg
+    - assets/svg/dress.svg
+    - assets/svg/dressmaker.svg
   fonts: 
     - family: Inter
       fonts: 

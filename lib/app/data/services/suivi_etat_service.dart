@@ -48,16 +48,4 @@ class SuiviEtatService {
       element.reference.delete();
     });
   }
-
-  // update
-
-  //get suivietat by id commande
-  // Stream<List<SuiviEtat>> getSuiviEtatByIdCommande(String idCommande) {
-  //   return collection
-  //       .where('idCommande', isEqualTo: idCommande)
-  //       .snapshots()
-  //       .map((snapshot) => snapshot.docs
-  //           .map((doc) => SuiviEtat.fromJson(doc.data(), doc.reference))
-  //           .toList());
-  // }
 }

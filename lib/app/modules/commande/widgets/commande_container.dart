@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/app/modules/globale_widgets/shimmer.dart';
 import 'package:flutter/material.dart';
-
-import '../../../app/style/my_theme.dart';
+import '../../../style/my_theme.dart';
 
 class CommandeContainer extends StatelessWidget {
   final String imageUrl;
-  final String nomPrenom;
+  final String? nomPrenom;
   final String dateCommande;
   final String etat;
 
@@ -31,9 +31,7 @@ class CommandeContainer extends StatelessWidget {
             imageUrl: imageUrl,
             fit: BoxFit.cover,
             colorBlendMode: BlendMode.darken,
-            placeholder: (context, url) => Center(
-              child: Image.asset('assets/images/loading.gif'),
-            ),
+            placeholder: (context, url) => shimmer(),
           ),
           Container(
             alignment: Alignment.bottomCenter,
@@ -49,7 +47,7 @@ class CommandeContainer extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    nomPrenom,
+                    nomPrenom!,
                     style: const TextStyle(
                       color: Colors.white,
                     ),
@@ -67,7 +65,7 @@ class CommandeContainer extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12)),
                       child: Text(
                         etat,
-                        style: TextStyle(color: primaryColor, fontSize: 13),
+                        style: const TextStyle(color: primaryColor, fontSize: 13),
                       ),
                     ),
                   ),

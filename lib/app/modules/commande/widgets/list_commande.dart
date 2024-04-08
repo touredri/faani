@@ -1,67 +1,54 @@
-import 'package:faani/app_state.dart';
-import 'package:faani/app/data/models/client_model.dart';
+import 'package:faani/app/data/models/users_model.dart';
+import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
+import 'package:faani/app/modules/commande/views/detail_commande_view.dart';
+import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
-import 'package:faani/app/data/models/tailleur_model.dart';
-import 'package:faani/pages/commande/detail_commande.dart';
-import 'package:faani/pages/commande/widget/save.dart';
-import 'package:faani/app/data/services/client_service.dart';
 import 'package:faani/app/data/services/commande_service.dart';
-import 'package:faani/app/data/services/modele_service.dart';
-import 'package:faani/app/data/services/suivi_etat_service.dart';
-import 'package:faani/app/data/services/tailleur_service.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'commande_container.dart';
 
-class ListCommande extends StatefulWidget {
+class ListCommande extends StatelessWidget {
   const ListCommande({super.key, required this.status});
 
   final String status;
 
   @override
-  State<ListCommande> createState() => _ListCommandeState();
-}
-
-class _ListCommandeState extends State<ListCommande> {
-  ClientService clientService = ClientService();
-  CommandeService commandeService = CommandeService();
-  late bool isTailleur;
-  ModeleService modeleService = ModeleService();
-  SuiviEtatService suiviEtatService = SuiviEtatService();
-  TailleurService tailleurService = TailleurService();
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    isTailleur = Provider.of<ApplicationState>(context).isTailleur;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final UserController userController = Get.find();
+    final CommandeController controller = Get.put(CommandeController());
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Flexible(
-            child: FutureBuilder(
-                future: widget.status == "receive"
-                    ? commandeService.getAllCommandeByEtat(isTailleur, 1)
-                    : commandeService.getAllCommandeByEtat(isTailleur, 2),
+            child: StreamBuilder(
+                stream: status == "receive"
+                    ? CommandeService().getAllCommandeByEtat(1)
+                    : status == "finish"
+                        ? CommandeService().getAllCommandeByEtat(0)
+                        : status == "save"
+                            ? CommandeService().getAllCommandeByEtat(2)
+                            : const Stream.empty(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Text('Error1: ${snapshot.error}');
-                  } else if (!snapshot.hasData) {
-                    return const Center(
+                  } else if (!snapshot.hasData || snapshot.data.isEmpty) {
+                    return Center(
                         child: Column(
                       children: [
-                        Text('Aucune commande pour le moment, AJouter une 👍'),
+                        Image.asset('assets/images/no_commande.png',
+                            height: MediaQuery.of(context).size.height * 0.5,
+                            width: MediaQuery.of(context).size.width),
+                        Text(
+                            textAlign: TextAlign.center,
+                            status == 'receive'
+                                ? 'Aucun habit en cour pour le moment, Ajouter une 👍'
+                                : status == 'save'
+                                    ? 'Oups !! No data'
+                                    : 'Oups !! vous n\'avez pas d\'habit terminer'),
                       ],
                     ));
                   } else {
@@ -77,16 +64,8 @@ class _ListCommandeState extends State<ListCommande> {
                         ),
                         itemBuilder: (context, index) {
                           return FutureBuilder(
-                              future: Future.wait([
-                                tailleurService.getTailleurById(
-                                    commande[index].idTailleur),
-                                clientService
-                                    .getClientById(commande[index].idClient),
-                                modeleService
-                                    .getModeleById(commande[index].idModele),
-                                suiviEtatService
-                                    .getEtatLibelle(commande[index].id)
-                              ]),
+                              future:
+                                  controller.fetchCommandeData(commande[index]),
                               builder: (context, result) {
                                 if (result.connectionState ==
                                     ConnectionState.waiting) {
@@ -96,15 +75,21 @@ class _ListCommandeState extends State<ListCommande> {
                                   return Text('Error2: ${result.error}');
                                 } else {
                                   Modele modele = result.data![2] as Modele;
-                                  Tailleur tailleur =
-                                      result.data![0] as Tailleur;
-                                  Client client = result.data![1] as Client;
+                                  UserModel tailleur =
+                                      result.data![0] as UserModel;
+                                  UserModel? client = result.data![1] != null
+                                      ? result.data![1] as UserModel
+                                      : null;
                                   String etat = result.data![3] as String;
-                                  final String nomPrenom = isTailleur
-                                      ? client.nomPrenom
-                                      : tailleur.nomPrenom;
+                                  final String? nomPrenom =
+                                      userController.isTailleur.value
+                                          ? client?.nomPrenom ??
+                                              commande[index].nomClient
+                                          : tailleur.nomPrenom;
                                   return GestureDetector(
                                     onTap: () {
+                                      Get.to(() => DetailCommandeView(modele),
+                                          transition: Transition.downToUp);
                                       // if (commande[index].idCategorie == null){
                                       //   Navigator.push(
                                       //     context,
@@ -118,27 +103,26 @@ class _ListCommandeState extends State<ListCommande> {
                                       //       ),
                                       //     ),
                                       //   );}
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => DetailCommande(
-                                            commandeId: commande[index].id,
-                                            isAnnonyme: true,
-                                            modele: modele,
-                                            idCategorie:
-                                                commande[index].idCategorie!,
-                                            tailleur: tailleur,
-                                            client: client,
-                                          ),
-                                        ),
-                                      );
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) => DetailCommande(
+                                      //       commandeId: commande[index].id,
+                                      //       isAnnonyme: true,
+                                      //       modele: modele,
+                                      //       idCategorie:
+                                      //           commande[index].idCategorie,
+                                      //       tailleur: tailleur,
+                                      //       client: client,
+                                      //     ),
+                                      //   ),
+                                      // );
                                     },
                                     child: CommandeContainer(
                                       imageUrl: modele.fichier[0]!,
                                       nomPrenom: nomPrenom,
-                                      dateCommande: commande[index]
-                                          .dateCommande
-                                          .toString(),
+                                      dateCommande:
+                                          commande[index].dateAjout.toString(),
                                       etat: etat,
                                     ),
                                   );

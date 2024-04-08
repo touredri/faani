@@ -1,164 +1,102 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app/firebase/global_function.dart';
 
 class Commande {
-  String id;
-  DateTime dateCommande;
-  DateTime dateRecuperation;
-  String idClient;
-  String idMesure;
-  String idModele;
-  String idTailleur;
+  String id,
+      idUser,
+      idMesure,
+      idModele,
+      idTailleur,
+      nomClient,
+      photoHabit,
+      idCategorie;
+  DateTime dateAjout, datePrevue, dateModifier;
+  int? numeroClient;
   int prix;
-  String? idCategorie;
+  bool isSelfAdded;
 
   Commande({
     required this.id,
-    required this.dateCommande,
-    required this.dateRecuperation,
-    required this.idClient,
+    required this.dateAjout,
+    required this.datePrevue,
+    required this.dateModifier,
+    this.idUser = '',
     required this.idMesure,
     required this.idModele,
     required this.idTailleur,
+    required this.numeroClient,
+    this.nomClient = '',
+    this.photoHabit = '',
     required this.prix,
     required this.idCategorie,
+    this.isSelfAdded = false,
   });
 
   factory Commande.fromMap(
       Map<String, dynamic> data, DocumentReference docRef) {
     return Commande(
       id: docRef.id,
-      dateCommande: (data['dateCommande'] as Timestamp).toDate(),
-      dateRecuperation: (data['dateRecuperation'] as Timestamp).toDate(),
-      idClient: data['idClient'],
+      dateAjout: (data['dateAjout'] as Timestamp).toDate(),
+      datePrevue: (data['datePrevue'] as Timestamp).toDate(),
+      dateModifier: (data['dateModifier'] as Timestamp).toDate(),
+      idUser: data['idUser'],
       idMesure: data['idMesure'],
       idModele: data['idModele'],
       idTailleur: data['idTailleur'],
+      numeroClient: data['numeroClient'],
+      nomClient: data['nomClient'],
+      photoHabit: data['photoHabit'],
       prix: data['prix'],
       idCategorie: data['idCategorie'],
+      isSelfAdded: data['isSelfAdded'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'dateCommande': dateCommande,
-      'dateRecuperation': dateRecuperation,
-      'idClient': idClient,
+      'dateAjout': dateAjout,
+      'datePrevue': datePrevue,
+      'dateModifier': dateModifier,
+      'idUser': idUser,
       'idMesure': idMesure,
       'idModele': idModele,
       'idTailleur': idTailleur,
+      'numeroClient': numeroClient,
+      'nomClient': nomClient,
+      'photoHabit': photoHabit,
       'prix': prix,
       'idCategorie': idCategorie,
+      'isSelfAdded' : isSelfAdded,
     };
   }
 
+  final collection = FirebaseFirestore.instance.collection('commandes');
+
   // create
   Future<void> create() async {
-    final firestore = FirebaseFirestore.instance;
-    final collection = firestore.collection('commande');
     final docRef = await collection.add(toMap());
     id = docRef.id;
   }
 
   // update
   Future<void> update() async {
-    final firestore = FirebaseFirestore.instance;
-    final collection = firestore.collection('commande');
     await collection.doc(id).update(toMap());
   }
 
   // delete
   Future<void> delete() async {
-    final firestore = FirebaseFirestore.instance;
-    final collection = firestore.collection('commande');
     await collection.doc(id).delete();
+    // delete image if exist is firebase storage
+    if (photoHabit.isNotEmpty) {
+      await deleteImage(photoHabit);
+    }
   }
 
-  static Future<bool> isAlreadyOrdered(String clientId, String modelId) async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('commande')
-        .where('idClient', isEqualTo: clientId)
+  Future<bool> isAlreadyOrdered(String clientId, String modelId) async {
+    final snapshot = await collection
+        .where('idUser', isEqualTo: clientId)
         .where('idModele', isEqualTo: modelId)
         .get();
-
     return snapshot.docs.isNotEmpty;
-  }
-}
-
-class CommandeAnonyme {
-  String? id;
-  DateTime? dateCommande;
-  DateTime? dateRecuperation;
-  String? idModele;
-  String idTailleur;
-  int? prix;
-  int? numeroClient;
-  String? nomClient;
-  String? image;
-  String? idMesure;
-  String? idCategorie;
-
-  CommandeAnonyme({
-    required this.id,
-    required this.dateCommande,
-    required this.dateRecuperation,
-    required this.idModele,
-    required this.idTailleur,
-    required this.prix,
-    required this.numeroClient,
-    required this.nomClient,
-    required this.image,
-    required this.idMesure,
-    required this.idCategorie,
-  });
-
-  factory CommandeAnonyme.fromMap(
-      Map<String, dynamic> data, DocumentReference docRef) {
-    return CommandeAnonyme(
-      id: docRef.id,
-      dateCommande: (data['dateCommande'] as Timestamp).toDate(),
-      dateRecuperation: (data['dateRecuperation'] as Timestamp).toDate(),
-      idModele: data['idModele'],
-      idTailleur: data['idTailleur'],
-      prix: data['prix'],
-      numeroClient: data['numeroClient'],
-      nomClient: data['nomClient'],
-      image: data['image'],
-      idMesure: data['idMesure'],
-      idCategorie: data['idCategorie'],
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'dateCommande': dateCommande,
-      'dateRecuperation': dateRecuperation,
-      'idModele': idModele,
-      'idTailleur': idTailleur,
-      'prix': prix,
-      'numeroClient': numeroClient,
-      'nomClient': nomClient,
-      'image': image,
-      'idMesure': idMesure,
-      'idCategorie': idCategorie,
-    };
-  }
-
-  Future<void> create() async {
-    final firestore = FirebaseFirestore.instance;
-    final collection = firestore.collection('commandeAnomyme');
-    final docRef = await collection.add(toMap());
-    id = docRef.id;
-  }
-
-  Future<void> update() async {
-    final firestore = FirebaseFirestore.instance;
-    final collection = firestore.collection('commandeAnomyme');
-    await collection.doc(id).update(toMap());
-  }
-
-  Future<void> delete() async {
-    final firestore = FirebaseFirestore.instance;
-    final collection = firestore.collection('commandeAnomyme');
-    await collection.doc(id).delete();
   }
 }
