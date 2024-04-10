@@ -1,4 +1,3 @@
-import 'package:faani/helpers/authentification.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';

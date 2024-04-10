@@ -23,8 +23,8 @@ class SelectCategoryState extends State<SelectCategory> {
   void initState() {
     super.initState();
     selectedCategoryId = '';
-    categories =
-        Provider.of<ApplicationState>(context, listen: false).categorie;
+    // categories =
+    //     Provider.of<ApplicationState>(context, listen: false).categorie;
   }
 
   @override

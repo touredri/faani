@@ -1,8 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faani/firebase_get_all_data.dart';
-import 'package:faani/helpers/authentification.dart';
-import 'package:faani/modele/classes.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/tailleur_model.dart';
@@ -11,7 +8,6 @@ import 'package:faani/app/modules/mesures/views/detail_mesure.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
 import '../../app/data/models/categorie_model.dart';
 import '../../app/data/services/categorie_service.dart';
 import '../../app/data/services/modele_service.dart';

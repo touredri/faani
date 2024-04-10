@@ -30,10 +30,7 @@ void main() async {
   }
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
-    runApp(ChangeNotifierProvider(
-      create: (context) => ApplicationState(),
-      builder: (context, _) => const FaaniApp(),
-    ));
+    runApp(const FaaniApp());
   });
 }
 

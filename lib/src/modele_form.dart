@@ -1,17 +1,13 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:faani/app/data/models/categorie_model.dart';
-import 'package:faani/helpers/authentification.dart';
 import 'package:faani/src/tailleur_modeles.dart';
 import 'package:faani/widgets/widgets.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:path/path.dart';
 import '../app/data/services/categorie_service.dart';
 import '../app/firebase/global_function.dart';
-import '../firebase_get_all_data.dart';
 import '../app/data/models/modele_model.dart';
 import '../app/style/my_theme.dart';
 

@@ -1,18 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app_state.dart';
-import 'package:faani/helpers/authentification.dart';
-import 'package:faani/firebase_get_all_data.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import 'app/data/models/modele_model.dart';
 import 'app/firebase/global_function.dart';
 import 'app/modules/globale_widgets/modele_card.dart';
 import 'app/style/my_theme.dart';
-import 'src/tailleur_modeles.dart';
 
 class AnonymeProfile extends StatefulWidget {
   const AnonymeProfile({super.key});
@@ -36,7 +31,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUsers = Provider.of<ApplicationState>(context).currentUsers;
+    // final currentUsers = Provider.of<ApplicationState>(context).currentUsers;
     final String imgUrl = getRandomProfileImageUrl();
     final profileImage = auth.currentUser!.photoURL != null
         ? CachedNetworkImage(
@@ -70,21 +65,21 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
           children: [
             IconButton(
                 onPressed: () async {
-                  if (Provider.of<ApplicationState>(context, listen: false)
-                          .isTailleur &&
-                      !auth.currentUser!.isAnonymous) {
-                    FirebaseFirestore.instance
-                        .collection('Tailleur')
-                        .doc(auth.currentUser!.uid)
-                        .delete();
-                  } else {
-                    if (!auth.currentUser!.isAnonymous) {
-                      FirebaseFirestore.instance
-                          .collection('client')
-                          .doc(auth.currentUser!.uid)
-                          .delete();
-                    }
-                  }
+                  // if (Provider.of<ApplicationState>(context, listen: false)
+                  //         .isTailleur &&
+                  //     !auth.currentUser!.isAnonymous) {
+                  //   FirebaseFirestore.instance
+                  //       .collection('Tailleur')
+                  //       .doc(auth.currentUser!.uid)
+                  //       .delete();
+                  // } else {
+                  //   if (!auth.currentUser!.isAnonymous) {
+                  //     FirebaseFirestore.instance
+                  //         .collection('client')
+                  //         .doc(auth.currentUser!.uid)
+                  //         .delete();
+                  //   }
+                  // }
                   // await disconnect();
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       '/sign_in', (Route<dynamic> route) => false);

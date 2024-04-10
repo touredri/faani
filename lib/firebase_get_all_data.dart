@@ -1,18 +1,8 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faani/app_state.dart';
-import 'package:faani/helpers/authentification.dart';
-import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/client_model.dart';
 import 'package:faani/app/data/models/message.dart';
 import 'package:faani/app/data/models/tailleur_model.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'app/data/models/mesure_model.dart';
 import 'app/data/models/modele_model.dart';
-
 final firestore = FirebaseFirestore.instance;
 
 Stream<List<Modele>> getAllModeleByTailleurId(String id) {
