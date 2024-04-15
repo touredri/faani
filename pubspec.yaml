@@ -2,10 +2,10 @@ name: faani
 version: 1.0.0+1
 publish_to: none
 description: An application to connect tailor and customer, it promote traditional suit. We can book inside and follow best tailor
-environment: 
+environment:
   sdk: '>=3.1.5 <4.0.0'
 
-dependencies: 
+dependencies:
   get: 4.6.6
   cupertino_icons: ^1.0.2
   firebase_core: ^2.27.1
@@ -39,23 +39,25 @@ dependencies:
   permission_handler: ^11.3.1
   modal_bottom_sheet: 3.0.0
   flutter_svg: 2.0.10+1
-  flutter: 
+  flutter:
     sdk: flutter
+  easy_stepper: ^0.8.3
+  timeline_tile: ^2.0.0
 
-dev_dependencies: 
+dev_dependencies:
   flutter_lints: ^3.0.1
-  flutter_test: 
+  flutter_test:
     sdk: flutter
 
-flutter_launcher_icons: 
+flutter_launcher_icons:
   image_path: assets/images/ic_launcher.png
   background_color: '#F3755F'
   android: true
   ios: true
   remove_alpha_ios: true
 
-flutter: 
-  assets: 
+flutter:
+  assets:
     - assets/images/
     - assets/images/measurement.png
     - assets/locales/
@@ -63,9 +65,9 @@ flutter:
     - assets/svg/measurep.svg
     - assets/svg/dress.svg
     - assets/svg/dressmaker.svg
-  fonts: 
+  fonts:
     - family: Inter
-      fonts: 
+      fonts:
         - asset: assets/fonts/Inter-Regular.ttf
           weight: 400
         - asset: assets/fonts/Inter-Light.ttf
@@ -73,8 +75,7 @@ flutter:
         - asset: assets/fonts/Inter-SemiBold.ttf
           weight: 600
     - family: Mochiy Pop One
-      fonts: 
+      fonts:
         - asset: assets/fonts/MochiyPopOne-Regular.ttf
           weight: 400
   uses-material-design: true
-

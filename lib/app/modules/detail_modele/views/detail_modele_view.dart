@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/services/modele_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/favorite_icon.dart';
-import 'package:faani/app/modules/globale_widgets/floating_bottom_sheet.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
 import 'package:faani/app/style/my_theme.dart';
@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import '../../../data/models/modele_model.dart';
 import '../controllers/detail_modele_controller.dart';
 import '../widgets/download.dart';
+import '../widgets/edit.dart';
 import '../widgets/icons.dart';
 
 class DetailModeleView extends GetView<DetailModeleController> {
@@ -23,6 +24,7 @@ class DetailModeleView extends GetView<DetailModeleController> {
   Widget build(BuildContext context) {
     final DetailModeleController controller =
         Get.find<DetailModeleController>();
+    final String imgUrl = getRandomProfileImageUrl();
     return FutureBuilder(
         future: controller.getModeleOwner(modele.idTailleur),
         builder: (context, snapshot) {
@@ -41,15 +43,16 @@ class DetailModeleView extends GetView<DetailModeleController> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(
-                            height:
-                                MediaQuery.of(context).size.height * 0.70,
+                            height: MediaQuery.of(context).size.height * 0.70,
                             child: DisplayImage(modele: modele)),
                         0.5.hs,
                         ListTile(
                           leading: CircleAvatar(
                             radius: 25,
                             backgroundImage: CachedNetworkImageProvider(
-                                controller.modeleUser.value.profileImage!),
+                                controller.modeleUser.value.profileImage != null
+                                    ? controller.modeleUser.value.profileImage!
+                                    : imgUrl),
                           ),
                           title: Text(
                             controller.modeleUser.value.nomPrenom!,
@@ -61,28 +64,28 @@ class DetailModeleView extends GetView<DetailModeleController> {
                             style: const TextStyle(fontSize: 13),
                           ),
                           // follow if not author && not already followed
-                          trailing:
-                              controller.isAuthor.value // && isNotFollowed
-                                  ? OutlinedButton(
-                                      onPressed: () {
-                                        editModal(context);
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5, vertical: 0),
-                                      ),
-                                      child: const Icon(
-                                        Icons.more_horiz,
-                                        size: 30,
-                                      ),
-                                    )
-                                  : OutlinedButton(
-                                      onPressed: () {},
-                                      style: OutlinedButton.styleFrom(),
-                                      child: const Text(
-                                        'Suivre',
-                                        style: TextStyle(fontSize: 13),
-                                      )),
+                          trailing: controller.isAuthor.value
+                              ? // && isNotFollowed
+                              OutlinedButton(
+                                  onPressed: () {
+                                    editModal(context);
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 0),
+                                  ),
+                                  child: const Icon(
+                                    Icons.more_horiz,
+                                    size: 30,
+                                  ),
+                                )
+                              : OutlinedButton(
+                                  onPressed: () {},
+                                  style: OutlinedButton.styleFrom(),
+                                  child: const Text(
+                                    'Suivre',
+                                    style: TextStyle(fontSize: 13),
+                                  )),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -164,40 +167,4 @@ class DetailModeleView extends GetView<DetailModeleController> {
           }
         });
   }
-}
-
-Future editModal(BuildContext context) {
-  return showFloatingModalBottomSheet(
-    context: context,
-    builder: (context) => Container(
-      height: 100,
-      child: Column(
-        children: <Widget>[
-          TextButton.icon(
-            icon: const Icon(
-              Icons.edit,
-              color: Colors.grey,
-            ),
-            label: const Text(
-              'Modifier le modèle',
-              style: TextStyle(color: Colors.black),
-            ),
-            onPressed: () {
-              // Votre code ici
-            },
-          ),
-          TextButton.icon(
-            icon: const Icon(Icons.delete),
-            label: const Text(
-              'Supprimer le modèle',
-              style: TextStyle(color: Colors.black),
-            ),
-            onPressed: () {
-              // Votre code ici
-            },
-          ),
-        ],
-      ),
-    ),
-  );
 }

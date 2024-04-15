@@ -4,6 +4,7 @@ import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/views/message_view.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:faani/app/modules/commande/widgets/circle_indicator.dart';
@@ -134,11 +135,13 @@ class _CommandeViewState extends State<CommandeView>
       floatingActionButton: Align(
         alignment: Alignment.bottomRight,
         child: Container(
-          margin: const EdgeInsets.only(bottom: 60),
+          margin: EdgeInsets.only(
+              bottom: MediaQuery.of(context).size.height * 0.001),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FloatingActionButton(
+                heroTag: "fab1",
                 backgroundColor: Colors.grey,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
@@ -152,6 +155,7 @@ class _CommandeViewState extends State<CommandeView>
               ),
               2.5.hs,
               FloatingActionButton(
+                heroTag: "fab2",
                 onPressed: () {},
                 child: const Icon(Icons.add),
               ),

@@ -1,18 +1,10 @@
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
 import 'package:faani/app/modules/profile/widgets.dart/build_list.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import '../../../style/my_theme.dart';
-import '../../mesures/views/mesures_view.dart';
 import '../controllers/profile_controller.dart';
-import '../widgets.dart/list_actions.dart';
-import 'aide_view.dart';
-import 'devenir_tailleur_view.dart';
-import 'mes_modeles_view.dart';
-import 'modifier_profile_view.dart';
-import 'parametre_view.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});
@@ -24,22 +16,23 @@ class ProfileView extends GetView<ProfileController> {
       backgroundColor: primaryColor,
       body: CustomScrollView(
         slivers: <Widget>[
-          const SliverAppBar(
+          SliverAppBar(
             backgroundColor: primaryColor,
-            expandedHeight: 60.0,
-            toolbarHeight: 0,
-            floating: false,
-            pinned: false,
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                Row(
+            automaticallyImplyLeading: false,
+            expandedHeight: 180.0,
+            toolbarHeight: 100,
+            flexibleSpace: Card(
+              color: Colors.blueGrey[50],
+              elevation: 5,
+              margin: const EdgeInsets.only(top: 50, left: 6, right: 6),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 28.0, left: 10),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     3.ws,
                     const BuildProfileImage(width: 120, height: 120),
-                    2.ws,
+                    8.ws,
                     Column(
                       children: [
                         Column(
@@ -48,7 +41,7 @@ class ProfileView extends GetView<ProfileController> {
                             Text(
                               '${controller.userController.currentUser.value.nomPrenom}',
                               style: const TextStyle(
-                                color: Colors.white,
+                                // color: Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -58,14 +51,14 @@ class ProfileView extends GetView<ProfileController> {
                               children: [
                                 Icon(
                                   Icons.location_on,
-                                  color: Colors.white,
+                                  // color: Colors.white,
                                   size: 15,
                                 ),
                                 SizedBox(width: 5),
                                 Text(
                                   'Bamako, Mali',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    // color: Colors.white,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -80,7 +73,7 @@ class ProfileView extends GetView<ProfileController> {
                                     Text(
                                       '21',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        // color: Colors.white,
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -88,7 +81,7 @@ class ProfileView extends GetView<ProfileController> {
                                     Text(
                                       'Suivie',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        // color: Colors.white,
                                         fontSize: 12,
                                       ),
                                     ),
@@ -100,7 +93,7 @@ class ProfileView extends GetView<ProfileController> {
                                     Text(
                                       '6',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        // color: Colors.white,
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -108,7 +101,7 @@ class ProfileView extends GetView<ProfileController> {
                                     Text(
                                       'Mesures',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        // color: Colors.white,
                                         fontSize: 12,
                                       ),
                                     ),
@@ -120,7 +113,7 @@ class ProfileView extends GetView<ProfileController> {
                                     Text(
                                       '10',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        // color: Colors.white,
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -128,7 +121,7 @@ class ProfileView extends GetView<ProfileController> {
                                     Text(
                                       'Modèles',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        // color: Colors.white,
                                         fontSize: 12,
                                       ),
                                     ),
@@ -142,7 +135,15 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                   ],
                 ),
-                1.hs,
+              ),
+            ),
+            floating: false,
+            pinned: false,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                1.5.hs,
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.blueGrey[50],

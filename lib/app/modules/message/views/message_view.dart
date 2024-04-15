@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import '../controllers/message_controller.dart';
 
 class MessageView extends GetView<MessageController> {

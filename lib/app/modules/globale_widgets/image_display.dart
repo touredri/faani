@@ -12,7 +12,7 @@ class DisplayImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PageController controller = PageController();
+    // PageController controller = PageController();
     return Stack(
       children: [
         PageView(

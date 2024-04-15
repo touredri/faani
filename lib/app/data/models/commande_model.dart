@@ -9,7 +9,9 @@ class Commande {
       idTailleur,
       nomClient,
       photoHabit,
-      idCategorie;
+      idCategorie,
+      etatLibelle,
+      modeleImage;
   DateTime dateAjout, datePrevue, dateModifier;
   int? numeroClient;
   int prix;
@@ -30,6 +32,8 @@ class Commande {
     required this.prix,
     required this.idCategorie,
     this.isSelfAdded = false,
+    this.etatLibelle = 'En cours',
+    required this.modeleImage,
   });
 
   factory Commande.fromMap(
@@ -49,6 +53,8 @@ class Commande {
       prix: data['prix'],
       idCategorie: data['idCategorie'],
       isSelfAdded: data['isSelfAdded'],
+      modeleImage: data['modeleImage'] ?? '',
+      etatLibelle: data['etatLibele'] ?? 'En cours',
     );
   }
 
@@ -66,7 +72,9 @@ class Commande {
       'photoHabit': photoHabit,
       'prix': prix,
       'idCategorie': idCategorie,
-      'isSelfAdded' : isSelfAdded,
+      'isSelfAdded': isSelfAdded,
+      'modeleImage': modeleImage,
+      'etatLibele': etatLibelle,
     };
   }
 

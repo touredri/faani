@@ -21,8 +21,7 @@ class CommandeService {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => Commande.fromMap(
-              doc.data() as Map<String, dynamic>, doc.reference))
+          .map((doc) => Commande.fromMap(doc.data(), doc.reference))
           .toList();
     });
   }
@@ -36,7 +35,6 @@ class CommandeService {
 
       for (Commande element in commandes) {
         String etat = await suiviEtatService.getEtatLibelle(element.id);
-        print(etat); // affiche 'En cours'
         if (etat == 'Terminer') {
           finishCommandes.add(element);
         } else {

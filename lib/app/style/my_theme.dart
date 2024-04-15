@@ -45,7 +45,11 @@ ThemeData buildTheme(BuildContext context) {
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-          const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+          const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+        ),
+        iconColor: MaterialStateProperty.all<Color>(Colors.black),
+        side: MaterialStateProperty.all<BorderSide>(
+          const BorderSide(color: inputBorderColor, width: 1),
         ),
         splashFactory: InkSplash.splashFactory,
         foregroundColor: MaterialStateProperty.all<Color>(primaryColor),
@@ -61,6 +65,7 @@ ThemeData buildTheme(BuildContext context) {
           const TextStyle(
             fontFamily: fontFamily,
             fontWeight: FontWeight.w500,
+            color: Colors.black,
           ),
         ),
       ),

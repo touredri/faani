@@ -1,4 +1,5 @@
 import 'package:faani/app/data/models/commande_model.dart';
+import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:faani/app/data/services/users_service.dart';
@@ -14,6 +15,7 @@ class CommandeController extends GetxController {
   final ModeleService modeleService = ModeleService();
   final SuiviEtatService suiviEtatService = SuiviEtatService();
   final String currentEtat = 'En cours';
+  final RxBool isExpanded = false.obs;
 
   Future<List<dynamic>> fetchCommandeData(Commande commande) async {
     return Future.wait([
@@ -22,7 +24,7 @@ class CommandeController extends GetxController {
           ? userService.getUser(commande.idUser)
           : Future.value(null),
       modeleService.getModeleById(commande.idModele),
-      suiviEtatService.getEtatLibelle(commande.id)
+      suiviEtatService.getSuiviEtatByCommandeId(commande.id)
     ]);
   }
 
