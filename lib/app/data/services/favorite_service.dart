@@ -5,7 +5,7 @@ import '../../firebase/global_function.dart';
 import '../models/favorite_model.dart';
 
 class FavorieService extends GetxService {
-  final collection = FirebaseFirestore.instance.collection('fovorite');
+  final collection = FirebaseFirestore.instance.collection('favorie');
 
   //get all favorie for a user
   Stream<List<Favorie>> getAllFavorie(String idUtilisateur) {

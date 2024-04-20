@@ -26,13 +26,10 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
         .get()
         .then((value) {
       if (value.docs.isNotEmpty) {
-        print('found**************');
         setState(() {
           isFavorite = true;
         });
-      } else
-        print('${widget.docId} &&&&&&&& ${user!.uid}');
-      print('not found in favorie');
+      }
     });
   }
 
