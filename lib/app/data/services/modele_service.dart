@@ -67,87 +67,51 @@ class ModeleService {
   }
 
 // get a tailleur's all modele
-  Stream<List<Modele>> getAllModeleByTailleurId(String id) {
-    return collection
-        .where('idTailleur', isEqualTo: id)
-        .snapshots()
-        .map((querySnapshot) {
+  Stream<List<Modele>> getAllModeleByTailleurId(String id,
+      {Modele? lastModele}) {
+    Query<Map<String, dynamic>> query =
+        collection.where('idTailleur', isEqualTo: id);
+    if (lastModele != null) {
+      query = query.startAfter([lastModele.id]);
+    }
+    return query.limit(10).snapshots().map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
         return Modele.fromMap(doc.data(), doc.reference);
       }).toList();
     });
   }
 
-  // get 10 random modele from the collection "modele"
-  Future<List<Modele>> getRandomModeles(
-      int limit, String clientCible, String categorie) async {
-    final prefs = await SharedPreferences.getInstance();
-    // Set a reasonable page size (adjust based on your needs)
-    const pageSize = 3;
-
-    // List to store all fetched models
+  Future<List<Modele>> getRandomModeles(String clientCible, String categorie,
+      {Modele? lastModele}) async {
+    const pageSize = 5;
     final models = <Modele>[];
 
-    // Loop until we have enough unique models
-    while (models.length < limit) {
-      Query<Map<String, dynamic>>? query;
-      // Initial query or query with last document for subsequent pages
-      if (clientCible.isEmpty && categorie.isEmpty) {
-        query = collection.orderBy(FieldPath.documentId).limit(pageSize);
-      } else if (clientCible.isNotEmpty && categorie.isEmpty) {
-        query = collection
-            .where('clientCible', isEqualTo: clientCible)
-            .orderBy(FieldPath.documentId)
-            .limit(pageSize);
-      } else if (clientCible.isEmpty && categorie.isNotEmpty) {
-        query = collection
-            .where('idCategorie', isEqualTo: categorie)
-            .orderBy(FieldPath.documentId)
-            .limit(pageSize);
-      } else {
-        query = collection
-            .where('clientCible', isEqualTo: clientCible)
-            .where('idCategorie', isEqualTo: categorie)
-            .orderBy(FieldPath.documentId)
-            .limit(pageSize);
+    while (models.length < pageSize) {
+      Query<Map<String, dynamic>> query = collection;
+      if (clientCible.isNotEmpty) {
+        query = query.where('clientCible', isEqualTo: clientCible);
       }
-
-      // final lastDocId = prefs.getString('lastDocId');
-      // if (lastDocId != null) {
-      //   print('id*********************');
-      //   lastDoc = await FirebaseFirestore.instance.doc(lastDocId).get();
-      //   print('$lastDocId ***********************************');
-      // }
-      if (lastDoc != null) {
-        query.startAfterDocument(lastDoc!);
-        print(lastDoc!.id);
+      if (categorie.isNotEmpty) {
+        query = query.where('idCategorie', isEqualTo: categorie);
       }
-
-      // Fetch a random page of documents with cursor
+      query = query.orderBy(FieldPath.documentId);
+      if (lastModele != null) {
+        lastDoc = await collection.doc(lastModele.id).get();
+        query = query.startAfterDocument(lastDoc!);
+      }
+      query = query.limit(pageSize);
       final querySnapshot = await query.get();
-
-      // If there are no documents left or not enough for next page, exit loop
-      if (querySnapshot.docs.isEmpty || querySnapshot.docs.length < pageSize) {
+      if (querySnapshot.docs.isEmpty) {
         break;
       }
-
-      // Shuffle the fetched documents for randomness within the page
-      querySnapshot.docs.shuffle();
-
-      // Add unique models to the results
       for (var doc in querySnapshot.docs) {
         final model = Modele.fromMap(doc.data(), doc.reference);
-        if (!models.contains(model)) {
-          // Check for uniqueness
-          models.add(model);
-          if (models.length == limit) {
-            break; // Exit inner loop if enough unique models found
-          }
+        models.add(model);
+        if (models.length == pageSize) {
+          break;
         }
       }
-      // Update lastDoc for next page
-      lastDoc = querySnapshot.docs.last;
-      // await prefs.setString('lastDocId', lastDoc!.id);
+      lastModele = models.last;
     }
     return models;
   }

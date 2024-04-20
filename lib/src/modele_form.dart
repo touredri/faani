@@ -24,8 +24,6 @@ class _ModeleFormState extends State<ModeleForm> {
   String selectedCategoryId = ''; // Store the selected category ID
   String? _selectedGender;
   bool _isPublic = false;
-  // Map<String, String> categoriesData =
-  //     {}; // Store category data (ID and libelle)
   List<Categorie> categorieList = <Categorie>[];
   final TextEditingController _detailController = TextEditingController();
   @override
@@ -248,8 +246,8 @@ class _ModeleFormState extends State<ModeleForm> {
                 ),
                 onPressed: () {
                   createModel();
-                  showSuccessDialog(context, 'Modèle ajouté avec succès',
-                      const TailleurModeles());
+                  // showSuccessDialog(context, 'Modèle ajouté avec succès',
+                  //     const TailleurModeles());
                 },
                 child: Text(
                   _isPublic ? '   Publier    ' : 'Enregistrer',

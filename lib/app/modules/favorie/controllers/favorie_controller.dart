@@ -1,3 +1,4 @@
+import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:get/get.dart';
 import '../../../data/models/favorite_model.dart';
 import '../../../data/models/modele_model.dart';
@@ -6,7 +7,6 @@ import '../../../data/services/modele_service.dart';
 import '../../../firebase/global_function.dart';
 
 class FavorieController extends GetxController {
-
   List<Modele?> modeles = [];
 
   Stream<List<Modele>> loadData() async* {
@@ -18,6 +18,12 @@ class FavorieController extends GetxController {
       }
       yield modeles;
     }
+  }
+
+  // category selected
+  void onCategorieSelected(Categorie categorie) {
+    // Reset pagination state for category change
+    update();
   }
 
   @override
@@ -34,5 +40,4 @@ class FavorieController extends GetxController {
   void onClose() {
     super.onClose();
   }
-
 }

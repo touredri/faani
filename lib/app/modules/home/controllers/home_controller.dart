@@ -8,9 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
-import 'package:faani/app/data/services/users_service.dart';
-import 'package:faani/app/firebase/global_function.dart';
-import '../../../data/models/users_model.dart';
 import '../../ajout_modele/views/ajout_modele_view.dart';
 
 class HomeController extends GetxController {

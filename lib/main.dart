@@ -22,7 +22,7 @@ void main() async {
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.appAttest,
   );
-  if(auth.currentUser != null){
+  if (auth.currentUser != null) {
     final UserController userController = Get.put(UserController());
     await userController.init();
   }

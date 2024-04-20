@@ -1,5 +1,4 @@
 import 'package:faani/app/data/models/tailleur_model.dart';
-import 'package:faani/pages/commande/widget/search_bar.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app/data/services/tailleur_service.dart';

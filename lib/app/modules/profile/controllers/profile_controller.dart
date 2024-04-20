@@ -1,3 +1,4 @@
+import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -6,9 +7,10 @@ import '../../home/controllers/user_controller.dart';
 class ProfileController extends GetxController {
   UserController userController = Get.find();
   RxString selectedClientCible = ''.obs;
-  RxString selectedCategorie = ''.obs;
+  final selectedCategorie = Rx<Categorie?>(null);
   RxBool isTailleur = false.obs;
   RxString selectedLanguage = 'Français'.obs;
+  // RxList<Categorie> listCategorie = <Categorie>[].obs;
   final List<String> languages = [
     'Espagnol',
     'Allemand',
@@ -19,7 +21,6 @@ class ProfileController extends GetxController {
     'Japonais',
     'Arabe'
   ];
-
   String measure = 'assets/svg/measurep.svg';
   String becomeTailor = 'assets/svg/dressmaker.svg';
   String dress = 'assets/svg/dress.svg';
@@ -50,6 +51,13 @@ class ProfileController extends GetxController {
   // change language
   void updateLanguage(String language) {
     selectedLanguage.value = language;
+  }
+
+  // category selected
+  void onCategorieSelected(Categorie categorie) {
+    // selectedCategorie.value = categorie;
+    // Reset pagination state for category change
+    update();
   }
 
   @override

@@ -22,7 +22,7 @@ class AccueilView extends GetView<AccueilController> {
         children: [
           // list view builder for images & videos in infinite scroll
           SizedBox(
-            width: double.infinity,
+            width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height * 0.92,
             child: const AccueilPAgeView(),
           ),
@@ -41,6 +41,8 @@ class AccueilView extends GetView<AccueilController> {
                             onPressed: () {
                               controller.isHommeSelected.value =
                                   !controller.isHommeSelected.value;
+                                  controller.modeles.clear();
+                                  controller.loadMore('Homme', '');
                             },
                             child: const Text('Homme',
                                 style: TextStyle(
@@ -52,6 +54,8 @@ class AccueilView extends GetView<AccueilController> {
                             onPressed: () {
                               controller.isHommeSelected.value =
                                   !controller.isHommeSelected.value;
+                                  controller.modeles.clear();
+                                  controller.loadMore('Femme', '');
                             },
                             child: const Text('Femme',
                                 style: TextStyle(
@@ -59,19 +63,20 @@ class AccueilView extends GetView<AccueilController> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15)),
                           ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.66,
-                      child: CategorieFiltre(
-                          // onCategorieSelected:
-                          //     controller.onCategorieSelected,
-                          ),
+                    Expanded(
+                      child: CategorieFiltre<AccueilController>(controller: controller,),
                     ),
                     IconButton(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(
+                              const EdgeInsets.symmetric(
+                                  horizontal: 0, vertical: 0)),
+                        ),
                         onPressed: () {},
                         icon: const Icon(
                           Icons.search,
                           color: Colors.white,
-                          size: 30,
+                          size: 25,
                         )),
                   ],
                 )),

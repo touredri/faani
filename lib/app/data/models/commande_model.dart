@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/firebase/global_function.dart';
 
 class Commande {
-  String id,
-      idUser,
+  String? id;
+  String idUser,
       idMesure,
       idModele,
       idTailleur,
@@ -12,14 +12,15 @@ class Commande {
       idCategorie,
       etatLibelle,
       modeleImage;
-  DateTime dateAjout, datePrevue, dateModifier;
+      final DateTime dateAjout;
+  DateTime datePrevue, dateModifier;
   int? numeroClient;
   int prix;
   bool isSelfAdded;
 
   Commande({
     required this.id,
-    required this.dateAjout,
+    DateTime? dateAjout,
     required this.datePrevue,
     required this.dateModifier,
     this.idUser = '',
@@ -34,7 +35,7 @@ class Commande {
     this.isSelfAdded = false,
     this.etatLibelle = 'En cours',
     required this.modeleImage,
-  });
+  }) : dateAjout = dateAjout ?? DateTime.now();
 
   factory Commande.fromMap(
       Map<String, dynamic> data, DocumentReference docRef) {

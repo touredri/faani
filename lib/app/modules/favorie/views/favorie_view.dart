@@ -25,7 +25,7 @@ class FavorieView extends GetView<FavorieController> {
               color: primaryColor,
               width: MediaQuery.of(context).size.width,
               height: 30,
-              child: CategorieFiltre(),
+              child: CategorieFiltre(controller: controller,),
             )),
       ),
       body: StreamBuilder<List<Modele>>(

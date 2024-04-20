@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import '../modules/accueil/bindings/accueil_binding.dart';
 import '../modules/accueil/views/accueil_view.dart';
-import '../modules/ajout_commande/bindings/ajout_commande_binding.dart';
-import '../modules/ajout_commande/views/ajout_commande_view.dart';
+// import '../modules/ajout_commande/bindings/ajout_commande_binding.dart';
+// import '../modules/ajout_commande/views/ajout_commande_view.dart';
 import '../modules/ajout_modele/bindings/ajout_modele_binding.dart';
 import '../modules/ajout_modele/views/ajout_modele_view.dart';
 import '../modules/authentification/bindings/authentification_binding.dart';
@@ -70,11 +70,11 @@ class AppPages {
       page: () => const AjoutModeleView(),
       binding: AjoutModeleBinding(),
     ),
-    GetPage(
-      name: _Paths.AJOUT_COMMANDE,
-      page: () => const AjoutCommandeView(),
-      binding: AjoutCommandeBinding(),
-    ),
+    // GetPage(
+    //   name: _Paths.AJOUT_COMMANDE,
+    //   page: () => const AjoutCommandeView(),
+    //   binding: AjoutCommandeBinding(),
+    // ),
     GetPage(
       name: _Paths.MESSAGE,
       page: () => const MessageView(),

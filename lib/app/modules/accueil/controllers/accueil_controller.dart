@@ -1,5 +1,6 @@
 import 'package:faani/app/data/services/categorie_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../data/models/categorie_model.dart';
 import '../../../data/models/modele_model.dart';
@@ -8,74 +9,50 @@ import '../../../data/services/modele_service.dart';
 class AccueilController extends GetxController {
   RxBool isHommeSelected = true.obs;
   RxList<Modele> modeles = <Modele>[].obs;
-  RxList<Categorie> listCategorie = <Categorie>[].obs;
   RxBool isFilterOpen = false.obs;
   final PageController pageController =
       PageController(initialPage: 0, viewportFraction: 0.87);
   final List<String> listId = <String>[];
+  String sewing = 'assets/svg/sewingp.svg';
+  late final Widget sewingIcon;
+
+  AccueilController() {
+    sewingIcon = SvgPicture.asset(
+      sewing,
+      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+      width: 30,
+      height: 30,
+    );
+  }
 
   // get ramdom model from modeles service
   final ModeleService modeleService = ModeleService();
-  Future<void> getRandomModele(
-      int limit, String clientCible, String categorie) async {
-    try {
-      final fetchedModeles =
-          await modeleService.getRandomModeles(limit, clientCible, categorie);
-      if (fetchedModeles.isEmpty) {
-        return;
-      } else {
-        for (var element in fetchedModeles) {
-          listId.add(element.id!);
-        }
-        modeles.assignAll(fetchedModeles);
-        modeles.shuffle();
-      }
-    } catch (e) {
-      // Handle errors appropriately (e.g., show a snackbar)
-      // check if the error is network related
-      if (e is NetworkError) {
-        // show snackbar
-        Get.snackbar('Network Error', e.message,
-            snackPosition: SnackPosition.TOP);
-      }
-    } finally {
-      // isLoading.value = false;
-      update(); // Inform UI about loading completion
-    }
-  }
-
-  void getCategories() {
-    CategorieService().getCategorie().listen((event) {
-      if (event.isNotEmpty) {
-        listCategorie.value = event;
-      }
-    });
-  }
 
   void onCategorieSelected(Categorie categorie) {
     // Reset pagination state for category change
     modeles.clear();
-    getRandomModele(3, '', categorie.id);
+    loadMore('', categorie.id);
     update();
   }
 
   Future<void> refreshPage() async {
-    print('refreshPage*************************');
     modeles.clear();
-    await getRandomModele(3, '', '');
+    await loadMore('', '');
   }
 
-  Future<void> loadMore() async {
+  Future<void> loadMore(String clientCible, String categorie) async {
     try {
-      final fetchedModeles = await modeleService.getRandomModeles(3, '', '');
-      if (fetchedModeles.isEmpty) {
-      } else {
-        for (var element in fetchedModeles) {
-          if (modeles.contains(element) == false && listId.contains(element.id) == false) {
-            print('load*************************');
-            modeles.add(element);
-          }
-        }
+      // Get the last document from your data list
+      final lastModele = modeles.isNotEmpty ? modeles.last : null;
+
+      // Fetch more data with pagination
+      final fetchedDocuments = await modeleService
+          .getRandomModeles(clientCible, categorie, lastModele: lastModele);
+
+      if (fetchedDocuments.isNotEmpty) {
+        // add the fetched data to your list model
+        modeles.addAll(fetchedDocuments);
+        update(); // Call update to refresh the UI
       }
     } catch (e) {
       if (e is NetworkError) {
@@ -89,13 +66,13 @@ class AccueilController extends GetxController {
   }
 
   Future<void> init() async {
-    await getRandomModele(4, '', '');
+    await loadMore('', '');
   }
 
   @override
   void onInit() {
     super.onInit();
-    getCategories();
+    // getCategories();
   }
 
   @override

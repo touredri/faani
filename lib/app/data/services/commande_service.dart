@@ -34,7 +34,7 @@ class CommandeService {
       List<Commande> selfSaveCommandes = [];
 
       for (Commande element in commandes) {
-        String etat = await suiviEtatService.getEtatLibelle(element.id);
+        String etat = await suiviEtatService.getEtatLibelle(element.id!);
         if (etat == 'Terminer') {
           finishCommandes.add(element);
         } else {

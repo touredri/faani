@@ -10,7 +10,7 @@ abstract class Routes {
   static const MESURES = _Paths.MESURES;
   static const PROFILE = _Paths.PROFILE;
   static const AJOUT_MODELE = _Paths.AJOUT_MODELE;
-  static const AJOUT_COMMANDE = _Paths.AJOUT_COMMANDE;
+  // static const AJOUT_COMMANDE = _Paths.AJOUT_COMMANDE;
   static const MESSAGE = _Paths.MESSAGE;
   static const DETAIL_MODELE = _Paths.DETAIL_MODELE;
 }
@@ -25,7 +25,7 @@ abstract class _Paths {
   static const MESURES = '/mesures';
   static const PROFILE = '/profile';
   static const AJOUT_MODELE = '/ajout-modele';
-  static const AJOUT_COMMANDE = '/ajout-commande';
+  // static const AJOUT_COMMANDE = '/ajout-commande';
   static const MESSAGE = '/message';
   static const DETAIL_MODELE = '/detail-modele';
 }

@@ -5,6 +5,7 @@ import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/widgets/build_time_line.dart';
+import 'package:faani/app/modules/commande/widgets/image_pop_up.dart';
 import 'package:faani/app/modules/commande/widgets/stepper.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
@@ -58,7 +59,16 @@ class DetailCommandeView extends GetView<CommandeController> {
                             child: OutlinedButton.icon(
                               icon: const Icon(Icons.remove_red_eye_outlined),
                               onPressed: () {
-                                showImage(context, modele.fichier[0]!);
+                                imagePopUp(
+                                    context: context,
+                                    imageUrl: modele.fichier[0]!,
+                                    onButtonPressed: () {
+                                      Get.back();
+                                    },
+                                    size: MediaQuery.of(context).size.height *
+                                        0.8,
+                                    buttonText: '',
+                                    isHaveAction: false);
                               },
                               label: const Text('voir'),
                             ),
@@ -80,13 +90,20 @@ class DetailCommandeView extends GetView<CommandeController> {
                             child: Image.network(imageUrl),
                           ),
                           title: Text(
-                              !controller.userController.isTailleur.value
-                                  ? commande.nomClient
-                                  : tailleur.nomPrenom!),
-                          subtitle: Text(!controller
-                                  .userController.isTailleur.value
-                              ? commande.numeroClient.toString()
-                              : 'fait des habits pour ${tailleur.clientCible!}'),
+                            controller.userController.isTailleur.value
+                                ? commande.nomClient
+                                : tailleur.nomPrenom!,
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                          ),
+                          subtitle: Text(
+                              controller.userController.isTailleur.value
+                                  ? commande.numeroClient.toString()
+                                  : 'Couture ${tailleur.clientCible!}',
+                              style: TextStyle(
+                                fontSize: 13,
+                              )),
                           trailing: TextButton.icon(
                               style: ButtonStyle(
                                 side: MaterialStateProperty.all(
@@ -110,7 +127,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                         children: [
                           const MyStep(),
                           Padding(
-                            padding: const EdgeInsets.only(top: 100.0),
+                            padding: const EdgeInsets.only(top: 65.0),
                             child: Column(
                               children: [
                                 TimelineTile(
@@ -132,7 +149,10 @@ class DetailCommandeView extends GetView<CommandeController> {
                                   ),
                                   endChild: const Padding(
                                     padding: EdgeInsets.only(left: 20.0),
-                                    child: Text('Autre détails'),
+                                    child: Text('Autre détails',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                        )),
                                   ),
                                 ),
                                 buildTimelineTile(
@@ -142,8 +162,18 @@ class DetailCommandeView extends GetView<CommandeController> {
                                     ),
                                     child: GestureDetector(
                                       onTap: () {
-                                        showHabitImage(
-                                            context, modele.fichier[0]!);
+                                        imagePopUp(
+                                            context: context,
+                                            imageUrl: imageUrl,
+                                            onButtonPressed: () {
+                                              Get.back();
+                                            },
+                                            size: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.45,
+                                            buttonText: 'Change Image 🔄',
+                                            isHaveAction: true);
                                       },
                                       child: Container(
                                         alignment: Alignment.centerLeft,
@@ -175,7 +205,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                                                   .toString()
                                                   .split(' ')[0],
                                               style: const TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 13,
                                               ),
                                             ),
                                             1.ws,
@@ -200,7 +230,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                                             const Text(
                                               'Voir les mésures',
                                               style: TextStyle(
-                                                fontSize: 15,
+                                                fontSize: 13,
                                               ),
                                             ),
                                             1.ws,
@@ -215,7 +245,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                           ),
                         ],
                       ),
-                      2.5.hs,
+                      6.5.hs,
                       // price info & icon message
                       Container(
                         margin: const EdgeInsets.symmetric(
@@ -229,13 +259,15 @@ class DetailCommandeView extends GetView<CommandeController> {
                               const EdgeInsets.symmetric(horizontal: 5),
                           leading: const Icon(
                             Icons.monetization_on,
-                            color: primaryColor,
+                            color: Colors.grey,
                           ),
                           title: Text('Prix: ${commande.prix} FCFA',
-                              style: const TextStyle(fontSize: 18)),
+                              style: const TextStyle(fontSize: 16)),
                           subtitle: const Text(
                             'Avance: 0 FCFA',
-                            style: TextStyle(color: Colors.grey),
+                            style: TextStyle(
+                              color: Colors.grey,
+                            ),
                           ),
                           trailing: TextButton.icon(
                               style: ButtonStyle(

@@ -1,11 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/app/data/models/modele_model.dart';
-import 'package:faani/pages/commande/ajout.dart';
 import 'package:faani/src/message_modal.dart';
-import 'package:faani/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import '../../globale_widgets/favorite_icon.dart';
 import '../controllers/accueil_controller.dart';
@@ -21,18 +19,23 @@ class HomeItem extends GetView<AccueilController> {
       children: [
         Column(
           children: [
-            Expanded(
-              child: CachedNetworkImage(
-                imageUrl: modele.fichier[0]!,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.80,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: CachedNetworkImage(
+                  imageUrl: modele.fichier[0]!,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
             ),
           ],
-        ), // black colors with opacity on modele image
+        ),
         // black opacity on model images
         SizedBox(
           height: MediaQuery.of(context).size.height,
@@ -74,25 +77,15 @@ class HomeItem extends GetView<AccueilController> {
               children: [
                 IconButton(
                   onPressed: () {
-                    // Navigator.of(context).push(MaterialPageRoute(
-                    //     builder: (BuildContext context) => AjoutCommande(
-                    //           modele: modele,
-                    //         )));
+                    Get.to(() => AjoutCommandePage(modele),
+                        transition: Transition.rightToLeft);
                   },
-                  icon: const Icon(
-                    Icons.shopping_cart_outlined,
-                    color: Colors.white,
-                    size: 30,
-                  ),
+                  icon: controller.sewingIcon,
                 ),
                 FavoriteIcone(
                   docId: modele.id!,
                   color: 'white',
                 ),
-                // Column(
-                //   mainAxisSize: MainAxisSize.min,
-                //   children: [Icon(Icons.follow_the_signs)],
-                // ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[

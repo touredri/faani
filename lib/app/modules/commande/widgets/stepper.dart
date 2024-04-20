@@ -17,14 +17,6 @@ class _MyStepState extends State<MyStep> {
   int reachedStep = 0;
   int upperBound = 5;
   double progress = 0.2;
-  // Set<int> reachedSteps = <int>{0, 2, 4, 5};
-  // final dashImages = [
-  //   'assets/1.png',
-  //   'assets/2.png',
-  //   'assets/3.png',
-  //   'assets/4.png',
-  //   'assets/5.png',
-  // ];
 
   void increaseProgress() {
     if (progress < 1) {
@@ -41,6 +33,7 @@ class _MyStepState extends State<MyStep> {
       children: [
         EasyStepper(
             activeStep: activeStep,
+            stepRadius: 25,
             lineStyle: LineStyle(
               lineLength: 75,
               lineSpace: 4,
@@ -54,32 +47,26 @@ class _MyStepState extends State<MyStep> {
             steps: const [
               EasyStep(
                 icon: Icon(Icons.info),
-                title: 'En cours',
-                lineText: 'Met en Decoupes',
+                lineText: 'Decoupes',
               ),
               EasyStep(
                 icon: Icon(Icons.cut),
-                title: 'Decoupes',
-                lineText: 'Vas en assemblage',
+                lineText: 'assemblage',
               ),
               EasyStep(
                 icon: Icon(Icons.man_2),
-                title: 'Assemblage',
-                lineText: 'Reste du paiement',
+                lineText: 'Paiement',
               ),
               EasyStep(
                 icon: Icon(CupertinoIcons.money_dollar),
-                title: 'Payment',
-                lineText: 'Recuperation',
+                lineText: 'Recuperer',
               ),
               EasyStep(
                 icon: Icon(Icons.file_present_rounded),
-                title: 'Livraison',
-                lineText: 'Marché conclu',
+                lineText: 'Terminer',
               ),
               EasyStep(
                 icon: Icon(Icons.check_circle_outline),
-                title: 'Terminé',
               ),
             ],
             onStepReached: (index) => {
