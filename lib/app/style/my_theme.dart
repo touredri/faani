@@ -48,9 +48,9 @@ ThemeData buildTheme(BuildContext context) {
           const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
         ),
         iconColor: MaterialStateProperty.all<Color>(Colors.black),
-        side: MaterialStateProperty.all<BorderSide>(
-          const BorderSide(color: inputBorderColor, width: 1),
-        ),
+        // side: MaterialStateProperty.all<BorderSide>(
+        //   const BorderSide(color: inputBorderColor, width: 1),
+        // ),
         splashFactory: InkSplash.splashFactory,
         foregroundColor: MaterialStateProperty.all<Color>(primaryColor),
         overlayColor: MaterialStateProperty.resolveWith<Color>(

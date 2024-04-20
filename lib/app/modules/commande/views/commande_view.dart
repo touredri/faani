@@ -1,4 +1,5 @@
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
+import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/globale_widgets/animated_seach.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/views/message_view.dart';
@@ -156,7 +157,10 @@ class _CommandeViewState extends State<CommandeView>
               2.5.hs,
               FloatingActionButton(
                 heroTag: "fab2",
-                onPressed: () {},
+                onPressed: () {
+                  Get.to(() => const AjoutCommandePage(),
+                      transition: Transition.downToUp);
+                },
                 child: const Icon(Icons.add),
               ),
             ],

@@ -5,6 +5,7 @@ import '../../style/my_theme.dart';
 
 AppBar primaryBackAppBar(String text) {
   return AppBar(
+    automaticallyImplyLeading: false,
     backgroundColor: primaryColor,
     leading: IconButton(
         onPressed: () {
