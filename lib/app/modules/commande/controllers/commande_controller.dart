@@ -1,6 +1,7 @@
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/models/suivi_etat_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/suivi_etat_service.dart';
@@ -66,6 +67,15 @@ class CommandeController extends GetxController {
         modeles.addAll(event);
       });
     }
+  }
+
+  void clearForm() {
+    image.value = null;
+    selectedDate.value = '';
+    mesure.value = null;
+    nomController.clear();
+    numeroController.clear();
+    prixController.clear();
   }
 
   @override

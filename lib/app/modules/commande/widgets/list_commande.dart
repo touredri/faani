@@ -1,12 +1,10 @@
-import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/views/detail_commande_view.dart';
-import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/data/models/commande_model.dart';
-import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/services/commande_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import 'commande_container.dart';
 
 class ListCommande extends StatelessWidget {
@@ -16,7 +14,6 @@ class ListCommande extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final UserController userController = Get.find();
     final CommandeController controller = Get.put(CommandeController());
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -70,8 +67,15 @@ class ListCommande extends StatelessWidget {
                               builder: (context, result) {
                                 if (result.connectionState ==
                                     ConnectionState.waiting) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
+                                  return Shimmer.fromColors(
+                                    baseColor: Colors.grey[300]!,
+                                    highlightColor: Colors.grey[100]!,
+                                    child: Container(
+                                      width: 200.0,
+                                      height: 200.0,
+                                      color: Colors.white,
+                                    ),
+                                  );
                                 } else if (result.hasError) {
                                   return Text('Error2: ${result.error}');
                                 } else {

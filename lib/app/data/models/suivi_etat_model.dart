@@ -5,12 +5,14 @@ class SuiviEtat {
   String idEtat = '1';
   String idCommande;
   Timestamp date = Timestamp.now();
+  Timestamp? dateModifier;
 
   SuiviEtat({
     required this.id,
     required this.idEtat,
     required this.date,
     required this.idCommande,
+    this.dateModifier,
   });
 
   factory SuiviEtat.fromJson(
@@ -20,6 +22,7 @@ class SuiviEtat {
       idEtat: json['idEtat'],
       date: json['createDate'],
       idCommande: json['idCommande'],
+      dateModifier: json['dateModifier'],
     );
   }
 
@@ -29,5 +32,6 @@ class SuiviEtat {
         'idEtat': idEtat,
         'createDate': date,
         'idCommande': idCommande,
+        'dateModifier': dateModifier,
       };
 }

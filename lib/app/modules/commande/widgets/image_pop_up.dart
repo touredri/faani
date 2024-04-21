@@ -57,3 +57,38 @@ Future imagePopUp(
     },
   );
 }
+
+Future successDialog(
+    {required BuildContext context,
+    required String successMessage,
+    required VoidCallback onButtonPressed}) {
+  return showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black45,
+    transitionDuration: const Duration(milliseconds: 200),
+    pageBuilder: (BuildContext buildContext, Animation animation,
+        Animation secondaryAnimation) {
+      return AlertDialog(
+        content: Text(successMessage),
+        actions: [
+          TextButton(
+            onPressed: onButtonPressed,
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+    transitionBuilder: (BuildContext context, Animation animation,
+        Animation secondaryAnimation, Widget child) {
+      return ScaleTransition(
+        scale: CurvedAnimation(
+          parent: animation as Animation<double>,
+          curve: Curves.easeOut,
+        ),
+        child: child,
+      );
+    },
+  );
+}

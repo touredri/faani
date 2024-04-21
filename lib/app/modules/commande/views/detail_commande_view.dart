@@ -9,6 +9,7 @@ import 'package:faani/app/modules/commande/widgets/image_pop_up.dart';
 import 'package:faani/app/modules/commande/widgets/stepper.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
+import 'package:faani/app/modules/message/views/discussion_view.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
@@ -22,7 +23,7 @@ class DetailCommandeView extends GetView<CommandeController> {
   @override
   Widget build(BuildContext context) {
     final CommandeController controller = Get.put(CommandeController());
-    final String imageUrl = getRandomProfileImageUrl();
+    const String imageUrl = 'https://robohash.org/98';
     final UserController userController = Get.find();
     return Scaffold(
         appBar: AppBar(
@@ -93,7 +94,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                             controller.userController.isTailleur.value
                                 ? commande.nomClient
                                 : tailleur.nomPrenom!,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15,
                             ),
                           ),
@@ -101,7 +102,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                               controller.userController.isTailleur.value
                                   ? commande.numeroClient.toString()
                                   : 'Couture ${tailleur.clientCible!}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 13,
                               )),
                           trailing: TextButton.icon(
@@ -125,7 +126,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                       ),
                       Stack(
                         children: [
-                          const MyStep(),
+                          MyStep(commande: commande,),
                           Padding(
                             padding: const EdgeInsets.only(top: 65.0),
                             child: Column(
@@ -164,7 +165,9 @@ class DetailCommandeView extends GetView<CommandeController> {
                                       onTap: () {
                                         imagePopUp(
                                             context: context,
-                                            imageUrl: imageUrl,
+                                            imageUrl: commande.photoHabit != ''
+                                                ? commande.photoHabit
+                                                : imageUrl,
                                             onButtonPressed: () {
                                               Get.back();
                                             },
@@ -180,10 +183,15 @@ class DetailCommandeView extends GetView<CommandeController> {
                                         padding:
                                             const EdgeInsets.only(bottom: 10),
                                         height: 80,
-                                        child: Image.asset(
-                                          'assets/images/ic_launcher.png',
-                                          fit: BoxFit.cover,
-                                          width: 90,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          child: Image.network(
+                                            commande.photoHabit,
+                                            fit: BoxFit.cover,
+                                            height: double.infinity,
+                                            width: 90,
+                                          ),
                                         ),
                                       ),
                                     )),
@@ -277,7 +285,9 @@ class DetailCommandeView extends GetView<CommandeController> {
                                   ),
                                 ),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.to(() => const DiscussionView());
+                              },
                               icon: const Icon(
                                 Icons.message_outlined,
                                 color: Colors.grey,

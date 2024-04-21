@@ -1,11 +1,16 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/models/suivi_etat_model.dart';
 import 'package:faani/app/data/services/mesure_service.dart';
+import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
+import 'package:faani/app/modules/commande/widgets/image_pop_up.dart';
 import 'package:faani/app/modules/commande/widgets/mesure_popup.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
@@ -39,10 +44,30 @@ class AjoutCommandePage extends GetView<CommandeController> {
     }
   }
 
+  //upload photo habit to firebase storage
+  Future<List<Map<String, String>>> uploadPhoto(XFile image) async {
+    List<Map<String, String>> imageInfo = [];
+    if (image.path.isNotEmpty) {
+      final File file = File(image.path);
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('photosHabit')
+          .child(file.path.split('/').last);
+      await ref.putFile(file);
+      final url = await ref.getDownloadURL();
+      imageInfo.add({
+        'downloadUrl': url,
+        'path': ref.fullPath,
+      });
+    }
+    return imageInfo;
+  }
+
   @override
   Widget build(BuildContext context) {
     final CommandeController controller = Get.put(CommandeController());
     final MesureService mesureService = MesureService();
+    final bool isTailleur = controller.userController.isTailleur.value;
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 0,
@@ -101,6 +126,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
                                 child: Image.file(
                                   File(controller.image.value!.path),
                                   fit: BoxFit.cover,
+                                  height: double.infinity,
                                   width: 100,
                                 ),
                               )
@@ -139,11 +165,9 @@ class AjoutCommandePage extends GetView<CommandeController> {
                   children: [
                     TextField(
                       controller: controller.nomController,
-                      enabled: controller.userController.isTailleur.value
-                          ? true
-                          : false,
+                      enabled: isTailleur ? true : false,
                       decoration: InputDecoration(
-                        labelText: controller.userController.isTailleur.value
+                        labelText: isTailleur
                             ? 'Nom du client'
                             : controller
                                 .userController.currentUser.value.nomPrenom!,
@@ -153,11 +177,12 @@ class AjoutCommandePage extends GetView<CommandeController> {
                     2.hs,
                     TextField(
                       controller: controller.numeroController,
-                      enabled: controller.userController.isTailleur.value
-                          ? true
-                          : false,
+                      enabled: isTailleur ? true : false,
+                      keyboardType: TextInputType.number,
+                      maxLength: 10,
                       decoration: InputDecoration(
-                        labelText: controller.userController.isTailleur.value
+                        counterText: '',
+                        labelText: isTailleur
                             ? 'Numéro du client'
                             : controller
                                 .userController.currentUser.value.phoneNumber!,
@@ -243,34 +268,39 @@ class AjoutCommandePage extends GetView<CommandeController> {
                       ),
                     ),
                     2.hs,
-                    if (controller.userController.isTailleur.value == true)
+                    if (isTailleur)
                       TextField(
                         controller: controller.prixController,
+                        keyboardType: TextInputType.number,
+                        maxLength: 10,
                         decoration: const InputDecoration(
+                          counterText: '',
                           labelText: 'Prix',
                           border: OutlineInputBorder(),
                         ),
                       ),
                     7.hs,
                     ElevatedButton(
-                      onPressed: () {
-                        // controller.addCommande(modele);
+                      onPressed: () async {
+                        List<Map<String, String>> imageInfo =
+                            await uploadPhoto(controller.image.value!);
                         final Commande newCommande = Commande(
                           idMesure: controller.mesure.value!.id!,
                           idModele: modele.id!,
-                          idTailleur: controller.userController.isTailleur.value
+                          isSelfAdded: isTailleur ? true : false,
+                          idTailleur: isTailleur
                               ? controller.userController.currentUser.value.id!
-                              : '',
-                          numeroClient:
-                              controller.userController.isTailleur.value
-                                  ? int.parse(controller.numeroController.text)
-                                  : int.parse(controller.userController
-                                      .currentUser.value.phoneNumber!),
-                          nomClient: controller.userController.isTailleur.value
+                              : '', // put the name of the selected tailleur by the user
+                          numeroClient: isTailleur
+                              ? int.parse(controller.numeroController.text)
+                              : int.parse(controller.userController.currentUser
+                                  .value.phoneNumber!),
+                          nomClient: isTailleur
                               ? controller.nomController.text
                               : controller
                                   .userController.currentUser.value.nomPrenom!,
-                          photoHabit: controller.image.value!.path,
+                          photoHabit: imageInfo[0]['downloadUrl']!,
+                          refPhotoHabit: imageInfo[0]['path']!,
                           prix: int.parse(controller.prixController.text),
                           idCategorie: modele.idCategorie!,
                           modeleImage: modele.fichier[0]!,
@@ -280,11 +310,27 @@ class AjoutCommandePage extends GetView<CommandeController> {
                           dateModifier:
                               DateTime.parse(controller.selectedDate.value),
                         );
+                        final SuiviEtat newSuiviEtat = SuiviEtat(
+                          id: '',
+                          idCommande: newCommande.id!,
+                          idEtat: '1',
+                          date: Timestamp.fromDate(DateTime.now()),
+                        );
                         newCommande.create();
+                        SuiviEtatService().createSuiviEtat(
+                            newSuiviEtat); // create a new suivi etat
+                        // clear the form and image and an animated show a success message
+                        controller.clearForm();
+                        successDialog(
+                            context: context,
+                            successMessage: 'Parfait👍, Ajouter avec succès',
+                            onButtonPressed: () {
+                              Get.back();
+                              Get.back();
+                              Get.back();
+                            });
                       },
-                      child: Text(controller.userController.isTailleur.value
-                          ? 'Enregistrer'
-                          : 'Envoyer'),
+                      child: Text(isTailleur ? 'Enregistrer' : 'Envoyer'),
                     ),
                   ],
                 ),

@@ -24,7 +24,7 @@ class SuiviEtatService {
   Future<SuiviEtat> getSuiviEtatByCommandeId(String id) async {
     final doc = await collection.where('idCommande', isEqualTo: id).get();
     if (doc.docs.isEmpty) {
-      throw Exception('Document does not exist!');
+      throw Exception('Document does not exist!****');
     } else {
       return SuiviEtat.fromJson(
           doc.docs.first.data(), doc.docs.first.reference);
@@ -38,6 +38,11 @@ class SuiviEtatService {
         .doc(suiviEtat.idEtat)
         .get()
         .then((value) => value.data()!['libelle']);
+  }
+
+  // update etat by id
+  Future<void> updateSuiviEtat(SuiviEtat suiviEtat) async {
+    await collection.doc(suiviEtat.id).update(suiviEtat.toJson());
   }
 
   // delete
