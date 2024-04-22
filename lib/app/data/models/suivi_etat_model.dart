@@ -15,7 +15,7 @@ class SuiviEtat {
     this.dateModifier,
   });
 
-  factory SuiviEtat.fromJson(
+  factory SuiviEtat.fromMap(
       Map<String, dynamic> json, DocumentReference docId) {
     return SuiviEtat(
       id: docId.id,
@@ -28,10 +28,18 @@ class SuiviEtat {
 
   final collection = FirebaseFirestore.instance.collection('suiviEtat');
 
-  Map<String, dynamic> toJson() => {
-        'idEtat': idEtat,
-        'createDate': date,
-        'idCommande': idCommande,
-        'dateModifier': dateModifier,
-      };
+  Map<String, dynamic> toMap() {
+    return {
+      'idEtat': idEtat,
+      'createDate': date,
+      'idCommande': idCommande,
+      'dateModifier': dateModifier,
+    };
+  }
+
+  // update
+  Future<void> update() async {
+    print('update suivi etat');
+    await collection.doc(id).update(toMap());
+  }
 }

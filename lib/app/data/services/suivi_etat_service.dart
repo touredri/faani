@@ -6,7 +6,7 @@ class SuiviEtatService {
 
   // create
   Future<void> createSuiviEtat(SuiviEtat suiviEtat) async {
-    final docRef = await collection.add(suiviEtat.toJson());
+    final docRef = await collection.add(suiviEtat.toMap());
     suiviEtat.id = docRef.id;
   }
 
@@ -16,7 +16,7 @@ class SuiviEtatService {
     if (doc.data() == null) {
       throw Exception('Document does not exist!');
     } else {
-      return SuiviEtat.fromJson(doc.data()!, doc.reference);
+      return SuiviEtat.fromMap(doc.data()!, doc.reference);
     }
   }
 
@@ -24,9 +24,9 @@ class SuiviEtatService {
   Future<SuiviEtat> getSuiviEtatByCommandeId(String id) async {
     final doc = await collection.where('idCommande', isEqualTo: id).get();
     if (doc.docs.isEmpty) {
-      throw Exception('Document does not exist!****');
+      throw Exception('Document does not exist!');
     } else {
-      return SuiviEtat.fromJson(
+      return SuiviEtat.fromMap(
           doc.docs.first.data(), doc.docs.first.reference);
     }
   }
@@ -42,7 +42,8 @@ class SuiviEtatService {
 
   // update etat by id
   Future<void> updateSuiviEtat(SuiviEtat suiviEtat) async {
-    await collection.doc(suiviEtat.id).update(suiviEtat.toJson());
+    print(suiviEtat.toMap());
+    await collection.doc(suiviEtat.id).update(suiviEtat.toMap());
   }
 
   // delete
