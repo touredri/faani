@@ -100,11 +100,14 @@ class DetailModeleView extends GetView<DetailModeleController> {
                             // share
                             iconShare(modele),
                             // save
-                            SizedBox(
-                              height: 50,
-                              width: 50,
-                              child: IconDownload(
-                                modele: modele,
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 17.0),
+                              child: SizedBox(
+                                height: 50,
+                                width: 50,
+                                child: IconDownload(
+                                  modele: modele,
+                                ),
                               ),
                             ),
                           ],

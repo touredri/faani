@@ -13,6 +13,7 @@ class MessageView extends GetView<MessageController> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: scaffoldBack,
         title: const Text('Discussions'),
         actions: [
           // AnimatedSearchBar(
@@ -83,8 +84,10 @@ class MessageView extends GetView<MessageController> {
                 ],
               ),
               onTap: () {
-                Get.to(() => const DiscussionView(),
-                    transition: Transition.rightToLeftWithFade,);
+                Get.to(
+                  () => const DiscussionView(),
+                  transition: Transition.rightToLeftWithFade,
+                );
               },
               minVerticalPadding: 15,
             );

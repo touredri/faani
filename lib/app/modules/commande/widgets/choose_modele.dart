@@ -7,6 +7,7 @@ import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/commande/widgets/image_pop_up.dart';
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -19,7 +20,23 @@ class ChooseModeleView extends GetView<CommandeController> {
   Widget build(BuildContext context) {
     final CommandeController controller = Get.put(CommandeController());
     return Scaffold(
-        appBar: primaryBackAppBar('Choisir un modèle'),
+        appBar: AppBar(
+          backgroundColor: primaryColor,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Get.back();
+              controller.modeles.clear();
+            },
+          ),
+          title: const Text(
+            'Choisir un modèle',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
         body: SafeArea(
           child: StreamBuilder<List<Modele>>(
             stream: controller.init(),
