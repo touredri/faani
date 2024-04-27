@@ -54,6 +54,12 @@ class ModeleService {
     });
   }
 
+  // get total modele count
+  Future<int> getTotalModeleCount() async {
+    final querySnapshot = await collection.get();
+    return querySnapshot.size;
+  }
+
 // get all modele by categorie
   Stream<List<Modele>> getAllModelesByCategorie(String idCategorie) {
     return collection
@@ -89,7 +95,7 @@ class ModeleService {
     while (models.length < pageSize) {
       Query<Map<String, dynamic>> query = collection;
       if (clientCible.isNotEmpty) {
-        query = query.where('clientCible', isEqualTo: clientCible);
+        query = query.where('genreHabit', isEqualTo: clientCible);
       }
       if (categorie.isNotEmpty) {
         query = query.where('idCategorie', isEqualTo: categorie);

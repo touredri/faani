@@ -22,8 +22,9 @@ class DetailModeleView extends GetView<DetailModeleController> {
 
   @override
   Widget build(BuildContext context) {
-    final DetailModeleController controller =
-        Get.find<DetailModeleController>();
+    // final DetailModeleController controller =
+    //     Get.find<DetailModeleController>();
+    final DetailModeleController controller = Get.put(DetailModeleController());
     final String imgUrl = getRandomProfileImageUrl();
     return FutureBuilder(
         future: controller.getModeleOwner(modele.idTailleur),
@@ -112,7 +113,7 @@ class DetailModeleView extends GetView<DetailModeleController> {
                           width: MediaQuery.of(context).size.width * 0.7,
                           child: ElevatedButton(
                               onPressed: () {},
-                              child: !controller.modeleUser.value.isTailleur
+                              child: controller.modeleUser.value.isTailleur
                                   ? const Text('Faire pour un client')
                                   : const Text('Envoyer à un tailleur')),
                         ),

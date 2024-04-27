@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/services/favorite_service.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,17 @@ class FavoriteIcone extends StatefulWidget {
 class _FavoriteIconeState extends State<FavoriteIcone> {
   bool isFavorite = false;
   final firestore = FirebaseFirestore.instance;
+  int count = 0;
+  Stream<DocumentSnapshot>? likeSnapshotStream;
+  final streamController = StreamController<DocumentSnapshot>();
+
+  void onChange(QuerySnapshot snapshot) {
+    if (mounted) {
+      setState(() {
+        count = snapshot.docs.length;
+      });
+    }
+  }
 
   void favorieInit() {
     firestore
@@ -37,6 +50,13 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
   void initState() {
     super.initState();
     favorieInit();
+    likeSnapshotStream =
+        firestore.collection('modele').doc(widget.docId).snapshots();
+    firestore
+        .collection('favorie')
+        .where('idModele', isEqualTo: widget.docId)
+        .snapshots()
+        .listen(onChange);
   }
 
   void createFavorie() async {
@@ -67,34 +87,26 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        IconButton(
-            onPressed: () {
-              if (isFavorite) {
-                deleteFavorie();
-                setState(() {
-                  isFavorite = !isFavorite;
-                });
-              } else {
-                createFavorie();
-                setState(() {
-                  isFavorite = !isFavorite;
-                });
-              }
-            },
-            icon: Icon(
-              Icons.favorite_border_outlined,
-              color: widget.color == 'white' ? Colors.white : Colors.grey,
-              size: 30,
-            ),
-            isSelected: isFavorite,
-            selectedIcon: const Icon(
-              semanticLabel: 'Remove from favorites',
-              textDirection: TextDirection.ltr,
-              Icons.favorite,
-              color: primaryColor,
-              size: 30,
-            )),
-        // Text(count.toString(), style: const TextStyle(color: Colors.grey)),
+        GestureDetector(
+          onTap: () {
+            if (isFavorite) {
+              deleteFavorie();
+            } else {
+              createFavorie();
+            }
+            setState(() {
+              isFavorite = !isFavorite;
+            });
+          },
+          child: Icon(
+            isFavorite ? Icons.favorite : Icons.favorite_border,
+            color: isFavorite
+                ? primaryColor
+                : (widget.color == 'white' ? Colors.white : Colors.black),
+            size: 30,
+          ),
+        ),
+        Text(count.toString(), style: const TextStyle(color: Colors.grey)),
       ],
     );
   }

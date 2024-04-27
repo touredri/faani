@@ -1,8 +1,7 @@
 import 'package:get/get.dart';
+
 import '../modules/accueil/bindings/accueil_binding.dart';
 import '../modules/accueil/views/accueil_view.dart';
-// import '../modules/ajout_commande/bindings/ajout_commande_binding.dart';
-// import '../modules/ajout_commande/views/ajout_commande_view.dart';
 import '../modules/ajout_modele/bindings/ajout_modele_binding.dart';
 import '../modules/ajout_modele/views/ajout_modele_view.dart';
 import '../modules/authentification/bindings/authentification_binding.dart';
@@ -20,6 +19,11 @@ import '../modules/mesures/bindings/mesures_binding.dart';
 import '../modules/mesures/views/mesures_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
+import '../modules/search_page/bindings/search_page_binding.dart';
+import '../modules/search_page/views/search_page_view.dart';
+
+// import '../modules/ajout_commande/bindings/ajout_commande_binding.dart';
+// import '../modules/ajout_commande/views/ajout_commande_view.dart';
 
 part 'app_routes.dart';
 
@@ -79,6 +83,11 @@ class AppPages {
       name: _Paths.MESSAGE,
       page: () => const MessageView(),
       binding: MessageBinding(),
+    ),
+    GetPage(
+      name: _Paths.SEARCH_PAGE,
+      page: () => const SearchPageView(),
+      binding: SearchPageBinding(),
     ),
   ];
 }

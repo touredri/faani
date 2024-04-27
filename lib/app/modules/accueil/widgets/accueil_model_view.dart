@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
+import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/src/message_modal.dart';
@@ -127,7 +128,10 @@ class HomeItem extends GetView<AccueilController> {
                   ],
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => DetailModeleView(modele),
+                        transition: Transition.rightToLeft);
+                  },
                   icon: const Icon(
                     Icons.info,
                     color: Colors.white,

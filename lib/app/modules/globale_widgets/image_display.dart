@@ -7,8 +7,7 @@ import '../../style/my_theme.dart';
 
 class DisplayImage extends StatelessWidget {
   final Modele modele;
-  const DisplayImage(
-      {super.key, required this.modele});
+  const DisplayImage({super.key, required this.modele});
 
   @override
   Widget build(BuildContext context) {
@@ -31,23 +30,28 @@ class DisplayImage extends StatelessWidget {
             ),
           ],
         ),
-        Container(
-          width: 30,
-          height: 30,
-          alignment: Alignment.center,
-          margin: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(40),
-              color: Colors.black.withOpacity(0.5)),
-          child: IconButton(
-            padding: const EdgeInsets.all(0),
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Get.back();
-            },
-          ),
-        ),
+        shadowBackButton(),
       ],
     );
   }
+}
+
+// shadow back button
+Widget shadowBackButton() {
+  return Container(
+    width: 30,
+    height: 30,
+    alignment: Alignment.center,
+    margin: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(40),
+        color: Colors.black.withOpacity(0.5)),
+    child: IconButton(
+      padding: const EdgeInsets.all(0),
+      icon: const Icon(Icons.arrow_back, color: Colors.white),
+      onPressed: () {
+        Get.back();
+      },
+    ),
+  );
 }

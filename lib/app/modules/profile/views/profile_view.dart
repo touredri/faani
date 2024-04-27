@@ -1,5 +1,5 @@
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
-import 'package:faani/app/modules/profile/widgets.dart/build_list.dart';
+import 'package:faani/app/modules/profile/widgets/build_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
@@ -13,117 +13,116 @@ class ProfileView extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     final ProfileController controller = Get.put(ProfileController());
     return Scaffold(
-      backgroundColor: primaryColor,
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            backgroundColor: primaryColor,
-            automaticallyImplyLeading: false,
-            expandedHeight: 180.0,
-            toolbarHeight: 100,
-            flexibleSpace: Card(
-              color: Colors.blueGrey[50],
-              elevation: 5,
-              margin: const EdgeInsets.only(top: 50, left: 6, right: 6),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 28.0, left: 10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    3.ws,
-                    const BuildProfileImage(width: 120, height: 120),
-                    8.ws,
-                    Column(
+      appBar: AppBar(
+        backgroundColor: primaryColor,
+        elevation: 0,
+        toolbarHeight: 0,
+        automaticallyImplyLeading: false,
+      ),
+      body: SafeArea(
+        child: Container(
+          color: primaryColor,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                1.1.hs,
+                Card(
+                  color: Colors.blueGrey[50],
+                  elevation: 5,
+                  margin: const EdgeInsets.only(top: 5, left: 6, right: 6),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(top: 18.0, left: 10, bottom: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
+                        const BuildProfileImage(width: 100, height: 100),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              '${controller.userController.currentUser.value.nomPrenom}',
-                              style: const TextStyle(
-                                // color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            // 3.hs,
-                            const Row(
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  Icons.location_on,
-                                  // color: Colors.white,
-                                  size: 15,
-                                ),
-                                SizedBox(width: 5),
                                 Text(
-                                  'Bamako, Mali',
-                                  style: TextStyle(
-                                    // color: Colors.white,
-                                    fontSize: 12,
+                                  '${controller.userController.currentUser.value.nomPrenom}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ],
-                            ),
-                            3.hs,
-                            // activity metrics
-                            Row(
-                              children: [
-                                const Column(
+                                // 3.hs,
+                                const Row(
                                   children: [
-                                    Text(
-                                      '21',
-                                      style: TextStyle(
-                                        // color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    Icon(
+                                      Icons.location_on,
+                                      // color: Colors.white,
+                                      size: 15,
                                     ),
+                                    SizedBox(width: 5),
                                     Text(
-                                      'Suivie',
+                                      'inconnu, Mali',
                                       style: TextStyle(
-                                        // color: Colors.white,
                                         fontSize: 12,
                                       ),
                                     ),
                                   ],
                                 ),
-                                5.ws,
-                                const Column(
+                                2.hs,
+                                // activity metrics
+                                Row(
                                   children: [
-                                    Text(
-                                      '6',
-                                      style: TextStyle(
-                                        // color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    const Column(
+                                      children: [
+                                        Text(
+                                          '21',
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Suivie',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      'Mesures',
-                                      style: TextStyle(
-                                        // color: Colors.white,
-                                        fontSize: 12,
-                                      ),
+                                    5.ws,
+                                    const Column(
+                                      children: [
+                                        Text(
+                                          '6',
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Mesures',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                5.ws,
-                                const Column(
-                                  children: [
-                                    Text(
-                                      '10',
-                                      style: TextStyle(
-                                        // color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Modèles',
-                                      style: TextStyle(
-                                        // color: Colors.white,
-                                        fontSize: 12,
-                                      ),
+                                    5.ws,
+                                    const Column(
+                                      children: [
+                                        Text(
+                                          '10',
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Modèles',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -133,18 +132,11 @@ class ProfileView extends GetView<ProfileController> {
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            floating: false,
-            pinned: false,
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                1.5.hs,
+                4.hs,
                 Container(
+                  padding: const EdgeInsets.only(bottom: 10),
                   decoration: BoxDecoration(
                     color: Colors.blueGrey[50],
                     borderRadius: const BorderRadius.only(
@@ -157,7 +149,7 @@ class ProfileView extends GetView<ProfileController> {
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

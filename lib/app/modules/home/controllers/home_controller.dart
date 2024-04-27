@@ -4,6 +4,7 @@ import 'package:faani/app/modules/favorie/views/favorie_view.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/profile/views/profile_view.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -16,22 +17,37 @@ class HomeController extends GetxController {
   UserController userController = Get.find();
 
   String sewing = 'assets/svg/sewingp.svg';
+  String dress = 'assets/svg/dress.svg';
   late final Widget sewingIcon;
-
+  late final Widget dressIcon;
   HomeController() {
     sewingIcon = SvgPicture.asset(
       sewing,
       width: 26,
       height: 26,
     );
+    dressIcon = SvgPicture.asset(
+      dress,
+      colorFilter: const ColorFilter.mode(primaryColor, BlendMode.srcIn),
+      width: 26,
+      height: 24,
+    );
   }
   List<PersistentTabConfig> tabs() => [
         PersistentTabConfig(
           screen: const AccueilView(),
+          // item: ItemConfig(
+          //   activeForegroundColor: primaryColor,
+          //   icon: const Icon(Icons.home),
+          // ),
           item: ItemConfig(
             activeForegroundColor: primaryColor,
-            icon: const Icon(Icons.home),
-            title: "Home",
+            icon: dressIcon,
+            inactiveIcon: SvgPicture.asset(
+              dress,
+              width: 26,
+              height: 24,
+            ),
           ),
         ),
         PersistentTabConfig(
@@ -39,7 +55,6 @@ class HomeController extends GetxController {
           item: ItemConfig(
             activeForegroundColor: primaryColor,
             icon: sewingIcon,
-            title: "Couture",
             inactiveIcon: SvgPicture.asset(
               sewing,
               colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
@@ -52,11 +67,11 @@ class HomeController extends GetxController {
           PersistentTabConfig(
             screen: const AjoutModeleView(),
             item: ItemConfig(
-              activeForegroundColor: primaryColor,
+              activeForegroundColor: Color.fromARGB(255, 238, 250, 255)!,
               icon: const Icon(
                 Icons.add,
+                color: primaryColor,
               ),
-              // title: "Modèle",
             ),
           ),
         PersistentTabConfig(
@@ -64,15 +79,13 @@ class HomeController extends GetxController {
           item: ItemConfig(
             activeForegroundColor: primaryColor,
             icon: const Icon(Icons.favorite),
-            title: "Favories",
           ),
         ),
         PersistentTabConfig(
           screen: const ProfileView(),
           item: ItemConfig(
             activeForegroundColor: primaryColor,
-            icon: const Icon(Icons.person),
-            title: "Profile",
+            icon: const Icon(CupertinoIcons.profile_circled),
           ),
         ),
       ];

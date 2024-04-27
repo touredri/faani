@@ -1,3 +1,4 @@
+import 'package:faani/app/modules/search_page/views/search_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
@@ -41,8 +42,8 @@ class AccueilView extends GetView<AccueilController> {
                             onPressed: () {
                               controller.isHommeSelected.value =
                                   !controller.isHommeSelected.value;
-                                  controller.modeles.clear();
-                                  controller.loadMore('Homme', '');
+                              controller.modeles.clear();
+                              controller.loadMore('Homme', '');
                             },
                             child: const Text('Homme',
                                 style: TextStyle(
@@ -54,8 +55,8 @@ class AccueilView extends GetView<AccueilController> {
                             onPressed: () {
                               controller.isHommeSelected.value =
                                   !controller.isHommeSelected.value;
-                                  controller.modeles.clear();
-                                  controller.loadMore('Femme', '');
+                              controller.modeles.clear();
+                              controller.loadMore('Femme', '');
                             },
                             child: const Text('Femme',
                                 style: TextStyle(
@@ -64,7 +65,9 @@ class AccueilView extends GetView<AccueilController> {
                                     fontSize: 15)),
                           ),
                     Expanded(
-                      child: CategorieFiltre<AccueilController>(controller: controller,),
+                      child: CategorieFiltre<AccueilController>(
+                        controller: controller,
+                      ),
                     ),
                     IconButton(
                         style: ButtonStyle(
@@ -72,7 +75,10 @@ class AccueilView extends GetView<AccueilController> {
                               const EdgeInsets.symmetric(
                                   horizontal: 0, vertical: 0)),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(() => const SearchPageView(),
+                              transition: Transition.downToUp);
+                        },
                         icon: const Icon(
                           Icons.search,
                           color: Colors.white,

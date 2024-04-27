@@ -1,10 +1,10 @@
-import 'package:faani/app/modules/profile/widgets.dart/gerer_compte.dart';
+import 'package:faani/app/modules/profile/widgets/gerer_compte.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import '../../globale_widgets/custom_app_bar.dart';
-import '../widgets.dart/change_langue.dart';
-import '../widgets.dart/notification_params.dart';
+import '../widgets/change_langue.dart';
+import '../widgets/notification_params.dart';
 
 class ParametreView extends GetView {
   const ParametreView({super.key});

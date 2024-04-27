@@ -11,6 +11,7 @@ class MesModelesView extends GetView {
   const MesModelesView({super.key});
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(ProfileController());
     return Scaffold(
       body: StreamBuilder<List<Modele>>(
           stream: null,
@@ -43,7 +44,9 @@ class MesModelesView extends GetView {
                         color: primaryColor,
                         width: MediaQuery.of(context).size.width,
                         height: 30,
-                        child: CategorieFiltre<ProfileController>(controller: controller,),
+                        child: CategorieFiltre<ProfileController>(
+                          controller: controller,
+                        ),
                       )),
                   flexibleSpace: const FlexibleSpaceBar(
                     background: Padding(

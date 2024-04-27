@@ -32,24 +32,24 @@ Widget listBuild(ProfileController controller) {
                 Get.to(() => const MesuresView(),
                     transition: Transition.rightToLeft),
               }),
-      // if (controller.isTailleur.value)
-      CustomListTile(
-          leadingIcon: controller.dressIcon,
-          title: 'Mes Modèles',
-          subTitle: 'Gerer mes modèles',
-          onTap: () => {
-                Get.to(() => const MesModelesView(),
-                    transition: Transition.rightToLeft),
-              }),
-      // if (controller.isTailleur.value)s
-      CustomListTile(
-          leadingIcon: controller.becomeTailorIcon,
-          title: 'Devenir Tailleur',
-          subTitle: 'Basculer vers compte tailleur',
-          onTap: () => {
-                Get.to(() => DevenirTailleurView(),
-                    transition: Transition.rightToLeft),
-              }),
+      if (controller.isTailleur.value)
+        CustomListTile(
+            leadingIcon: controller.dressIcon,
+            title: 'Mes Modèles',
+            subTitle: 'Gerer mes modèles',
+            onTap: () => {
+                  Get.to(() => const MesModelesView(),
+                      transition: Transition.rightToLeft),
+                }),
+      if (!controller.isTailleur.value)
+        CustomListTile(
+            leadingIcon: controller.becomeTailorIcon,
+            title: 'Devenir Tailleur',
+            subTitle: 'Basculer vers compte tailleur',
+            onTap: () => {
+                  Get.to(() => DevenirTailleurView(),
+                      transition: Transition.rightToLeft),
+                }),
       CustomListTile(
         leadingIcon: const Icon(
           Icons.settings,
