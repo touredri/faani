@@ -12,7 +12,7 @@ class AuthView extends GetView<AuthController> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthController controller = Get.put(AuthController());
+    Get.put(AuthController());
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(

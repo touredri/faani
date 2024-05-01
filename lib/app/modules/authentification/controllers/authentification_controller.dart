@@ -22,6 +22,7 @@ class AuthController extends GetxController {
   late Timer timer;
   TextEditingController smsCodeController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  final String defaultProfileImage = getRandomProfileImageUrl();
 
   // open url
   void openUrl(String link) async {
@@ -153,7 +154,7 @@ class AuthController extends GetxController {
       id: auth.currentUser!.uid,
       nomPrenom: nameController.text,
       phoneNumber: phoneNumber.value,
-      profileImage: user!.photoURL ?? '',
+      profileImage: user!.photoURL ?? defaultProfileImage,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );

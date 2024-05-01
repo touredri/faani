@@ -21,4 +21,13 @@ class UserService {
   Future<void> deleteUser(String id) {
     return _usersRef.doc(id).delete();
   }
+
+  Stream<List<UserModel>> getAllTailleur() {
+    return _usersRef
+        .where('isTailleur', isEqualTo: true)
+        .snapshots()
+        .map((event) => event.docs
+            .map((e) => UserModel.fromMap(e.data() as Map<String, dynamic>, e.reference))
+            .toList());
+  }
 }

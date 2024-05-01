@@ -10,7 +10,7 @@ class AjoutModele extends GetView<AjoutModeleController> {
 
   @override
   Widget build(BuildContext context) {
-    final AjoutModeleController controller = Get.put(AjoutModeleController());
+    Get.put(AjoutModeleController());
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,

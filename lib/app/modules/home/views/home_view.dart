@@ -6,6 +6,7 @@ import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   HomeView({super.key});
+  @override
   final HomeController controller = Get.put(HomeController());
   @override
   Widget build(BuildContext context) => PersistentTabView(

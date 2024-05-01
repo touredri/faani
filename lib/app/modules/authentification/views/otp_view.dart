@@ -6,10 +6,11 @@ import '../../globale_widgets/circular_progress.dart';
 import '../controllers/authentification_controller.dart';
 
 class OtpView extends GetView<AuthController> {
-  final AuthController controller = Get.put(AuthController());
+  const OtpView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Get.put(AuthController());
     return Scaffold(
       appBar: AppBar(
         backgroundColor: scaffoldBack,

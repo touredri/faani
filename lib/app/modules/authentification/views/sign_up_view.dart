@@ -8,12 +8,11 @@ import '../../globale_widgets/circular_progress.dart';
 import '../controllers/authentification_controller.dart';
 
 class SignUpView extends GetView<AuthController> {
-  SignUpView({super.key});
+  const SignUpView({super.key});
 
   @override
-  final AuthController controller = Get.put(AuthController());
-  @override
   Widget build(BuildContext context) {
+    Get.put(AuthController());
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

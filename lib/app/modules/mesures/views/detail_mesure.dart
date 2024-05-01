@@ -1,3 +1,4 @@
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/mesures/views/widgets/change_name.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/style/my_theme.dart';
@@ -10,7 +11,7 @@ import 'widgets/mesure_list_tile.dart';
 
 class DetailMesure extends StatefulWidget {
   final String id;
-  DetailMesure({super.key, required this.id});
+  const DetailMesure({super.key, required this.id});
 
   @override
   State<DetailMesure> createState() => _DetailMesureState();
@@ -54,71 +55,73 @@ class _DetailMesureState extends State<DetailMesure> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text((mesure.nom).toString(),
-                                  style: const TextStyle(fontSize: 20)),
+                                  style: const TextStyle(fontSize: 18)),
                               Text(
-                                DateFormat('dd-MM-yyyy')
+                                DateFormat('EEEE d MMMM y', 'fr_FR')
                                     .format(mesure.date!)
                                     .toString(),
+                                style: const TextStyle(fontSize: 14),
                               ),
                             ],
                           ),
                           const Spacer(),
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  TextEditingController controller =
-                                      TextEditingController();
-                                  setState(() {
-                                    changeName(mesure, context, controller);
-                                  });
-                                },
-                                icon: const Icon(
-                                  Icons.edit,
-                                  size: 30,
-                                  color: primaryColor,
+                          if (user!.uid == mesure.idUser)
+                            Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    TextEditingController controller =
+                                        TextEditingController();
+                                    setState(() {
+                                      changeName(mesure, context, controller);
+                                    });
+                                  },
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    size: 30,
+                                    color: primaryColor,
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text('Supprimer ??'),
-                                        content: const Text(
-                                            'Voulez-vous vraiment supprimer cette mesure ?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text(
-                                              'Non',
-                                              style: TextStyle(
-                                                  color: Colors.black),
-                                            ),
-                                          ),
-                                          TextButton(
+                                IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text('Supprimer ??'),
+                                          content: const Text(
+                                              'Voulez-vous vraiment supprimer cette mesure ?'),
+                                          actions: [
+                                            TextButton(
                                               onPressed: () {
-                                                mesure.delete();
-                                                Navigator.pop(context);
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text('Oui')),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.delete,
-                                  size: 30,
-                                  color: Colors.red,
+                                              child: const Text(
+                                                'Non',
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            TextButton(
+                                                onPressed: () {
+                                                  mesure.delete();
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('Oui')),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    size: 30,
+                                    color: Colors.red,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          )
+                              ],
+                            )
                         ],
                       ),
                     ),

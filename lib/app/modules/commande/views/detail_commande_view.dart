@@ -10,10 +10,12 @@ import 'package:faani/app/modules/commande/widgets/stepper.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/views/discussion_view.dart';
+import 'package:faani/app/modules/mesures/views/detail_mesure.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 import '../widgets/expand_image.dart';
 
@@ -22,7 +24,7 @@ class DetailCommandeView extends GetView<CommandeController> {
   const DetailCommandeView(this.commande, {super.key});
   @override
   Widget build(BuildContext context) {
-    final CommandeController controller = Get.put(CommandeController());
+    Get.put(CommandeController());
     const String imageUrl = 'https://robohash.org/98';
     final UserController userController = Get.find();
     return Scaffold(
@@ -40,10 +42,10 @@ class DetailCommandeView extends GetView<CommandeController> {
               } else {
                 Modele modele = result.data![2] as Modele;
                 UserModel tailleur = result.data![0] as UserModel;
-                UserModel? client = result.data![1] != null
-                    ? result.data![1] as UserModel
-                    : null;
-                SuiviEtat etat = result.data![3];
+                // UserModel? client = result.data![1] != null
+                //     ? result.data![1] as UserModel
+                //     : null;
+                // SuiviEtat etat = result.data![3];
                 return SingleChildScrollView(
                   child: Column(
                     children: [
@@ -57,8 +59,11 @@ class DetailCommandeView extends GetView<CommandeController> {
                             margin: EdgeInsets.only(
                               top: MediaQuery.of(context).size.height * 0.2,
                             ),
-                            child: OutlinedButton.icon(
-                              icon: const Icon(Icons.remove_red_eye_outlined),
+                            child: ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.remove_red_eye_outlined,
+                                color: Colors.white,
+                              ),
                               onPressed: () {
                                 imagePopUp(
                                     context: context,
@@ -119,14 +124,16 @@ class DetailCommandeView extends GetView<CommandeController> {
                                 color: Colors.grey,
                               ),
                               label: const Text(
-                                'Valider',
+                                'Accepte',
                                 style: TextStyle(color: Colors.grey),
                               )),
                         ),
                       ),
                       Stack(
                         children: [
-                          MyStep(commande: commande,),
+                          MyStep(
+                            commande: commande,
+                          ),
                           Padding(
                             padding: const EdgeInsets.only(top: 65.0),
                             child: Column(
@@ -208,17 +215,29 @@ class DetailCommandeView extends GetView<CommandeController> {
                                             const EdgeInsets.only(bottom: 16.0),
                                         child: Row(
                                           children: [
-                                            Text(
-                                              commande.datePrevue
-                                                  .toString()
-                                                  .split(' ')[0],
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                              ),
+                                            GetBuilder<CommandeController>(
+                                              init: CommandeController(),
+                                              initState: (_) {},
+                                              builder: (_) {
+                                                return Text(
+                                                  DateFormat('EEEE d MMMM y',
+                                                          'fr_FR')
+                                                      .format(
+                                                          commande.datePrevue)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                  ),
+                                                );
+                                              },
                                             ),
                                             1.ws,
                                             IconButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  controller.changeDate(
+                                                      commande,
+                                                      context: context);
+                                                },
                                                 icon: const Icon(Icons
                                                     .edit_calendar_outlined))
                                           ],
@@ -243,7 +262,11 @@ class DetailCommandeView extends GetView<CommandeController> {
                                             ),
                                             1.ws,
                                             IconButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  Get.to(() => DetailMesure(
+                                                        id: commande.idMesure,
+                                                      ));
+                                                },
                                                 icon: const Icon(
                                                     Icons.open_in_new))
                                           ],
@@ -265,16 +288,32 @@ class DetailCommandeView extends GetView<CommandeController> {
                         child: ListTile(
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 5),
-                          leading: const Icon(
-                            Icons.monetization_on,
-                            color: Colors.grey,
+                          leading: IconButton(
+                              padding: const EdgeInsets.all(0),
+                              onPressed: () {
+                                controller.changePrice(commande,
+                                    context: context);
+                              },
+                              icon: Icon(
+                                commande.prix != 0 &&
+                                        !userController.isTailleur.value
+                                    ? Icons.monetization_on
+                                    : Icons.edit,
+                                color: Colors.grey,
+                              )),
+                          title: GetBuilder<CommandeController>(
+                            init: CommandeController(),
+                            initState: (_) {},
+                            builder: (_) {
+                              return Text('Prix: ${commande.prix} FCFA',
+                                  style: const TextStyle(fontSize: 15));
+                            },
                           ),
-                          title: Text('Prix: ${commande.prix} FCFA',
-                              style: const TextStyle(fontSize: 16)),
                           subtitle: const Text(
                             'Avance: 0 FCFA',
                             style: TextStyle(
                               color: Colors.grey,
+                              fontSize: 13,
                             ),
                           ),
                           trailing: TextButton.icon(

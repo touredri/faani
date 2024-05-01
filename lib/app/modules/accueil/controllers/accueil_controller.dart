@@ -1,3 +1,4 @@
+import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/categorie_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -15,6 +16,7 @@ class AccueilController extends GetxController {
   final List<String> listId = <String>[];
   String sewing = 'assets/svg/sewingp.svg';
   late final Widget sewingIcon;
+  final selectedTailleur = Rx<UserModel?>(null);
 
   AccueilController() {
     sewingIcon = SvgPicture.asset(
@@ -72,7 +74,6 @@ class AccueilController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // getCategories();
   }
 
   @override

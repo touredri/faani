@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-class DiscussionView extends GetView {
+class DiscussionView extends GetView<MessageController> {
   const DiscussionView({super.key});
   @override
   Widget build(BuildContext context) {
-    final MessageController controller = Get.put(MessageController());
+    Get.put(MessageController());
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -51,7 +51,7 @@ class DiscussionView extends GetView {
         children: [
           // Expanded(
           //   // make the whatsapp like chat screen
-            
+
           // ),
           Container(
             padding: const EdgeInsets.all(10),

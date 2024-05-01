@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/services/suivi_etat_service.dart';
+import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
+import 'package:faani/app/modules/home/controllers/home_controller.dart';
+import 'package:get/get.dart';
 import '../../firebase/global_function.dart';
 
 class CommandeService {
@@ -16,8 +19,23 @@ class CommandeService {
 
   // get all commande
   Stream<List<Commande>> getAllCommande() {
+    if (Get.find<HomeController>().userController.isTailleur.value) {
+      return collection
+          .where('idTailleur',
+              isEqualTo: Get.find<HomeController>()
+                  .userController
+                  .currentUser
+                  .value
+                  .id)
+          .snapshots()
+          .map((snapshot) {
+        return snapshot.docs
+            .map((doc) => Commande.fromMap(doc.data(), doc.reference))
+            .toList();
+      });
+    }
     return collection
-        .where('idTailleur', isEqualTo: user!.uid)
+        .where('idUser', isEqualTo: user!.uid)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs

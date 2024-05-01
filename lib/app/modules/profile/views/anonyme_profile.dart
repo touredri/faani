@@ -1,13 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faani/app_state.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'app/data/models/modele_model.dart';
-import 'app/firebase/global_function.dart';
-import 'app/modules/globale_widgets/modele_card.dart';
-import 'app/style/my_theme.dart';
+import '../../../data/models/modele_model.dart';
+import '../../../firebase/global_function.dart';
+import '../../globale_widgets/modele_card.dart';
+import '../../../style/my_theme.dart';
 
 class AnonymeProfile extends StatefulWidget {
   const AnonymeProfile({super.key});

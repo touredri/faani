@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 import '../controllers/profile_controller.dart';
 
 class ChangeLanguage extends GetView<ProfileController> {
-  ChangeLanguage({super.key});
-  final ProfileController controller = Get.put(ProfileController());
+  const ChangeLanguage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Get.put(ProfileController());
     return Scaffold(
       appBar: primaryBackAppBar('Paramète de langue'),
       body: ListView(

@@ -1,9 +1,8 @@
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/comment_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-import 'package:faani/firebase_get_all_data.dart';
 import 'package:faani/src/message_modal.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -44,7 +43,7 @@ Widget iconMessage(Modele modele, BuildContext context) {
                 return Container(
                   height: 600,
                   padding: const EdgeInsets.only(top: 20, left: 8, right: 8),
-                  child: MessageModal(
+                  child: CommentModal(
                     idModele: modele.id!,
                   ),
                 );
@@ -57,7 +56,7 @@ Widget iconMessage(Modele modele, BuildContext context) {
         ),
       ),
       StreamBuilder<int>(
-        stream: getNombreMessage(modele.id!),
+        stream: CommentService().getNombreMessage(modele.id!),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Text('${snapshot.data}',

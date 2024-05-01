@@ -42,7 +42,6 @@ class SuiviEtatService {
 
   // update etat by id
   Future<void> updateSuiviEtat(SuiviEtat suiviEtat) async {
-    print(suiviEtat.toMap());
     await collection.doc(suiviEtat.id).update(suiviEtat.toMap());
   }
 

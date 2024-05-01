@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import '../controllers/search_page_controller.dart';
 
 class SearchPageView extends GetView<SearchPageController> {
-  const SearchPageView({Key? key}) : super(key: key);
+  const SearchPageView({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final SearchPageController controller = Get.put(SearchPageController());
+    Get.put(SearchPageController());
     return Scaffold(
       appBar: AppBar(
         title: SizedBox(

@@ -22,7 +22,7 @@ class MesureListTile extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            title: Text(name, style: const TextStyle(fontSize: 18)),
+            title: Text(name, style: const TextStyle(fontSize: 16)),
             trailing: SizedBox(
               width: 110,
               child: Row(

@@ -2,6 +2,7 @@ import 'package:faani/app/modules/accueil/views/accueil_view.dart';
 import 'package:faani/app/modules/commande/views/commande_view.dart';
 import 'package:faani/app/modules/favorie/views/favorie_view.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
+import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:faani/app/modules/profile/views/profile_view.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,19 +37,19 @@ class HomeController extends GetxController {
   List<PersistentTabConfig> tabs() => [
         PersistentTabConfig(
           screen: const AccueilView(),
-          // item: ItemConfig(
-          //   activeForegroundColor: primaryColor,
-          //   icon: const Icon(Icons.home),
-          // ),
           item: ItemConfig(
             activeForegroundColor: primaryColor,
-            icon: dressIcon,
-            inactiveIcon: SvgPicture.asset(
-              dress,
-              width: 26,
-              height: 24,
-            ),
+            icon: const Icon(Icons.home),
           ),
+          // item: ItemConfig(
+          //   activeForegroundColor: primaryColor,
+          //   icon: dressIcon,
+          //   inactiveIcon: SvgPicture.asset(
+          //     dress,
+          //     width: 26,
+          //     height: 24,
+          //   ),
+          // ),
         ),
         PersistentTabConfig(
           screen: const CommandeView(),
@@ -63,17 +64,19 @@ class HomeController extends GetxController {
             ),
           ),
         ),
-        if (userController.isTailleur.value)
-          PersistentTabConfig(
-            screen: const AjoutModeleView(),
-            item: ItemConfig(
-              activeForegroundColor: Color.fromARGB(255, 238, 250, 255)!,
-              icon: const Icon(
-                Icons.add,
-                color: primaryColor,
-              ),
+        // if (userController.isTailleur.value)
+        PersistentTabConfig(
+          screen: userController.isTailleur.value
+              ? const AjoutModeleView()
+              : const AjoutMesure(),
+          item: ItemConfig(
+            activeForegroundColor: const Color.fromARGB(255, 238, 250, 255),
+            icon: const Icon(
+              Icons.add,
+              color: primaryColor,
             ),
           ),
+        ),
         PersistentTabConfig(
           screen: const FavorieView(),
           item: ItemConfig(

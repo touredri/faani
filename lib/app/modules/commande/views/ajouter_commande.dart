@@ -44,28 +44,9 @@ class AjoutCommandePage extends GetView<CommandeController> {
     }
   }
 
-  //upload photo habit to firebase storage
-  Future<List<Map<String, String>>> uploadPhoto(XFile image) async {
-    List<Map<String, String>> imageInfo = [];
-    if (image.path.isNotEmpty) {
-      final File file = File(image.path);
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('photosHabit')
-          .child(file.path.split('/').last);
-      await ref.putFile(file);
-      final url = await ref.getDownloadURL();
-      imageInfo.add({
-        'downloadUrl': url,
-        'path': ref.fullPath,
-      });
-    }
-    return imageInfo;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final CommandeController controller = Get.put(CommandeController());
+    Get.put(CommandeController());
     final MesureService mesureService = MesureService();
     final bool isTailleur = controller.userController.isTailleur.value;
     return Scaffold(
@@ -94,7 +75,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
                     'Habit à coudre',
                     style: TextStyle(
                       // color: primaryColor,
-                      fontSize: 17,
+                      fontSize: 18,
                     ),
                   ),
                   const SizedBox(width: 50),
@@ -235,7 +216,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
                           context: context,
                           initialDate: DateTime.now(),
                           firstDate: DateTime.now(),
-                          lastDate: DateTime(DateTime.now().year + 5),
+                          lastDate: DateTime(DateTime.now().year + 2),
                         );
                         if (date != null) {
                           // Format the date as you want and set it to the controller
@@ -280,57 +261,14 @@ class AjoutCommandePage extends GetView<CommandeController> {
                         ),
                       ),
                     7.hs,
-                    ElevatedButton(
-                      onPressed: () async {
-                        List<Map<String, String>> imageInfo =
-                            await uploadPhoto(controller.image.value!);
-                        final Commande newCommande = Commande(
-                          idMesure: controller.mesure.value!.id!,
-                          idModele: modele.id!,
-                          isSelfAdded: isTailleur ? true : false,
-                          idTailleur: isTailleur
-                              ? controller.userController.currentUser.value.id!
-                              : '', // put the name of the selected tailleur by the user
-                          numeroClient: isTailleur
-                              ? int.parse(controller.numeroController.text)
-                              : int.parse(controller.userController.currentUser
-                                  .value.phoneNumber!),
-                          nomClient: isTailleur
-                              ? controller.nomController.text
-                              : controller
-                                  .userController.currentUser.value.nomPrenom!,
-                          photoHabit: imageInfo[0]['downloadUrl']!,
-                          refPhotoHabit: imageInfo[0]['path']!,
-                          prix: int.parse(controller.prixController.text),
-                          idCategorie: modele.idCategorie!,
-                          modeleImage: modele.fichier[0]!,
-                          id: '',
-                          datePrevue:
-                              DateTime.parse(controller.selectedDate.value),
-                          dateModifier:
-                              DateTime.parse(controller.selectedDate.value),
-                        );
-                        final SuiviEtat newSuiviEtat = SuiviEtat(
-                          id: '',
-                          idCommande: newCommande.id!,
-                          idEtat: '1',
-                          date: Timestamp.fromDate(DateTime.now()),
-                        );
-                        newCommande.create();
-                        SuiviEtatService().createSuiviEtat(
-                            newSuiviEtat); // create a new suivi etat
-                        // clear the form and image and an animated show a success message
-                        controller.clearForm();
-                        successDialog(
-                            context: context,
-                            successMessage: 'Parfait👍, Ajouter avec succès',
-                            onButtonPressed: () {
-                              Get.back();
-                              Get.back();
-                              Get.back();
-                            });
-                      },
-                      child: Text(isTailleur ? 'Enregistrer' : 'Envoyer'),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          controller.createCommande(modele, context);
+                        },
+                        child: Text(isTailleur ? 'Enregistrer' : 'Envoyer'),
+                      ),
                     ),
                   ],
                 ),

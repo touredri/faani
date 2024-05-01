@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'app/firebase/global_function.dart';
 import 'app/modules/home/controllers/user_controller.dart';
 import 'app/routes/app_pages.dart';
@@ -26,6 +27,7 @@ void main() async {
     final UserController userController = Get.put(UserController());
     await userController.init();
   }
+  await initializeDateFormatting();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(const FaaniApp());

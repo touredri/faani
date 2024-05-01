@@ -1,40 +1,38 @@
-import 'package:faani/firebase_get_all_data.dart';
+import 'package:faani/app/data/services/comment_service.dart';
+import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
-
-import '../app/data/models/message.dart';
+import '../app/data/models/comment_modele.dart';
 import '../app/firebase/global_function.dart';
 
-class MessageModal extends StatefulWidget {
+class CommentModal extends StatefulWidget {
   final String idModele;
-  const MessageModal({super.key, required this.idModele});
+  const CommentModal({super.key, required this.idModele});
 
   @override
-  State<MessageModal> createState() => _MessageModalState();
+  State<CommentModal> createState() => _CommentModalState();
 }
 
-class _MessageModalState extends State<MessageModal> {
-  // final User? user = FirebaseAuth.instance.currentUser;
+class _CommentModalState extends State<CommentModal> {
   @override
   void initState() {
     super.initState();
   }
 
-  Stream<List<Message>> _loadData() async* {
-    await for (var event in getAllMessage(widget.idModele)) {
-      var messages = <Message>[];
-      for (var message in event) {
-        // var message = Message.fromMap(messageData, messageData.reference);
-        if (message.userType == 'client') {
-          var user = await getClient(message.idUser!);
-          message.client = user;
-        } else if (message.userType == 'tailleur') {
-          var user = await getTailleur(message.idUser!);
-          message.tailleur = user;
+  Stream<List<Comment>> _loadData() async* {
+    await for (var event in CommentService().getAllMessage(widget.idModele)) {
+      var comments = <Comment>[];
+      for (var comment in event) {
+        if (comment.role == 'client') {
+          var user = await UserService().getUser(comment.idUser!);
+          comment.client = user;
+        } else if (comment.role == 'tailleur') {
+          var user = await UserService().getUser(comment.idUser!);
+          comment.tailleur = user;
         }
-        messages.add(message);
+        comments.add(comment);
       }
-      yield messages;
+      yield comments;
     }
   }
 
@@ -42,7 +40,7 @@ class _MessageModalState extends State<MessageModal> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Message>>(
+    return StreamBuilder<List<Comment>>(
       stream: _loadData(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -57,9 +55,9 @@ class _MessageModalState extends State<MessageModal> {
                     shrinkWrap: true,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      var message = snapshot.data![index];
+                      var comment = snapshot.data![index];
                       final String imgUrl = getRandomProfileImageUrl();
-                      if (message.userType == 'client') {
+                      if (comment.role == 'client') {
                         return Row(
                           children: [
                             CircleAvatar(
@@ -68,11 +66,11 @@ class _MessageModalState extends State<MessageModal> {
                             Expanded(
                               child: ListTile(
                                 title: Text(
-                                  message.message!,
+                                  comment.comment!,
                                   style: TextStyle(color: primaryColor),
                                 ),
                                 subtitle:
-                                    Text('par ${message.client!.nomPrenom}'),
+                                    Text('par ${comment.client!.nomPrenom}'),
                               ),
                             ),
                           ],
@@ -83,11 +81,11 @@ class _MessageModalState extends State<MessageModal> {
                           Expanded(
                             child: ListTile(
                               title: Text(
-                                message.message!,
+                                comment.comment!,
                                 style: TextStyle(color: primaryColor),
                               ),
                               subtitle:
-                                  Text('By ${message.tailleur!.nomPrenom}'),
+                                  Text('By ${comment.tailleur!.nomPrenom}'),
                             ),
                           ),
                           CircleAvatar(
@@ -121,13 +119,13 @@ class _MessageModalState extends State<MessageModal> {
                   ),
                   IconButton(
                     onPressed: () {
-                      final Message message = Message(
+                      final Comment comment = Comment(
                           idUser: auth.currentUser!.uid,
                           idModele: widget.idModele,
-                          message: _controller.text,
-                          userType: 'client',
+                          comment: _controller.text,
+                          role: 'client',
                           id: '');
-                      message.createMessage();
+                      comment.createComment();
                       _controller.clear();
                     },
                     icon: auth.currentUser!.isAnonymous

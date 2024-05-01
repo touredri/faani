@@ -1,6 +1,7 @@
 // Pop up list mesures to select
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
+import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
@@ -19,16 +20,17 @@ Future<void> mesuresPopUp(
         Animation secondaryAnimation) {
       return AlertDialog(
         contentPadding: const EdgeInsets.all(5),
-        insetPadding: const EdgeInsets.all(10),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 10),
         content: SizedBox(
           height: MediaQuery.of(context).size.height * 0.8,
           width: MediaQuery.of(context).size.width * 0.9,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              elevation: 0,
+              title: Row(
                 children: [
-                  // 1.hs,
                   const Expanded(
                     child: SizedBox(
                       height: 40,
@@ -46,8 +48,8 @@ Future<void> mesuresPopUp(
                   ),
                   2.ws,
                   Container(
-                      height: 30,
-                      width: 30,
+                      height: 40,
+                      width: 40,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -59,24 +61,33 @@ Future<void> mesuresPopUp(
                           onPressed: () {
                             Get.to(() => const AjoutMesure());
                           },
-                          icon: const Icon(Icons.add))),
+                          icon: const Icon(
+                            Icons.add,
+                            color: primaryColor,
+                          ))),
                 ],
               ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: mesures.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                      title: Text(mesures[index].nom!),
-                      onTap: () {
-                        onMesureSelected(mesures[index]);
-                        Get.back();
-                      },
-                    );
+            ),
+            body: ListView.builder(
+              itemCount: mesures.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(
+                    mesures[index].nom!,
+                    style: const TextStyle(fontSize: 17),
+                  ),
+                  subtitle: Text(
+                    mesures[index].updateDate!.toString().split(' ')[0],
+                    style: TextStyle(
+                        color: Colors.black.withOpacity(0.5), fontSize: 14),
+                  ),
+                  onTap: () {
+                    onMesureSelected(mesures[index]);
+                    Get.back();
                   },
-                ),
-              ),
-            ],
+                );
+              },
+            ),
           ),
         ),
       );

@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/services/favorite_service.dart';
 import 'package:flutter/material.dart';
-import '../../../anonyme_profile.dart';
-import '../../../widgets/widgets.dart';
+import '../profile/views/anonyme_profile.dart';
 import '../../firebase/global_function.dart';
 import '../../style/my_theme.dart';
 
@@ -61,10 +60,12 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
 
   void createFavorie() async {
     if (user!.isAnonymous) {
-      showSuccessDialog(
-          context,
-          'Vous devez vous connecter pour ajouter ce modèle à vos favoris',
-          AnonymeProfile());
+      // make
+      // showSuccessDialog(
+      //     context,
+      //     'Vous devez vous connecter pour ajouter ce modèle à vos favoris',
+      //     AnonymeProfile()
+      //     );
       return;
     }
     FavorieService().create(widget.docId);
@@ -72,10 +73,10 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
 
   void deleteFavorie() async {
     if (user!.isAnonymous) {
-      showSuccessDialog(
-          context,
-          'Vous devez vous connecter pour ajouter ce modèle à vos favoris',
-          AnonymeProfile());
+      // showSuccessDialog(
+      //     context,
+      //     'Vous devez vous connecter pour ajouter ce modèle à vos favoris',
+      //     AnonymeProfile());
       return;
     }
     FavorieService().delete(widget.docId);
@@ -106,7 +107,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
             size: 30,
           ),
         ),
-        Text(count.toString(), style: const TextStyle(color: Colors.grey)),
+        Text(count.toString(), style: const TextStyle(color: Colors.white)),
       ],
     );
   }

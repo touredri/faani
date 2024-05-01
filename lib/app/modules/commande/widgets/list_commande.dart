@@ -1,3 +1,4 @@
+import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/views/detail_commande_view.dart';
 import 'package:faani/app/data/models/commande_model.dart';
@@ -31,7 +32,6 @@ class ListCommande extends StatelessWidget {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    print(snapshot.error);
                     return Text('Error1: ${snapshot.error}');
                   } else if (!snapshot.hasData || snapshot.data.isEmpty) {
                     return Center(
@@ -79,6 +79,7 @@ class ListCommande extends StatelessWidget {
                                 } else if (result.hasError) {
                                   return Text('Error2: ${result.error}');
                                 } else {
+                                  final tailleur = result.data![0] as UserModel;
                                   return GestureDetector(
                                     onTap: () {
                                       Get.to(
@@ -88,9 +89,12 @@ class ListCommande extends StatelessWidget {
                                     },
                                     child: CommandeContainer(
                                       imageUrl: commande[index].modeleImage,
-                                      nomPrenom: commande[index].nomClient,
+                                      nomPrenom: controller
+                                              .userController.isTailleur.value
+                                          ? commande[index].nomClient
+                                          : tailleur.nomPrenom!,
                                       dateCommande:
-                                          commande[index].dateAjout.toString(),
+                                          commande[index].dateAjout,
                                       etat: commande[index].etatLibelle,
                                     ),
                                   );

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Mesure {
   int? bras, epaule, hanche, longueur, poitrine, taille, ventre, poignet;
   String? idUser, nom, id;
-  DateTime? date;
+  DateTime? date, updateDate;
 
   Mesure({
     required this.bras,
@@ -18,6 +18,7 @@ class Mesure {
     required this.ventre,
     required this.poignet,
     required this.date,
+    this.updateDate,
   });
 
   Map<String, dynamic> toMap() {
@@ -33,6 +34,7 @@ class Mesure {
       'ventre': ventre,
       'poignet': poignet,
       'date': date,
+      'updateDate': updateDate ?? Timestamp.now(),
     };
   }
 
@@ -51,6 +53,7 @@ class Mesure {
       ventre: map['ventre'],
       poignet: map['poignet'],
       date: (map['date'] as Timestamp).toDate(),
+      updateDate: (map['updateDate'] as Timestamp).toDate(),
     );
   }
 

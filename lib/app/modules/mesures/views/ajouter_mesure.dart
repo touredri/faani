@@ -19,7 +19,10 @@ class AjoutMesure extends GetView {
           children: [
             SizedBox(
                 height: MediaQuery.of(context).size.height * 0.6,
-                child: Image.asset('/assets/images/measurement.png')),
+                child: Image.asset(
+                  'assets/images/measurement.png',
+                  width: double.infinity,
+                )),
             Padding(
               padding: const EdgeInsets.all(
                 20,
@@ -29,7 +32,7 @@ class AjoutMesure extends GetView {
                   TextButton(
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => MesurePaveView()));
+                            builder: (context) => const MesurePaveView()));
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -55,6 +58,7 @@ class AjoutMesure extends GetView {
                           ],
                         ),
                       )),
+                  2.hs,
                   TextButton(
                       onPressed: () {
                         showDialog(

@@ -1,5 +1,6 @@
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
+import 'package:faani/app/modules/commande/views/list_tailleur_view.dart';
 import 'package:faani/app/modules/commande/widgets/choose_modele.dart';
 import 'package:faani/app/modules/globale_widgets/animated_seach.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
@@ -11,7 +12,6 @@ import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:faani/app/modules/commande/widgets/circle_indicator.dart';
 import 'package:faani/app/modules/commande/widgets/list_commande.dart';
-import 'package:faani/pages/commande/widget/tailleurs.dart';
 
 class CommandeView extends StatefulWidget {
   const CommandeView({super.key});
@@ -127,7 +127,7 @@ class _CommandeViewState extends State<CommandeView>
             ),
             controller.isTailleur.value
                 ? const ListCommande(status: 'save')
-                : const ListTailleur(),
+                : const ListTailleurView(),
             const ListCommande(
               status: 'finish',
             ),
@@ -155,15 +155,16 @@ class _CommandeViewState extends State<CommandeView>
                 },
                 child: const Icon(Icons.sms, color: Colors.white),
               ),
-              2.5.hs,
-              FloatingActionButton(
-                heroTag: "fab2",
-                onPressed: () {
-                  Get.to(() => const ChooseModeleView(),
-                      transition: Transition.downToUp);
-                },
-                child: const Icon(Icons.add),
-              ),
+              if (controller.isTailleur.value) 2.5.hs,
+              if (controller.isTailleur.value)
+                FloatingActionButton(
+                  heroTag: "fab2",
+                  onPressed: () {
+                    Get.to(() => const ChooseModeleView(),
+                        transition: Transition.downToUp);
+                  },
+                  child: const Icon(Icons.add),
+                ),
             ],
           ),
         ),

@@ -35,7 +35,7 @@ class AjoutModeleController extends GetxController {
     }
     if (pickedImages.isEmpty) return; // Handle no selection case
     final List<XFile> newImages = [];
-    final int totalModeleCount = await ModeleService().getTotalModeleCount();
+    // final int totalModeleCount = await ModeleService().getTotalModeleCount();
     for (final XFile image in pickedImages) {
       final Uint8List bytes = await image.readAsBytes();
       final editedImage = await pushWithoutNavBar(
@@ -45,8 +45,8 @@ class AjoutModeleController extends GetxController {
       if (editedImage != null) {
         // Save the edited image to a temporary file
         final tempDir = await getTemporaryDirectory();
-        final tempFile =
-            File('${tempDir.path}/modele${totalModeleCount + 1}.jpg');
+        final tempFile = File(
+            '${tempDir.path}/modele${DateTime.now().millisecondsSinceEpoch}.jpg');
         await tempFile.writeAsBytes(editedImage);
         newImages.add(XFile(tempFile.path));
       }

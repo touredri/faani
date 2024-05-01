@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/app/data/services/comment_service.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
-import 'package:faani/firebase_get_all_data.dart';
+import 'package:faani/app/modules/globale_widgets/list_tailleur_bottom_sheet.dart';
+import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/src/message_modal.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +17,7 @@ class HomeItem extends GetView<AccueilController> {
 
   @override
   Widget build(BuildContext context) {
-    final AccueilController controller = Get.put(AccueilController());
+    Get.put(AccueilController());
     return Stack(
       children: [
         Column(
@@ -78,8 +80,13 @@ class HomeItem extends GetView<AccueilController> {
               children: [
                 IconButton(
                   onPressed: () {
-                    Get.to(() => AjoutCommandePage(modele),
-                        transition: Transition.rightToLeft);
+                    final userController = Get.find<UserController>();
+                    if (userController.isTailleur.value) {
+                      Get.to(() => AjoutCommandePage(modele),
+                          transition: Transition.rightToLeft);
+                    } else {
+                      showTailleurModalBottomSheet(context, modele);
+                    }
                   },
                   icon: controller.sewingIcon,
                 ),
@@ -102,7 +109,7 @@ class HomeItem extends GetView<AccueilController> {
                                 height: 600,
                                 padding: const EdgeInsets.only(
                                     top: 20, left: 8, right: 8),
-                                child: MessageModal(
+                                child: CommentModal(
                                   idModele: modele.id!,
                                 ),
                               );
@@ -115,7 +122,7 @@ class HomeItem extends GetView<AccueilController> {
                       ),
                     ),
                     StreamBuilder<int>(
-                      stream: getNombreMessage(modele.id!),
+                      stream: CommentService().getNombreMessage(modele.id!),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           return Text('${snapshot.data}',

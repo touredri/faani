@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/modules/globale_widgets/shimmer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import '../../../style/my_theme.dart';
 
 class CommandeContainer extends StatelessWidget {
   final String imageUrl;
   final String? nomPrenom;
-  final String dateCommande;
+  final DateTime dateCommande;
   final String etat;
 
   const CommandeContainer({
@@ -19,13 +21,11 @@ class CommandeContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.black.withOpacity(0.1)),
-          color: Colors.grey.withOpacity(0.2)),
-      child: Stack(
-        children: [
-          CachedNetworkImage(
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          child: CachedNetworkImage(
             width: double.infinity,
             height: double.infinity,
             imageUrl: imageUrl,
@@ -33,48 +33,53 @@ class CommandeContainer extends StatelessWidget {
             colorBlendMode: BlendMode.darken,
             placeholder: (context, url) => shimmer(),
           ),
-          Container(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: 80,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.4),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  )),
-              child: Column(
-                children: [
-                  Text(
-                    nomPrenom!,
-                    style: const TextStyle(
-                      color: Colors.white,
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            height: 80,
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.4),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                  bottomLeft: Radius.circular(7),
+                  bottomRight: Radius.circular(7),
+                )),
+            child: Column(
+              children: [
+                Text(
+                  nomPrenom!,
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  DateFormat('EEEE d MMMM y', 'fr_FR')
+                      .format(dateCommande)
+                      .toString(),
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(top: 7),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Text(
+                      etat,
+                      style: const TextStyle(color: primaryColor, fontSize: 13),
                     ),
                   ),
-                  Text(
-                    dateCommande.substring(0, 10),
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(top: 7),
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12)),
-                      child: Text(
-                        etat,
-                        style: const TextStyle(color: primaryColor, fontSize: 13),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

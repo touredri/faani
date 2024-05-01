@@ -22,9 +22,7 @@ class DetailModeleView extends GetView<DetailModeleController> {
 
   @override
   Widget build(BuildContext context) {
-    // final DetailModeleController controller =
-    //     Get.find<DetailModeleController>();
-    final DetailModeleController controller = Get.put(DetailModeleController());
+    Get.put(DetailModeleController());
     final String imgUrl = getRandomProfileImageUrl();
     return FutureBuilder(
         future: controller.getModeleOwner(modele.idTailleur),

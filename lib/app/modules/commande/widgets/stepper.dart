@@ -120,50 +120,42 @@ class _MyStepState extends State<MyStep> {
                       ),
                     ],
                     onStepReached: (index) => {
-                          if (userController.isTailleur.value)
+                          if (userController.isTailleur.value &&
+                              widget.commande.idTailleur ==
+                                  userController.currentUser.value.id)
                             {
                               if (index == 0)
                                 {
                                   widget.commande.etatLibelle = 'En cours',
                                   currentSuiviEtat.value!.idEtat = '1',
-                                  currentSuiviEtat.value!.dateModifier =
-                                      Timestamp.fromDate(DateTime.now()),
                                 }
                               else if (index == 1)
                                 {
                                   widget.commande.etatLibelle = 'Decoupes',
                                   currentSuiviEtat.value!.idEtat = '2',
-                                  currentSuiviEtat.value!.dateModifier =
-                                      Timestamp.fromDate(DateTime.now()),
                                 }
                               else if (index == 2)
                                 {
                                   widget.commande.etatLibelle = 'assemblage',
                                   currentSuiviEtat.value!.idEtat = '3',
-                                  currentSuiviEtat.value!.dateModifier =
-                                      Timestamp.fromDate(DateTime.now()),
                                 }
                               else if (index == 3)
                                 {
                                   widget.commande.etatLibelle = 'Paiement',
                                   currentSuiviEtat.value!.idEtat = '4',
-                                  currentSuiviEtat.value!.dateModifier =
-                                      Timestamp.fromDate(DateTime.now()),
                                 }
                               else if (index == 4)
                                 {
                                   widget.commande.etatLibelle = 'Recuperer',
                                   currentSuiviEtat.value!.idEtat = '5',
-                                  currentSuiviEtat.value!.dateModifier =
-                                      Timestamp.fromDate(DateTime.now()),
                                 }
                               else if (index == 5)
                                 {
                                   widget.commande.etatLibelle = 'Terminer',
                                   currentSuiviEtat.value!.idEtat = '6',
-                                  currentSuiviEtat.value!.dateModifier =
-                                      Timestamp.fromDate(DateTime.now()),
                                 },
+                              currentSuiviEtat.value!.dateModifier =
+                                  Timestamp.fromDate(DateTime.now()),
                               SuiviEtatService()
                                   .updateSuiviEtat(currentSuiviEtat.value!),
                               updateCommande(),

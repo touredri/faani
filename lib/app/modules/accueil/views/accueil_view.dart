@@ -12,7 +12,7 @@ class AccueilView extends GetView<AccueilController> {
 
   @override
   Widget build(BuildContext context) {
-    final AccueilController controller = Get.put(AccueilController());
+    Get.put(AccueilController());
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,

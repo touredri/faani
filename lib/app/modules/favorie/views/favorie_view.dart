@@ -12,7 +12,7 @@ class FavorieView extends GetView<FavorieController> {
 
   @override
   Widget build(BuildContext context) {
-    final FavorieController controller = Get.put(FavorieController());
+    Get.put(FavorieController());
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
