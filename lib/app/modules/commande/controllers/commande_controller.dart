@@ -1,24 +1,21 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/suivi_etat_model.dart';
-import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:faani/app/data/services/users_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/globale_widgets/animated_pop_up.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 
 class CommandeController extends GetxController {
   final UserController userController = Get.find();
@@ -58,6 +55,7 @@ class CommandeController extends GetxController {
     return modeleService
         .getAllModeleByTailleurId(userController.currentUser.value.id!)
         .map((event) {
+      modeles.clear();
       modeles.addAll(event);
       return modeles;
     });
@@ -252,5 +250,15 @@ class CommandeController extends GetxController {
       );
     }
     update();
+  }
+
+  void acceptCommande(Commande commande) async {
+    if (userController.isTailleur.value && user!.uid == commande.idTailleur) {
+      await FirebaseFirestore.instance
+          .collection('commandes')
+          .doc(commande.id)
+          .update({'isAccepted': true});
+      update();
+    }
   }
 }

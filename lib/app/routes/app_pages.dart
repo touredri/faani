@@ -75,8 +75,8 @@ class AppPages {
       binding: AjoutModeleBinding(),
     ),
     // GetPage(
-    //   name: _Paths.AJOUT_COMMANDE,
-    //   page: () => const AjoutCommandeView(),
+    //   name: _Paths.MESSAGEVIEW,
+    //   page: () => const MessageView(),
     //   binding: AjoutCommandeBinding(),
     // ),
     GetPage(

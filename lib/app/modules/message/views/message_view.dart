@@ -1,15 +1,19 @@
-// import 'package:faani/app/modules/globale_widgets/animated_seach.dart';
-import 'package:faani/app/modules/message/views/discussion_view.dart';
+import 'package:faani/app/data/models/message_modele.dart';
+import 'package:faani/app/data/services/users_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../controllers/message_controller.dart';
 
 class MessageView extends GetView<MessageController> {
-  const MessageView({Key? key}) : super(key: key);
+  const MessageView({super.key});
+
   @override
   Widget build(BuildContext context) {
-    // final controller = Get.put(MessageController());
+    Get.put(MessageController());
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -43,56 +47,67 @@ class MessageView extends GetView<MessageController> {
           )
         ],
       ),
-      body: ListView.builder(
-          itemBuilder: (context, index) {
-            return ListTile(
-              leading: const CircleAvatar(
-                radius: 35,
-                backgroundImage: AssetImage('assets/images/ic_launcher.png'),
-              ),
-              title: Text('Discussion $index'),
-              subtitle: const Text(
-                'Votre message ici ...',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              trailing: const Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SizedBox(
-                    height: 20,
-                    width: 50,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.check,
-                          size: 15,
-                          color: Colors.grey,
-                        ),
-                        Text('12:00'),
-                      ],
-                    ),
+      body: StreamBuilder<List<MessageModel>>(
+        stream: controller.getMessages(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            return ListView.builder(
+              itemBuilder: (context, index) {
+                final message = snapshot.data![index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    radius: 35,
+                    child: imageCacheNetwork(context, message.modele_img!),
                   ),
-                  CircleAvatar(
-                    radius: 10,
-                    backgroundColor: Colors.green,
-                    child: Text(
-                      '2',
-                      textAlign: TextAlign.end,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  )
-                ],
-              ),
-              onTap: () {
-                Get.to(
-                  () => const DiscussionView(),
-                  transition: Transition.rightToLeftWithFade,
+                  title: Text(user!.uid == message.to_id!
+                      ? message.from_name!
+                      : message.to_name!),
+                  subtitle: Text(
+                    message.last_msg!,
+                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      SizedBox(
+                        height: 20,
+                        width: 52,
+                        child: Row(
+                          children: [
+                            Text(
+                              DateFormat('HH:mm', 'fr_FR')
+                                  .format(message.last_time!.toDate())
+                                  .toString(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.check,
+                        size: 19,
+                        color: Colors.grey,
+                      )
+                    ],
+                  ),
+                  onTap: () async {
+                    final to_user = await UserService().getUser(
+                        user!.uid == message.to_id!
+                            ? message.from_id!
+                            : message.to_id!);
+                    controller.goChat(to_user);
+                  },
+                  minVerticalPadding: 15,
                 );
               },
-              minVerticalPadding: 15,
+              itemCount: snapshot.data!.length,
             );
-          },
-          itemCount: 10),
+          }
+        },
+      ),
     );
   }
 }

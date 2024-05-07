@@ -17,7 +17,7 @@ class Commande {
   DateTime datePrevue, dateModifier;
   int? numeroClient;
   int prix;
-  bool isSelfAdded;
+  bool isSelfAdded, isAccepted;
 
   Commande({
     required this.id,
@@ -35,6 +35,7 @@ class Commande {
     required this.prix,
     required this.idCategorie,
     this.isSelfAdded = false,
+    this.isAccepted = false,
     this.etatLibelle = 'En cours',
     required this.modeleImage,
   }) : dateAjout = dateAjout ?? DateTime.now();
@@ -57,6 +58,7 @@ class Commande {
       prix: data['prix'],
       idCategorie: data['idCategorie'],
       isSelfAdded: data['isSelfAdded'],
+      isAccepted: data['isAccepted'],
       modeleImage: data['modeleImage'] ?? '',
       etatLibelle: data['etatLibele'] ?? 'En cours',
     );
@@ -78,6 +80,7 @@ class Commande {
       'prix': prix,
       'idCategorie': idCategorie,
       'isSelfAdded': isSelfAdded,
+      'isAccepted': isAccepted,
       'modeleImage': modeleImage,
       'etatLibele': etatLibelle,
     };

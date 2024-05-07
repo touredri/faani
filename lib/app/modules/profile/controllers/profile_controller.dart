@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/categorie_model.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -6,11 +8,13 @@ import '../../home/controllers/user_controller.dart';
 
 class ProfileController extends GetxController {
   UserController userController = Get.find();
-  RxString selectedClientCible = ''.obs;
+  RxString selectedGenreCible = ''.obs;
+  final TextEditingController nomPrenomController = TextEditingController();
+  final TextEditingController villeQuartierController = TextEditingController();
+  final TextEditingController telephoneController = TextEditingController();
   final selectedCategorie = Rx<Categorie?>(null);
   RxBool isTailleur = false.obs;
   RxString selectedLanguage = 'Français'.obs;
-  // RxList<Categorie> listCategorie = <Categorie>[].obs;
   final List<String> languages = [
     'Espagnol',
     'Allemand',
@@ -27,6 +31,8 @@ class ProfileController extends GetxController {
   late final Widget measureIcon;
   late final Widget becomeTailorIcon;
   late final Widget dressIcon;
+  RxBool isLoading = false.obs;
+
   ProfileController() {
     measureIcon = SvgPicture.asset(
       measure,
@@ -76,5 +82,30 @@ class ProfileController extends GetxController {
   @override
   void onClose() {
     super.onClose();
+  }
+
+  void updateProfile() async {
+    isLoading.value = true;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .update({
+          'nomPrenom': nomPrenomController.text.isEmpty
+              ? user!.displayName
+              : nomPrenomController.text,
+          'adress': villeQuartierController.text.isEmpty
+              ? userController.currentUser.value.adress
+              : villeQuartierController.text,
+          'sex': selectedGenreCible.value,
+        })
+        .then((value) => {
+              isLoading.value = false,
+              Get.snackbar('Succès', 'Profil mis à jour avec succès'),
+              Get.back(),
+            })
+        .catchError((error) {
+          isLoading.value = false;
+          Get.snackbar('Erreur', 'Erreur lors de la mise à jour du profil');
+        });
   }
 }

@@ -1,4 +1,7 @@
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
+import 'package:faani/app/modules/home/controllers/user_controller.dart';
+import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +34,11 @@ class SignUpView extends GetView<AuthController> {
                 ),
               ),
               7.hs, // select image profile
-              const BuildProfileImage(width: 100, height: 100, showIcon: true,),
+              const BuildProfileImage(
+                width: 100,
+                height: 100,
+                showIcon: true,
+              ),
               5.hs, // input name
               TextField(
                 controller: controller.nameController,
@@ -45,8 +52,23 @@ class SignUpView extends GetView<AuthController> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
-                        controller.saveUserInFirestore();
+                      onPressed: () async {
+                        final isUserExist = await controller.checkUserExists();
+                        if (isUserExist &&
+                            controller.nameController.text.isNotEmpty) {
+                          controller.updateUserName();
+                        } else if (isUserExist &&
+                            controller.nameController.text.isEmpty) {
+                          Get.snackbar(
+                            "Success",
+                            "Bienvenue ${auth.currentUser!.displayName} !",
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          controller.setUser();
+                          Get.to(() => HomeView());
+                        } else {
+                          controller.saveUserInFirestore();
+                        }
                       },
                       child: controller.loading.value
                           ? circularProgress()

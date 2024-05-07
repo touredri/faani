@@ -1,3 +1,4 @@
+import 'package:faani/app/data/services/notifications_service.dart';
 import 'package:faani/app/modules/accueil/views/accueil_view.dart';
 import 'package:faani/app/modules/commande/views/commande_view.dart';
 import 'package:faani/app/modules/favorie/views/favorie_view.dart';
@@ -95,6 +96,7 @@ class HomeController extends GetxController {
 
   @override
   void onInit() {
+    PushNotifications.getAndUpdateUserToken();
     super.onInit();
   }
 

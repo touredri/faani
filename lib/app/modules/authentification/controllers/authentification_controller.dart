@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -64,11 +65,10 @@ class AuthController extends GetxController {
             snackPosition: SnackPosition.BOTTOM,
           );
 
-          Get.to(() =>
-              SignUpView()); // navigate to sign up view after successful verification
+          Get.to(() => const SignUpView());
         },
         verificationFailed: (FirebaseAuthException e) {
-          // Handle verification failure
+          // print('********** ${e.message.toString()} **********');
           Get.snackbar(
             "Error",
             e.message.toString(),
@@ -81,7 +81,7 @@ class AuthController extends GetxController {
           this.verificationId.value = verificationId;
           isCodeSent.value = true;
           loading.value = false;
-          Get.to(() => OtpView()); // navigate to otp view to enter code
+          Get.to(() => const OtpView()); // navigate to otp view to enter code
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           // Handle auto-retrieval timeout
@@ -122,7 +122,7 @@ class AuthController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
       Get.to(() =>
-          SignUpView()); // navigate to sign up view after successful sign in
+          const SignUpView()); // navigate to sign up view after successful sign in
       loading.value = false;
     } catch (e) {
       Get.snackbar(
@@ -133,12 +133,22 @@ class AuthController extends GetxController {
     }
   }
 
+  // check if user exists in firestore and return true
+  Future<bool> checkUserExists() async {
+    final UserService usersService = UserService();
+    final UserModel? user = await usersService.getIfUser(auth.currentUser!.uid);
+    if (user != null) {
+      return true;
+    }
+    return false;
+  }
+
   // create user with its information
   void saveUserInFirestore() async {
-    if (nameController.text.isEmpty || nameController.text.length < 3) {
+    if (nameController.text.length < 3) {
       Get.snackbar(
         "Error",
-        "Please enter your name",
+        "S\'il vous plaît, entrez votre nom complet.",
         snackPosition: SnackPosition.BOTTOM,
         borderColor: Colors.red,
       );
@@ -149,6 +159,10 @@ class AuthController extends GetxController {
     await auth.currentUser!.updateDisplayName(
       nameController.text,
     );
+    if (auth.currentUser!.photoURL == null ||
+        auth.currentUser!.photoURL!.isEmpty) {
+      await auth.currentUser!.updatePhotoURL(defaultProfileImage);
+    }
     // Create a new user model
     final UserModel newUser = UserModel(
       id: auth.currentUser!.uid,
@@ -199,5 +213,24 @@ class AuthController extends GetxController {
   @override
   void onClose() {
     super.onClose();
+  }
+
+  void updateUserName() async {
+    await auth.currentUser!.updateDisplayName(
+      nameController.text,
+    );
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .update({
+      'nomPrenom': nameController.text,
+    });
+    Get.snackbar(
+      "Success",
+      "Welcome ${nameController.text} !",
+      snackPosition: SnackPosition.BOTTOM,
+    );
+    setUser();
+    Get.to(() => HomeView());
   }
 }

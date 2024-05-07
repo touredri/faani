@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/suivi_etat_model.dart';
@@ -9,10 +10,12 @@ import 'package:faani/app/modules/commande/widgets/image_pop_up.dart';
 import 'package:faani/app/modules/commande/widgets/stepper.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
+import 'package:faani/app/modules/message/controllers/message_controller.dart';
 import 'package:faani/app/modules/message/views/discussion_view.dart';
 import 'package:faani/app/modules/mesures/views/detail_mesure.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -42,9 +45,9 @@ class DetailCommandeView extends GetView<CommandeController> {
               } else {
                 Modele modele = result.data![2] as Modele;
                 UserModel tailleur = result.data![0] as UserModel;
-                // UserModel? client = result.data![1] != null
-                //     ? result.data![1] as UserModel
-                //     : null;
+                UserModel? client = result.data![1] != null
+                    ? result.data![1] as UserModel
+                    : null;
                 // SuiviEtat etat = result.data![3];
                 return SingleChildScrollView(
                   child: Column(
@@ -93,7 +96,11 @@ class DetailCommandeView extends GetView<CommandeController> {
                               const EdgeInsets.symmetric(horizontal: 5),
                           leading: CircleAvatar(
                             radius: 25,
-                            child: Image.network(imageUrl),
+                            child: imageCacheNetwork(
+                                context,
+                                controller.userController.isTailleur.value
+                                    ? client?.profileImage ?? imageUrl
+                                    : tailleur.profileImage!),
                           ),
                           title: Text(
                             controller.userController.isTailleur.value
@@ -118,14 +125,29 @@ class DetailCommandeView extends GetView<CommandeController> {
                                   ),
                                 ),
                               ),
-                              onPressed: () {},
-                              icon: const Icon(
+                              onPressed: () async {
+                                controller.acceptCommande(commande);
+                              },
+                              icon: Icon(
                                 Icons.check_circle_outline,
-                                color: Colors.grey,
+                                color: commande.isAccepted
+                                    ? Colors.green
+                                    : Colors.grey,
                               ),
-                              label: const Text(
-                                'Accepte',
-                                style: TextStyle(color: Colors.grey),
+                              label: GetBuilder<CommandeController>(
+                                init: CommandeController(),
+                                initState: (_) {},
+                                builder: (_) {
+                                  return Text(
+                                    commande.isAccepted
+                                        ? 'Accepter'
+                                        : 'En attente',
+                                    style: TextStyle(
+                                        color: commande.isAccepted
+                                            ? Colors.green
+                                            : Colors.grey),
+                                  );
+                                },
                               )),
                         ),
                       ),
@@ -198,6 +220,12 @@ class DetailCommandeView extends GetView<CommandeController> {
                                             fit: BoxFit.cover,
                                             height: double.infinity,
                                             width: 90,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    const Icon(
+                                              Icons.error,
+                                              color: Colors.red,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -219,14 +247,18 @@ class DetailCommandeView extends GetView<CommandeController> {
                                               init: CommandeController(),
                                               initState: (_) {},
                                               builder: (_) {
-                                                return Text(
-                                                  DateFormat('EEEE d MMMM y',
-                                                          'fr_FR')
-                                                      .format(
-                                                          commande.datePrevue)
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                    fontSize: 13,
+                                                return SizedBox(
+                                                  width: 130.sp,
+                                                  child: Text(
+                                                    DateFormat('EEEE d MMMM y',
+                                                            'fr_FR')
+                                                        .format(
+                                                            commande.datePrevue)
+                                                        .toString(),
+                                                    overflow: TextOverflow.clip,
+                                                    style: TextStyle(
+                                                      fontSize: 13.sp,
+                                                    ),
                                                   ),
                                                 );
                                               },
@@ -325,7 +357,14 @@ class DetailCommandeView extends GetView<CommandeController> {
                                 ),
                               ),
                               onPressed: () {
-                                Get.to(() => const DiscussionView());
+                                if (commande.isSelfAdded) {
+                                  Get.snackbar('Erreur',
+                                      'Vous ne pouvez pas discuter avec vous même',
+                                      snackPosition: SnackPosition.BOTTOM);
+                                } else {
+                                  MessageController().goChat(tailleur,
+                                      modeleImg: modele.fichier[0]!);
+                                }
                               },
                               icon: const Icon(
                                 Icons.message_outlined,

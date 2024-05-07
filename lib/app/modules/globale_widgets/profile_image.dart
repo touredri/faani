@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/app/data/models/users_model.dart';
+import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -79,6 +81,13 @@ class _BuildProfileImageState extends State<BuildProfileImage> {
 
       // Update the user's profile with the new image URL
       await user!.updatePhotoURL(imageUrl);
+
+      // Update the user's profile in Firestore if exists
+      final UserModel? checkUser = await UserService().getIfUser(user!.uid);
+      if(checkUser != null){
+        checkUser.profileImage = imageUrl;
+        await UserService().updateUser(user!.uid, checkUser);
+      }
 
       // Delete the old image from Firebase Storage
       if (oldImageUrl != null) {

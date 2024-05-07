@@ -8,6 +8,7 @@ class MessageModel {
       to_name,
       to_id,
       message,
+      modele_img,
       last_msg;
   int? msg_num;
   Timestamp? last_time;
@@ -20,6 +21,7 @@ class MessageModel {
     this.to_name,
     this.to_id,
     this.message,
+    this.modele_img,
     this.last_msg,
     this.msg_num = 0,
     this.last_time,
@@ -37,6 +39,7 @@ class MessageModel {
       to_avatar: data?['to_avatar'],
       to_name: data?['to_name'],
       to_id: data?['to_id'],
+      modele_img: data?['modele_img'],
       message: data?['message'],
       last_msg: data?['last_msg'],
       msg_num: data?['msg_num'],
@@ -53,9 +56,39 @@ class MessageModel {
       if (to_name != null) 'to_name': to_name,
       if (to_id != null) 'to_id': to_id,
       if (message != null) 'message': message,
+      if (modele_img != null) 'modele_img': modele_img,
       if (last_msg != null) 'last_msg': last_msg,
       if (msg_num != null) 'msg_num': msg_num,
       if (last_time != null) 'last_time': last_time,
+    };
+  }
+}
+
+class MsgContent {
+  final String? id, content, type;
+  final Timestamp? addtime;
+
+  MsgContent({ this.id, this.content, this.type, this.addtime});
+
+  factory MsgContent.fromMap(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+    return MsgContent(
+      id: data?['id'],
+      content: data?['content'],
+      type: data?['type'],
+      addtime: data?['addtime'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      if (id != null) 'id': id,
+      if (content != null) 'content': content,
+      if (type != null) 'type': type,
+      if (addtime != null) 'addtime': addtime,
     };
   }
 }

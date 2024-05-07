@@ -13,6 +13,13 @@ class UserService {
     DocumentSnapshot doc = await _usersRef.doc(id).get();
     return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
   }
+  Future<UserModel?> getIfUser(String id) async {
+    DocumentSnapshot doc = await _usersRef.doc(id).get();
+    if(doc.exists){
+      return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
+    }
+    return null;
+  }
 
   Future<void> updateUser(String id, UserModel user) {
     return _usersRef.doc(id).update(user.toMap());
@@ -29,5 +36,9 @@ class UserService {
         .map((event) => event.docs
             .map((e) => UserModel.fromMap(e.data() as Map<String, dynamic>, e.reference))
             .toList());
+  }
+
+  void updateUserToken(String uid, String? token) {
+    _usersRef.doc(uid).update({'token': token});
   }
 }

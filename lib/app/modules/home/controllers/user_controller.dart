@@ -15,4 +15,10 @@ class UserController extends GetxController {
       isTailleur.value = userModel.isTailleur;
     }
   }
+
+  updateUserToken(String? token) {
+    if (auth.currentUser != null) {
+      UserService().updateUserToken(auth.currentUser!.uid, token);
+    }
+  }
 }

@@ -18,7 +18,7 @@ class ChooseModeleView extends GetView<CommandeController> {
 
   @override
   Widget build(BuildContext context) {
-    final CommandeController controller = Get.put(CommandeController());
+    Get.put(CommandeController());
     return Scaffold(
         appBar: AppBar(
           backgroundColor: primaryColor,

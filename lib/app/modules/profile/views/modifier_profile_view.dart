@@ -5,8 +5,9 @@ import 'package:get/get.dart';
 import '../../../style/my_theme.dart';
 import '../../globale_widgets/profile_image.dart';
 
-class ModifierProfileView extends GetView {
+class ModifierProfileView extends GetView<ProfileController> {
   const ModifierProfileView({super.key});
+
   @override
   Widget build(BuildContext context) {
     ProfileController controller = ProfileController();
@@ -28,12 +29,14 @@ class ModifierProfileView extends GetView {
                   const SizedBox(
                       width: 145,
                       height: 145,
-                      child: BuildProfileImage(width: 145, height: 145)),
+                      child: BuildProfileImage(
+                          width: 145, height: 145, showIcon: true)),
                   4.hs,
-                  const SizedBox(
+                  SizedBox(
                     height: 50,
                     child: TextField(
-                      decoration: InputDecoration(
+                      controller: controller.nomPrenomController,
+                      decoration: const InputDecoration(
                         labelText: 'Nom Prenom',
                       ),
                     ),
@@ -48,23 +51,23 @@ class ModifierProfileView extends GetView {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      items: <String>['Homme', 'Femme']
-                          .map((String value) {
+                      items: <String>['Homme', 'Femme'].map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
-                        controller.selectedClientCible.value = newValue!;
+                        controller.selectedGenreCible.value = newValue!;
                       },
                     ),
                   ),
                   2.5.hs,
-                  const SizedBox(
+                  SizedBox(
                     height: 50,
                     child: TextField(
-                      decoration: InputDecoration(
+                      controller: controller.villeQuartierController,
+                      decoration: const InputDecoration(
                         labelText: 'Ville, Quartier',
                       ),
                     ),
@@ -75,8 +78,15 @@ class ModifierProfileView extends GetView {
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.8,
                 height: 50,
-                child: ElevatedButton(
-                    onPressed: () {}, child: const Text('Enregistrer')),
+                child: Obx(() => ElevatedButton(
+                    onPressed: () {
+                      controller.updateProfile();
+                    },
+                    child: !controller.isLoading.value
+                        ? const Text('Enregistrer')
+                        : const CircularProgressIndicator(
+                            color: Colors.white,
+                          ))),
               )
             ],
           ),

@@ -11,18 +11,19 @@ dependencies:
   firebase_core: ^2.27.1
   firebase_auth: ^4.17.9
   cloud_firestore: ^4.15.9
+  firebase_storage: ^11.6.10
+  firebase_messaging: ^14.7.20
+  firebase_in_app_messaging: ^0.7.4+18
+  firebase_app_check: ^0.2.1+18
   provider: ^6.0.5
   intl_phone_field: ^3.2.0
   pinput: ^4.0.0
   camera: ^0.10.5+5
   http: ^1.1.0
   shared_preferences: ^2.2.2
-  firebase_messaging: ^14.7.20
-  firebase_in_app_messaging: ^0.7.4+18
   image_picker: ^1.0.4
   url_launcher: ^6.0.12
   smooth_page_indicator: ^1.1.0
-  firebase_storage: ^11.6.10
   path: ^1.8.3
   intl: ^0.19.0
   cached_network_image: ^3.1.0
@@ -33,18 +34,20 @@ dependencies:
   shimmer: ^3.0.0
   flutter_launcher_icons: ^0.13.1
   flutter_spacer: ^1.0.3
-  firebase_app_check: ^0.2.1+18
   persistent_bottom_nav_bar_v2: ^5.0.0
   flutter_staggered_grid_view: 0.7.0
   permission_handler: ^11.3.1
   modal_bottom_sheet: 3.0.0
   flutter_svg: 2.0.10+1
-  flutter:
-    sdk: flutter
   easy_stepper: ^0.8.3
   timeline_tile: ^2.0.0
   image_editor_plus: ^1.0.5
   rxdart: ^0.27.7
+  flutter_screenutil: ^5.9.0
+  flutter_local_notifications: ^17.1.2
+
+  flutter:
+    sdk: flutter
 
 dev_dependencies:
   flutter_lints: ^3.0.1

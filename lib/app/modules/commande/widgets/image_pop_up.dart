@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/app/modules/globale_widgets/shimmer.dart';
 import 'package:flutter/material.dart';
 
 Future imagePopUp(
@@ -29,9 +30,7 @@ Future imagePopUp(
             child: CachedNetworkImage(
               imageUrl: imageUrl,
               fit: BoxFit.cover,
-              placeholder: (context, url) => const Center(
-                child: CircularProgressIndicator(),
-              ),
+              placeholder: (context, url) => shimmer(),
             ),
           ),
         ),

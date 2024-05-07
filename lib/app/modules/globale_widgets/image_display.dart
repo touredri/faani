@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/modules/globale_widgets/shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -52,6 +53,27 @@ Widget shadowBackButton() {
       onPressed: () {
         Get.back();
       },
+    ),
+  );
+}
+
+// Image cache network template
+Widget imageCacheNetwork(BuildContext context, String url) {
+  return CachedNetworkImage(
+    imageUrl: url,
+    placeholder: (context, url) => shimmer(),
+    imageBuilder: (context, imageProvider) => Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        image: DecorationImage(
+          image: imageProvider,
+          fit: BoxFit.cover,
+        ),
+      ),
+    ),
+    errorWidget: (context, url, error) => const Icon(
+      Icons.error,
+      color: primaryColor,
     ),
   );
 }

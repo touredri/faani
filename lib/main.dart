@@ -1,6 +1,12 @@
+import 'dart:convert';
+
+import 'package:faani/app/data/services/notifications_service.dart';
+import 'package:faani/app/firebase/push_notification.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'app/firebase/global_function.dart';
@@ -12,21 +18,33 @@ import 'app/style/my_theme.dart';
 import 'package:get/get.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 
+// Future _firebaseBackgroundMessage(RemoteMessage message) async {
+//   if (message.notification != null) {
+//     print("Handling a background message: ${message.messageId}");
+//   }
+// }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   await FirebaseAppCheck.instance.activate(
     webProvider:
         ReCaptchaV3Provider('6LcToJ0pAAAAAChLT7Ao7VBy-nt5n56IcMoGi9Np'),
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.appAttest,
   );
+
+  await initializePushNotifications();
+
   if (auth.currentUser != null) {
     final UserController userController = Get.put(UserController());
     await userController.init();
   }
+
   await initializeDateFormatting();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
@@ -39,6 +57,9 @@ class FaaniApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      context,
+    );
     return FlutterSpacer(
       builder: (BuildContext context) {
         return GetMaterialApp(

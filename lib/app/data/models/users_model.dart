@@ -8,6 +8,7 @@ class UserModel {
       phoneNumber,
       adress,
       profileImage,
+      token,
       sex;
   bool  isTailleur ;
   DateTime? createdAt, updatedAt;
@@ -22,6 +23,7 @@ class UserModel {
       this.profileImage,
       this.isTailleur = false,
       this.sex = '',
+      this.token,
       this.createdAt,
       this.updatedAt});
 
@@ -36,6 +38,7 @@ class UserModel {
     final profileImage = data['profileImage'];
     final isTailleur = data['isTailleur'];
     final sex = data['sex'];
+    final token = data['token'];
     final createdAt = (data['createdAt'] as Timestamp).toDate();
     final updatedAt = (data['updatedAt'] as Timestamp).toDate();
 
@@ -49,6 +52,7 @@ class UserModel {
       profileImage: profileImage,
       isTailleur: isTailleur,
       sex: sex,
+      token: token,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -64,6 +68,7 @@ class UserModel {
       'profileImage': profileImage,
       'isTailleur': isTailleur,
       'sex': sex,
+      'token': token,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     });
