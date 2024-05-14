@@ -1,9 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
-import 'package:faani/app/data/models/suivi_etat_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
-import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/widgets/build_time_line.dart';
 import 'package:faani/app/modules/commande/widgets/image_pop_up.dart';
@@ -11,7 +8,6 @@ import 'package:faani/app/modules/commande/widgets/stepper.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/controllers/message_controller.dart';
-import 'package:faani/app/modules/message/views/discussion_view.dart';
 import 'package:faani/app/modules/mesures/views/detail_mesure.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +16,6 @@ import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:timeline_tile/timeline_tile.dart';
-import '../widgets/expand_image.dart';
 
 class DetailCommandeView extends GetView<CommandeController> {
   final Commande commande;
@@ -141,7 +136,10 @@ class DetailCommandeView extends GetView<CommandeController> {
                                   return Text(
                                     commande.isAccepted
                                         ? 'Accepter'
-                                        : 'En attente',
+                                        : !controller
+                                                .userController.isTailleur.value
+                                            ? 'En attente'
+                                            : 'Accepté',
                                     style: TextStyle(
                                         color: commande.isAccepted
                                             ? Colors.green

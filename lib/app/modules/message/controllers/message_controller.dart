@@ -28,6 +28,7 @@ class MessageController extends GetxController {
             fromFirestore: MessageModel.fromMap,
             toFirestore: (MessageModel msg, options) => msg.toMap())
         .where('from_id', isEqualTo: user!.uid)
+        .orderBy('last_time', descending: true)
         .snapshots()
         .map((event) => event.docs.map((e) => e.data()).toList());
 
@@ -93,7 +94,8 @@ class MessageController extends GetxController {
                       'to_id': to_user.id,
                       'to_name': to_user.nomPrenom,
                       'to_avatar': to_user.profileImage,
-                      'modele_img': modeleImg
+                      'modele_img': modeleImg,
+                      'token': to_user.token,
                     })
               });
     } else {
@@ -105,7 +107,8 @@ class MessageController extends GetxController {
               'to_id': to_user.id,
               'to_name': to_user.nomPrenom,
               'to_avatar': to_user.profileImage,
-              'modele_img': modeleImg
+              'modele_img': modeleImg,
+              'token': to_user.token,
             });
       }
       if (to_message.docs.isNotEmpty) {
@@ -116,7 +119,8 @@ class MessageController extends GetxController {
               'to_id': to_user.id,
               'to_name': to_user.nomPrenom,
               'to_avatar': to_user.profileImage,
-              'modele_img': modeleImg
+              'modele_img': modeleImg,
+              'token': to_user.token,
             });
       }
     }

@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_stepper/easy_stepper.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/suivi_etat_model.dart';
+import 'package:faani/app/data/models/users_model.dart';
+import 'package:faani/app/data/services/users_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +66,15 @@ class _MyStepState extends State<MyStep> {
 
   void updateCommande() async {
     await widget.commande.update();
+  }
+
+  void sendNotif() async {
+    if (widget.commande.idUser.isNotEmpty) {
+      final UserModel client =
+          await UserService().getUser(widget.commande.idUser);
+      await sendNotification(client.token!, 'Etat Commande modifié',
+          'L\etat de votre commande a été modifiée par le tailleur à ${widget.commande.etatLibelle}');
+    }
   }
 
   @override
@@ -159,6 +171,7 @@ class _MyStepState extends State<MyStep> {
                               SuiviEtatService()
                                   .updateSuiviEtat(currentSuiviEtat.value!),
                               updateCommande(),
+                              sendNotif(),
                               setState(() => stepperCurrentIndex.value = index),
                             },
                         }),

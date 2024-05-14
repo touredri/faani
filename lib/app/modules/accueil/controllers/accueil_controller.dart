@@ -3,6 +3,7 @@ import 'package:faani/app/data/services/categorie_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh_new/pull_to_refresh.dart';
 import '../../../data/models/categorie_model.dart';
 import '../../../data/models/modele_model.dart';
 import '../../../data/services/modele_service.dart';
@@ -28,13 +29,12 @@ class AccueilController extends GetxController {
   }
 
   // get ramdom model from modeles service
-  final ModeleService modeleService = ModeleService();
+  // final ModeleService modeleService = ModeleService();
 
   void onCategorieSelected(Categorie categorie) {
     // Reset pagination state for category change
     modeles.clear();
     loadMore('', categorie.id);
-    update();
   }
 
   Future<void> refreshPage() async {
@@ -43,17 +43,27 @@ class AccueilController extends GetxController {
   }
 
   Future<void> loadMore(String clientCible, String categorie) async {
+    var modeleService;
+    if (modeles.isEmpty) {
+      modeleService = ModeleService();
+    } else {
+      // modeleService = ModeleService(lastDoc: modeles.last.doc!);
+      modeleService = Get.find<ModeleService>();
+    }
     try {
       // Get the last document from your data list
       final lastModele = modeles.isNotEmpty ? modeles.last : null;
 
       // Fetch more data with pagination
-      final fetchedDocuments = await modeleService
-          .getRandomModeles(clientCible, categorie, lastModele: lastModele);
+      final fetchedDocuments = await modeleService.getRandomModeles(
+          clientCible, categorie == 'Tous' ? '' : categorie,
+          lastModele: lastModele);
 
       if (fetchedDocuments.isNotEmpty) {
+        if (categorie == 'Tous') modeles.clear();
         // add the fetched data to your list model
         modeles.addAll(fetchedDocuments);
+        // modeles.shuffle();
         update(); // Call update to refresh the UI
       }
     } catch (e) {
@@ -69,6 +79,7 @@ class AccueilController extends GetxController {
 
   Future<void> init() async {
     await loadMore('', '');
+    modeles.shuffle();
   }
 
   @override
@@ -84,6 +95,26 @@ class AccueilController extends GetxController {
   @override
   void onClose() {
     super.onClose();
+  }
+
+  RefreshController refreshController =
+      RefreshController(initialRefresh: false);
+
+  void onRefresh() async {
+    print('refreshed page**************************');
+    // monitor network fetch
+    await Future.delayed(const Duration(milliseconds: 1000));
+    print('refreshed page**************************');
+    // if failed,use refreshFailed()
+    refreshController.refreshCompleted();
+  }
+
+  void onLoading() async {
+    // monitor network fetch
+    await Future.delayed(const Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+
+    refreshController.loadComplete();
   }
 }
 

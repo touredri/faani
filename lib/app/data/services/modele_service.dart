@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ModeleService {
@@ -112,7 +114,23 @@ class ModeleService {
       }
       for (var doc in querySnapshot.docs) {
         final model = Modele.fromMap(doc.data(), doc.reference);
-        models.add(model);
+        final accueilController = Get.find<AccueilController>();
+        // if (models.last.id != model.id) {
+          // models.add(model);
+        // }
+        //  &&
+            // !accueilController.modeles.contains(model)
+
+        if(models.isNotEmpty && accueilController.modeles.isNotEmpty){
+          if(models.last.id != model.id && !accueilController.modeles.contains(model) && !models.contains(model)){
+            models.add(model);
+          }
+        } else {
+          models.add(model);
+          continue;
+        }
+
+
         if (models.length == pageSize) {
           break;
         }

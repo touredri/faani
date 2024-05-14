@@ -12,6 +12,7 @@ abstract class Routes {
   static const AJOUT_MODELE = _Paths.AJOUT_MODELE;
   // static const AJOUT_COMMANDE = _Paths.AJOUT_COMMANDE;
   static const MESSAGE = _Paths.MESSAGE;
+  static const DISCUSSION = _Paths.DISCUSSION;
   static const DETAIL_MODELE = _Paths.DETAIL_MODELE;
   static const SEARCH_PAGE = _Paths.SEARCH_PAGE;
 }
@@ -28,6 +29,7 @@ abstract class _Paths {
   static const AJOUT_MODELE = '/ajout-modele';
   // static const AJOUT_COMMANDE = '/ajout-commande';
   static const MESSAGE = '/message';
+  static const DISCUSSION = '/discussion';
   static const DETAIL_MODELE = '/detail-modele';
   static const SEARCH_PAGE = '/search-page';
 }

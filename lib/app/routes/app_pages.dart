@@ -1,3 +1,4 @@
+import 'package:faani/app/modules/message/views/discussion_view.dart';
 import 'package:get/get.dart';
 
 import '../modules/accueil/bindings/accueil_binding.dart';
@@ -74,14 +75,14 @@ class AppPages {
       page: () => const AjoutModeleView(),
       binding: AjoutModeleBinding(),
     ),
-    // GetPage(
-    //   name: _Paths.MESSAGEVIEW,
-    //   page: () => const MessageView(),
-    //   binding: AjoutCommandeBinding(),
-    // ),
     GetPage(
       name: _Paths.MESSAGE,
       page: () => const MessageView(),
+      binding: MessageBinding(),
+    ),
+    GetPage(
+      name: _Paths.DISCUSSION,
+      page: () => const DiscussionView(),
       binding: MessageBinding(),
     ),
     GetPage(

@@ -5,7 +5,7 @@ import 'package:faani/app/modules/message/controllers/message_controller.dart';
 import 'package:faani/app/modules/message/views/widgets/chat_list.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
+// import 'package:flutter_spacer/flutter_spacer.dart';
 
 import 'package:get/get.dart';
 
@@ -132,7 +132,7 @@ class DiscussionView extends GetView<DiscussionController> {
                                   focusedBorder: InputBorder.none,
                                   disabledBorder: InputBorder.none,
                                   suffixIcon: IconButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       controller.sendMessage();
                                     },
                                     icon: Icon(

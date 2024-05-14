@@ -1,8 +1,4 @@
-import 'dart:convert';
-
-import 'package:faani/app/data/services/notifications_service.dart';
 import 'package:faani/app/firebase/push_notification.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
@@ -17,12 +13,6 @@ import 'generated/locales.g.dart';
 import 'app/style/my_theme.dart';
 import 'package:get/get.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-
-// Future _firebaseBackgroundMessage(RemoteMessage message) async {
-//   if (message.notification != null) {
-//     print("Handling a background message: ${message.messageId}");
-//   }
-// }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

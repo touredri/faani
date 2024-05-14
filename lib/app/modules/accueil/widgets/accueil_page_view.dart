@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh_new/pull_to_refresh.dart';
 import '../../globale_widgets/circular_progress.dart';
 import '../controllers/accueil_controller.dart';
 import 'accueil_model_view.dart';
@@ -9,10 +10,8 @@ class AccueilPAgeView extends GetView<AccueilController> {
 
   @override
   Widget build(BuildContext context) {
-    final AccueilController accueilController = Get.put(AccueilController());
-
     return FutureBuilder(
-      future: accueilController.init(),
+      future: controller.init(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: circularProgress());
@@ -21,25 +20,22 @@ class AccueilPAgeView extends GetView<AccueilController> {
               init: AccueilController(),
               initState: (_) {},
               builder: (_) {
-                return RefreshIndicator(
-                  onRefresh: controller.refreshPage,
-                  child: PageView.builder(
-                    controller: controller.pageController,
-                    scrollDirection: Axis.vertical,
-                    itemCount: accueilController.modeles.length,
-                    itemBuilder: (context, index) {
-                      if (accueilController.modeles.isNotEmpty &&
-                          index < accueilController.modeles.length) {
-                        final modele = accueilController.modeles[index];
-                        if (index == accueilController.modeles.length - 1) {
-                          accueilController.loadMore('','');
-                        }
-                        return HomeItem(modele);
-                      } else {
-                        return const SizedBox.shrink();
+                return PageView.builder(
+                  controller: controller.pageController,
+                  scrollDirection: Axis.vertical,
+                  itemCount: controller.modeles.length,
+                  itemBuilder: (context, index) {
+                    if (controller.modeles.isNotEmpty &&
+                        index < controller.modeles.length) {
+                      final modele = controller.modeles[index];
+                      if (index == controller.modeles.length - 1) {
+                        controller.loadMore('', '');
                       }
-                    },
-                  ),
+                      return HomeItem(modele);
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
                 );
               });
         }

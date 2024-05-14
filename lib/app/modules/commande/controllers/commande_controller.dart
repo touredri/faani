@@ -4,6 +4,7 @@ import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/suivi_etat_model.dart';
+import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:faani/app/data/services/users_service.dart';
@@ -125,6 +126,9 @@ class CommandeController extends GetxController {
       idCategorie: modele.idCategorie!,
       modeleImage: modele.fichier[0]!,
       id: '',
+      idUser: !userController.isTailleur.value
+          ? userController.currentUser.value.id!
+          : '',
       datePrevue: DateTime.parse(selectedDate.value),
       dateModifier: DateTime.parse(selectedDate.value),
     );
@@ -136,9 +140,13 @@ class CommandeController extends GetxController {
       date: Timestamp.fromDate(DateTime.now()),
     );
     if (!userController.isTailleur.value) {
-      newCommande.idUser = userController.currentUser.value.id!;
+      final UserModel tailleur =
+          await userService.getUser(newCommande.idTailleur);
+      await sendNotification(tailleur.token!, 'Nouvelle commande',
+          'Vous avez une nouvelle commande de ${userController.currentUser.value.nomPrenom}');
     }
     await SuiviEtatService().createSuiviEtat(newSuiviEtat);
+
     clearForm();
     animatedPopUp(
         context,
@@ -210,10 +218,15 @@ class CommandeController extends GetxController {
               onPressed: () async {
                 commande.prix = int.parse(prix.text);
                 await commande.update();
-                Get.back();
-                update();
                 Get.snackbar('Succèss', 'Le prix à été modifier avec succès 👍',
                     snackPosition: SnackPosition.BOTTOM);
+                if (commande.idUser.isNotEmpty) {
+                  UserModel client = await userService.getUser(commande.idUser);
+                  await sendNotification(client.token!, 'Prix modifié',
+                      'Le tailleur ${userController.currentUser.value.nomPrenom} a modifié le prix de votre commande à ${prix.text} FCFA');
+                }
+                Get.back();
+                update();
               },
               child: const Text('Valider'),
             )
@@ -230,7 +243,7 @@ class CommandeController extends GetxController {
   }
 
   void changeDate(Commande commande, {required BuildContext context}) async {
-    if (userController.isTailleur.value) {
+    if (userController.isTailleur.value && user!.uid == commande.idTailleur) {
       final date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),

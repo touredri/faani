@@ -3,8 +3,10 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/message_modele.dart';
 import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/controllers/message_controller.dart';
 import 'package:faani/app/routes/app_pages.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,16 +16,16 @@ class DiscussionController extends GetxController {
   DiscussionController();
   final textEditingController = TextEditingController();
   final collection = FirebaseFirestore.instance.collection('messages');
+  final UserController userController = Get.find();
   final RxList<MsgContent> msgcontentlist = <MsgContent>[].obs;
   final RxString doc_id = ''.obs;
   final RxString to_id = ''.obs;
   final RxString to_name = ''.obs;
   final RxString to_avatar = ''.obs;
   final RxString modeleImage = ''.obs;
-
+  final RxString token = ''.obs;
   var listener;
   ScrollController msgScrolling = ScrollController();
-  FocusNode contentNode = FocusNode();
 
   sendMessage() async {
     if (textEditingController.text.isNotEmpty) {
@@ -44,7 +46,14 @@ class DiscussionController extends GetxController {
       await collection.doc(doc_id.value).update({
         'last_msg': textEditingController.text,
         'last_time': Timestamp.now(),
-      }).then((value) => textEditingController.clear());
+      }).then((value) => {
+            sendNotification(
+              token.value,
+              'Nouveau message de ${userController.currentUser.value.nomPrenom}',
+              textEditingController.text,
+            ),
+            textEditingController.clear(),
+          });
     }
   }
 
@@ -58,6 +67,7 @@ class DiscussionController extends GetxController {
       to_name.value = args['to_name'];
       to_avatar.value = args['to_avatar'];
       modeleImage.value = args['modele_img'];
+      token.value = args['token'];
     }
   }
 
@@ -166,13 +176,7 @@ class DiscussionController extends GetxController {
             await collection.doc(doc_id.value).update({
               'last_msg': 'New Image',
               'last_time': Timestamp.now(),
-            })
-                // .then((value) => msgScrolling.animateTo(
-                //       msgScrolling.position.maxScrollExtent,
-                //       duration: const Duration(milliseconds: 300),
-                //       curve: Curves.easeOut,
-                //     ))
-                ;
+            });
             break;
           case TaskState.running:
             break;

@@ -10,7 +10,7 @@ class ModifierProfileView extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    ProfileController controller = ProfileController();
+    Get.find<ProfileController>();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

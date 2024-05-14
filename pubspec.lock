@@ -1064,6 +1064,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
+  pull_to_refresh_new:
+    dependency: "direct main"
+    description:
+      name: pull_to_refresh_new
+      sha256: c21c87485a23d64072019c6c5719e8c0a22fbf7a8ab7a1cc6ee695f90194fefa
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.5"
   reorderables:
     dependency: transitive
     description:
