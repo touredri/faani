@@ -1,4 +1,5 @@
 import 'package:faani/app/data/models/mesure_model.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,9 +17,14 @@ class MesuresController extends GetxController {
 
   void resetController() {
     pageController.dispose();
-    ventreController.text = ''; epauleController.text = ''; poitrineController.text = '';
-    longeurController.text = ''; hancheController.text = ''; brasController.text = '';
-    tailleController.text = ''; poignetController.text = '';
+    ventreController.text = '';
+    epauleController.text = '';
+    poitrineController.text = '';
+    longeurController.text = '';
+    hancheController.text = '';
+    brasController.text = '';
+    tailleController.text = '';
+    poignetController.text = '';
   }
 
   Mesure? currentMesure;
@@ -26,6 +32,11 @@ class MesuresController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    if (Get.find<ConnectivityController>().isOnline.value == false) {
+      Get.snackbar(
+          'Pas d\'accès internet ', 'Please check your internet connection',
+          snackPosition: SnackPosition.TOP);
+    }
     isLastPage.value = false;
   }
 

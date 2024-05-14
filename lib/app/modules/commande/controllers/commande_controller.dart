@@ -53,6 +53,11 @@ class CommandeController extends GetxController {
   }
 
   Stream<List<Modele>> init() {
+    if (Get.find<ConnectivityController>().isOnline.value == false) {
+      Get.snackbar(
+          'Pas d\'accès internet ', 'Please check your internet connection',
+          snackPosition: SnackPosition.TOP);
+    }
     return modeleService
         .getAllModeleByTailleurId(userController.currentUser.value.id!)
         .map((event) {

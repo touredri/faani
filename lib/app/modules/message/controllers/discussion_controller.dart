@@ -69,6 +69,12 @@ class DiscussionController extends GetxController {
       modeleImage.value = args['modele_img'];
       token.value = args['token'];
     }
+
+    if (Get.find<ConnectivityController>().isOnline.value == false) {
+      Get.snackbar(
+          'Pas d\'accès internet ', 'Please check your internet connection',
+          snackPosition: SnackPosition.TOP);
+    }
   }
 
   @override

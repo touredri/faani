@@ -59,6 +59,19 @@ class Modele {
     };
   }
 
+  factory Modele.fromDocumentSnapshot(DocumentSnapshot doc) {
+    return Modele(
+      id: doc.id,
+      detail: doc['detail'],
+      fichier: List<String>.from(doc['fichier']),
+      imagePath: doc['imagePath'] != null ? List<String>.from(doc['imagePath']) : null,
+      genreHabit: doc['genreHabit'],
+      idTailleur: doc['idTailleur'],
+      idCategorie: doc['idCategorie'],
+      isPublic: doc['isPublic'],
+    );
+  }
+
   final firestore = FirebaseFirestore.instance;
 
   // Crée un nouveau document dans la collection "modele"

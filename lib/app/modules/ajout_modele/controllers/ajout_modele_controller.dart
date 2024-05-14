@@ -102,6 +102,11 @@ class AjoutModeleController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    if (Get.find<ConnectivityController>().isOnline.value == false) {
+      Get.snackbar(
+          'Pas d\'accès internet ', 'Please check your internet connection',
+          snackPosition: SnackPosition.TOP);
+    }
     fetchCategories();
   }
 

@@ -1,5 +1,6 @@
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/categorie_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -18,6 +19,7 @@ class AccueilController extends GetxController {
   String sewing = 'assets/svg/sewingp.svg';
   late final Widget sewingIcon;
   final selectedTailleur = Rx<UserModel?>(null);
+  final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
 
   AccueilController() {
     sewingIcon = SvgPicture.asset(
@@ -43,16 +45,10 @@ class AccueilController extends GetxController {
   }
 
   Future<void> loadMore(String clientCible, String categorie) async {
-    var modeleService;
-    if (modeles.isEmpty) {
-      modeleService = ModeleService();
-    } else {
-      // modeleService = ModeleService(lastDoc: modeles.last.doc!);
-      modeleService = Get.find<ModeleService>();
-    }
+    final modeleService = ModeleService();
     try {
       // Get the last document from your data list
-      final lastModele = modeles.isNotEmpty ? modeles.last : null;
+      final lastModele = modeles.isNotEmpty ? lastModeleFetch.value : null;
 
       // Fetch more data with pagination
       final fetchedDocuments = await modeleService.getRandomModeles(
@@ -61,23 +57,21 @@ class AccueilController extends GetxController {
 
       if (fetchedDocuments.isNotEmpty) {
         if (categorie == 'Tous') modeles.clear();
-        // add the fetched data to your list model
         modeles.addAll(fetchedDocuments);
-        // modeles.shuffle();
-        update(); // Call update to refresh the UI
+        lastModeleFetch.value = modeles.last;
+        update();
       }
     } catch (e) {
       if (e is NetworkError) {
-        // show snackbar
         Get.snackbar('Network Error', e.message,
             snackPosition: SnackPosition.TOP);
       }
     } finally {
-      update();
     }
   }
 
   Future<void> init() async {
+    
     await loadMore('', '');
     modeles.shuffle();
   }
@@ -90,6 +84,11 @@ class AccueilController extends GetxController {
   @override
   void onReady() {
     super.onReady();
+    if (Get.find<ConnectivityController>().isOnline.value == false) {
+      Get.snackbar(
+          'Pas d\'accès internet ', 'Please check your internet connection',
+          snackPosition: SnackPosition.TOP);
+    }
   }
 
   @override
@@ -101,10 +100,8 @@ class AccueilController extends GetxController {
       RefreshController(initialRefresh: false);
 
   void onRefresh() async {
-    print('refreshed page**************************');
     // monitor network fetch
     await Future.delayed(const Duration(milliseconds: 1000));
-    print('refreshed page**************************');
     // if failed,use refreshFailed()
     refreshController.refreshCompleted();
   }

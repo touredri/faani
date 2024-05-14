@@ -92,51 +92,41 @@ class ModeleService {
   Future<List<Modele>> getRandomModeles(String clientCible, String categorie,
       {Modele? lastModele}) async {
     const pageSize = 5;
+
     final models = <Modele>[];
 
-    while (models.length < pageSize) {
-      Query<Map<String, dynamic>> query = collection;
-      if (clientCible.isNotEmpty) {
-        query = query.where('genreHabit', isEqualTo: clientCible);
-      }
-      if (categorie.isNotEmpty) {
-        query = query.where('idCategorie', isEqualTo: categorie);
-      }
-      query = query.orderBy(FieldPath.documentId);
-      if (lastModele != null) {
-        lastDoc = await collection.doc(lastModele.id).get();
-        query = query.startAfterDocument(lastDoc!);
-      }
-      query = query.limit(pageSize);
-      final querySnapshot = await query.get();
-      if (querySnapshot.docs.isEmpty) {
-        break;
-      }
-      for (var doc in querySnapshot.docs) {
-        final model = Modele.fromMap(doc.data(), doc.reference);
-        final accueilController = Get.find<AccueilController>();
-        // if (models.last.id != model.id) {
-          // models.add(model);
-        // }
-        //  &&
-            // !accueilController.modeles.contains(model)
-
-        if(models.isNotEmpty && accueilController.modeles.isNotEmpty){
-          if(models.last.id != model.id && !accueilController.modeles.contains(model) && !models.contains(model)){
-            models.add(model);
-          }
-        } else {
-          models.add(model);
-          continue;
-        }
-
-
-        if (models.length == pageSize) {
-          break;
-        }
-      }
-      lastModele = models.last;
+    Query<Map<String, dynamic>> query = collection;
+    if (clientCible.isNotEmpty) {
+      query = query.where('genreHabit', isEqualTo: clientCible);
     }
+    if (categorie.isNotEmpty) {
+      query = query.where('idCategorie', isEqualTo: categorie);
+    }
+    query = query.orderBy(FieldPath.documentId);
+    if (lastModele != null) {
+      lastDoc = await collection.doc(lastModele.id).get();
+      query = query.startAfterDocument(lastDoc!);
+    }
+    query = query.limit(pageSize);
+    final querySnapshot = await query.get();
+    if (querySnapshot.docs.isEmpty) {
+      return models;
+    }
+    final accueilController = Get.find<AccueilController>();
+    for (var doc in querySnapshot.docs) {
+      final model = Modele.fromMap(doc.data(), doc.reference);
+      
+
+      if (accueilController.modeles.isNotEmpty) {
+        if (!accueilController.modeles.contains(model)) {
+          models.add(model);
+        }
+      } else {
+        models.add(model);
+        continue;
+      }
+    }
+    lastModele = models.last;
     return models;
   }
 
