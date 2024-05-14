@@ -31,16 +31,27 @@ class AnimatedSearchBar extends StatelessWidget {
             child: TextField(
               controller: textEditingController,
               decoration: InputDecoration(
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: Colors.white)
-                    // : BorderSide.none,
-                    ),
+                // fillColor: Colors.white,
+                border: InputBorder.none,
+                disabledBorder: isSearching.value
+                    ? OutlineInputBorder(
+                        borderSide: BorderSide(color: color),
+                      )
+                    : InputBorder.none,
+                enabledBorder: isSearching.value
+                    ? OutlineInputBorder(
+                        borderSide: BorderSide(color: color),
+                      )
+                    : InputBorder.none,
+                focusedBorder: isSearching.value
+                    ? OutlineInputBorder(
+                        borderSide: BorderSide(color: color),
+                      )
+                    : InputBorder.none,
                 labelText: 'Chercher',
                 suffixIcon: IconButton(
                   padding: const EdgeInsets.all(0),
-                  color: Colors.white,
+                  color: color,
                   icon: Icon(isSearching.value ? Icons.close : Icons.search,
                       size: 30),
                   onPressed: () => onSearch(),

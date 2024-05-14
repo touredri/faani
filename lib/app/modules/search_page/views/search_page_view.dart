@@ -37,16 +37,20 @@ class SearchPageView extends GetView<SearchPageController> {
               return const Center(child: Text('Pas d\'accès internet'));
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData) {
+              return const Center(
+                  child: Text(
+                      'Resultat: Le modèle que vous recherchez n\'a été trouvé, utliser d\'autre mot clé.'));
             } else {
               return MasonryGridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                return buildCard(snapshot.data![index], context: context);
-              },
-            );
+                crossAxisCount: 2,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return buildCard(snapshot.data![index], context: context);
+                },
+              );
             }
           }),
     );

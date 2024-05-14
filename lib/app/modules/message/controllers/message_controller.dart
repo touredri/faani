@@ -21,6 +21,11 @@ class MessageController extends GetxController {
     }
   }
 
+  void toggleSearch() {
+    isSearching.value = !isSearching.value;
+    update(['search']);
+  }
+
   Stream<List<MessageModel>> getMessages() {
     // Query where 'from_id' is equal to 'user!.uid'
     Stream<List<MessageModel>> fromStream = collection
@@ -129,16 +134,16 @@ class MessageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (Get.find<ConnectivityController>().isOnline.value == false) {
-      Get.snackbar(
-          'Pas d\'accès internet ', 'Please check your internet connection',
-          snackPosition: SnackPosition.TOP);
-    }
   }
 
   @override
   void onReady() {
     super.onReady();
+    if (Get.find<ConnectivityController>().isOnline.value == false) {
+      Get.snackbar(
+          'Pas d\'accès internet ', 'Please check your internet connection',
+          snackPosition: SnackPosition.TOP);
+    }
   }
 
   @override
