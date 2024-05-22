@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:faani/app/data/services/notifications_service.dart';
 import 'package:faani/app/modules/accueil/views/accueil_view.dart';
 import 'package:faani/app/modules/commande/views/commande_view.dart';
@@ -8,6 +9,7 @@ import 'package:faani/app/modules/profile/views/profile_view.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
@@ -17,6 +19,12 @@ class HomeController extends GetxController {
   PersistentTabController tabController =
       PersistentTabController(initialIndex: 0);
   UserController userController = Get.find();
+
+  /* connectivity check part */
+  final Connectivity _connectivity = Connectivity();
+  final _connectionStatus = ConnectivityResult.none.obs;
+  final RxBool isOnline = false.obs;
+  /* connectivity listen part */
 
   String sewing = 'assets/svg/sewingp.svg';
   String dress = 'assets/svg/dress.svg';
@@ -42,15 +50,6 @@ class HomeController extends GetxController {
             activeForegroundColor: primaryColor,
             icon: const Icon(Icons.home),
           ),
-          // item: ItemConfig(
-          //   activeForegroundColor: primaryColor,
-          //   icon: dressIcon,
-          //   inactiveIcon: SvgPicture.asset(
-          //     dress,
-          //     width: 26,
-          //     height: 24,
-          //   ),
-          // ),
         ),
         PersistentTabConfig(
           screen: const CommandeView(),
@@ -98,7 +97,43 @@ class HomeController extends GetxController {
   void onInit() {
     PushNotifications.getAndUpdateUserToken();
     super.onInit();
+    initConnectivity();
+    _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
+
+  /* connectivity check fonctions part */
+  Future<void> initConnectivity() async {
+    try {
+      var result = await _connectivity.checkConnectivity();
+      _updateConnectionStatus(result);
+    } on PlatformException catch (e) {
+      debugPrint('Couldn\'t check connectivity status: $e');
+    }
+  }
+
+  void _updateConnectionStatus(List<ConnectivityResult> result) {
+    _connectionStatus.value = result.first;
+    isOnline.value = result.first != ConnectivityResult.none;
+    if (result.first == ConnectivityResult.none) {
+      isOnline.value = false;
+    } else if (result.contains(ConnectivityResult.mobile) ||
+        result.contains(ConnectivityResult.wifi)) {
+      isOnline.value = true;
+    } else {
+      isOnline.value = false;
+    }
+  }
+
+  ConnectivityResult get connectionStatus => _connectionStatus.value;
+
+  void checkInternetConnectivity() {
+    if (isOnline.value == false) {
+      Get.snackbar(
+          'Pas d\'accès internet', 'Please check your internet connection',
+          snackPosition: SnackPosition.TOP);
+    }
+  }
+  /* connectivity check fonctions part */
 
   @override
   void onReady() {

@@ -28,10 +28,18 @@ class ProfileController extends GetxController {
   String measure = 'assets/svg/measurep.svg';
   String becomeTailor = 'assets/svg/dressmaker.svg';
   String dress = 'assets/svg/dress.svg';
+  String scissor = 'assets/svg/scissor.svg';
   late final Widget measureIcon;
   late final Widget becomeTailorIcon;
   late final Widget dressIcon;
+  late final Widget scissorIcon;
   RxBool isLoading = false.obs;
+  final TextEditingController nomAtelier = TextEditingController();
+  final TextEditingController ville = TextEditingController();
+  final TextEditingController quartier = TextEditingController();
+  String selectedCountry = '';
+  String selectedClientCible = '';
+  bool isHasAgent = false;
 
   ProfileController() {
     measureIcon = SvgPicture.asset(
@@ -52,6 +60,12 @@ class ProfileController extends GetxController {
       width: 26,
       height: 26,
     );
+    scissorIcon = SvgPicture.asset(
+      scissor,
+      // colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+      width: 26,
+      height: 26,
+    );
   }
 
   // change language
@@ -69,11 +83,6 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (Get.find<ConnectivityController>().isOnline.value == false) {
-      Get.snackbar(
-          'Pas d\'accès internet ', 'Please check your internet connection',
-          snackPosition: SnackPosition.TOP);
-    }
     if (userController.isTailleur.value) {
       isTailleur.value = true;
     }

@@ -2,6 +2,7 @@ import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:faani/app/modules/profile/views/aide_view.dart';
 import 'package:faani/app/modules/profile/views/mes_modeles_view.dart';
 import 'package:faani/app/modules/profile/views/parametre_view.dart';
+import 'package:faani/app/modules/profile/widgets/commentaire_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../mesures/views/mesures_view.dart';
@@ -9,7 +10,7 @@ import '../views/devenir_tailleur_view.dart';
 import '../views/modifier_profile_view.dart';
 import 'list_actions.dart';
 
-Widget listBuild(ProfileController controller) {
+Widget listBuild(ProfileController controller, BuildContext context) {
   return Column(
     children: [
       CustomListTile(
@@ -32,6 +33,12 @@ Widget listBuild(ProfileController controller) {
                 Get.to(() => const MesuresView(),
                     transition: Transition.rightToLeft),
               }),
+      if (controller.isTailleur.value)
+        CustomListTile(
+            leadingIcon: controller.scissorIcon,
+            title: 'Mon Atelier',
+            subTitle: 'Gestion de mon atelier et agents',
+            onTap: () {}),
       if (controller.isTailleur.value)
         CustomListTile(
             leadingIcon: controller.dressIcon,
@@ -70,7 +77,7 @@ Widget listBuild(ProfileController controller) {
         title: 'Centre d\'aide',
         subTitle: 'FAQ, Contactez-nous',
         onTap: () {
-          Get.to(() => const AideView(), transition: Transition.rightToLeft);
+          Get.to(() => AideView(), transition: Transition.rightToLeft);
         },
       ),
       CustomListTile(
@@ -81,30 +88,33 @@ Widget listBuild(ProfileController controller) {
         title: 'Laissez un commentaire',
         subTitle: 'Comment vous trouvez Faani App',
         onTap: () {
-          // Get.to(() => AidePage());
+          commentaire(context);
         },
       ),
-      CustomListTile(
-        leadingIcon: const Icon(
-          Icons.star_rate_sharp,
-          color: Colors.yellow,
+      ListTile(
+        leading: const Text(
+          "⭐",
+          style: TextStyle(fontSize: 25),
         ),
-        title: 'Notez l\'Appli',
-        subTitle: 'Donnez votre avis',
-        onTap: () {
-          // Get.to(() => AidePage());
-        },
+        title: const Text('Notez l\'Appli'),
+        subtitle: Text(
+          'Donnez votre avis',
+          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+        ),
+        trailing: Icon(Icons.open_in_new, color: Colors.grey[500]),
       ),
-      CustomListTile(
-        leadingIcon: const Icon(
+      ListTile(
+        leading: const Icon(
           Icons.share,
           color: Colors.blue,
+          size: 30,
         ),
-        title: 'Partager Faani App',
-        subTitle: 'Invitez vos amis',
-        onTap: () {
-          // Get.to(() => AidePage());
-        },
+        title: const Text('Partager Faani App'),
+        subtitle: Text(
+          "Invitez vos amis",
+          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+        ),
+        trailing: Icon(Icons.open_in_new, color: Colors.grey[500]),
       ),
     ],
   );

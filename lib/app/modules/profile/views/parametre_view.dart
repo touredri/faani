@@ -24,7 +24,7 @@ class ParametreView extends GetView {
                 children: [
                   const Text(
                     'Compte',
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                    style: TextStyle(color: Colors.grey, fontSize: 14.5),
                   ),
                   3.hs,
                   GestureDetector(
@@ -33,16 +33,23 @@ class ParametreView extends GetView {
                           transition: Transition.downToUp);
                     },
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(
-                          Icons.account_circle_outlined,
-                          color: Colors.grey,
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.account_circle_outlined,
+                              color: Colors.grey,
+                            ),
+                            2.ws,
+                            const Text(
+                              'Gerer le compte',
+                              style: TextStyle(
+                                  color: Colors.black, fontSize: 14.5),
+                            ),
+                          ],
                         ),
-                        2.ws,
-                        const Text(
-                          'Gerer le compte',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
-                        )
+                        const Icon(Icons.keyboard_arrow_right_rounded)
                       ],
                     ),
                   ),
@@ -50,16 +57,23 @@ class ParametreView extends GetView {
                   GestureDetector(
                     onTap: () {},
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(
-                          Icons.privacy_tip_outlined,
-                          color: Colors.grey,
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.privacy_tip_outlined,
+                              color: Colors.grey,
+                            ),
+                            2.ws,
+                            const Text(
+                              'Privacy',
+                              style: TextStyle(
+                                  color: Colors.black, fontSize: 14.5),
+                            ),
+                          ],
                         ),
-                        2.ws,
-                        const Text(
-                          'Privacy',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
-                        )
+                        const Icon(Icons.open_in_new_rounded)
                       ],
                     ),
                   ),
@@ -73,7 +87,7 @@ class ParametreView extends GetView {
                 children: [
                   const Text(
                     'Contenue & Activité',
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                    style: TextStyle(color: Colors.grey, fontSize: 14.5),
                   ),
                   3.hs,
                   GestureDetector(
@@ -90,12 +104,12 @@ class ParametreView extends GetView {
                         2.ws,
                         const Text(
                           'Changer de langue',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
+                          style: TextStyle(color: Colors.black, fontSize: 14.5),
                         ),
                         23.ws,
                         const Text(
                           'Français',
-                          style: TextStyle(color: Colors.grey, fontSize: 13),
+                          style: TextStyle(color: Colors.grey, fontSize: 14.5),
                         )
                       ],
                     ),
@@ -107,16 +121,23 @@ class ParametreView extends GetView {
                           transition: Transition.downToUp);
                     },
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(
-                          Icons.notifications_none_outlined,
-                          color: Colors.grey,
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.notifications_none_outlined,
+                              color: Colors.grey,
+                            ),
+                            2.ws,
+                            const Text(
+                              'Notifications',
+                              style: TextStyle(
+                                  color: Colors.black, fontSize: 14.5),
+                            ),
+                          ],
                         ),
-                        2.ws,
-                        const Text(
-                          'Notifications',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
-                        )
+                        const Icon(Icons.keyboard_arrow_right_rounded)
                       ],
                     ),
                   ),
@@ -131,8 +152,8 @@ class ParametreView extends GetView {
                         ),
                         2.ws,
                         const Text(
-                          'Suprimer cache',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
+                          'Vider le cache',
+                          style: TextStyle(color: Colors.black, fontSize: 14.5),
                         )
                       ],
                     ),
@@ -148,21 +169,28 @@ class ParametreView extends GetView {
                 children: [
                   const Text(
                     'A propos de l\'app',
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                    style: TextStyle(color: Colors.grey, fontSize: 14.5),
                   ),
                   3.hs,
                   GestureDetector(
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(
-                          Icons.account_circle_outlined,
-                          color: Colors.grey,
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.account_circle_outlined,
+                              color: Colors.grey,
+                            ),
+                            2.ws,
+                            const Text(
+                              'Conditions d\'utilisation',
+                              style: TextStyle(
+                                  color: Colors.black, fontSize: 14.5),
+                            ),
+                          ],
                         ),
-                        2.ws,
-                        const Text(
-                          'Conditions d\'utilisation',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
-                        )
+                        const Icon(Icons.open_in_new_rounded)
                       ],
                     ),
                   ),
@@ -170,16 +198,23 @@ class ParametreView extends GetView {
                   GestureDetector(
                     onTap: () {},
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(
-                          Icons.privacy_tip_outlined,
-                          color: Colors.grey,
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.privacy_tip_outlined,
+                              color: Colors.grey,
+                            ),
+                            2.ws,
+                            const Text(
+                              'Politique de confidentialité',
+                              style: TextStyle(
+                                  color: Colors.black, fontSize: 14.5),
+                            ),
+                          ],
                         ),
-                        2.ws,
-                        const Text(
-                          'Politique de confidentialité',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
-                        )
+                        const Icon(Icons.open_in_new_rounded)
                       ],
                     ),
                   ),
@@ -187,16 +222,23 @@ class ParametreView extends GetView {
                   GestureDetector(
                     onTap: () {},
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(
-                          Icons.privacy_tip_outlined,
-                          color: Colors.grey,
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.privacy_tip_outlined,
+                              color: Colors.grey,
+                            ),
+                            2.ws,
+                            const Text(
+                              'Open Source Software Notices',
+                              style: TextStyle(
+                                  color: Colors.black, fontSize: 14.5),
+                            ),
+                          ],
                         ),
-                        2.ws,
-                        const Text(
-                          'Open Source Software Notices',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
-                        )
+                        const Icon(Icons.open_in_new_rounded)
                       ],
                     ),
                   ),
@@ -218,7 +260,7 @@ class ParametreView extends GetView {
                         2.ws,
                         const Text(
                           'Se déconnecter',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
+                          style: TextStyle(color: Colors.black, fontSize: 14.5),
                         )
                       ],
                     ),
@@ -235,7 +277,7 @@ class ParametreView extends GetView {
 
 Widget _Container(Widget widget) {
   return Container(
-    padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15, top: 15),
+    padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20, top: 20),
     decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.all(Radius.circular(10))),

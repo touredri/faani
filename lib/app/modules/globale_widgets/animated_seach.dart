@@ -31,7 +31,6 @@ class AnimatedSearchBar extends StatelessWidget {
             child: TextField(
               controller: textEditingController,
               decoration: InputDecoration(
-                // fillColor: Colors.white,
                 border: InputBorder.none,
                 disabledBorder: isSearching.value
                     ? OutlineInputBorder(

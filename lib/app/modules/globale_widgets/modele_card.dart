@@ -19,6 +19,7 @@ Widget buildCard(Modele modele, {required BuildContext context}) {
         onTap: () {
           final controller = Get.put(DetailModeleController());
           controller.getModeleOwner(modele.idTailleur);
+          Get.back();
           Get.to(() => DetailModeleView(modele),
               transition: Transition.downToUp);
         },

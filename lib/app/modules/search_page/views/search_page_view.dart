@@ -1,6 +1,7 @@
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
+import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -32,7 +33,7 @@ class SearchPageView extends GetView<SearchPageController> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
-            } else if (Get.find<ConnectivityController>().isOnline.value ==
+            } else if (Get.find<HomeController>().isOnline.value ==
                 false) {
               return const Center(child: Text('Pas d\'accès internet'));
             } else if (snapshot.hasError) {

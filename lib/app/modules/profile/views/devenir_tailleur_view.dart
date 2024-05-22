@@ -1,20 +1,16 @@
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
+import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 
 import 'package:get/get.dart';
 
-class DevenirTailleurView extends GetView {
-  DevenirTailleurView({super.key});
-
-  final TextEditingController nomAtelier = TextEditingController();
-  final TextEditingController ville = TextEditingController();
-  final TextEditingController quartier = TextEditingController();
-  String selectedCountry = '';
-  String selectedClientCible = '';
+class DevenirTailleurView extends GetView<ProfileController> {
+  const DevenirTailleurView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Get.find<ProfileController>();
     return Scaffold(
       appBar: primaryBackAppBar('Compte Tailleur'),
       body: SingleChildScrollView(
@@ -22,22 +18,20 @@ class DevenirTailleurView extends GetView {
         child: Center(
           child: Column(
             children: [
-              4.hs,
+              3.hs,
               SizedBox(
                 height: 55,
                 child: TextFormField(
-                  controller: nomAtelier,
+                  controller: controller.nomAtelier,
                   validator: (String? value) {
-                    if(value!.isEmpty) {
-                      
-                    }
+                    if (value!.isEmpty) {}
                   },
                   decoration: const InputDecoration(
                     labelText: 'Nom de l\'atelier',
                   ),
                 ),
               ),
-              4.hs,
+              3.hs,
               SizedBox(
                 height: 55,
                 child: DropdownButtonFormField<String>(
@@ -55,12 +49,12 @@ class DevenirTailleurView extends GetView {
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
-                    selectedClientCible = newValue ?? '';
+                    controller.selectedClientCible = newValue ?? '';
                     // controller.selectedClientCible.value = newValue!;
                   },
                 ),
               ),
-              4.hs,
+              3.hs,
               SizedBox(
                 height: 55,
                 child: DropdownButtonFormField<String>(
@@ -87,28 +81,54 @@ class DevenirTailleurView extends GetView {
                   }).toList(),
                   onChanged: (String? newValue) {
                     // controller.selectedClientCible.value = newValue!;
-                    selectedCountry = newValue ?? '';
+                    controller.selectedCountry = newValue ?? '';
                   },
                 ),
               ),
-              4.hs,
-                SizedBox(
+              3.hs,
+              SizedBox(
                 height: 55,
                 child: TextFormField(
-                  controller: ville,
+                  controller: controller.ville,
                   decoration: const InputDecoration(
                     labelText: 'Ville',
                   ),
                 ),
               ),
-              4.hs,
+              3.hs,
               SizedBox(
                 height: 55,
                 child: TextField(
-                  controller: quartier,
+                  controller: controller.quartier,
                   decoration: const InputDecoration(
                     labelText: 'Quartier',
                   ),
+                ),
+              ),
+              3.hs,
+              SizedBox(
+                height: 55,
+                child: DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'Des gens travaille pour vous ?',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  items:
+                      <String>['Nom', '1 à 5', 'plus de 5'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    if (newValue != 'Nom') {
+                      controller.isHasAgent = true;
+                    } else {
+                      controller.isHasAgent = false;
+                    }
+                  },
                 ),
               ),
               5.5.hs,

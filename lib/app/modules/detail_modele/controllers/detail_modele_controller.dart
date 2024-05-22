@@ -1,3 +1,4 @@
+import 'package:faani/app/data/models/modele_model.dart';
 import 'package:get/get.dart';
 import '../../../data/models/users_model.dart';
 import '../../../data/services/users_service.dart';
@@ -6,6 +7,7 @@ import '../../../firebase/global_function.dart';
 class DetailModeleController extends GetxController {
   RxBool isAuthor = false.obs;
   final modeleUser = UserModel(nomPrenom: '', phoneNumber: '').obs;
+  final Rx<Modele?> currentModele = Rx<Modele?>(null);
 
   // get modele owner
   Future<void> getModeleOwner(String idUser) async {
@@ -19,11 +21,6 @@ class DetailModeleController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (Get.find<ConnectivityController>().isOnline.value == false) {
-      Get.snackbar(
-          'Pas d\'accès internet ', 'Please check your internet connection',
-          snackPosition: SnackPosition.TOP);
-    }
   }
 
   @override

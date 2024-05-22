@@ -4,14 +4,20 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class FloatingModal extends StatelessWidget {
   final Widget child;
   final Color? backgroundColor;
+  final double? horizontalPadding;
 
-  const FloatingModal({super.key, required this.child, this.backgroundColor});
+  const FloatingModal(
+      {super.key,
+      required this.child,
+      this.backgroundColor,
+      this.horizontalPadding});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding ?? 20, vertical: 10),
         child: Material(
           color: backgroundColor,
           clipBehavior: Clip.antiAlias,
@@ -26,6 +32,7 @@ class FloatingModal extends StatelessWidget {
 Future<T> showFloatingModalBottomSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
+  double? horizontalPadding,
   Color? backgroundColor,
 }) async {
   final result = await showCustomModalBottomSheet(
@@ -33,6 +40,7 @@ Future<T> showFloatingModalBottomSheet<T>({
       builder: builder,
       containerWidget: (_, animation, child) => FloatingModal(
             child: child,
+            horizontalPadding: horizontalPadding,
           ),
       expand: false);
 

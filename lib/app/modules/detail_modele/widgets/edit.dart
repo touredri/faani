@@ -1,7 +1,8 @@
+import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/modules/globale_widgets/floating_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
-Future editModal(BuildContext context) {
+Future editModal(BuildContext context, Modele modele) {
   return showFloatingModalBottomSheet(
     context: context,
     builder: (context) => SizedBox(
@@ -18,17 +19,44 @@ Future editModal(BuildContext context) {
               style: TextStyle(color: Colors.black),
             ),
             onPressed: () {
-              // Votre code ici
+              // edit logic here
             },
           ),
           TextButton.icon(
-            icon: const Icon(Icons.delete),
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
             label: const Text(
               'Supprimer le modèle',
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.red),
             ),
             onPressed: () {
-              // Votre code ici
+              // delete logic here
+              // show confirmation dialog
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Supprimer le modèle'),
+                  content:
+                      const Text('Voulez-vous vraiment supprimer ce modèle ?'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        // delete logic here
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Oui'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Non', style: TextStyle(color: Colors.green)),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         ],

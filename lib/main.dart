@@ -16,8 +16,6 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 
 void main() async {
 
-
-
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
@@ -50,7 +48,7 @@ class FaaniApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(ConnectivityController());
+    // Get.put(ConnectivityController());
     ScreenUtil.init(
       context,
     );

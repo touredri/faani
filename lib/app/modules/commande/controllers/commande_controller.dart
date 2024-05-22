@@ -53,11 +53,6 @@ class CommandeController extends GetxController {
   }
 
   Stream<List<Modele>> init() {
-    if (Get.find<ConnectivityController>().isOnline.value == false) {
-      Get.snackbar(
-          'Pas d\'accès internet ', 'Please check your internet connection',
-          snackPosition: SnackPosition.TOP);
-    }
     return modeleService
         .getAllModeleByTailleurId(userController.currentUser.value.id!)
         .map((event) {
@@ -149,6 +144,7 @@ class CommandeController extends GetxController {
           await userService.getUser(newCommande.idTailleur);
       await sendNotification(tailleur.token!, 'Nouvelle commande',
           'Vous avez une nouvelle commande de ${userController.currentUser.value.nomPrenom}');
+          sendProgrammingNotification(tailleur.token!, userController.currentUser.value.token!, 'Alert date Prevue', 'La date prevue pour l\habit de ${userController.currentUser.value.nomPrenom} est arrivé', newCommande.datePrevue);
     }
     await SuiviEtatService().createSuiviEtat(newSuiviEtat);
 
@@ -276,7 +272,7 @@ class CommandeController extends GetxController {
           .collection('commandes')
           .doc(commande.id)
           .update({'isAccepted': true});
-      update();
+      update(['commande']);
     }
   }
 }

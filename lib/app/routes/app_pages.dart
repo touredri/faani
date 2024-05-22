@@ -1,3 +1,4 @@
+import 'package:faani/app/modules/home/mildware/connectivity_mildware.dart';
 import 'package:faani/app/modules/message/views/discussion_view.dart';
 import 'package:get/get.dart';
 
@@ -44,6 +45,7 @@ class AppPages {
       name: _Paths.ACCUEIL,
       page: () => const AccueilView(),
       binding: AccueilBinding(),
+      middlewares: [InternetConnectivityMiddleware()],
     ),
     GetPage(
       name: _Paths.AUTH,
@@ -54,41 +56,49 @@ class AppPages {
       name: _Paths.COMMANDE,
       page: () => const CommandeView(),
       binding: CommandeBinding(),
+      middlewares: [InternetConnectivityMiddleware()],
     ),
     GetPage(
       name: _Paths.FAVORIE,
       page: () => const FavorieView(),
       binding: FavorieBinding(),
+      middlewares: [InternetConnectivityMiddleware()],
     ),
     GetPage(
         name: _Paths.MESURES,
         page: () => const MesuresView(),
         binding: MesuresBinding(),
+        middlewares: [InternetConnectivityMiddleware()],
         transition: Transition.rightToLeft),
     GetPage(
       name: _Paths.PROFILE,
       page: () => const ProfileView(),
       binding: ProfileBinding(),
+      middlewares: [InternetConnectivityMiddleware()],
     ),
     GetPage(
       name: _Paths.AJOUT_MODELE,
       page: () => const AjoutModeleView(),
       binding: AjoutModeleBinding(),
+      middlewares: [InternetConnectivityMiddleware()],
     ),
     GetPage(
       name: _Paths.MESSAGE,
       page: () => const MessageView(),
       binding: MessageBinding(),
+      middlewares: [InternetConnectivityMiddleware()],
     ),
     GetPage(
       name: _Paths.DISCUSSION,
       page: () => const DiscussionView(),
       binding: MessageBinding(),
+      middlewares: [InternetConnectivityMiddleware()],
     ),
     GetPage(
       name: _Paths.SEARCH_PAGE,
       page: () => const SearchPageView(),
       binding: SearchPageBinding(),
+      middlewares: [InternetConnectivityMiddleware()],
     ),
   ];
 }

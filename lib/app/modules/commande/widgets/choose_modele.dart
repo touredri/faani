@@ -70,7 +70,7 @@ class ChooseModeleView extends GetView<CommandeController> {
                       },
                       child: SizedBox(
                         height: 100.0 *
-                            randomHeight, // Set the height of the ModeleCard
+                            randomHeight,
                         width: MediaQuery.of(context).size.width / 2.2,
                         child: Card(
                           clipBehavior: Clip.antiAlias,

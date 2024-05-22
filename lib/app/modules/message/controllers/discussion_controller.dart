@@ -4,9 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/message_modele.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
-import 'package:faani/app/modules/message/controllers/message_controller.dart';
-import 'package:faani/app/routes/app_pages.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -68,12 +65,6 @@ class DiscussionController extends GetxController {
       to_avatar.value = args['to_avatar'];
       modeleImage.value = args['modele_img'];
       token.value = args['token'];
-    }
-
-    if (Get.find<ConnectivityController>().isOnline.value == false) {
-      Get.snackbar(
-          'Pas d\'accès internet ', 'Please check your internet connection',
-          snackPosition: SnackPosition.TOP);
     }
   }
 

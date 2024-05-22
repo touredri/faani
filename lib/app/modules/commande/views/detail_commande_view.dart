@@ -131,6 +131,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                               ),
                               label: GetBuilder<CommandeController>(
                                 init: CommandeController(),
+                                id: 'commande',
                                 initState: (_) {},
                                 builder: (_) {
                                   return Text(

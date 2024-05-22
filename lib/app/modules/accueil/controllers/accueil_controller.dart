@@ -84,11 +84,6 @@ class AccueilController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    if (Get.find<ConnectivityController>().isOnline.value == false) {
-      Get.snackbar(
-          'Pas d\'accès internet ', 'Please check your internet connection',
-          snackPosition: SnackPosition.TOP);
-    }
   }
 
   @override

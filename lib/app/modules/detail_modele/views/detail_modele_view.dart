@@ -5,6 +5,7 @@ import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/favorite_icon.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
+import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
@@ -67,7 +68,13 @@ class DetailModeleView extends GetView<DetailModeleController> {
                               ? // && isNotFollowed
                               OutlinedButton(
                                   onPressed: () {
-                                    editModal(context);
+                                    if (auth.currentUser!.uid ==
+                                        modele.idTailleur) {
+                                      editModal(context, modele);
+                                    } else {
+                                      Get.snackbar('Erreur',
+                                          'Vous ne pouvez pas modifier ce modèle');
+                                    }
                                   },
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
@@ -114,7 +121,7 @@ class DetailModeleView extends GetView<DetailModeleController> {
                           width: MediaQuery.of(context).size.width * 0.7,
                           child: ElevatedButton(
                               onPressed: () {},
-                              child: controller.modeleUser.value.isTailleur
+                              child: UserController().currentUser.value.isTailleur
                                   ? const Text('Faire pour un client')
                                   : const Text('Envoyer à un tailleur')),
                         ),
@@ -151,6 +158,7 @@ class DetailModeleView extends GetView<DetailModeleController> {
                               mainAxisSpacing: 4,
                               crossAxisSpacing: 4,
                               itemCount: snapshot.data!.length,
+                              padding: const EdgeInsets.only(bottom: 30),
                               itemBuilder: (context, index) {
                                 // not include the current modele
                                 if (snapshot.data![index].id == modele.id) {

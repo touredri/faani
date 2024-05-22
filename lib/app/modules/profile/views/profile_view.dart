@@ -144,7 +144,7 @@ class ProfileView extends GetView<ProfileController> {
                       topRight: Radius.circular(35),
                     ),
                   ),
-                  child: listBuild(controller),
+                  child: listBuild(controller, context),
                 )
               ],
             ),
