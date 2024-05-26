@@ -14,56 +14,67 @@ class FavorieView extends GetView<FavorieController> {
   Widget build(BuildContext context) {
     Get.put(FavorieController());
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-        toolbarHeight: 40.0,
-        title: Text('Mes favories',
-            style: Theme.of(context).textTheme.displayMedium),
-        bottom: PreferredSize(
-            preferredSize: const Size(double.infinity, 30),
-            child: Container(
-              color: primaryColor,
-              width: MediaQuery.of(context).size.width,
-              height: 30,
-              child: CategorieFiltre(controller: controller,),
-            )),
-      ),
-      body: StreamBuilder<List<Modele>>(
-        stream: controller.loadData(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return Column(
-              children: [
-                Image.asset('assets/images/no_favori.png'),
-                const Text(
-                  'Oups 😊 Vous n\'avez pas mis de modèle en favorie',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
+        appBar: AppBar(
+          backgroundColor: primaryColor,
+          toolbarHeight: 40.0,
+          title: Text('Mes favories',
+              style: Theme.of(context).textTheme.displayMedium),
+          bottom: PreferredSize(
+              preferredSize: const Size(double.infinity, 30),
+              child: Container(
+                color: primaryColor,
+                height: 30,
+                padding: const EdgeInsets.only(bottom: 5),
+                width: MediaQuery.of(context).size.width,
+                child: CategorieFiltre(
+                  controller: controller,
                 ),
-              ],
-            );
-          } else {
-            return MasonryGridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                return buildCard(snapshot.data![index], context: context);
+              )),
+        ),
+        body: GetBuilder<FavorieController>(
+          init: FavorieController(),
+          initState: (_) {},
+          // id: 'favorie',
+          builder: (_) {
+            return StreamBuilder<List<Modele>>(
+              stream: controller.loadData(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                  return Column(
+                    children: [
+                      Image.asset('assets/images/no_favori.png'),
+                      const Text(
+                        'Oups 😊 Vous n\'avez pas mis de modèle en favorie',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  controller.modeles.value = snapshot.data!;
+                  return MasonryGridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return buildCard(controller.modeles.value[index]!,
+                          context: context);
+                    },
+                  );
+                }
               },
             );
-          }
-        },
-      ),
-    );
+          },
+        ));
   }
 }

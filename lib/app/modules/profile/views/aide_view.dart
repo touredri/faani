@@ -29,7 +29,7 @@ class AideView extends GetView<ProfileController> {
       // 'view': const SearchHelp(),
     },
     {
-      'title': 'Comment ajouter un moyen de paiement ?',
+      'title': 'Ajouter d\'un moyen de paiement ?',
       'icon': Icons.add_card,
       // 'view': const AjoutCartePayemment(),
     },

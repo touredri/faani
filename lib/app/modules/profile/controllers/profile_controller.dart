@@ -1,13 +1,19 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/categorie_model.dart';
+import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../home/controllers/user_controller.dart';
 
 class ProfileController extends GetxController {
   UserController userController = Get.find();
+  // final ModeleService modeleService = Get.find();
   RxString selectedGenreCible = ''.obs;
   final TextEditingController nomPrenomController = TextEditingController();
   final TextEditingController villeQuartierController = TextEditingController();
@@ -40,6 +46,10 @@ class ProfileController extends GetxController {
   String selectedCountry = '';
   String selectedClientCible = '';
   bool isHasAgent = false;
+  final Rx<List<Modele?>> mesModelesList = Rx<List<Modele?>>([]);
+  final Rx<List<Modele?>> originalModelesList = Rx<List<Modele?>>([]);
+  final ScrollController scrollController = ScrollController();
+  late int myTotalModeleNumber;
 
   ProfileController() {
     measureIcon = SvgPicture.asset(
@@ -50,13 +60,11 @@ class ProfileController extends GetxController {
     );
     becomeTailorIcon = SvgPicture.asset(
       becomeTailor,
-      // colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
       width: 26,
       height: 26,
     );
     dressIcon = SvgPicture.asset(
       dress,
-      // colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
       width: 26,
       height: 26,
     );
@@ -74,18 +82,35 @@ class ProfileController extends GetxController {
   }
 
   // category selected
-  void onCategorieSelected(Categorie categorie) {
-    // selectedCategorie.value = categorie;
-    // Reset pagination state for category change
-    update();
+  void onCategorieSelected(Categorie categorie) async {
+    if (categorie.libelle != 'Tous') {
+      mesModelesList.value =
+          await ModeleService().getAllModeleByTailleur(user!.uid, categorie.id);
+    } else {
+      mesModelesList.value = originalModelesList.value;
+    }
+    update(['mesModeles']);
   }
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     if (userController.isTailleur.value) {
       isTailleur.value = true;
     }
+
+    myTotalModeleNumber = await ModeleService().getTotalModeleCount(user!.uid);
+
+    getMesModeles();
+
+    // scrollController.addListener(() {
+    //   if (scrollController.position.atEdge) {
+    //     if (scrollController.position.pixels != 0) {
+    //       print('At the bottom of the page');
+    //       getMesModeles();
+    //     }
+    //   }
+    // });
   }
 
   @override
@@ -121,5 +146,38 @@ class ProfileController extends GetxController {
           isLoading.value = false;
           Get.snackbar('Erreur', 'Erreur lors de la mise à jour du profil');
         });
+  }
+
+  void rateApp() {
+    const url = 'https://play.google.com/store/apps/details?id=com.faani.faani';
+    if (Platform.isAndroid) {
+      launchUrl(Uri.parse(url));
+    }
+  }
+
+  void shareApp() {
+    Share.share(
+        'https://play.google.com/store/apps/details?id=com.faani.faani');
+  }
+
+  void getMesModeles() {
+    if (mesModelesList.value.isNotEmpty) {
+      ModeleService()
+          .getAllModeleByTailleurId(user!.uid,
+              lastModele: mesModelesList.value.last)
+          .listen((event) {
+        for (Modele modele in event) {
+          if (!mesModelesList.value.contains(modele)) {
+            mesModelesList.value.add(modele);
+            originalModelesList.value.add(modele);
+          }
+        }
+      });
+    } else {
+      ModeleService().getAllModeleByTailleurId(user!.uid).listen((event) {
+        mesModelesList.value.addAll(event);
+        originalModelesList.value.addAll(event);
+      });
+    }
   }
 }

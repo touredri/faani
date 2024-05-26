@@ -32,14 +32,26 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                           controller.pageController.jumpToPage(index);
                         },
                         children: [
-                          for (var image in controller.images)
+                          if (controller.images.isNotEmpty)
+                            for (var image in controller.images)
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
+                                ),
+                                child: Image.file(
+                                  File(image.path),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                          if (controller.images.isEmpty)
                             ClipRRect(
                               borderRadius: const BorderRadius.only(
                                 bottomLeft: Radius.circular(10),
                                 bottomRight: Radius.circular(10),
                               ),
-                              child: Image.file(
-                                File(image.path),
+                              child: Image.asset(
+                                'assets/images/ic_launcher.png',
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -98,7 +110,8 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                 const SizedBox(height: 10),
                 SmoothPageIndicator(
                   controller: controller.pageController,
-                  count: controller.images.length,
+                  count:
+                      controller.images.isEmpty ? 1 : controller.images.length,
                   effect: const ExpandingDotsEffect(
                     dotColor: Colors.grey,
                     activeDotColor: primaryColor,

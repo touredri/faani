@@ -1,6 +1,7 @@
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/categorie_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -19,7 +20,9 @@ class AccueilController extends GetxController {
   String sewing = 'assets/svg/sewingp.svg';
   late final Widget sewingIcon;
   final selectedTailleur = Rx<UserModel?>(null);
+  final selectedCategorie = Rx<Categorie?>(null);
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
+  final userController = Get.find<UserController>();
 
   AccueilController() {
     sewingIcon = SvgPicture.asset(
@@ -35,8 +38,11 @@ class AccueilController extends GetxController {
 
   void onCategorieSelected(Categorie categorie) {
     // Reset pagination state for category change
+    selectedCategorie.value = categorie;
     modeles.clear();
-    loadMore('', categorie.id);
+    // userController.currentUser.value.sex??
+    loadMore(userController.currentUser.value.sex ?? '', categorie.libelle,
+        idCategorie: categorie.id);
   }
 
   Future<void> refreshPage() async {
@@ -44,19 +50,26 @@ class AccueilController extends GetxController {
     await loadMore('', '');
   }
 
-  Future<void> loadMore(String clientCible, String categorie) async {
+  Future<void> loadMore(String clientCible, String libelle,
+      {String? idCategorie}) async {
     final modeleService = ModeleService();
     try {
       // Get the last document from your data list
       final lastModele = modeles.isNotEmpty ? lastModeleFetch.value : null;
+      List<Modele> fetchedDocuments;
 
-      // Fetch more data with pagination
-      final fetchedDocuments = await modeleService.getRandomModeles(
-          clientCible, categorie == 'Tous' ? '' : categorie,
-          lastModele: lastModele);
+      if (idCategorie != null) {
+        fetchedDocuments = await modeleService.getRandomModeles(
+            clientCible, libelle == 'Tous' ? '' : idCategorie,
+            lastModele: lastModele);
+      } else {
+        fetchedDocuments = await modeleService.getRandomModeles(
+            clientCible, libelle,
+            lastModele: lastModele);
+      }
 
       if (fetchedDocuments.isNotEmpty) {
-        if (categorie == 'Tous') modeles.clear();
+        if (libelle == 'Tous') modeles.clear();
         modeles.addAll(fetchedDocuments);
         lastModeleFetch.value = modeles.last;
         update();
@@ -66,13 +79,22 @@ class AccueilController extends GetxController {
         Get.snackbar('Network Error', e.message,
             snackPosition: SnackPosition.TOP);
       }
-    } finally {
-    }
+    } finally {}
+  }
+
+  void genreChange() {
+    isHommeSelected.value = !isHommeSelected.value;
+    modeles.clear();
+    loadMore(
+        isHommeSelected.value == true ? 'Homme' : 'Femme',
+        selectedCategorie.value == null
+            ? ''
+            : selectedCategorie.value!.libelle);
+    update();
   }
 
   Future<void> init() async {
-    
-    await loadMore('', '');
+    await loadMore(userController.currentUser.value.sex??'', '');
     modeles.shuffle();
   }
 
@@ -97,7 +119,7 @@ class AccueilController extends GetxController {
   void onRefresh() async {
     // monitor network fetch
     await Future.delayed(const Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
+    // if failed, use refreshFailed()
     refreshController.refreshCompleted();
   }
 

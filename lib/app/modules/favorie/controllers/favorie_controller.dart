@@ -7,14 +7,19 @@ import '../../../data/services/modele_service.dart';
 import '../../../firebase/global_function.dart';
 
 class FavorieController extends GetxController {
-  List<Modele?> modeles = [];
+  Rx<List<Modele?>> modeles = Rx<List<Modele?>>([]);
+  Rx<Categorie?> selectedCategorie = Rx<Categorie?>(null);
 
   Stream<List<Modele>> loadData() async* {
     await for (var event in FavorieService().getAllFavorie(user!.uid)) {
       var modeles = <Modele>[];
       for (Favorie fav in event) {
         var modele = await ModeleService().getModeleById(fav.idModele!);
-        modeles.add(modele);
+        if (selectedCategorie.value == null ||
+            selectedCategorie.value!.libelle == 'Tous' ||
+            modele.idCategorie == selectedCategorie.value!.id) {
+          modeles.add(modele);
+        }
       }
       yield modeles;
     }
@@ -22,12 +27,13 @@ class FavorieController extends GetxController {
 
   // category selected
   void onCategorieSelected(Categorie categorie) {
-    // Reset pagination state for category change
+    selectedCategorie.value = categorie;
+    loadData();
     update();
   }
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
   }
 

@@ -35,7 +35,6 @@ class AjoutModeleController extends GetxController {
     }
     if (pickedImages.isEmpty) return; // Handle no selection case
     final List<XFile> newImages = [];
-    // final int totalModeleCount = await ModeleService().getTotalModeleCount();
     for (final XFile image in pickedImages) {
       final Uint8List bytes = await image.readAsBytes();
       final editedImage = await pushWithoutNavBar(

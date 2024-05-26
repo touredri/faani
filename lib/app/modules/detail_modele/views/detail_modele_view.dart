@@ -120,10 +120,16 @@ class DetailModeleView extends GetView<DetailModeleController> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.7,
                           child: ElevatedButton(
-                              onPressed: () {},
-                              child: UserController().currentUser.value.isTailleur
-                                  ? const Text('Faire pour un client')
-                                  : const Text('Envoyer à un tailleur')),
+                              onPressed: () {
+                                print(UserController()
+                                    .currentUser
+                                    .value
+                                    .isTailleur);
+                              },
+                              child:
+                                  controller.userController.currentUser.value.isTailleur
+                                      ? const Text('Faire pour un client')
+                                      : const Text('Envoyer à un tailleur')),
                         ),
                         0.5.hs,
                         const ListTile(

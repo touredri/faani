@@ -1,6 +1,7 @@
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:faani/app/modules/profile/views/aide_view.dart';
 import 'package:faani/app/modules/profile/views/mes_modeles_view.dart';
+import 'package:faani/app/modules/profile/views/mon_atelier.dart';
 import 'package:faani/app/modules/profile/views/parametre_view.dart';
 import 'package:faani/app/modules/profile/widgets/commentaire_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,10 @@ Widget listBuild(ProfileController controller, BuildContext context) {
             leadingIcon: controller.scissorIcon,
             title: 'Mon Atelier',
             subTitle: 'Gestion de mon atelier et agents',
-            onTap: () {}),
+            onTap: () {
+              Get.to(() => const MonAtelierView(),
+                  transition: Transition.rightToLeft);
+            }),
       if (controller.isTailleur.value)
         CustomListTile(
             leadingIcon: controller.dressIcon,
@@ -102,6 +106,9 @@ Widget listBuild(ProfileController controller, BuildContext context) {
           style: TextStyle(fontSize: 12, color: Colors.grey[800]),
         ),
         trailing: Icon(Icons.open_in_new, color: Colors.grey[500]),
+        onTap: () {
+          controller.rateApp();
+        },
       ),
       ListTile(
         leading: const Icon(
@@ -115,6 +122,9 @@ Widget listBuild(ProfileController controller, BuildContext context) {
           style: TextStyle(fontSize: 12, color: Colors.grey[800]),
         ),
         trailing: Icon(Icons.open_in_new, color: Colors.grey[500]),
+        onTap: () {
+          controller.shareApp();
+        },
       ),
     ],
   );

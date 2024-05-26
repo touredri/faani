@@ -8,7 +8,7 @@ class CommentService extends GetxService {
     return this;
   }
 
-  //get all message for a user and a modele
+  //get all comments for a modele
   Stream<List<Comment>> getAllMessage(String idModele) {
     return collection.where('idModele', isEqualTo: idModele).snapshots().map(
         (querySnapshot) => querySnapshot.docs

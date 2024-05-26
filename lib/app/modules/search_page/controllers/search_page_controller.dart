@@ -10,10 +10,8 @@ class SearchPageController extends GetxController {
 
   Stream<List<Modele>> searchResultsStream() async* {
     if (searchController.text.isEmpty) {
-      print('empty');
       yield <Modele>[];
     } else {
-      print('not empty');
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('modele')
           .where('detail',
@@ -30,7 +28,6 @@ class SearchPageController extends GetxController {
 
   void onTextChange(String text) {
     searchText.value = text;
-    // print('searchText: $text');
   }
 
   @override

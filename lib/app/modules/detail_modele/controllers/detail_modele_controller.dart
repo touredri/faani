@@ -1,4 +1,5 @@
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:get/get.dart';
 import '../../../data/models/users_model.dart';
 import '../../../data/services/users_service.dart';
@@ -8,6 +9,7 @@ class DetailModeleController extends GetxController {
   RxBool isAuthor = false.obs;
   final modeleUser = UserModel(nomPrenom: '', phoneNumber: '').obs;
   final Rx<Modele?> currentModele = Rx<Modele?>(null);
+  final userController = Get.find<UserController>();
 
   // get modele owner
   Future<void> getModeleOwner(String idUser) async {

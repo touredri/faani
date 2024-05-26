@@ -1,7 +1,9 @@
 import 'package:faani/app/modules/globale_widgets/floating_bottom_sheet.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
+import 'package:get/get.dart';
 
 Future commentaire(BuildContext context) {
   return showFloatingModalBottomSheet(
@@ -10,7 +12,7 @@ Future commentaire(BuildContext context) {
       builder: (context) => SingleChildScrollView(
             padding: const EdgeInsets.all(10.0),
             child: SizedBox(
-              height: 500,
+              height: 525,
               child: Column(
                 children: [
                   Row(
@@ -36,14 +38,46 @@ Future commentaire(BuildContext context) {
                     textAlign: TextAlign.center,
                   ),
                   1.hs,
-                  Row(
-                    children: [
-                      for (int i = 0; i < 10; i++)
-                        const Icon(
-                          Icons.star_outline_rounded,
-                          size: 37,
-                        )
-                    ],
+                  RatingBar.builder(
+                    initialRating: 3,
+                    itemCount: 5,
+                    itemBuilder: (context, index) {
+                      switch (index) {
+                        case 0:
+                          return const Icon(
+                            Icons.sentiment_very_dissatisfied,
+                            color: Colors.red,
+                          );
+                        case 1:
+                          return const Icon(
+                            Icons.sentiment_dissatisfied,
+                            color: Colors.redAccent,
+                          );
+                        case 2:
+                          return const Icon(
+                            Icons.sentiment_neutral,
+                            color: Colors.amber,
+                          );
+                        case 3:
+                          return const Icon(
+                            Icons.sentiment_satisfied,
+                            color: Colors.lightGreen,
+                          );
+                        case 4:
+                          return const Icon(
+                            Icons.sentiment_very_satisfied,
+                            color: Colors.green,
+                          );
+                        default:
+                          return const Icon(
+                            Icons.sentiment_very_dissatisfied,
+                            color: Colors.red,
+                          );
+                      }
+                    },
+                    onRatingUpdate: (rating) {
+                      // print(rating);
+                    },
                   ),
                   2.hs,
                   const Text(
@@ -65,7 +99,12 @@ Future commentaire(BuildContext context) {
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.8,
                       child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Get.snackbar('Commentaire envoyer',
+                                'Merci pour d\'avoir donner votre avis',
+                                snackPosition: SnackPosition.BOTTOM);
+                            Navigator.pop(context);
+                          },
                           child: const Text(
                             "Soumettre",
                             style: TextStyle(fontSize: 15),

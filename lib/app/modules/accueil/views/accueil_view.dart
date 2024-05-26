@@ -37,36 +37,23 @@ class AccueilView extends GetView<AccueilController> {
             child: Obx(() => Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    controller.isHommeSelected.value
-                        ? TextButton(
-                            onPressed: () {
-                              controller.isHommeSelected.value =
-                                  !controller.isHommeSelected.value;
-                              controller.modeles.clear();
-                              controller.loadMore('Homme', '');
-                            },
-                            child: const Text('Homme',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15)),
-                          )
-                        : TextButton(
-                            onPressed: () {
-                              controller.isHommeSelected.value =
-                                  !controller.isHommeSelected.value;
-                              controller.modeles.clear();
-                              controller.loadMore('Femme', '');
-                            },
-                            child: const Text('Femme',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15)),
-                          ),
+                    TextButton(
+                      onPressed: () {
+                        controller.genreChange();
+                      },
+                      child: Text(
+                          controller.isHommeSelected.value ? 'Homme' : 'Femme',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15)),
+                    ),
                     Expanded(
-                      child: CategorieFiltre<AccueilController>(
-                        controller: controller,
+                      child: SizedBox(
+                        height: 26,
+                        child: CategorieFiltre<AccueilController>(
+                          controller: controller,
+                        ),
                       ),
                     ),
                     IconButton(

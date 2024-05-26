@@ -17,7 +17,7 @@ class InternetConnectivityMiddlewareWithRedirect extends GetMiddleware {
     final homeController = Get.find<HomeController>();
     homeController.checkInternetConnectivity();
     if (!homeController.isOnline.value) {
-      return RouteSettings(name: '/');
+      return const RouteSettings(name: '/');
     }
     return super.redirect(route);
   }
