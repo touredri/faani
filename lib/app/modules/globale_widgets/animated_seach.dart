@@ -6,7 +6,7 @@ class AnimatedSearchBar extends StatelessWidget {
   final RxBool isSearching;
   final Function onSearch;
   final Color color;
-  final GetxController? controller; // Change this to accept null
+  final GetxController? controller;
   const AnimatedSearchBar({
     super.key,
     required this.textEditingController,

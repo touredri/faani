@@ -94,7 +94,7 @@ class AccueilController extends GetxController {
   }
 
   Future<void> init() async {
-    await loadMore(userController.currentUser.value.sex??'', '');
+    await loadMore(userController.currentUser.value.sex ?? '', '');
     modeles.shuffle();
   }
 

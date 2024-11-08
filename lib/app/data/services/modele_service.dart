@@ -32,10 +32,11 @@ class ModeleService {
   // Supprime le document dans la collection "modele"
   Future<void> delete(String id) async {
     final docRef = collection.doc(id);
-    final doc = await docRef.get();
+    final doc = await collection.doc(id).get();
     List<String> imagePath = List<String>.from(doc.data()!['imagePath']);
 
     for (String path in imagePath) {
+      print(' delete image path: $path');
       await FirebaseStorage.instance.ref(path).delete();
     }
     await docRef.delete();
@@ -111,7 +112,7 @@ class ModeleService {
     }
   }
 
-  Future<List<Modele>> getRandomModeles(String clientCible, String categorie,
+  Future<List<Modele>> getRandomModeles(String clientCible, String idCategorie,
       {Modele? lastModele}) async {
     const pageSize = 5;
 
@@ -122,8 +123,8 @@ class ModeleService {
     if (clientCible.isNotEmpty) {
       query = query.where('genreHabit', isEqualTo: clientCible);
     }
-    if (categorie.isNotEmpty) {
-      query = query.where('idCategorie', isEqualTo: categorie);
+    if (idCategorie.isNotEmpty) {
+      query = query.where('idCategorie', isEqualTo: idCategorie);
     }
     if (lastModele != null) {
       final lastDoc = await collection.doc(lastModele.id).get();

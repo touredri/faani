@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:faani/app/data/services/notifications_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/home/views/home_view.dart';
@@ -19,18 +18,14 @@ Future<void> initializePushNotifications() async {
       .localNotificationInit(); // initialize local notifications
 
   void handleRedirection(RemoteMessage message) {
-    print('***************** ${message.notification!.title}');
     if (auth.currentUser != null) {
       if (message.notification!.title == 'Message' &&
           Get.currentRoute != '/message') {
-        print('message view ******************************');
         Get.to(() => const MessageView());
       } else if (message.notification!.title == 'Notification' &&
           Get.currentRoute != '/discussion') {
-        print('notification view ******************************');
         Get.to(() => const NotificationView());
       } else {
-        print('home view ******************************');
         Get.offAllNamed('/home');
       }
     }

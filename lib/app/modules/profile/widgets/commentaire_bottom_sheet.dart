@@ -101,7 +101,7 @@ Future commentaire(BuildContext context) {
                       child: ElevatedButton(
                           onPressed: () {
                             Get.snackbar('Commentaire envoyer',
-                                'Merci pour d\'avoir donner votre avis',
+                                'Merci d\'avoir donner votre avis',
                                 snackPosition: SnackPosition.BOTTOM);
                             Navigator.pop(context);
                           },

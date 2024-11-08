@@ -24,7 +24,7 @@ class ParametreView extends GetView {
                 children: [
                   const Text(
                     'Compte',
-                    style: TextStyle(color: Colors.grey, fontSize: 14.5),
+                    style: TextStyle(color: Colors.grey, fontSize: 13.5),
                   ),
                   3.hs,
                   GestureDetector(
@@ -45,7 +45,7 @@ class ParametreView extends GetView {
                             const Text(
                               'Gerer le compte',
                               style: TextStyle(
-                                  color: Colors.black, fontSize: 14.5),
+                                  color: Colors.black, fontSize: 13.5),
                             ),
                           ],
                         ),
@@ -69,11 +69,11 @@ class ParametreView extends GetView {
                             const Text(
                               'Privacy',
                               style: TextStyle(
-                                  color: Colors.black, fontSize: 14.5),
+                                  color: Colors.black, fontSize: 13.5),
                             ),
                           ],
                         ),
-                        const Icon(Icons.open_in_new_rounded)
+                        const Icon(Icons.keyboard_arrow_right_outlined)
                       ],
                     ),
                   ),
@@ -87,7 +87,7 @@ class ParametreView extends GetView {
                 children: [
                   const Text(
                     'Contenue & Activité',
-                    style: TextStyle(color: Colors.grey, fontSize: 14.5),
+                    style: TextStyle(color: Colors.grey, fontSize: 13.5),
                   ),
                   3.hs,
                   GestureDetector(
@@ -104,12 +104,12 @@ class ParametreView extends GetView {
                         2.ws,
                         const Text(
                           'Changer de langue',
-                          style: TextStyle(color: Colors.black, fontSize: 14.5),
+                          style: TextStyle(color: Colors.black, fontSize: 13.5),
                         ),
                         23.ws,
                         const Text(
                           'Français',
-                          style: TextStyle(color: Colors.grey, fontSize: 14.5),
+                          style: TextStyle(color: Colors.grey, fontSize: 13.5),
                         )
                       ],
                     ),
@@ -133,7 +133,7 @@ class ParametreView extends GetView {
                             const Text(
                               'Notifications',
                               style: TextStyle(
-                                  color: Colors.black, fontSize: 14.5),
+                                  color: Colors.black, fontSize: 13.5),
                             ),
                           ],
                         ),
@@ -153,7 +153,7 @@ class ParametreView extends GetView {
                         2.ws,
                         const Text(
                           'Vider le cache',
-                          style: TextStyle(color: Colors.black, fontSize: 14.5),
+                          style: TextStyle(color: Colors.black, fontSize: 13.5),
                         )
                       ],
                     ),
@@ -169,7 +169,7 @@ class ParametreView extends GetView {
                 children: [
                   const Text(
                     'A propos de l\'app',
-                    style: TextStyle(color: Colors.grey, fontSize: 14.5),
+                    style: TextStyle(color: Colors.grey, fontSize: 13.5),
                   ),
                   3.hs,
                   GestureDetector(
@@ -186,11 +186,11 @@ class ParametreView extends GetView {
                             const Text(
                               'Conditions d\'utilisation',
                               style: TextStyle(
-                                  color: Colors.black, fontSize: 14.5),
+                                  color: Colors.black, fontSize: 13.5),
                             ),
                           ],
                         ),
-                        const Icon(Icons.open_in_new_rounded)
+                        const Icon(Icons.keyboard_arrow_right_outlined)
                       ],
                     ),
                   ),
@@ -210,11 +210,11 @@ class ParametreView extends GetView {
                             const Text(
                               'Politique de confidentialité',
                               style: TextStyle(
-                                  color: Colors.black, fontSize: 14.5),
+                                  color: Colors.black, fontSize: 13.5),
                             ),
                           ],
                         ),
-                        const Icon(Icons.open_in_new_rounded)
+                        const Icon(Icons.keyboard_arrow_right_outlined)
                       ],
                     ),
                   ),
@@ -234,11 +234,11 @@ class ParametreView extends GetView {
                             const Text(
                               'Open Source Software Notices',
                               style: TextStyle(
-                                  color: Colors.black, fontSize: 14.5),
+                                  color: Colors.black, fontSize: 13.5),
                             ),
                           ],
                         ),
-                        const Icon(Icons.open_in_new_rounded)
+                        const Icon(Icons.keyboard_arrow_right_outlined)
                       ],
                     ),
                   ),
@@ -260,7 +260,7 @@ class ParametreView extends GetView {
                         2.ws,
                         const Text(
                           'Se déconnecter',
-                          style: TextStyle(color: Colors.black, fontSize: 14.5),
+                          style: TextStyle(color: Colors.black, fontSize: 13.5),
                         )
                       ],
                     ),

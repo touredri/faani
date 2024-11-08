@@ -95,7 +95,7 @@ class AuthView extends GetView<AuthController> {
                 onPressed: () async {
                   // await signInAnonymously();
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (c) => HomeView()),
+                    MaterialPageRoute(builder: (c) => const HomeView()),
                     (route) => false,
                   );
                 },

@@ -1,4 +1,5 @@
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/modules/globale_widgets/floating_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
@@ -42,8 +43,11 @@ Future editModal(BuildContext context, Modele modele) {
                       const Text('Voulez-vous vraiment supprimer ce modèle ?'),
                   actions: <Widget>[
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         // delete logic here
+                        await ModeleService().delete(modele.id!);
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                         Navigator.of(context).pop();
                       },
                       child: const Text('Oui'),
@@ -52,7 +56,8 @@ Future editModal(BuildContext context, Modele modele) {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text('Non', style: TextStyle(color: Colors.green)),
+                      child: const Text('Non',
+                          style: TextStyle(color: Colors.green)),
                     ),
                   ],
                 ),

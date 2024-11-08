@@ -1,4 +1,5 @@
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:get/get.dart';
 import '../../../data/models/users_model.dart';

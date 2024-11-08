@@ -34,7 +34,7 @@ class _NotificationParamState extends State<NotificationParam> {
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 subtitle: const Text(
                   'Autoriser pour recevoir les alertes',
-                  style: TextStyle(fontSize: 14),
+                  style: TextStyle(fontSize: 13),
                 ),
                 trailing: TextButton(
                   onPressed: () {}, // open phone settings
@@ -88,7 +88,7 @@ class _NotificationParamState extends State<NotificationParam> {
                     title: const Text(
                       'J\'aimes',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                       ),
                     ),
                     trailing: Switch(
@@ -108,7 +108,7 @@ class _NotificationParamState extends State<NotificationParam> {
                       'Commentaires',
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                       ),
                     ),
                     trailing: Switch(
@@ -127,7 +127,7 @@ class _NotificationParamState extends State<NotificationParam> {
                     title: const Text(
                       'Nouveau follower',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                       ),
                     ),
                     trailing: Switch(
@@ -146,7 +146,7 @@ class _NotificationParamState extends State<NotificationParam> {
                     title: const Text(
                       'Message direct',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                       ),
                     ),
                     trailing: Switch(
@@ -165,7 +165,7 @@ class _NotificationParamState extends State<NotificationParam> {
                     title: const Text(
                       'Modèle ajouter d\'un compte suivie',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                       ),
                     ),
                     trailing: Switch(

@@ -122,13 +122,13 @@ class _CommandeViewState extends State<CommandeView>
         child: TabBarView(
           controller: _tabController,
           children: [
-            const ListCommande(
+            ListCommande(
               status: 'receive',
             ),
             controller.isTailleur.value
-                ? const ListCommande(status: 'save')
+                ? ListCommande(status: 'save')
                 : const ListTailleurView(),
-            const ListCommande(
+            ListCommande(
               status: 'finish',
             ),
           ],

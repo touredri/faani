@@ -128,17 +128,17 @@ ThemeData buildTheme(BuildContext context) {
     fontFamily: fontFamily,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
-        overlayColor: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) {
-            if (states.contains(MaterialState.pressed)) {
+        overlayColor: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.pressed)) {
               return blackColor.withOpacity(0.3);
             } // The splash color when the button is pressed
             return primaryColor; // Use the component's default.
           },
         ),
-        backgroundColor: MaterialStateProperty.all<Color>(primaryColor),
-        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-        textStyle: MaterialStateProperty.all<TextStyle>(
+        backgroundColor: WidgetStateProperty.all<Color>(primaryColor),
+        foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+        textStyle: WidgetStateProperty.all<TextStyle>(
           const TextStyle(
             fontFamily: fontFamily,
             fontWeight: FontWeight.bold,
@@ -148,14 +148,14 @@ ThemeData buildTheme(BuildContext context) {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.all<Color>(blackColor),
-        textStyle: MaterialStateProperty.all<TextStyle>(
+        foregroundColor: WidgetStateProperty.all<Color>(blackColor),
+        textStyle: WidgetStateProperty.all<TextStyle>(
           const TextStyle(
             fontFamily: fontFamily,
             fontWeight: FontWeight.normal,
           ),
         ),
-        side: MaterialStateProperty.all<BorderSide>(
+        side: WidgetStateProperty.all<BorderSide>(
           const BorderSide(
             color: inputBorderColor,
             width: 1,

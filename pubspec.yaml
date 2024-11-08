@@ -52,6 +52,7 @@ dependencies:
   connectivity_plus: ^6.0.3
   flutter_rating_stars: ^1.1.0
   flutter_rating_bar: ^4.0.1
+  upgrader: ^11.3.0
 
 dev_dependencies:
   flutter_lints: ^4.0.0

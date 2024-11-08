@@ -4,14 +4,58 @@ import 'package:faani/app/modules/commande/views/detail_commande_view.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/services/commande_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'commande_container.dart';
 
 class ListCommande extends StatelessWidget {
-  const ListCommande({super.key, required this.status});
+  ListCommande({super.key, required this.status});
 
   final String status;
+
+  OverlayEntry? overlayEntry;
+
+  void showDeleteOverlay(BuildContext context, RenderBox renderBox, String idCommande) {
+    final size = renderBox.size;
+    final position = renderBox.localToGlobal(Offset.zero);
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: position.dx,
+        top: position.dy,
+        width: size.width,
+        height: size.height,
+        child: Material(
+          color: Colors.black.withOpacity(0.6),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    overlayEntry?.remove();
+                  },
+                  child: Text('Supprimer'),
+                ),
+                2.hs,
+                OutlinedButton(
+                  onPressed: () {
+                    overlayEntry?.remove();
+                  },
+                  child: const Text(
+                    'Annuler',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    Overlay.of(context).insert(overlayEntry!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +125,11 @@ class ListCommande extends StatelessWidget {
                                 } else {
                                   final tailleur = result.data![0] as UserModel;
                                   return GestureDetector(
+                                    onLongPress: () {
+                                      final renderBox = context
+                                          .findRenderObject() as RenderBox;
+                                      showDeleteOverlay(context, renderBox, commande[index].id!);
+                                    },
                                     onTap: () {
                                       Get.to(
                                           () => DetailCommandeView(
@@ -93,8 +142,7 @@ class ListCommande extends StatelessWidget {
                                               .userController.isTailleur.value
                                           ? commande[index].nomClient
                                           : tailleur.nomPrenom!,
-                                      dateCommande:
-                                          commande[index].dateAjout,
+                                      dateCommande: commande[index].dateAjout,
                                       etat: commande[index].etatLibelle,
                                     ),
                                   );

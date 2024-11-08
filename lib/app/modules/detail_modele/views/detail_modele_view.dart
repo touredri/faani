@@ -126,10 +126,10 @@ class DetailModeleView extends GetView<DetailModeleController> {
                                     .value
                                     .isTailleur);
                               },
-                              child:
-                                  controller.userController.currentUser.value.isTailleur
-                                      ? const Text('Faire pour un client')
-                                      : const Text('Envoyer à un tailleur')),
+                              child: controller.userController.currentUser.value
+                                      .isTailleur
+                                  ? const Text('Faire pour un client')
+                                  : const Text('Envoyer à un tailleur')),
                         ),
                         0.5.hs,
                         const ListTile(
@@ -153,6 +153,7 @@ class DetailModeleView extends GetView<DetailModeleController> {
                         stream: ModeleService()
                             .getAllModelesByCategorie(modele.idCategorie!),
                         builder: (context, snapshot) {
+                          print(modele.id);
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const Center(
