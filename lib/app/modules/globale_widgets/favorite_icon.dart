@@ -34,7 +34,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
     firestore
         .collection('favorie')
         .where('idModele', isEqualTo: widget.docId)
-        .where('idUtilisateur', isEqualTo: user!.uid)
+        .where('idUtilisateur', isEqualTo: user?.uid??'')
         .get()
         .then((value) {
       if (value.docs.isNotEmpty) {

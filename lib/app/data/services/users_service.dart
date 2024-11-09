@@ -11,7 +11,19 @@ class UserService {
 
   Future<UserModel> getUser(String id) async {
     DocumentSnapshot doc = await _usersRef.doc(id).get();
-    return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
+    if (doc.exists) {
+  return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
+} else {
+  return UserModel(
+    id: '',
+    nomPrenom: null,
+    phoneNumber: '',
+    profileImage: '',
+    isTailleur: false,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+  );
+}
   }
   Future<UserModel?> getIfUser(String id) async {
     DocumentSnapshot doc = await _usersRef.doc(id).get();

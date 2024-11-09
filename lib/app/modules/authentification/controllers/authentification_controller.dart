@@ -143,6 +143,23 @@ class AuthController extends GetxController {
     return false;
   }
 
+  // auth anonymous
+  Future<User?> signInAnonymously() async {
+    try {
+      final result = await auth.signInAnonymously();
+      if (result.user != null) {
+        print('User created successfully');
+        setUser();
+        return result.user;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      print(
+          'Failed to create user anonymously ! error: ************** $e **************');
+    }
+    return null;
+  }
+
   // create user with its information
   void saveUserInFirestore() async {
     if (nameController.text.length < 3) {

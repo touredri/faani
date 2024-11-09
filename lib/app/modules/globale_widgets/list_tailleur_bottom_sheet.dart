@@ -1,6 +1,7 @@
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/users_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/home/controllers/home_controller.dart';
@@ -82,8 +83,16 @@ void showTailleurModalBottomSheet(BuildContext context, Modele modele) {
                     onTap: () {
                       Get.find<AccueilController>().selectedTailleur.value =
                           tailleur;
-                      Get.to(() => AjoutCommandePage(modele),
-                          transition: Transition.rightToLeft);
+                      if (auth.currentUser!.isAnonymous) {
+                        Get.snackbar(
+                          'Erreur',
+                          'Vous devez vous connecter pour faire une commande',
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                      } else {
+                        Get.to(() => AjoutCommandePage(modele),
+                            transition: Transition.rightToLeft);
+                      }
                     },
                   );
                 },

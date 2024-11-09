@@ -99,7 +99,8 @@ class ProfileController extends GetxController {
       isTailleur.value = true;
     }
 
-    myTotalModeleNumber = await ModeleService().getTotalModeleCount(user!.uid);
+    myTotalModeleNumber =
+        await ModeleService().getTotalModeleCount(user?.uid ?? '');
 
     getMesModeles();
 
@@ -174,7 +175,7 @@ class ProfileController extends GetxController {
         }
       });
     } else {
-      ModeleService().getAllModeleByTailleurId(user!.uid).listen((event) {
+      ModeleService().getAllModeleByTailleurId(user?.uid??'').listen((event) {
         mesModelesList.value.addAll(event);
         originalModelesList.value.addAll(event);
       });

@@ -11,8 +11,13 @@ class UserController extends GetxController {
     if (auth.currentUser != null) {
       // Récupération de l'utilisateur actuel et mis a jour de `user` et `isTailleur`
       UserModel userModel = await UserService().getUser(auth.currentUser!.uid);
-      currentUser.value = userModel;
-      isTailleur.value = userModel.isTailleur;
+      if (userModel.nomPrenom != null) {
+        currentUser.value = userModel;
+        isTailleur.value = userModel.isTailleur;
+      }else{
+        currentUser.value = UserModel(nomPrenom: 'Annonymous', phoneNumber: 'Annonymous');
+      }
+      
     }
   }
 

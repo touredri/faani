@@ -35,7 +35,7 @@ class CommandeService {
       });
     }
     return collection
-        .where('idUser', isEqualTo: user!.uid)
+        .where('idUser', isEqualTo: user?.uid)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
