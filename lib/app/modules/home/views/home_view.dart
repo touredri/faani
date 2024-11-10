@@ -11,7 +11,9 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     Get.put(HomeController());
-    Get.put(UserController());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.pushNotifications.initializeFCM(context);
+    });
     return UpgradeAlert(
       dialogStyle: UpgradeDialogStyle.cupertino,
       upgrader: Upgrader(messages: UpgraderMessages(code: 'fr')),

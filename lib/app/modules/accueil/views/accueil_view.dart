@@ -34,45 +34,34 @@ class AccueilView extends GetView<AccueilController> {
             decoration: BoxDecoration(
               color: const Color.fromARGB(255, 51, 51, 51).withOpacity(0.4),
             ),
-            child: Obx(() => Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        controller.genreChange();
-                      },
-                      child: Text(
-                          controller.isHommeSelected.value ? 'Homme' : 'Femme',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 26,
+                    child: CategorieFiltre<AccueilController>(
+                      controller: controller,
                     ),
-                    Expanded(
-                      child: SizedBox(
-                        height: 26,
-                        child: CategorieFiltre<AccueilController>(
-                          controller: controller,
-                        ),
-                      ),
+                  ),
+                ),
+                IconButton(
+                    style: ButtonStyle(
+                      padding: WidgetStateProperty.all(
+                          const EdgeInsets.symmetric(
+                              horizontal: 0, vertical: 0)),
                     ),
-                    IconButton(
-                        style: ButtonStyle(
-                          padding: MaterialStateProperty.all(
-                              const EdgeInsets.symmetric(
-                                  horizontal: 0, vertical: 0)),
-                        ),
-                        onPressed: () {
-                          Get.to(() => const SearchPageView(),
-                              transition: Transition.downToUp);
-                        },
-                        icon: const Icon(
-                          Icons.search,
-                          color: Colors.white,
-                          size: 25,
-                        )),
-                  ],
-                )),
+                    onPressed: () {
+                      Get.to(() => const SearchPageView(),
+                          transition: Transition.downToUp);
+                    },
+                    icon: const Icon(
+                      Icons.search,
+                      color: Colors.white,
+                      size: 25,
+                    )),
+              ],
+            ),
           ),
         ],
       ),

@@ -1,21 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
+import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
 class ModeleService {
+  // Singleton pattern to avoid multiple instances
+  static final ModeleService _singleton = ModeleService._internal();
+
   factory ModeleService() {
     return _singleton;
   }
 
-  ModeleService._internal();
+  ModeleService._internal() {
+    // Ensure no recursive instantiation
+    // ...existing code...
+  }
 
   final collection = FirebaseFirestore.instance.collection('modele');
   DocumentSnapshot? lastDoc;
 
-  static final ModeleService _singleton = ModeleService._internal();
+  // final homeController = Get.find<HomeController>();
 
   // Crée un nouveau document dans la collection "modele"
   Future<void> create(Modele modele) async {
@@ -64,10 +72,10 @@ class ModeleService {
     return querySnapshot.size;
   }
 
-// get all modele by categorie
-  Stream<List<Modele>> getAllModelesByCategorie(String idCategorie) {
+  // get all modeles by a list of categories
+  Stream<List<Modele>> getAllModelesByCategories(List<String> idCategories) {
     return collection
-        .where('idCategorie', isEqualTo: idCategorie)
+        .where('idCategorie', whereIn: idCategories)
         .snapshots()
         .map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
@@ -96,11 +104,14 @@ class ModeleService {
     });
   }
 
-  Future<List<Modele>> getAllModeleByTailleur(String id, String idCategorie,
+  Future<List<Modele>> getAllModeleByTailleur(
+      String id, List<String>? idCategorie,
       {Modele? lastModele}) async {
-    Query<Map<String, dynamic>> query = collection
-        .where('idTailleur', isEqualTo: id)
-        .where('idCategorie', isEqualTo: idCategorie);
+    Query<Map<String, dynamic>> query =
+        collection.where('idTailleur', isEqualTo: id);
+    if (idCategorie != null) {
+      query = query.where('idCategorie', whereIn: idCategorie);
+    }
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await query.get();
       return querySnapshot.docs.map((doc) {
@@ -112,26 +123,31 @@ class ModeleService {
     }
   }
 
-  Future<List<Modele>> getRandomModeles(String clientCible, String idCategorie,
+  Future<List<Modele>> getRandomModeles(List<String>? idCategories,
       {Modele? lastModele}) async {
     const pageSize = 5;
-
     final models = <Modele>[];
 
     Query<Map<String, dynamic>> query =
         collection.orderBy(FieldPath.documentId).limit(pageSize);
-    if (clientCible.isNotEmpty) {
-      query = query.where('genreHabit', isEqualTo: clientCible);
+    if (idCategories != null) {
+      query = query.where('idCategorie', whereIn: idCategories);
+      if (idCategories.contains("1")) {
+        query = query.where('genreHabit', isEqualTo: 'Homme');
+      }
+      if (idCategories.contains("8")) {
+        query = query.where('genreHabit', isEqualTo: 'Femme');
+      }
     }
-    if (idCategorie.isNotEmpty) {
-      query = query.where('idCategorie', isEqualTo: idCategorie);
-    }
-    if (lastModele != null) {
-      final lastDoc = await collection.doc(lastModele.id).get();
+
+    if (Get.find<HomeController>().lastModeleFetch.value != null) {
+      final lastDoc =
+          await collection.doc(Get.find<HomeController>().lastModeleFetch.value?.id).get();
       query = query.startAfterDocument(lastDoc);
     }
     final querySnapshot = await query.get();
     if (querySnapshot.docs.isEmpty) {
+      Get.find<HomeController>().lastModeleFetch.value = null;
       return models;
     }
     final accueilController = Get.find<AccueilController>();
@@ -139,7 +155,8 @@ class ModeleService {
       final model = Modele.fromMap(doc.data(), doc.reference);
       models.addIf(!accueilController.modeles.contains(model), model);
     }
-    lastModele = models.last;
+    Get.find<HomeController>().lastModeleFetch.value =
+        models.isNotEmpty ? models.last : null;
     return models;
   }
 

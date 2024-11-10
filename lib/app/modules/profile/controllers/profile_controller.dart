@@ -13,12 +13,10 @@ import '../../home/controllers/user_controller.dart';
 
 class ProfileController extends GetxController {
   UserController userController = Get.find();
-  // final ModeleService modeleService = Get.find();
   RxString selectedGenreCible = ''.obs;
   final TextEditingController nomPrenomController = TextEditingController();
   final TextEditingController villeQuartierController = TextEditingController();
   final TextEditingController telephoneController = TextEditingController();
-  final selectedCategorie = Rx<Categorie?>(null);
   RxBool isTailleur = false.obs;
   RxString selectedLanguage = 'Français'.obs;
   final List<String> languages = [
@@ -47,9 +45,9 @@ class ProfileController extends GetxController {
   String selectedClientCible = '';
   bool isHasAgent = false;
   final Rx<List<Modele?>> mesModelesList = Rx<List<Modele?>>([]);
-  final Rx<List<Modele?>> originalModelesList = Rx<List<Modele?>>([]);
   final ScrollController scrollController = ScrollController();
   late int myTotalModeleNumber;
+  RxList<String>? listSelectedCategorie;
 
   ProfileController() {
     measureIcon = SvgPicture.asset(
@@ -83,12 +81,13 @@ class ProfileController extends GetxController {
 
   // category selected
   void onCategorieSelected(Categorie categorie) async {
-    if (categorie.libelle != 'Tous') {
-      mesModelesList.value =
-          await ModeleService().getAllModeleByTailleur(user!.uid, categorie.id);
+    if (listSelectedCategorie?.contains(categorie.id) ?? false) {
+      listSelectedCategorie?.remove(categorie.id);
     } else {
-      mesModelesList.value = originalModelesList.value;
+      listSelectedCategorie?.add(categorie.id);
     }
+    mesModelesList.value = await ModeleService()
+        .getAllModeleByTailleur(user!.uid, listSelectedCategorie);
     update(['mesModeles']);
   }
 
@@ -103,15 +102,6 @@ class ProfileController extends GetxController {
         await ModeleService().getTotalModeleCount(user?.uid ?? '');
 
     getMesModeles();
-
-    // scrollController.addListener(() {
-    //   if (scrollController.position.atEdge) {
-    //     if (scrollController.position.pixels != 0) {
-    //       print('At the bottom of the page');
-    //       getMesModeles();
-    //     }
-    //   }
-    // });
   }
 
   @override
@@ -150,7 +140,8 @@ class ProfileController extends GetxController {
   }
 
   void rateApp() {
-    const url = 'https://play.google.com/store/apps/details?id=com.faani.faani';
+    const url =
+        'https://play.google.com/store/apps/details?id=com.faani.app.faani';
     if (Platform.isAndroid) {
       launchUrl(Uri.parse(url));
     }
@@ -158,7 +149,7 @@ class ProfileController extends GetxController {
 
   void shareApp() {
     Share.share(
-        'https://play.google.com/store/apps/details?id=com.faani.faani');
+        'https://play.google.com/store/apps/details?id=com.faani.app.faani');
   }
 
   void getMesModeles() {
@@ -170,14 +161,12 @@ class ProfileController extends GetxController {
         for (Modele modele in event) {
           if (!mesModelesList.value.contains(modele)) {
             mesModelesList.value.add(modele);
-            originalModelesList.value.add(modele);
           }
         }
       });
     } else {
-      ModeleService().getAllModeleByTailleurId(user?.uid??'').listen((event) {
+      ModeleService().getAllModeleByTailleurId(user?.uid ?? '').listen((event) {
         mesModelesList.value.addAll(event);
-        originalModelesList.value.addAll(event);
       });
     }
   }

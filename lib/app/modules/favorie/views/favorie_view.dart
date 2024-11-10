@@ -16,14 +16,14 @@ class FavorieView extends GetView<FavorieController> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: primaryColor,
-          toolbarHeight: 40.0,
+          toolbarHeight: 45.0,
           title: Text('Mes favories',
               style: Theme.of(context).textTheme.displayMedium),
           bottom: PreferredSize(
               preferredSize: const Size(double.infinity, 30),
               child: Container(
                 color: primaryColor,
-                height: 30,
+                height: 35,
                 padding: const EdgeInsets.only(bottom: 5),
                 width: MediaQuery.of(context).size.width,
                 child: CategorieFiltre(

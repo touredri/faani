@@ -151,7 +151,7 @@ class DetailModeleView extends GetView<DetailModeleController> {
                   SliverFillRemaining(
                     child: StreamBuilder(
                         stream: ModeleService()
-                            .getAllModelesByCategorie(modele.idCategorie!),
+                            .getAllModelesByCategories([modele.idCategorie!]),
                         builder: (context, snapshot) {
                           print(modele.id);
                           if (snapshot.connectionState ==

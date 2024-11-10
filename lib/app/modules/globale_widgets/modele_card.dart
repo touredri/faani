@@ -8,10 +8,11 @@ import 'package:shimmer/shimmer.dart';
 import '../../data/models/modele_model.dart';
 
 Widget buildCard(Modele modele, {required BuildContext context}) {
-  // Generate a random height between 0.5 and 1.0
-  final randomHeight = 1.5 + Random().nextDouble() * 2.5;
+  // Generate a consistent height based on the sum of ASCII values of characters in modele.id
+  final int idSum = modele.id!.codeUnits.fold(0, (sum, char) => sum + char);
+  final consistentHeight = 150.0 + (idSum % 100);
   return SizedBox(
-    height: 100.0 * randomHeight, // Set the height of the ModeleCard
+    height: consistentHeight, // Use the consistent height
     width: MediaQuery.of(context).size.width / 2.2,
     child: Card(
       clipBehavior: Clip.antiAlias,

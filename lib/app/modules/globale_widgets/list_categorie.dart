@@ -14,14 +14,14 @@ class CategorieFiltre<T extends GetxController> extends StatefulWidget {
 class _CategorieFiltreState<T extends GetxController>
     extends State<CategorieFiltre<T>> {
   final ScrollController _scrollController = ScrollController();
-  final double itemHeight = 50;
+  final double itemHeight = 55;
   RxList<Categorie> listCategorie = <Categorie>[].obs;
 
   // fetch categories from the database
   void getCategories() {
     CategorieService().getCategorie().listen((event) {
       if (event.isNotEmpty) {
-        event[0].isSelected = true;
+        // event[0].isSelected = true;
         listCategorie.value = event;
       }
     });
@@ -29,15 +29,23 @@ class _CategorieFiltreState<T extends GetxController>
 
   void _scrollToCenter(int selectedIndex, BuildContext context) {
     const itemWidth = 40;
-    final scrollOffset = selectedIndex * itemWidth -
-        (MediaQuery.of(context).size.width / 2 - itemWidth / 2);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scrollOffset =
+        selectedIndex * itemWidth - (screenWidth / 2 - itemWidth / 2);
 
     if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        scrollOffset.clamp(0.0, double.infinity),
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.ease,
-      );
+      final currentScrollOffset = _scrollController.offset;
+      final minScrollOffset = scrollOffset - screenWidth / 2;
+      final maxScrollOffset = scrollOffset + screenWidth / 2;
+
+      if (currentScrollOffset < minScrollOffset ||
+          currentScrollOffset > maxScrollOffset) {
+        _scrollController.animateTo(
+          scrollOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.ease,
+        );
+      }
     }
   }
 
@@ -67,10 +75,8 @@ class _CategorieFiltreState<T extends GetxController>
               margin: const EdgeInsets.symmetric(horizontal: 5),
               child: TextButton(
                 onPressed: () {
-                  for (int i = 0; i < listCategorie.length; i++) {
-                    listCategorie[i].isSelected = (i == index);
-                  }
                   setState(() {
+                    categorie.isSelected = !categorie.isSelected;
                     _scrollToCenter(index, context);
                   });
                   (widget.controller as dynamic).onCategorieSelected(categorie);

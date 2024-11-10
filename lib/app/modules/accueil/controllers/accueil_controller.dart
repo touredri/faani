@@ -1,6 +1,7 @@
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/categorie_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,18 +12,20 @@ import '../../../data/models/modele_model.dart';
 import '../../../data/services/modele_service.dart';
 
 class AccueilController extends GetxController {
-  RxBool isHommeSelected = true.obs;
+  // RxBool isHommeSelected = true.obs;
   RxList<Modele> modeles = <Modele>[].obs;
-  RxBool isFilterOpen = false.obs;
+  // RxBool isFilterOpen = false.obs;
   final PageController pageController =
       PageController(initialPage: 0, viewportFraction: 0.87);
-  final List<String> listId = <String>[];
+  // final List<String> listId = <String>[];
   String sewing = 'assets/svg/sewingp.svg';
   late final Widget sewingIcon;
   final selectedTailleur = Rx<UserModel?>(null);
   final selectedCategorie = Rx<Categorie?>(null);
+  RxList<String>? listSelectedCategorie;
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
   final userController = Get.find<UserController>();
+  final homeController = Get.find<HomeController>();
 
   AccueilController() {
     sewingIcon = SvgPicture.asset(
@@ -33,45 +36,33 @@ class AccueilController extends GetxController {
     );
   }
 
-  // get ramdom model from modeles service
-  // final ModeleService modeleService = ModeleService();
-
   void onCategorieSelected(Categorie categorie) {
     // Reset pagination state for category change
-    selectedCategorie.value = categorie;
     modeles.clear();
-    // userController.currentUser.value.sex??
-    loadMore(userController.currentUser.value.sex ?? '', categorie.libelle,
-        idCategorie: categorie.id);
+    if (listSelectedCategorie?.contains(categorie.id) ?? false) {
+      listSelectedCategorie?.remove(categorie.id);
+    } else {
+      listSelectedCategorie?.add(categorie.id);
+    }
+    loadMore();
+    pageController.jumpToPage(0);
   }
 
   Future<void> refreshPage() async {
     modeles.clear();
-    await loadMore('', '');
+    await loadMore();
   }
 
-  Future<void> loadMore(String clientCible, String libelle,
-      {String? idCategorie}) async {
-    final modeleService = ModeleService();
+  Future<void> loadMore() async {
     try {
-      // Get the last document from your data list
-      final lastModele = modeles.isNotEmpty ? lastModeleFetch.value : null;
       List<Modele> fetchedDocuments;
-
-      if (idCategorie != null) {
-        fetchedDocuments = await modeleService.getRandomModeles(
-            clientCible, libelle == 'Tous' ? '' : idCategorie,
-            lastModele: lastModele);
-      } else {
-        fetchedDocuments = await modeleService.getRandomModeles(
-            clientCible, libelle,
-            lastModele: lastModele);
-      }
+      fetchedDocuments = await homeController.modeleService.getRandomModeles(
+          listSelectedCategorie,
+          lastModele: homeController.lastModeleFetch.value);
 
       if (fetchedDocuments.isNotEmpty) {
-        if (libelle == 'Tous') modeles.clear();
+        // modeles.clear();
         modeles.addAll(fetchedDocuments);
-        lastModeleFetch.value = modeles.last;
         update();
       }
     } catch (e) {
@@ -82,19 +73,8 @@ class AccueilController extends GetxController {
     } finally {}
   }
 
-  void genreChange() {
-    isHommeSelected.value = !isHommeSelected.value;
-    modeles.clear();
-    loadMore(
-        isHommeSelected.value == true ? 'Homme' : 'Femme',
-        selectedCategorie.value == null
-            ? ''
-            : selectedCategorie.value!.libelle);
-    update();
-  }
-
   Future<void> init() async {
-    await loadMore(userController.currentUser.value.sex ?? '', '');
+    await loadMore();
     modeles.shuffle();
   }
 

@@ -1,4 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/notifications_service.dart';
 import 'package:faani/app/modules/accueil/views/accueil_view.dart';
 import 'package:faani/app/modules/commande/views/commande_view.dart';
@@ -9,7 +11,6 @@ import 'package:faani/app/modules/profile/views/profile_view.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
@@ -19,12 +20,10 @@ class HomeController extends GetxController {
   PersistentTabController tabController =
       PersistentTabController(initialIndex: 0);
   UserController userController = Get.find();
-
-  /* connectivity check part */
-  final Connectivity _connectivity = Connectivity();
-  final _connectionStatus = ConnectivityResult.none.obs;
-  final RxBool isOnline = false.obs;
-  /* connectivity listen part */
+  RxBool isNetworkAvailable = true.obs;
+  PushNotifications pushNotifications = PushNotifications();
+  final modeleService = Get.find<ModeleService>();
+  final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
 
   String sewing = 'assets/svg/sewingp.svg';
   String dress = 'assets/svg/dress.svg';
@@ -43,6 +42,7 @@ class HomeController extends GetxController {
       height: 24,
     );
   }
+
   List<PersistentTabConfig> tabs() => [
         PersistentTabConfig(
           screen: const AccueilView(),
@@ -64,16 +64,15 @@ class HomeController extends GetxController {
             ),
           ),
         ),
-        // if (userController.isTailleur.value)
         PersistentTabConfig(
           screen: userController.isTailleur.value
               ? const AjoutModeleView()
               : const AjoutMesure(),
           item: ItemConfig(
-            activeForegroundColor: const Color.fromARGB(255, 238, 250, 255),
+            activeForegroundColor: primaryColor,
             icon: const Icon(
               Icons.add,
-              color: primaryColor,
+              color: Colors.white,
             ),
           ),
         ),
@@ -95,45 +94,29 @@ class HomeController extends GetxController {
 
   @override
   void onInit() {
-    PushNotifications.getAndUpdateUserToken();
+    _checkNetworkStatus();
+    _monitorNetworkChanges();
     super.onInit();
-    initConnectivity();
-    _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
 
-  /* connectivity check fonctions part */
-  Future<void> initConnectivity() async {
-    try {
-      var result = await _connectivity.checkConnectivity();
-      _updateConnectionStatus(result);
-    } on PlatformException catch (e) {
-      debugPrint('Couldn\'t check connectivity status: $e');
-    }
+  // Initial network status check
+  Future<void> _checkNetworkStatus() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    isNetworkAvailable.value = connectivityResult.isNotEmpty &&
+        connectivityResult.first != ConnectivityResult.none;
+    // print('Network status: $isNetworkAvailable');
   }
 
-  void _updateConnectionStatus(List<ConnectivityResult> result) {
-    _connectionStatus.value = result.first;
-    isOnline.value = result.first != ConnectivityResult.none;
-    if (result.first == ConnectivityResult.none) {
-      isOnline.value = false;
-    } else if (result.contains(ConnectivityResult.mobile) ||
-        result.contains(ConnectivityResult.wifi)) {
-      isOnline.value = true;
-    } else {
-      isOnline.value = false;
-    }
+  // Monitor network status changes
+  void _monitorNetworkChanges() {
+    Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> results) {
+      isNetworkAvailable.value =
+          results.isNotEmpty && results.first != ConnectivityResult.none;
+      // print('Network status in monitor: $isNetworkAvailable');
+    });
   }
-
-  ConnectivityResult get connectionStatus => _connectionStatus.value;
-
-  void checkInternetConnectivity() {
-    if (isOnline.value == false) {
-      Get.snackbar(
-          'Pas d\'accès internet', 'Please check your internet connection',
-          snackPosition: SnackPosition.TOP);
-    }
-  }
-  /* connectivity check fonctions part */
 
   @override
   void onReady() {

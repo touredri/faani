@@ -9,16 +9,17 @@ import '../../../firebase/global_function.dart';
 class FavorieController extends GetxController {
   Rx<List<Modele?>> modeles = Rx<List<Modele?>>([]);
   Rx<Categorie?> selectedCategorie = Rx<Categorie?>(null);
+  RxList<String>? listSelectedCategorie;
 
   Stream<List<Modele>> loadData() async* {
     await for (var event in FavorieService().getAllFavorie(user!.uid)) {
       var modeles = <Modele>[];
       for (Favorie fav in event) {
         var modele = await ModeleService().getModeleById(fav.idModele!);
-        if (selectedCategorie.value == null ||
-            selectedCategorie.value!.libelle == 'Tous' ||
-            modele.idCategorie == selectedCategorie.value!.id) {
-          modeles.add(modele);
+        if (listSelectedCategorie != null) {
+          if (listSelectedCategorie!.contains(modele.idCategorie)) {
+            modeles.add(modele);
+          }
         }
       }
       yield modeles;
@@ -27,7 +28,11 @@ class FavorieController extends GetxController {
 
   // category selected
   void onCategorieSelected(Categorie categorie) {
-    selectedCategorie.value = categorie;
+    if (listSelectedCategorie?.contains(categorie.id) ?? false) {
+      listSelectedCategorie?.remove(categorie.id);
+    } else {
+      listSelectedCategorie?.add(categorie.id);
+    }
     loadData();
     update();
   }

@@ -1,109 +1,126 @@
+import 'dart:convert';
+
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
+import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
 class PushNotifications {
-  static final FirebaseMessaging _firebaseMessaging =
-      FirebaseMessaging.instance;
-  static final FlutterLocalNotificationsPlugin
-      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  // final apiService = Get.find<ApiService>();
 
-  Future<void> init() async {
-    // request notif permissions
-    await _firebaseMessaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-  }
-
-  static getAndUpdateUserToken() async {
-    final String? token = await _firebaseMessaging.getToken();
-
-    bool isUserLoggedin = auth.currentUser != null;
-    if (isUserLoggedin) {
-      // update user token
-      await UserController().updateUserToken(token);
-    }
-
-    await _firebaseMessaging.onTokenRefresh.listen((event) {
-      if (isUserLoggedin) {
-        UserController().updateUserToken(event);
-      }
-    });
-  }
-
-  // initialize the local notification plugin
-  static Future localNotificationInit() async {
+  Future<void> initializeFCM(BuildContext context) async {
+    // Initialize local notifications
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    final DarwinInitializationSettings initializationSettingsDarwin =
-        DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-      onDidReceiveLocalNotification:
-          (int id, String? title, String? body, String? payload) {},
-    );
 
-    final LinuxInitializationSettings initializationSettingsLinux =
-        LinuxInitializationSettings(defaultActionName: 'Ouvrir Notification');
-
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
-      iOS: initializationSettingsDarwin,
-      linux: initializationSettingsLinux,
     );
 
-    // resuest permissions for android 13 and above
-    _flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()!
-        .requestNotificationsPermission();
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        if (response.payload != null) {
+          final Map<String, dynamic> data = jsonDecode(response.payload!);
+          _handleMessageOpen(context, data);
+        }
+      },
+    );
 
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: onNotificationTap,
-        onDidReceiveBackgroundNotificationResponse: onNotificationTap);
-  }
+    // Request permission for iOS devices
+    await _requestPermission();
 
-  // on local notification tap
-  static void onNotificationTap(NotificationResponse notificationResponse) {
-    if (auth.currentUser != null) {
-      // Get.to(() => const HomeView());
+    // Get the device token
+    String? token = await _firebaseMessaging.getToken();
+    print("FCM Token: $token");
+    // apiService.saveFcmToken(token!);
+
+    // Handle token refresh
+    _firebaseMessaging.onTokenRefresh.listen((newToken) async {
+      print("Token refreshed: $newToken");
+      // Send the new token to the backend if necessary
+      // apiService.saveFcmToken(newToken);
+      bool isUserLoggedin = auth.currentUser != null;
+      if (isUserLoggedin) {
+        // update user token
+        await UserController().updateUserToken(token);
+      }
+    });
+
+    // Handle foreground message display
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print(
+          "Message received: ${message.notification?.title}, ${message.notification?.body}");
+      _showForegroundNotification(message);
+    });
+
+    // Handle when the app is opened from a notification
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print(
+          "Message opened: ${message.notification?.title}, ${message.notification?.body}");
+      _handleMessageOpen(Get.context ?? context, message.data);
+    });
+
+    // Handle message when the app launches from a terminated state
+    RemoteMessage? initialMessage =
+        await _firebaseMessaging.getInitialMessage();
+    if (initialMessage != null) {
+      _handleMessageOpen(Get.context ?? context, initialMessage.data);
     }
   }
 
-  static Future showSimpleNotification({
-    required String title,
-    required String body,
-    required String payload,
-  }) async {
-    const AndroidNotificationDetails androidNotificationDetails =
+  Future<void> _requestPermission() async {
+    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print("User granted permission");
+    } else {
+      print("User denied permission");
+    }
+  }
+
+  void _showForegroundNotification(RemoteMessage message) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'channelId',
-      'channelName',
-      channelDescription: 'channelDescription',
+      'high_importance_channel',
+      'Faani',
+      channelDescription: 'This channel is used for important notifications',
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'ticker',
-      icon: '@mipmap/ic_launcher',
     );
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
     );
+
     await _flutterLocalNotificationsPlugin.show(
-      0,
-      title,
-      body,
-      notificationDetails,
-      payload: payload,
+      message.hashCode,
+      message.notification?.title,
+      message.notification?.body,
+      platformChannelSpecifics,
+      payload: 'Notification Payload Data',
     );
+  }
+
+  void _handleMessageOpen(BuildContext context, Map<String, dynamic>? data) {
+    Get.to(() => const HomeView());
+    Future.delayed(const Duration(milliseconds: 500), () {
+      // Get.to(() => NotificationPage());
+      data?.entries.forEach((entry) {
+        print("Key: ${entry.key}, Value: ${entry.value}");
+      });
+    });
   }
 }
