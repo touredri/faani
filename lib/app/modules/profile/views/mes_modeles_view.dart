@@ -94,20 +94,18 @@ class MesModelesView extends GetView {
                 return MasonryGridView.count(
                   controller: controller.scrollController,
                   padding: const EdgeInsets.only(bottom: 10),
-                  crossAxisCount: 2,
+                  crossAxisCount: 3,
                   mainAxisSpacing: 4,
                   crossAxisSpacing: 4,
                   itemCount: controller.mesModelesList.value.length,
                   itemBuilder: (context, index) {
+                    final modele = controller.mesModelesList.value[index];
                     return GestureDetector(
                       onTap: () {
-                        Get.to(
-                            () => DetailModeleView(
-                                controller.mesModelesList.value[index]!),
-                            arguments: controller.mesModelesList.value[index]);
+                        Get.to(() => DetailModeleView(modele),
+                            arguments: modele);
                       },
-                      child: _buildCard(
-                          controller.mesModelesList.value[index]!.fichier[0]!),
+                      child: _buildCard(modele!.fichier[0]!, modele),
                     );
                   },
                 );
@@ -128,8 +126,9 @@ class MesModelesView extends GetView {
   }
 }
 
-Widget _buildCard(String imageUrl) {
-  final imageHeight = (Random().nextInt(4) + 1) * 100.0;
+Widget _buildCard(String imageUrl, Modele modele) {
+  final int idSum = modele.id!.codeUnits.fold(0, (sum, char) => sum + char);
+  final imageHeight = 150.0 + (idSum % 100);
   return Card(
     clipBehavior: Clip.antiAliasWithSaveLayer,
     child: Image.network(

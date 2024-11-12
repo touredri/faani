@@ -1,5 +1,5 @@
 name: faani
-version: 1.0.1+1
+version: 1.0.0+3
 publish_to: none
 description: An application to connect tailor and customer, it promote traditional suit. We can book inside and follow best tailor
 environment:
