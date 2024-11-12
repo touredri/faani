@@ -14,14 +14,13 @@ class CategorieFiltre<T extends GetxController> extends StatefulWidget {
 class _CategorieFiltreState<T extends GetxController>
     extends State<CategorieFiltre<T>> {
   final ScrollController _scrollController = ScrollController();
-  final double itemHeight = 55;
+  final double itemHeight = 50;
   RxList<Categorie> listCategorie = <Categorie>[].obs;
 
   // fetch categories from the database
   void getCategories() {
     CategorieService().getCategorie().listen((event) {
       if (event.isNotEmpty) {
-        // event[0].isSelected = true;
         listCategorie.value = event;
       }
     });

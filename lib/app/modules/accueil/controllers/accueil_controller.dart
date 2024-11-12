@@ -12,17 +12,14 @@ import '../../../data/models/modele_model.dart';
 import '../../../data/services/modele_service.dart';
 
 class AccueilController extends GetxController {
-  // RxBool isHommeSelected = true.obs;
   RxList<Modele> modeles = <Modele>[].obs;
-  // RxBool isFilterOpen = false.obs;
   final PageController pageController =
       PageController(initialPage: 0, viewportFraction: 0.87);
-  // final List<String> listId = <String>[];
   String sewing = 'assets/svg/sewingp.svg';
   late final Widget sewingIcon;
   final selectedTailleur = Rx<UserModel?>(null);
   final selectedCategorie = Rx<Categorie?>(null);
-  RxList<String>? listSelectedCategorie;
+  RxList<String> listSelectedCategorie = <String>[].obs;
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
   final userController = Get.find<UserController>();
   final homeController = Get.find<HomeController>();
@@ -39,10 +36,10 @@ class AccueilController extends GetxController {
   void onCategorieSelected(Categorie categorie) {
     // Reset pagination state for category change
     modeles.clear();
-    if (listSelectedCategorie?.contains(categorie.id) ?? false) {
-      listSelectedCategorie?.remove(categorie.id);
+    if (listSelectedCategorie.contains(categorie.id)) {
+      listSelectedCategorie.remove(categorie.id);
     } else {
-      listSelectedCategorie?.add(categorie.id);
+      listSelectedCategorie.add(categorie.id);
     }
     loadMore();
     pageController.jumpToPage(0);

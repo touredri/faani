@@ -101,18 +101,21 @@ class AuthView extends GetView<AuthController> {
                   )),
               3.hs, // button sign in anonymously
               if (auth.currentUser == null)
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  onPressed: () async {
-                    final anonyme = await controller.signInAnonymously();
-                    if (anonyme != null) {
-                      Get.offAll(() => const HomeView());
-                    }
-                  },
-                  child: const Text('Continuer sans compte'),
-                )
+                Obx(() => OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () async {
+                        controller.isLoading.value = true;
+                        final anonyme = await controller.signInAnonymously();
+                        if (anonyme != null) {
+                          Get.offAll(() => const HomeView());
+                        }
+                      },
+                      child: controller.isLoading.value
+                          ? circularProgress()
+                          : const Text('Continuer sans compte'),
+                    ))
             ],
           ),
         ),

@@ -36,7 +36,7 @@ class CommandeController extends GetxController {
   final TextEditingController prixController = TextEditingController();
   final TextEditingController nomController = TextEditingController();
   final TextEditingController numeroController = TextEditingController();
-  RxList<String>? listSelectedCategorie;
+  RxList<String> listSelectedCategorie = <String>[].obs;
 
   Future<List<dynamic>> fetchCommandeData(Commande commande) async {
     return Future.wait([
@@ -50,10 +50,10 @@ class CommandeController extends GetxController {
   }
 
   void onCategorieSelected(Categorie categorie) {
-    if (listSelectedCategorie?.contains(categorie.id) ?? false) {
-      listSelectedCategorie?.remove(categorie.id);
+    if (listSelectedCategorie.contains(categorie.id)) {
+      listSelectedCategorie.remove(categorie.id);
     } else {
-      listSelectedCategorie?.add(categorie.id);
+      listSelectedCategorie.add(categorie.id);
     }
     update();
   }
@@ -155,7 +155,12 @@ class CommandeController extends GetxController {
           await userService.getUser(newCommande.idTailleur);
       await sendNotification(tailleur.token!, 'Nouvelle commande',
           'Vous avez une nouvelle commande de ${userController.currentUser.value.nomPrenom}');
-          sendProgrammingNotification(tailleur.token!, userController.currentUser.value.token!, 'Alert date Prevue', 'La date prevue pour l\habit de ${userController.currentUser.value.nomPrenom} est arrivé', newCommande.datePrevue);
+      sendProgrammingNotification(
+          tailleur.token!,
+          userController.currentUser.value.token!,
+          'Alert date Prevue',
+          'La date prevue pour l\habit de ${userController.currentUser.value.nomPrenom} est arrivé',
+          newCommande.datePrevue);
     }
     await SuiviEtatService().createSuiviEtat(newSuiviEtat);
 

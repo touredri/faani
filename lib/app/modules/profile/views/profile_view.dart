@@ -1,3 +1,4 @@
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
 import 'package:faani/app/modules/profile/widgets/build_list.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class ProfileView extends GetView<ProfileController> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const SizedBox(height: 165), // Height of the fixed card
+                    const SizedBox(height: 160),
                     Container(
                       padding: const EdgeInsets.only(bottom: 10),
                       decoration: BoxDecoration(
@@ -49,7 +50,6 @@ class ProfileView extends GetView<ProfileController> {
               right: 0,
               child: Column(
                 children: [
-                  1.1.hs,
                   Card(
                     color: Colors.blueGrey[50],
                     elevation: 5,
@@ -68,24 +68,24 @@ class ProfileView extends GetView<ProfileController> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${controller.userController.currentUser.value.nomPrenom}',
+                                    auth.currentUser!.displayName ?? 'Anonyme',
                                     style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   // 3.hs,
-                                  const Row(
+                                  Row(
                                     children: [
-                                      Icon(
+                                      const Icon(
                                         Icons.location_on,
                                         // color: Colors.white,
                                         size: 15,
                                       ),
-                                      SizedBox(width: 5),
+                                      const SizedBox(width: 5),
                                       Text(
-                                        'inconnu, Mali',
-                                        style: TextStyle(
+                                        '${controller.userController.currentUser.value.adress ?? 'Bamako, Mali'} ',
+                                        style: const TextStyle(
                                           fontSize: 12,
                                         ),
                                       ),

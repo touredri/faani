@@ -73,7 +73,7 @@ Widget listBuild(ProfileController controller, BuildContext context) {
               Get.to(() => const MonAtelierView(),
                   transition: Transition.rightToLeft);
             }),
-      if (controller.isTailleur.value)
+      if (controller.userController.isTailleur.value)
         CustomListTile(
             leadingIcon: controller.dressIcon,
             title: 'Mes Modèles',
@@ -82,7 +82,8 @@ Widget listBuild(ProfileController controller, BuildContext context) {
                   Get.to(() => const MesModelesView(),
                       transition: Transition.rightToLeft),
                 }),
-      if (!controller.isTailleur.value && !auth.currentUser!.isAnonymous)
+      if (!controller.userController.isTailleur.value &&
+          !auth.currentUser!.isAnonymous)
         CustomListTile(
             leadingIcon: controller.becomeTailorIcon,
             title: 'Devenir Tailleur',

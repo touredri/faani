@@ -1,3 +1,4 @@
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
@@ -11,10 +12,19 @@ class ModifierProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     Get.find<ProfileController>();
+    if (auth.currentUser != null) {
+      controller.nomPrenomController.text = auth.currentUser!.displayName!;
+      controller.villeQuartierController.text =
+          controller.userController.currentUser.value.adress ??
+              "Ville, Quartier";
+      controller.selectedGenreCible.value =
+          controller.userController.currentUser.value.sex ?? "Genre";
+    }
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: scaffoldBack,
+        title: Text(auth.currentUser!.displayName ?? "Anonyme"),
       ),
       body: SingleChildScrollView(
         child: Container(

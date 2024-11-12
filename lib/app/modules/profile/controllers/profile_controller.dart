@@ -58,7 +58,7 @@ class ProfileController extends GetxController {
   final Rx<List<Modele?>> mesModelesList = Rx<List<Modele?>>([]);
   final ScrollController scrollController = ScrollController();
   late int myTotalModeleNumber;
-  RxList<String>? listSelectedCategorie;
+  RxList<String> listSelectedCategorie = <String>[].obs;
 
   // change language
   void updateLanguage(String language) {
@@ -67,10 +67,11 @@ class ProfileController extends GetxController {
 
   // category selected
   void onCategorieSelected(Categorie categorie) async {
-    if (listSelectedCategorie?.contains(categorie.id) ?? false) {
-      listSelectedCategorie?.remove(categorie.id);
+    mesModelesList.value = [];
+    if (listSelectedCategorie.contains(categorie.id)) {
+      listSelectedCategorie.remove(categorie.id);
     } else {
-      listSelectedCategorie?.add(categorie.id);
+      listSelectedCategorie.add(categorie.id);
     }
     mesModelesList.value = await ModeleService()
         .getAllModeleByTailleur(user!.uid, listSelectedCategorie);
@@ -82,8 +83,10 @@ class ProfileController extends GetxController {
     super.onInit();
     if (!Get.isRegistered<UserController>()) {
       userController = Get.put(UserController());
+      userController.init();
+    } else {
+      userController = Get.find<UserController>();
     }
-    userController = Get.find<UserController>();
     if (userController.isTailleur.value) {
       isTailleur.value = true;
     }

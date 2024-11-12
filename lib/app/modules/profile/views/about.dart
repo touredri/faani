@@ -18,9 +18,9 @@ class AboutUsPage extends StatelessWidget {
             const Text(
               'Bienvenue chez Faani',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: primaryColor,
+                // color: primaryColor,
               ),
             ),
             const SizedBox(height: 10),
@@ -49,9 +49,9 @@ class AboutUsPage extends StatelessWidget {
             const Text(
               'Notre Engagement',
               style: TextStyle(
-                fontSize: 22,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: primaryColor,
+                // color: primaryColor,
               ),
             ),
             const SizedBox(height: 10),
@@ -73,9 +73,9 @@ class AboutUsPage extends StatelessWidget {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 22,
+        fontSize: 16,
         fontWeight: FontWeight.bold,
-        color: primaryColor,
+        // color: primaryColor,
       ),
     );
   }
@@ -95,8 +95,8 @@ class AboutUsPage extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    // fontWeight: FontWeight.bold,
                     // color: Colors.blue,
                   ),
                 ),
@@ -104,7 +104,7 @@ class AboutUsPage extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 25),
                   child: Text(
                     description,
-                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                   ),
                 ),
               ],

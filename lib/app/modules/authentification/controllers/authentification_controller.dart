@@ -20,6 +20,7 @@ class AuthController extends GetxController {
   RxBool isCodeSent = false.obs;
   RxString smsCode = ''.obs;
   RxBool loading = false.obs;
+  RxBool isLoading = false.obs;
   RxBool resend = false.obs;
   RxInt count = 60.obs;
   late Timer timer;

@@ -10,14 +10,14 @@ class UserController extends GetxController {
   Future<void> init() async {
     if (auth.currentUser != null) {
       // Récupération de l'utilisateur actuel et mis a jour de `user` et `isTailleur`
-      UserModel userModel = await UserService().getUser(auth.currentUser!.uid);
-      if (userModel.nomPrenom != null) {
-        currentUser.value = userModel;
-        isTailleur.value = userModel.isTailleur;
-      }else{
-        currentUser.value = UserModel(nomPrenom: 'Annonymous', phoneNumber: 'Annonymous');
+      UserModel user = await UserService().getUser(auth.currentUser!.uid);
+      if (user.nomPrenom != null) {
+        currentUser.value = user;
+        isTailleur.value = user.isTailleur;
+      } else {
+        currentUser.value =
+            UserModel(nomPrenom: 'Annonymous', phoneNumber: 'Annonymous');
       }
-      
     }
   }
 
