@@ -1,3 +1,4 @@
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/floating_bottom_sheet.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,7 @@ Future commentaire(BuildContext context) {
                     ],
                   ),
                   const Text(
-                    "How like will you you recommand Fanni to a friend?",
+                    "Dans quelle mesure recommanderez-vous Fanni à un ami ?",
                     textAlign: TextAlign.center,
                   ),
                   1.hs,
@@ -100,9 +101,7 @@ Future commentaire(BuildContext context) {
                       width: MediaQuery.of(context).size.width * 0.8,
                       child: ElevatedButton(
                           onPressed: () {
-                            Get.snackbar('Commentaire envoyer',
-                                'Merci d\'avoir donner votre avis',
-                                snackPosition: SnackPosition.BOTTOM);
+                            showCustomSnackbar(message: "Merci pour votre avis", backgroundColor: Colors.green);
                             Navigator.pop(context);
                           },
                           child: const Text(
