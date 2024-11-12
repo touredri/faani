@@ -10,7 +10,7 @@ class UserModel {
       profileImage,
       token,
       sex;
-  bool  isTailleur ;
+  bool isTailleur;
   DateTime? createdAt, updatedAt;
 
   UserModel(
@@ -72,5 +72,35 @@ class UserModel {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     });
+  }
+
+  UserModel copyWith({
+    String? id,
+    String? nomPrenom,
+    String? clientCible,
+    String? email,
+    String? phoneNumber,
+    String? adress,
+    String? profileImage,
+    bool? isTailleur,
+    String? sex,
+    String? token,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      nomPrenom: nomPrenom ?? this.nomPrenom,
+      clientCible: clientCible ?? this.clientCible,
+      email: email ?? this.email,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      adress: adress ?? this.adress,
+      profileImage: profileImage ?? this.profileImage,
+      isTailleur: isTailleur ?? this.isTailleur,
+      sex: sex ?? this.sex,
+      token: token ?? this.token,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 }

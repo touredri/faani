@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
@@ -35,6 +36,7 @@ class CommandeController extends GetxController {
   final TextEditingController prixController = TextEditingController();
   final TextEditingController nomController = TextEditingController();
   final TextEditingController numeroController = TextEditingController();
+  RxList<String>? listSelectedCategorie;
 
   Future<List<dynamic>> fetchCommandeData(Commande commande) async {
     return Future.wait([
@@ -45,6 +47,15 @@ class CommandeController extends GetxController {
       modeleService.getModeleById(commande.idModele),
       suiviEtatService.getSuiviEtatByCommandeId(commande.id!)
     ]);
+  }
+
+  void onCategorieSelected(Categorie categorie) {
+    if (listSelectedCategorie?.contains(categorie.id) ?? false) {
+      listSelectedCategorie?.remove(categorie.id);
+    } else {
+      listSelectedCategorie?.add(categorie.id);
+    }
+    update();
   }
 
   void toggleSearch() {

@@ -92,7 +92,6 @@ class HomeItem extends GetView<AccueilController> {
                 ),
                 FavoriteIcone(
                   docId: modele.id!,
-                  color: 'white',
                 ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
@@ -126,7 +125,7 @@ class HomeItem extends GetView<AccueilController> {
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           return Text('${snapshot.data}',
-                              style: TextStyle(color: Colors.grey));
+                              style: const TextStyle(color: Colors.white));
                         } else {
                           return const CircularProgressIndicator();
                         }

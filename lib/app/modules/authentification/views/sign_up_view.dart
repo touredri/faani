@@ -65,7 +65,7 @@ class SignUpView extends GetView<AuthController> {
                             snackPosition: SnackPosition.BOTTOM,
                           );
                           controller.setUser();
-                          Get.to(() => HomeView());
+                          Get.offAll(() => const HomeView());
                         } else {
                           controller.saveUserInFirestore();
                         }

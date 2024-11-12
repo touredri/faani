@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 SizedBox circularProgress() {
   return const SizedBox(
@@ -6,6 +7,20 @@ SizedBox circularProgress() {
     width: 20,
     child: CircularProgressIndicator(
       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+    ),
+  );
+}
+
+void showCustomSnackbar({
+  required String message,
+  Color backgroundColor = Colors.red,
+  Duration duration = const Duration(seconds: 3),
+}) {
+  ScaffoldMessenger.of(Get.context!).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: backgroundColor,
+      duration: duration,
     ),
   );
 }

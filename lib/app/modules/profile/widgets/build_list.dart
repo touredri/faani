@@ -1,10 +1,16 @@
+import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/modules/authentification/views/authentification_view.dart';
+import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
+import 'package:faani/app/modules/profile/views/about.dart';
 import 'package:faani/app/modules/profile/views/aide_view.dart';
 import 'package:faani/app/modules/profile/views/mes_modeles_view.dart';
 import 'package:faani/app/modules/profile/views/mon_atelier.dart';
 import 'package:faani/app/modules/profile/views/parametre_view.dart';
 import 'package:faani/app/modules/profile/widgets/commentaire_bottom_sheet.dart';
+import 'package:faani/app/modules/profile/widgets/received_request.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import '../../mesures/views/mesures_view.dart';
 import '../views/devenir_tailleur_view.dart';
@@ -14,18 +20,32 @@ import 'list_actions.dart';
 Widget listBuild(ProfileController controller, BuildContext context) {
   return Column(
     children: [
-      CustomListTile(
-        leadingIcon: const Icon(
-          Icons.person,
-          color: Colors.blue,
+      1.5.hs,
+      if (!auth.currentUser!.isAnonymous)
+        CustomListTile(
+          leadingIcon: const Icon(
+            Icons.person,
+            color: Colors.blue,
+          ),
+          title: 'Mon profile',
+          subTitle: 'Changez vos informations',
+          onTap: () => {
+            Get.to(const ModifierProfileView(),
+                transition: Transition.rightToLeft)
+          },
         ),
-        title: 'Mon profile',
-        subTitle: 'Changez vos informations',
-        onTap: () => {
-          Get.to(const ModifierProfileView(),
-              transition: Transition.rightToLeft)
-        },
-      ),
+      if (auth.currentUser!.isAnonymous)
+        CustomListTile(
+            leadingIcon: const Icon(
+              Icons.person_add,
+              color: Colors.blue,
+            ),
+            title: 'S\'inscrire',
+            subTitle: 'Créer un compte pour plus de fonctionnalités',
+            onTap: () => {
+                  Get.to(() => const AuthView(),
+                      transition: Transition.rightToLeft)
+                }),
       CustomListTile(
           leadingIcon: controller.measureIcon,
           title: 'Mes Mesures',
@@ -34,6 +54,16 @@ Widget listBuild(ProfileController controller, BuildContext context) {
                 Get.to(() => const MesuresView(),
                     transition: Transition.rightToLeft),
               }),
+      if (Get.find<HomeController>().isAdmin.value)
+        CustomListTile(
+            leadingIcon: controller.becomeTailorIcon,
+            title: 'Gestion tailleurs',
+            subTitle:
+                'Gerer les demandes d\'etre tailleur et les compte tailleurs',
+            onTap: () => {
+                  Get.to(() => const ReceivedRequest(),
+                      transition: Transition.rightToLeft),
+                }),
       if (controller.isTailleur.value)
         CustomListTile(
             leadingIcon: controller.scissorIcon,
@@ -52,13 +82,13 @@ Widget listBuild(ProfileController controller, BuildContext context) {
                   Get.to(() => const MesModelesView(),
                       transition: Transition.rightToLeft),
                 }),
-      if (!controller.isTailleur.value)
+      if (!controller.isTailleur.value && !auth.currentUser!.isAnonymous)
         CustomListTile(
             leadingIcon: controller.becomeTailorIcon,
             title: 'Devenir Tailleur',
             subTitle: 'Basculer vers compte tailleur',
             onTap: () => {
-                  Get.to(() => DevenirTailleurView(),
+                  Get.to(() => const DevenirTailleurView(),
                       transition: Transition.rightToLeft),
                 }),
       CustomListTile(
@@ -75,13 +105,24 @@ Widget listBuild(ProfileController controller, BuildContext context) {
       ),
       CustomListTile(
         leadingIcon: const Icon(
+          Icons.info,
+          color: Colors.blue,
+        ),
+        title: 'A propos',
+        subTitle: 'En savoir plus sur Faani App',
+        onTap: () {
+          Get.to(() => const AboutUsPage(), transition: Transition.rightToLeft);
+        },
+      ),
+      CustomListTile(
+        leadingIcon: const Icon(
           Icons.help,
           color: Colors.blue,
         ),
         title: 'Centre d\'aide',
         subTitle: 'FAQ, Contactez-nous',
         onTap: () {
-          Get.to(() => AideView(), transition: Transition.rightToLeft);
+          Get.to(() => const AideView(), transition: Transition.rightToLeft);
         },
       ),
       CustomListTile(

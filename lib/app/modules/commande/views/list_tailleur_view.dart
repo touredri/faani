@@ -1,6 +1,7 @@
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/modules/commande/views/tailor_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,10 +10,6 @@ class ListTailleurView extends GetView {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('ListTailleurView'),
-      //   centerTitle: true,
-      // ),
       body: StreamBuilder(
         stream: UserService().getAllTailleur(),
         builder: (context, snapshot) {
@@ -58,7 +55,7 @@ class ListTailleurView extends GetView {
                     ],
                   ),
                   onTap: () {
-                    // Get.toNamed('/tailleur/${users[index]['id']}');
+                    Get.to(() => TailorProfilePage(tailor: tailleur));
                   },
                 );
               },

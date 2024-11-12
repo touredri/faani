@@ -12,23 +12,26 @@ class UserService {
   Future<UserModel> getUser(String id) async {
     DocumentSnapshot doc = await _usersRef.doc(id).get();
     if (doc.exists) {
-  return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
-} else {
-  return UserModel(
-    id: '',
-    nomPrenom: null,
-    phoneNumber: '',
-    profileImage: '',
-    isTailleur: false,
-    createdAt: DateTime.now(),
-    updatedAt: DateTime.now(),
-  );
-}
+      return UserModel.fromMap(
+          doc.data() as Map<String, dynamic>, doc.reference);
+    } else {
+      return UserModel(
+        id: '',
+        nomPrenom: null,
+        phoneNumber: '',
+        profileImage: '',
+        isTailleur: false,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+    }
   }
+
   Future<UserModel?> getIfUser(String id) async {
     DocumentSnapshot doc = await _usersRef.doc(id).get();
-    if(doc.exists){
-      return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.reference);
+    if (doc.exists) {
+      return UserModel.fromMap(
+          doc.data() as Map<String, dynamic>, doc.reference);
     }
     return null;
   }
@@ -42,15 +45,18 @@ class UserService {
   }
 
   Stream<List<UserModel>> getAllTailleur() {
-    return _usersRef
-        .where('isTailleur', isEqualTo: true)
-        .snapshots()
-        .map((event) => event.docs
-            .map((e) => UserModel.fromMap(e.data() as Map<String, dynamic>, e.reference))
+    return _usersRef.where('isTailleur', isEqualTo: true).snapshots().map(
+        (event) => event.docs
+            .map((e) => UserModel.fromMap(
+                e.data() as Map<String, dynamic>, e.reference))
             .toList());
   }
 
   void updateUserToken(String uid, String? token) {
     _usersRef.doc(uid).update({'token': token});
+  }
+
+  Future<void> updateUserIsTailleur(String id, bool isTailleur) {
+    return _usersRef.doc(id).update({'isTailleur': isTailleur});
   }
 }

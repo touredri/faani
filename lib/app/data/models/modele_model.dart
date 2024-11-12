@@ -12,6 +12,7 @@ class Modele {
   final String idTailleur;
   final String? idCategorie;
   final bool? isPublic;
+  final bool isApproved; // New property
 
   Modele({
     required this.id,
@@ -22,6 +23,7 @@ class Modele {
     required this.idTailleur,
     required this.idCategorie,
     required this.isPublic,
+    this.isApproved = false, // Initialize to false
   });
 
   factory Modele.fromMap(
@@ -34,6 +36,7 @@ class Modele {
     final idTailleur = data['idTailleur'] as String;
     final idCategorie = data['idCategorie'] as String;
     final isPublic = data['isPublic'] as bool? ?? false;
+    final isApproved = data['isApproved'] as bool? ?? false; // New property
 
     return Modele(
       id: id,
@@ -44,6 +47,7 @@ class Modele {
       idTailleur: idTailleur,
       idCategorie: idCategorie,
       isPublic: isPublic,
+      isApproved: isApproved, // New property
     );
   }
 
@@ -56,6 +60,7 @@ class Modele {
       'idTailleur': idTailleur,
       'idCategorie': idCategorie,
       'isPublic': isPublic,
+      'isApproved': isApproved, // New property
     };
   }
 
@@ -69,6 +74,7 @@ class Modele {
       idTailleur: doc['idTailleur'],
       idCategorie: doc['idCategorie'],
       isPublic: doc['isPublic'],
+      isApproved: doc['isApproved'] ?? false, // New property
     );
   }
 

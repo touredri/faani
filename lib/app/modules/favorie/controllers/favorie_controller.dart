@@ -13,16 +13,18 @@ class FavorieController extends GetxController {
 
   Stream<List<Modele>> loadData() async* {
     await for (var event in FavorieService().getAllFavorie(user!.uid)) {
-      var modeles = <Modele>[];
+      var models = <Modele>[];
       for (Favorie fav in event) {
         var modele = await ModeleService().getModeleById(fav.idModele!);
         if (listSelectedCategorie != null) {
           if (listSelectedCategorie!.contains(modele.idCategorie)) {
-            modeles.add(modele);
+            models.add(modele);
           }
+        } else {
+          models.add(modele);
         }
       }
-      yield modeles;
+      yield models;
     }
   }
 

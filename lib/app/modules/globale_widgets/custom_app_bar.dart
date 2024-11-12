@@ -22,3 +22,14 @@ AppBar primaryBackAppBar(String text) {
     elevation: 0,
   );
 }
+
+AppBar customAppBar(String text) {
+  return AppBar(
+    backgroundColor: scaffoldBack,
+    title: Text(
+      text,
+      style: const TextStyle(fontSize: 16),
+    ),
+    centerTitle: true,
+  );
+}

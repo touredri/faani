@@ -8,8 +8,10 @@ import '../../firebase/global_function.dart';
 import '../../style/my_theme.dart';
 
 class FavoriteIcone extends StatefulWidget {
-  final String docId, color;
-  const FavoriteIcone({super.key, required this.docId, required this.color});
+  final String docId;
+  final Color color;
+  const FavoriteIcone(
+      {super.key, required this.docId, this.color = Colors.white});
 
   @override
   State<FavoriteIcone> createState() => _FavoriteIconeState();
@@ -34,7 +36,7 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
     firestore
         .collection('favorie')
         .where('idModele', isEqualTo: widget.docId)
-        .where('idUtilisateur', isEqualTo: user?.uid??'')
+        .where('idUtilisateur', isEqualTo: user?.uid ?? '')
         .get()
         .then((value) {
       if (value.docs.isNotEmpty) {
@@ -59,24 +61,14 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
   }
 
   void createFavorie() async {
-    if (user!.isAnonymous) {
-      // make
-      // showSuccessDialog(
-      //     context,
-      //     'Vous devez vous connecter pour ajouter ce modèle à vos favoris',
-      //     AnonymeProfile()
-      //     );
+    if (user == null) {
       return;
     }
     FavorieService().create(widget.docId);
   }
 
   void deleteFavorie() async {
-    if (user!.isAnonymous) {
-      // showSuccessDialog(
-      //     context,
-      //     'Vous devez vous connecter pour ajouter ce modèle à vos favoris',
-      //     AnonymeProfile());
+    if (user == null) {
       return;
     }
     FavorieService().delete(widget.docId);
@@ -101,13 +93,11 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
           },
           child: Icon(
             isFavorite ? Icons.favorite : Icons.favorite_border,
-            color: isFavorite
-                ? primaryColor
-                : (widget.color == 'white' ? Colors.white : Colors.black),
+            color: isFavorite ? primaryColor : widget.color,
             size: 30,
           ),
         ),
-        Text(count.toString(), style: const TextStyle(color: Colors.white)),
+        Text(count.toString(), style: TextStyle(color: widget.color)),
       ],
     );
   }

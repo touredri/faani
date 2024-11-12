@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/users_model.dart';
+import 'package:faani/app/modules/authentification/views/authentification_view.dart';
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -75,6 +77,7 @@ class AuthController extends GetxController {
             snackPosition: SnackPosition.BOTTOM,
           );
           isCodeSent.value = false;
+          loading.value = false;
         },
         codeSent: (String verificationId, int? resendToken) {
           // Store verification ID and set code sent flag
@@ -89,12 +92,12 @@ class AuthController extends GetxController {
         },
       );
     } catch (e) {
-      loading.value = false;
       Get.snackbar(
         "Error",
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
       );
+      loading.value = false;
     }
   }
 
@@ -115,14 +118,15 @@ class AuthController extends GetxController {
         verificationId: verificationId.value,
         smsCode: code,
       );
-      await auth.signInWithCredential(credential);
-      Get.snackbar(
-        "Success",
-        "Successfully signed in!",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      Get.to(() =>
-          const SignUpView()); // navigate to sign up view after successful sign in
+      if (auth.currentUser != null) {
+        await auth.currentUser!.linkWithCredential(credential);
+      } else {
+        await auth.signInWithCredential(credential);
+      }
+      showCustomSnackbar(
+          message: "Numéro de téléphone vérifié avec succès",
+          backgroundColor: Colors.green);
+      Get.offAll(() => const SignUpView());
       loading.value = false;
     } catch (e) {
       Get.snackbar(
@@ -130,6 +134,7 @@ class AuthController extends GetxController {
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
       );
+      loading.value = false;
     }
   }
 
@@ -199,7 +204,7 @@ class AuthController extends GetxController {
         "Welcome ${newUser.nomPrenom} !",
         snackPosition: SnackPosition.BOTTOM,
       );
-      Get.to(() => HomeView());
+      Get.offAll(() => const HomeView());
       loading.value = false;
     }).catchError((error) {
       Get.snackbar(
@@ -214,6 +219,16 @@ class AuthController extends GetxController {
   void setUser() async {
     final UserController userController = Get.put(UserController());
     await userController.init();
+  }
+
+  Future<void> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Get.offAll(() => const AuthView());
+      showCustomSnackbar(message: "Déconnecté avec succès");
+    } catch (e) {
+      showCustomSnackbar(message: e.toString());
+    }
   }
 
   @override
@@ -248,6 +263,6 @@ class AuthController extends GetxController {
       snackPosition: SnackPosition.BOTTOM,
     );
     setUser();
-    Get.to(() => HomeView());
+    Get.offAll(() => const HomeView());
   }
 }

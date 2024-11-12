@@ -30,7 +30,7 @@ Widget iconShare(Modele modele) {
   );
 }
 
-Widget iconMessage(Modele modele, BuildContext context) {
+Widget iconMessage(Modele modele, BuildContext context, Color color) {
   return Column(
     children: [
       GestureDetector(
@@ -49,9 +49,9 @@ Widget iconMessage(Modele modele, BuildContext context) {
                 );
               });
         },
-        child: const Icon(
+        child: Icon(
           Icons.message_outlined,
-          color: Colors.grey,
+          color: color,
           size: 30,
         ),
       ),

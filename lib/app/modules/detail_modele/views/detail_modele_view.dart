@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/favorite_icon.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
@@ -97,10 +98,10 @@ class DetailModeleView extends GetView<DetailModeleController> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             // commentaire
-                            iconMessage(modele, context),
+                            iconMessage(modele, context, Colors.grey),
                             FavoriteIcone(
                               docId: modele.id!,
-                              color: '',
+                              color: Colors.grey,
                             ),
                             // share
                             iconShare(modele),
@@ -120,11 +121,14 @@ class DetailModeleView extends GetView<DetailModeleController> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.7,
                           child: ElevatedButton(
-                              onPressed: () {
-                                print(UserController()
-                                    .currentUser
-                                    .value
-                                    .isTailleur);
+                              onPressed: (){
+                                if(!auth.currentUser!.isAnonymous) {
+                                  Get.to(
+                                  () => AjoutCommandePage(modele),
+                                  transition: Transition.rightToLeft);
+                                } else {
+                                  showCustomSnackbar(message: 'Vous devez vous connecter pour continuer');
+                                }
                               },
                               child: controller.userController.currentUser.value
                                       .isTailleur
@@ -153,7 +157,6 @@ class DetailModeleView extends GetView<DetailModeleController> {
                         stream: ModeleService()
                             .getAllModelesByCategories([modele.idCategorie!]),
                         builder: (context, snapshot) {
-                          print(modele.id);
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const Center(
@@ -165,9 +168,8 @@ class DetailModeleView extends GetView<DetailModeleController> {
                               mainAxisSpacing: 4,
                               crossAxisSpacing: 4,
                               itemCount: snapshot.data!.length,
-                              padding: const EdgeInsets.only(bottom: 30),
+                              padding: const EdgeInsets.only(bottom: 5),
                               itemBuilder: (context, index) {
-                                // not include the current modele
                                 if (snapshot.data![index].id == modele.id) {
                                   return const SizedBox.shrink();
                                 }

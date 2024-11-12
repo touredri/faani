@@ -28,8 +28,6 @@ void main() async {
     appleProvider: AppleProvider.appAttest,
   );
 
-  // await initializePushNotifications();
-
   if (auth.currentUser != null) {
     final UserController userController = Get.put(UserController());
     await userController.init();

@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/notifications_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/views/accueil_view.dart';
 import 'package:faani/app/modules/commande/views/commande_view.dart';
 import 'package:faani/app/modules/favorie/views/favorie_view.dart';
@@ -9,8 +11,10 @@ import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:faani/app/modules/profile/views/profile_view.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
@@ -22,8 +26,9 @@ class HomeController extends GetxController {
   UserController userController = Get.find();
   RxBool isNetworkAvailable = true.obs;
   PushNotifications pushNotifications = PushNotifications();
-  final modeleService = Get.find<ModeleService>();
+  late final ModeleService modeleService;
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
+  RxBool isAdmin = false.obs;
 
   String sewing = 'assets/svg/sewingp.svg';
   String dress = 'assets/svg/dress.svg';
@@ -94,9 +99,29 @@ class HomeController extends GetxController {
 
   @override
   void onInit() {
+    if (!Get.isRegistered<ModeleService>()) {
+      Get.put(ModeleService());
+    }
+    modeleService = Get.find<ModeleService>();
     _checkNetworkStatus();
     _monitorNetworkChanges();
+    checkIfUserIsAdmin();
     super.onInit();
+  }
+
+  // check from admin collection in firestore if user is admin the use flutter secure storage to store is admin value boolean
+  void checkIfUserIsAdmin() async {
+    final check = await const FlutterSecureStorage().read(key: 'isAdmin');
+    if (check != null) {
+      final isAdmin = await FirebaseFirestore.instance
+          .collection('admin')
+          .doc(auth.currentUser!.uid)
+          .get()
+          .then((value) => value.exists);
+      await const FlutterSecureStorage()
+          .write(key: 'isAdmin', value: isAdmin.toString());
+      this.isAdmin.value = isAdmin;
+    }
   }
 
   // Initial network status check

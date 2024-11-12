@@ -1,3 +1,4 @@
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
@@ -24,10 +25,29 @@ class DevenirTailleurView extends GetView<ProfileController> {
                 child: TextFormField(
                   controller: controller.nomAtelier,
                   validator: (String? value) {
-                    if (value!.isEmpty) {}
+                    if (value!.isEmpty) {
+                      return 'Veuillez entrer le nom de l\'atelier';
+                    }
+                    return null;
                   },
                   decoration: const InputDecoration(
                     labelText: 'Nom de l\'atelier',
+                  ),
+                ),
+              ),
+              3.hs,
+              SizedBox(
+                height: 55,
+                child: TextFormField(
+                  controller: controller.numAtelier,
+                  validator: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Veuillez entrer le numero de l\'atelier';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Numero de l\'atelier',
                   ),
                 ),
               ),
@@ -41,7 +61,7 @@ class DevenirTailleurView extends GetView<ProfileController> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  items: <String>['Hommes', 'Femmes', 'Garçons', 'Filles']
+                  items: <String>['Hommes', 'Femmes', 'Garçons', 'Filles', 'Confection générale']
                       .map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -49,8 +69,7 @@ class DevenirTailleurView extends GetView<ProfileController> {
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
-                    controller.selectedClientCible = newValue ?? '';
-                    // controller.selectedClientCible.value = newValue!;
+                    controller.selectedClientCible.value = newValue!;
                   },
                 ),
               ),
@@ -80,8 +99,7 @@ class DevenirTailleurView extends GetView<ProfileController> {
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
-                    // controller.selectedClientCible.value = newValue!;
-                    controller.selectedCountry = newValue ?? '';
+                    controller.selectedCountry.value = newValue!;
                   },
                 ),
               ),
@@ -115,28 +133,42 @@ class DevenirTailleurView extends GetView<ProfileController> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  items:
-                      <String>['Nom', '1 à 5', 'plus de 5'].map((String value) {
+                  items: <String>['Oui', 'Non'].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
-                    if (newValue != 'Nom') {
-                      controller.isHasAgent = true;
-                    } else {
-                      controller.isHasAgent = false;
-                    }
+                    controller.isHasAgent.value = newValue == 'Non';
                   },
                 ),
               ),
+              3.hs,
+              Obx(() => Visibility(
+                    visible: !controller.isHasAgent.value,
+                    child: SizedBox(
+                      height: 55,
+                      child: TextField(
+                        controller: controller.selectedNombreTravailleur,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Nombre de travailleur',
+                        ),
+                      ),
+                    ),
+                  )),
               5.5.hs,
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.8,
                 height: 50,
-                child: ElevatedButton(
-                    onPressed: () {}, child: const Text('Envoyer la demande')),
+                child: Obx(() => ElevatedButton(
+                    onPressed: () {
+                      controller.becomeTailleur();
+                    },
+                    child: controller.isLoading.value
+                        ? circularProgress()
+                        : const Text('Envoyer la demande'))),
               )
             ],
           ),

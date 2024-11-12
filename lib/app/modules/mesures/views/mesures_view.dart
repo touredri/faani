@@ -1,4 +1,5 @@
 import 'package:faani/app/data/models/mesure_model.dart';
+import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:flutter/material.dart';
@@ -16,17 +17,7 @@ class MesuresView extends GetView<MesuresController> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: scaffoldBack,
-        appBar: AppBar(
-          centerTitle: true,
-          backgroundColor: primaryColor,
-          title: const Text(
-            'Mes Mesures',
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
-          leading: const BackButton(
-            color: Colors.white,
-          ),
-        ),
+        appBar: customAppBar('Mes Mesures'),
         body: StreamBuilder<List<Mesure>>(
           stream: MesureService().getAllUserMesure(user!.uid),
           builder: (context, snapshot) {

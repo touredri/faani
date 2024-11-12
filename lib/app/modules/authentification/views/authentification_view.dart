@@ -1,3 +1,4 @@
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,17 @@ class AuthView extends GetView<AuthController> {
       appBar: AppBar(
         backgroundColor: scaffoldBack,
         elevation: 0,
-        toolbarHeight: 0,
+        toolbarHeight: auth.currentUser == null ? 10 : 50,
+        automaticallyImplyLeading: false,
+        leading: auth.currentUser == null
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  // Get.offAll(() => const HomeView());
+                  Get.back();
+                },
+              ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -81,7 +92,6 @@ class AuthView extends GetView<AuthController> {
                       padding: const EdgeInsets.symmetric(vertical: 18),
                     ),
                     onPressed: () {
-                      controller.loading.value = true;
                       controller
                           .verifyPhoneNumber(controller.phoneNumber.value);
                     },
@@ -90,16 +100,19 @@ class AuthView extends GetView<AuthController> {
                         : const Text('S\'identifier'),
                   )),
               3.hs, // button sign in anonymously
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                onPressed: () async {
-                  await controller.signInAnonymously();
-                  Get.offAll(() => const HomeView());
-                },
-                child: const Text('Continuer sans compte'),
-              )
+              if (auth.currentUser == null)
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  onPressed: () async {
+                    final anonyme = await controller.signInAnonymously();
+                    if (anonyme != null) {
+                      Get.offAll(() => const HomeView());
+                    }
+                  },
+                  child: const Text('Continuer sans compte'),
+                )
             ],
           ),
         ),

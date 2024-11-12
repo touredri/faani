@@ -53,6 +53,8 @@ dependencies:
   flutter_rating_stars: ^1.1.0
   flutter_rating_bar: ^4.0.1
   upgrader: ^11.3.0
+  flutter_secure_storage: ^4.2.1
+  android_intent_plus: ^5.2.0
 
 dev_dependencies:
   flutter_lints: ^4.0.0
