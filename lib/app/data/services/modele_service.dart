@@ -109,9 +109,23 @@ class ModeleService {
         query = query.startAfterDocument(lastDoc);
       }
     }
+
     try {
+      print("Executing query with the following parameters:");
+      print("idCategories: $idCategories");
+      print("idTailleur: $idTailleur");
+      print("lastModele: ${lastModele?.id}");
+
       final querySnapshot = await query.get();
       print("querySnapshot.docs.length: ${querySnapshot.docs.length}");
+
+      if (querySnapshot.docs.isEmpty) {
+        print("No documents found. Check if the documents in Firestore match the query criteria.");
+      } else {
+        querySnapshot.docs.forEach((doc) {
+          print("Document found: ${doc.data()}");
+        });
+      }
 
       final models = querySnapshot.docs.map((doc) {
         return Modele.fromMap(doc.data(), doc.reference);
@@ -153,6 +167,7 @@ class ModeleService {
         query = query.where('idCategorie', whereIn: filteredCategories);
       }
     }
+    print("query: $query ************ length: ${query.count()}");
 
     return query;
   }

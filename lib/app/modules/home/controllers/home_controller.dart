@@ -33,6 +33,7 @@ class HomeController extends GetxController {
   late final ModeleService modeleService;
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
   RxBool isAdmin = false.obs;
+  RxBool hasMoreData = true.obs;
 
   int backPressCounter = 0;
   Timer? backPressTimer;

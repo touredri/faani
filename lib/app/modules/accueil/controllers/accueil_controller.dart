@@ -1,6 +1,7 @@
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/categorie_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
@@ -36,10 +37,17 @@ class AccueilController extends GetxController {
   void onCategorieSelected(Categorie categorie) {
     // Reset pagination state for category change
     modeles.clear();
+    homeController.hasMoreData.value = true;
+    homeController.lastModeleFetch.value = null;
     if (listSelectedCategorie.contains(categorie.id)) {
       listSelectedCategorie.remove(categorie.id);
     } else {
       listSelectedCategorie.add(categorie.id);
+    }
+    if (categorie.id == "1" && listSelectedCategorie.contains("8")) {
+      listSelectedCategorie.remove("2");
+    } else if (categorie.id == "8" && listSelectedCategorie.contains("1")) {
+      listSelectedCategorie.remove("1");
     }
     loadMore();
     pageController.jumpToPage(0);
@@ -47,6 +55,8 @@ class AccueilController extends GetxController {
 
   Future<void> refreshPage() async {
     modeles.clear();
+    homeController.lastModeleFetch.value = null;
+    homeController.hasMoreData.value = true;
     await loadMore();
     pageController.jumpToPage(0);
   }
@@ -59,9 +69,12 @@ class AccueilController extends GetxController {
           lastModele: homeController.lastModeleFetch.value);
 
       if (fetchedDocuments.isNotEmpty) {
-        // modeles.clear();
+        fetchedDocuments
+            .removeWhere((model) => modeles.contains(model) || model.id == null);
         modeles.addAll(fetchedDocuments);
         update();
+      } else {
+        homeController.hasMoreData.value = false;
       }
     } catch (e) {
       if (e is NetworkError) {

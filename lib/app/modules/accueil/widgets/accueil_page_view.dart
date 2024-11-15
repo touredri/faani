@@ -30,7 +30,7 @@ class AccueilPAgeView extends GetView<AccueilController> {
                       if (controller.modeles.isNotEmpty &&
                           index < controller.modeles.length) {
                         final modele = controller.modeles[index];
-                        if (index == controller.modeles.length - 1) {
+                        if (index == controller.modeles.length - 1 && controller.homeController.hasMoreData.value) {
                           controller.loadMore();
                         }
                         return HomeItem(modele);
