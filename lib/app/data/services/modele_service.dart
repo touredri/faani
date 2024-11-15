@@ -41,6 +41,32 @@ class ModeleService {
     return Modele.fromMap(doc.data()!, doc.reference);
   }
 
+  Future<Modele?> getModelByIdAndCategories(
+      String id, List<String> idCategories) async {
+    final doc = await collection.doc(id).get();
+    final modele = Modele.fromMap(doc.data()!, doc.reference);
+    if (idCategories.isNotEmpty) {
+      final filteredCategories = List<String>.from(idCategories)
+        ..removeWhere((id) => id == "1" || id == "8");
+      if (idCategories.contains("1")) {
+        if (modele.genreHabit != 'Homme') {
+          return null;
+        }
+      }
+      if (idCategories.contains("8")) {
+        if (modele.genreHabit != 'Femme') {
+          return null;
+        }
+      }
+      if (filteredCategories.isNotEmpty) {
+        if (!filteredCategories.contains(modele.idCategorie)) {
+          return null;
+        }
+      }
+    }
+    return modele;
+  }
+
   Stream<List<Modele>> getAllModeles() {
     return collection.snapshots().map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
@@ -98,35 +124,25 @@ class ModeleService {
       {String? idTailleur, Modele? lastModele, int pageSize = 10}) async {
     Query<Map<String, dynamic>> query =
         buildQuery(idCategories).orderBy('id').limit(pageSize);
-
     if (idTailleur != null) {
       query = query.where('idTailleur', isEqualTo: idTailleur);
     }
-
     if (lastModele != null) {
       final lastDoc = await collection.doc(lastModele.id).get();
       if (lastDoc.exists) {
         query = query.startAfterDocument(lastDoc);
       }
     }
-
     try {
-      print("Executing query with the following parameters:");
-      print("idCategories: $idCategories");
-      print("idTailleur: $idTailleur");
-      print("lastModele: ${lastModele?.id}");
-
       final querySnapshot = await query.get();
-      print("querySnapshot.docs.length: ${querySnapshot.docs.length}");
-
       if (querySnapshot.docs.isEmpty) {
-        print("No documents found. Check if the documents in Firestore match the query criteria.");
+        print(
+            "No documents found. Check if the documents in Firestore match the query criteria.");
       } else {
         querySnapshot.docs.forEach((doc) {
           print("Document found: ${doc.data()}");
         });
       }
-
       final models = querySnapshot.docs.map((doc) {
         return Modele.fromMap(doc.data(), doc.reference);
       }).toList();
@@ -138,7 +154,6 @@ class ModeleService {
         Get.find<HomeController>().lastModeleFetch.value =
             models.isNotEmpty ? models.last : null;
       }
-
       return models;
     } catch (e) {
       print('Erreur lors de l\'exécution de la requête : $e');
@@ -152,23 +167,16 @@ class ModeleService {
     if (idCategories.isNotEmpty) {
       final filteredCategories = List<String>.from(idCategories)
         ..removeWhere((id) => id == "1" || id == "8");
-
-      print("idCategories: $idCategories");
-      print("filteredCategories: $filteredCategories");
-
       if (idCategories.contains("1")) {
         query = query.where('genreHabit', isEqualTo: 'Homme');
       }
       if (idCategories.contains("8")) {
         query = query.where('genreHabit', isEqualTo: 'Femme');
       }
-
       if (filteredCategories.isNotEmpty) {
         query = query.where('idCategorie', whereIn: filteredCategories);
       }
     }
-    print("query: $query ************ length: ${query.count()}");
-
     return query;
   }
 

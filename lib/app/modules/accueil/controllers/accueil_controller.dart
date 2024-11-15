@@ -1,7 +1,4 @@
 import 'package:faani/app/data/models/users_model.dart';
-import 'package:faani/app/data/services/categorie_service.dart';
-import 'package:faani/app/firebase/global_function.dart';
-import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:pull_to_refresh_new/pull_to_refresh.dart';
 import '../../../data/models/categorie_model.dart';
 import '../../../data/models/modele_model.dart';
-import '../../../data/services/modele_service.dart';
 
 class AccueilController extends GetxController {
   RxList<Modele> modeles = <Modele>[].obs;

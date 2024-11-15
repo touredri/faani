@@ -15,18 +15,21 @@ class FavorieController extends GetxController {
     await for (var event in FavorieService().getAllFavorie(user!.uid)) {
       var models = <Modele>[];
       for (Favorie fav in event) {
-        var modele = await ModeleService().getModeleById(fav.idModele!);
-        if (modele.idCategorie == "1" || modele.idCategorie == "8") {
-          print("**********************added ${modele.idCategorie}");
-        }
-        if (listSelectedCategorie.isNotEmpty) {
-          if (listSelectedCategorie.contains(modele.idCategorie)) {
-            print("**********************added");
-            models.add(modele);
-          }
-        } else {
+        var modele = await ModeleService()
+            .getModelByIdAndCategories(fav.idModele!, listSelectedCategorie);
+        // if (modele.idCategorie == "1" || modele.idCategorie == "8") {
+        //   print("**********************added ${modele.idCategorie}");
+        // }
+        // if (listSelectedCategorie.isNotEmpty) {
+        //   if (listSelectedCategorie.contains(modele.idCategorie)) {
+        //     print("**********************added");
+        //     models.add(modele);
+        //   }
+        // } else {
+        if (modele != null) {
           models.add(modele);
         }
+        // }
       }
       yield models;
     }
