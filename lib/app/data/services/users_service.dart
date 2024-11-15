@@ -5,8 +5,10 @@ class UserService {
   final CollectionReference _usersRef =
       FirebaseFirestore.instance.collection('users');
 
-  Future<void> createUser(UserModel user) {
-    return _usersRef.doc(user.id).set(user.toMap());
+  Future<void> createUser(UserModel user) async {
+    await _usersRef.doc(user.id).set(user.toMap());
+    await _usersRef.doc(user.id).update({'id': user.id});
+    return;
   }
 
   Future<UserModel> getUser(String id) async {

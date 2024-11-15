@@ -64,15 +64,15 @@ Widget listBuild(ProfileController controller, BuildContext context) {
                   Get.to(() => const ReceivedRequest(),
                       transition: Transition.rightToLeft),
                 }),
-      if (controller.isTailleur.value)
-        CustomListTile(
-            leadingIcon: controller.scissorIcon,
-            title: 'Mon Atelier',
-            subTitle: 'Gestion de mon atelier et agents',
-            onTap: () {
-              Get.to(() => const MonAtelierView(),
-                  transition: Transition.rightToLeft);
-            }),
+      // if (controller.isTailleur.value)
+      //   CustomListTile(
+      //       leadingIcon: controller.scissorIcon,
+      //       title: 'Mon Atelier',
+      //       subTitle: 'Gestion de mon atelier et agents',
+      //       onTap: () {
+      //         Get.to(() => const MonAtelierView(),
+      //             transition: Transition.rightToLeft);
+      //       }),
       if (controller.userController.isTailleur.value)
         CustomListTile(
             leadingIcon: controller.dressIcon,

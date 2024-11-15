@@ -44,7 +44,7 @@ class Comment {
   // create a new comment
   Future<void> createComment() async {
     final docRef =  await collection.add(toMap());
-    id = docRef.id;
+    await docRef.update({'id': docRef.id});
   }
 
   //delete a comment

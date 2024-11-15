@@ -30,16 +30,15 @@ class Favorie {
     };
   }
 
-  final firestore = FirebaseFirestore.instance;
+  final collection = FirebaseFirestore.instance.collection('favorie');
 
   Future<void> create() async {
-    final collection = firestore.collection('favorie');
     final docRef = await collection.add(toMap());
-    id = docRef.id;
+    await docRef.update({'id': docRef.id});
   }
 
   Future<void> delete() async {
-    final documentReference = firestore.collection('favorie').doc(id);
+    final documentReference = collection.doc(id);
     await documentReference.delete();
   }
 }

@@ -56,10 +56,7 @@ class ModeleService {
   }
 
   Stream<List<Modele>> getAllModelesByCategories(List<String> idCategories) {
-    return collection
-        .where('idCategorie', whereIn: idCategories)
-        .snapshots()
-        .map((querySnapshot) {
+    return buildQuery(idCategories).snapshots().map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
         return Modele.fromMap(doc.data(), doc.reference);
       }).toList();
@@ -86,67 +83,78 @@ class ModeleService {
   }
 
   Future<List<Modele>> getAllModeleByTailleur(
-      String id, List<String> idCategorie,
+      String idTailleur, List<String> idCategories,
       {Modele? lastModele}) async {
-    Query<Map<String, dynamic>> query =
-        collection.where('idTailleur', isEqualTo: id);
-    if (idCategorie.isNotEmpty) {
-      query = query.where('idCategorie', whereIn: idCategorie);
-      if (idCategorie.contains("1")) {
-        query = query.where('genreHabit', isEqualTo: 'Homme');
-      }
-      if (idCategorie.contains("8")) {
-        query = query.where('genreHabit', isEqualTo: 'Femme');
-      }
-    }
-    try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await query.get();
-      print(querySnapshot.docs.length);
-      return querySnapshot.docs.map((doc) {
-        return Modele.fromMap(doc.data(), doc.reference);
-      }).toList();
-    } catch (e) {
-      print('Error occurred while processing query results: $e');
-      return [];
-    }
+    return _getModeles(idCategories,
+        idTailleur: idTailleur, lastModele: lastModele);
   }
 
   Future<List<Modele>> getRandomModeles(List<String> idCategories,
       {Modele? lastModele}) async {
-    const pageSize = 5;
-    final models = <Modele>[];
+    return _getModeles(idCategories, lastModele: lastModele, pageSize: 5);
+  }
 
+  Future<List<Modele>> _getModeles(List<String> idCategories,
+      {String? idTailleur, Modele? lastModele, int pageSize = 10}) async {
     Query<Map<String, dynamic>> query =
-        collection.orderBy(FieldPath.documentId).limit(pageSize);
+        buildQuery(idCategories).orderBy('id').limit(pageSize);
+
+    if (idTailleur != null) {
+      query = query.where('idTailleur', isEqualTo: idTailleur);
+    }
+
+    if (lastModele != null) {
+      final lastDoc = await collection.doc(lastModele.id).get();
+      if (lastDoc.exists) {
+        query = query.startAfterDocument(lastDoc);
+      }
+    }
+    try {
+      final querySnapshot = await query.get();
+      print("querySnapshot.docs.length: ${querySnapshot.docs.length}");
+
+      final models = querySnapshot.docs.map((doc) {
+        return Modele.fromMap(doc.data(), doc.reference);
+      }).toList();
+
+      if (idTailleur == null) {
+        final accueilController = Get.find<AccueilController>();
+        models
+            .removeWhere((model) => accueilController.modeles.contains(model));
+        Get.find<HomeController>().lastModeleFetch.value =
+            models.isNotEmpty ? models.last : null;
+      }
+
+      return models;
+    } catch (e) {
+      print('Erreur lors de l\'exécution de la requête : $e');
+      return [];
+    }
+  }
+
+  Query<Map<String, dynamic>> buildQuery(List<String> idCategories) {
+    Query<Map<String, dynamic>> query = collection;
+
     if (idCategories.isNotEmpty) {
-      query = query.where('idCategorie', whereIn: idCategories);
+      final filteredCategories = List<String>.from(idCategories)
+        ..removeWhere((id) => id == "1" || id == "8");
+
+      print("idCategories: $idCategories");
+      print("filteredCategories: $filteredCategories");
+
       if (idCategories.contains("1")) {
         query = query.where('genreHabit', isEqualTo: 'Homme');
       }
       if (idCategories.contains("8")) {
         query = query.where('genreHabit', isEqualTo: 'Femme');
       }
+
+      if (filteredCategories.isNotEmpty) {
+        query = query.where('idCategorie', whereIn: filteredCategories);
+      }
     }
 
-    if (Get.find<HomeController>().lastModeleFetch.value != null) {
-      final lastDoc = await collection
-          .doc(Get.find<HomeController>().lastModeleFetch.value?.id)
-          .get();
-      query = query.startAfterDocument(lastDoc);
-    }
-    final querySnapshot = await query.get();
-    if (querySnapshot.docs.isEmpty) {
-      Get.find<HomeController>().lastModeleFetch.value = null;
-      return models;
-    }
-    final accueilController = Get.find<AccueilController>();
-    for (final doc in querySnapshot.docs) {
-      final model = Modele.fromMap(doc.data(), doc.reference);
-      models.addIf(!accueilController.modeles.contains(model), model);
-    }
-    Get.find<HomeController>().lastModeleFetch.value =
-        models.isNotEmpty ? models.last : null;
-    return models;
+    return query;
   }
 
   Future<bool> isModeleExist(String? id) async {

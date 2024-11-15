@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:faani/app/data/models/modele_model.dart';
@@ -7,6 +9,7 @@ import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/views/accueil_view.dart';
 import 'package:faani/app/modules/commande/views/commande_view.dart';
 import 'package:faani/app/modules/favorie/views/favorie_view.dart';
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:faani/app/modules/profile/views/profile_view.dart';
@@ -14,6 +17,7 @@ import 'package:faani/app/style/my_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -29,6 +33,9 @@ class HomeController extends GetxController {
   late final ModeleService modeleService;
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
   RxBool isAdmin = false.obs;
+
+  int backPressCounter = 0;
+  Timer? backPressTimer;
 
   String sewing = 'assets/svg/sewingp.svg';
   String dress = 'assets/svg/dress.svg';
@@ -46,6 +53,33 @@ class HomeController extends GetxController {
       width: 26,
       height: 24,
     );
+  }
+
+  Future<bool> canPop() {
+    if (tabController.index == 0) {
+      if (backPressCounter == 0) {
+        backPressCounter++;
+        Timer(Duration(milliseconds: 100), () {
+          ScaffoldMessenger.of(Get.context!).showSnackBar(
+            SnackBar(
+              content: Text('Appuyez de nouveau pour quitter'),
+              backgroundColor: Colors.black.withOpacity(0.8),
+            ),
+          );
+        });
+        backPressTimer = Timer(Duration(seconds: 3), () {
+          backPressCounter = 0;
+        });
+        return Future.value(false);
+      } else {
+        backPressTimer?.cancel();
+        SystemNavigator.pop();
+        return Future.value(false);
+      }
+    } else {
+      tabController.jumpToTab(0);
+      return Future.value(false);
+    }
   }
 
   List<PersistentTabConfig> tabs() => [

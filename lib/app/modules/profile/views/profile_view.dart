@@ -53,7 +53,7 @@ class ProfileView extends GetView<ProfileController> {
                   Card(
                     color: Colors.blueGrey[50],
                     elevation: 5,
-                    margin: const EdgeInsets.only(top: 5, left: 6, right: 6),
+                    margin: const EdgeInsets.only(left: 1, right: 1),
                     child: Padding(
                       padding: const EdgeInsets.only(
                           top: 18.0, left: 10, bottom: 10),

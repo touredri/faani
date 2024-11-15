@@ -91,7 +91,7 @@ class Commande {
   // create
   Future<void> create() async {
     final docRef = await collection.add(toMap());
-    id = docRef.id;
+    await docRef.update({'id': docRef.id});
   }
 
   // update

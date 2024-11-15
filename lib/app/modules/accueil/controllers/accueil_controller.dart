@@ -48,6 +48,7 @@ class AccueilController extends GetxController {
   Future<void> refreshPage() async {
     modeles.clear();
     await loadMore();
+    pageController.jumpToPage(0);
   }
 
   Future<void> loadMore() async {

@@ -1,5 +1,5 @@
 name: faani
-version: 1.0.0+3
+version: 1.0.1+4
 publish_to: none
 description: An application to connect tailor and customer, it promote traditional suit. We can book inside and follow best tailor
 environment:
@@ -8,16 +8,16 @@ environment:
 dependencies:
   get: 4.6.6
   cupertino_icons: ^1.0.2
-  firebase_core: ^2.27.1
-  firebase_auth: ^4.17.9
-  cloud_firestore: ^4.15.9
-  firebase_storage: ^11.6.10
-  firebase_messaging: ^14.7.20
-  firebase_in_app_messaging: ^0.7.4+18
-  firebase_app_check: ^0.2.1+18
+  firebase_core: ^3.7.0
+  firebase_auth: ^5.3.2
+  cloud_firestore: ^5.4.5
+  firebase_storage: ^12.3.5
+  firebase_messaging: ^15.1.4
+  firebase_in_app_messaging: ^0.8.0+9
+  firebase_app_check: ^0.3.1+5
   provider: ^6.0.5
   intl_phone_field: ^3.2.0
-  pinput: ^4.0.0
+  pinput: ^5.0.0
   camera: ^0.11.0
   http: ^1.1.0
   shared_preferences: ^2.2.2
@@ -28,23 +28,23 @@ dependencies:
   intl: ^0.19.0
   cached_network_image: ^3.1.0
   path_provider: ^2.1.1
-  share_plus: ^9.0.0
+  share_plus: ^10.1.2
   dio: ^5.3.3
   image_gallery_saver: ^2.0.3
   shimmer: ^3.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.1
   flutter_spacer: ^1.0.3
   persistent_bottom_nav_bar_v2: ^5.0.0
   flutter_staggered_grid_view: 0.7.0
   permission_handler: ^11.3.1
   modal_bottom_sheet: 3.0.0
-  flutter_svg: 2.0.10+1
+  flutter_svg: ^2.0.14
   easy_stepper: ^0.8.3
   timeline_tile: ^2.0.0
   image_editor_plus: ^1.0.5
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
   flutter_screenutil: ^5.9.0
-  flutter_local_notifications: ^17.1.2
+  flutter_local_notifications: ^18.0.1
   pull_to_refresh_new: ^2.0.5
 
   flutter:
@@ -58,7 +58,7 @@ dependencies:
   back_button_interceptor: ^8.0.0
 
 dev_dependencies:
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
 
