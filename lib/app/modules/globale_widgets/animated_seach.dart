@@ -23,7 +23,8 @@ class AnimatedSearchBar extends StatelessWidget {
       init: controller,
       builder: (dynamic controller) {
         return AnimatedContainer(
-          width: isSearching.value ? 220 : 35,
+          width:
+              isSearching.value ? MediaQuery.of(context).size.width * 0.8 : 35,
           height: 40,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,

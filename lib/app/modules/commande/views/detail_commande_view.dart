@@ -28,7 +28,7 @@ class DetailCommandeView extends GetView<CommandeController> {
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 0,
-          backgroundColor: primaryColor,
+          backgroundColor: scaffoldBack,
         ),
         body: FutureBuilder(
             future: controller.fetchCommandeData(commande),
@@ -349,7 +349,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                           ),
                           trailing: TextButton.icon(
                               style: ButtonStyle(
-                                side: MaterialStateProperty.all(
+                                side: WidgetStateProperty.all(
                                   const BorderSide(
                                     color: Colors.transparent,
                                   ),

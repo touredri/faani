@@ -23,13 +23,9 @@ class _DetailMesureState extends State<DetailMesure> {
     final MesuresController mesureController = Get.put(MesuresController());
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Détail de la mesure',
-            style: TextStyle(color: Colors.white)),
+        title: const Text('Détail de la mesure'),
         centerTitle: true,
-        leading: const BackButton(
-          color: Colors.white,
-        ),
-        backgroundColor: primaryColor,
+        backgroundColor: scaffoldBack,
       ),
       body: StreamBuilder(
           stream: MesureService().getById(widget.id),
@@ -48,7 +44,8 @@ class _DetailMesureState extends State<DetailMesure> {
                   children: [
                     // title & action button
                     Padding(
-                      padding: const EdgeInsets.only(left: 3, right: 3),
+                      padding:
+                          const EdgeInsets.only(left: 3, right: 3, top: 10),
                       child: Row(
                         children: [
                           Column(

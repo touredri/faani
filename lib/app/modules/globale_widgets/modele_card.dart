@@ -20,9 +20,12 @@ Widget buildCard(Modele modele, {required BuildContext context}) {
         onTap: () {
           final controller = Get.put(DetailModeleController());
           controller.getModeleOwner(modele.idTailleur);
-          Get.back();
-          Get.to(() => DetailModeleView(modele),
-              transition: Transition.downToUp);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailModeleView(modele),
+            ),
+          );
         },
         child: CachedNetworkImage(
           imageUrl: modele.fichier[0]!,

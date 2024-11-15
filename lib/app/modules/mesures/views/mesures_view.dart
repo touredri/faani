@@ -32,7 +32,6 @@ class MesuresView extends GetView<MesuresController> {
                   child: Text(
                 'Aucune mesure disponible! Ajouter pour voir la liste',
                 textAlign: TextAlign.center,
-                // style: TextStyle(fontSize: 30),
               ));
             }
             final data = snapshot.data!;

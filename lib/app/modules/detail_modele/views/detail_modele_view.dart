@@ -33,10 +33,6 @@ class DetailModeleView extends GetView<DetailModeleController> {
             return Center(child: circularProgress());
           } else {
             return Scaffold(
-              appBar: AppBar(
-                backgroundColor: primaryColor,
-                toolbarHeight: 1,
-              ),
               body: CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
@@ -121,13 +117,14 @@ class DetailModeleView extends GetView<DetailModeleController> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.7,
                           child: ElevatedButton(
-                              onPressed: (){
-                                if(!auth.currentUser!.isAnonymous) {
-                                  Get.to(
-                                  () => AjoutCommandePage(modele),
-                                  transition: Transition.rightToLeft);
+                              onPressed: () {
+                                if (!auth.currentUser!.isAnonymous) {
+                                  Get.to(() => AjoutCommandePage(modele),
+                                      transition: Transition.rightToLeft);
                                 } else {
-                                  showCustomSnackbar(message: 'Vous devez vous connecter pour continuer');
+                                  showCustomSnackbar(
+                                      message:
+                                          'Vous devez vous connecter pour continuer');
                                 }
                               },
                               child: controller.userController.currentUser.value

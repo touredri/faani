@@ -31,17 +31,17 @@ class DisplayImage extends StatelessWidget {
             ),
           ],
         ),
-        shadowBackButton(),
+        Positioned(top: 20, child: shadowBackButton(context)),
       ],
     );
   }
 }
 
 // shadow back button
-Widget shadowBackButton() {
+Widget shadowBackButton(BuildContext context) {
   return Container(
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,
     alignment: Alignment.center,
     margin: const EdgeInsets.all(10),
     decoration: BoxDecoration(
@@ -51,7 +51,7 @@ Widget shadowBackButton() {
       padding: const EdgeInsets.all(0),
       icon: const Icon(Icons.arrow_back, color: Colors.white),
       onPressed: () {
-        Get.back();
+        Navigator.pop(context);
       },
     ),
   );

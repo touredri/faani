@@ -99,13 +99,13 @@ ThemeData buildTheme(BuildContext context) {
       ),
       titleLarge: TextStyle(
         fontFamily: fontFamily,
-        fontSize: 18,
+        fontSize: 16,
         color: Colors.black,
         fontWeight: FontWeight.w500,
       ),
       titleMedium: TextStyle(
         fontFamily: fontFamily,
-        fontSize: 17,
+        fontSize: 14,
         color: subTextColor,
         fontWeight: FontWeight.w400,
       ),
