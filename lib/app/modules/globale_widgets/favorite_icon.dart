@@ -2,27 +2,21 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/services/favorite_service.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:flutter/material.dart';
-import '../profile/views/anonyme_profile.dart';
 import '../../firebase/global_function.dart';
 import '../../style/my_theme.dart';
 
-class FavoriteIcone extends StatefulWidget {
+abstract class BaseIcon extends StatefulWidget {
   final String docId;
   final Color color;
-  const FavoriteIcone(
-      {super.key, required this.docId, this.color = Colors.white});
-
-  @override
-  State<FavoriteIcone> createState() => _FavoriteIconeState();
+  const BaseIcon({super.key, required this.docId, this.color = Colors.white});
 }
 
-class _FavoriteIconeState extends State<FavoriteIcone> {
-  bool isFavorite = false;
+abstract class BaseIconState<T extends BaseIcon> extends State<T> {
+  bool isActive = false;
   final firestore = FirebaseFirestore.instance;
   int count = 0;
-  Stream<DocumentSnapshot>? likeSnapshotStream;
-  final streamController = StreamController<DocumentSnapshot>();
 
   void onChange(QuerySnapshot snapshot) {
     if (mounted) {
@@ -32,47 +26,18 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
     }
   }
 
-  void favorieInit() {
-    firestore
-        .collection('favorie')
-        .where('idModele', isEqualTo: widget.docId)
-        .where('idUtilisateur', isEqualTo: user?.uid ?? '')
-        .get()
-        .then((value) {
-      if (value.docs.isNotEmpty) {
-        setState(() {
-          isFavorite = true;
-        });
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    favorieInit();
-    likeSnapshotStream =
-        firestore.collection('modele').doc(widget.docId).snapshots();
-    firestore
-        .collection('favorie')
-        .where('idModele', isEqualTo: widget.docId)
-        .snapshots()
-        .listen(onChange);
+    init();
+    getSnapshotStream().listen(onChange);
   }
 
-  void createFavorie() async {
-    if (user == null) {
-      return;
-    }
-    FavorieService().create(widget.docId);
-  }
+  void toggleActive();
 
-  void deleteFavorie() async {
-    if (user == null) {
-      return;
-    }
-    FavorieService().delete(widget.docId);
-  }
+  void init();
+
+  Stream<QuerySnapshot> getSnapshotStream();
 
   @override
   Widget build(BuildContext context) {
@@ -82,18 +47,14 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
       children: <Widget>[
         GestureDetector(
           onTap: () {
-            if (isFavorite) {
-              deleteFavorie();
-            } else {
-              createFavorie();
-            }
+            toggleActive();
             setState(() {
-              isFavorite = !isFavorite;
+              isActive = !isActive;
             });
           },
           child: Icon(
-            isFavorite ? Icons.favorite : Icons.favorite_border,
-            color: isFavorite ? primaryColor : widget.color,
+            isActive ? getActiveIcon() : getInactiveIcon(),
+            color: isActive ? primaryColor : widget.color,
             size: 30,
           ),
         ),
@@ -101,4 +62,130 @@ class _FavoriteIconeState extends State<FavoriteIcone> {
       ],
     );
   }
+
+  IconData getActiveIcon();
+
+  IconData getInactiveIcon();
+}
+
+class FavoriteIcone extends BaseIcon {
+  const FavoriteIcone({super.key, required String docId, Color color = Colors.white})
+      : super(docId: docId, color: color);
+
+  @override
+  State<FavoriteIcone> createState() => _FavoriteIconeState();
+}
+
+class _FavoriteIconeState extends BaseIconState<FavoriteIcone> {
+  @override
+  void init() {
+    firestore
+        .collection('favorie')
+        .where('idModele', isEqualTo: widget.docId)
+        .where('idUtilisateur', isEqualTo: user?.uid ?? '')
+        .get()
+        .then((value) {
+      if (value.docs.isNotEmpty) {
+        setState(() {
+          isActive = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void toggleActive() {
+    if (isActive) {
+      FavorieService().delete(widget.docId);
+    } else {
+      FavorieService().create(widget.docId);
+    }
+  }
+
+  @override
+  Stream<QuerySnapshot> getSnapshotStream() {
+    return firestore
+        .collection('favorie')
+        .where('idModele', isEqualTo: widget.docId)
+        .snapshots();
+  }
+
+  @override
+  IconData getActiveIcon() => Icons.favorite;
+
+  @override
+  IconData getInactiveIcon() => Icons.favorite_border;
+}
+
+class LikeIcon extends BaseIcon {
+  const LikeIcon({super.key, required String docId, Color color = Colors.white})
+      : super(docId: docId, color: color);
+
+  @override
+  State<LikeIcon> createState() => _LikeIconState();
+}
+
+class _LikeIconState extends BaseIconState<LikeIcon> {
+  @override
+  void init() {
+    firestore
+        .collection('modele')
+        .doc(widget.docId)
+        .collection('likes')
+        .where('idUser', isEqualTo: user?.uid ?? '')
+        .get()
+        .then((value) {
+      if (value.docs.isNotEmpty) {
+        setState(() {
+          isActive = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void toggleActive() {
+    if (isActive) {
+      removeLike();
+    } else {
+      addLike();
+    }
+  }
+
+  void addLike() async {
+    if (user == null) {
+      return;
+    }
+    await ModeleService().addLike(widget.docId, user!.uid);
+  }
+
+  void removeLike() async {
+    if (user == null) {
+      return;
+    }
+    final likeSnapshot = await firestore
+        .collection('modele')
+        .doc(widget.docId)
+        .collection('likes')
+        .where('idUser', isEqualTo: user!.uid)
+        .get();
+    if (likeSnapshot.docs.isNotEmpty) {
+      await ModeleService().removeLike(widget.docId, likeSnapshot.docs.first.id);
+    }
+  }
+
+  @override
+  Stream<QuerySnapshot> getSnapshotStream() {
+    return firestore
+        .collection('modele')
+        .doc(widget.docId)
+        .collection('likes')
+        .snapshots();
+  }
+
+  @override
+  IconData getActiveIcon() => Icons.thumb_up;
+
+  @override
+  IconData getInactiveIcon() => Icons.thumb_up_off_alt;
 }

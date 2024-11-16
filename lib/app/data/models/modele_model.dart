@@ -3,6 +3,49 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+class Like {
+  String id;
+  String idUser;
+
+  Like({required this.id, required this.idUser});
+
+  factory Like.fromMap(Map<String, dynamic> data, DocumentReference documentReference) {
+    final id = documentReference.id;
+    final idUser = data['idUser'] as String;
+
+    return Like(id: id, idUser: idUser);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'idUser': idUser,
+    };
+  }
+}
+
+class Comment {
+  String id;
+  String comment;
+  String idUser;
+
+  Comment({required this.id, required this.comment, required this.idUser});
+
+  factory Comment.fromMap(Map<String, dynamic> data, DocumentReference documentReference) {
+    final id = documentReference.id;
+    final comment = data['comment'] as String;
+    final idUser = data['idUser'] as String;
+
+    return Comment(id: id, comment: comment, idUser: idUser);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'comment': comment,
+      'idUser': idUser,
+    };
+  }
+}
+
 class Modele {
   String? id;
   final String? detail;

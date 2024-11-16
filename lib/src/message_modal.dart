@@ -1,151 +1,246 @@
-import 'package:faani/app/data/services/comment_service.dart';
+import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/users_service.dart';
+import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
-import '../app/data/models/comment_modele.dart';
+import 'package:faani/app/data/services/modele_service.dart';
+import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import '../app/firebase/global_function.dart';
+import 'comment_controller.dart';
 
 class CommentModal extends StatefulWidget {
   final String idModele;
-  const CommentModal({super.key, required this.idModele});
+
+  CommentModal({super.key, required this.idModele});
 
   @override
-  State<CommentModal> createState() => _CommentModalState();
+  _CommentModalState createState() => _CommentModalState();
 }
 
 class _CommentModalState extends State<CommentModal> {
+  final CommentController _commentController = Get.put(CommentController());
+
   @override
   void initState() {
     super.initState();
+    _commentController
+        .setCommentsStream(ModeleService().getComments(widget.idModele));
   }
 
-  Stream<List<Comment>> _loadData() async* {
-    await for (var event in CommentService().getAllMessage(widget.idModele)) {
-      var comments = <Comment>[];
-      for (var comment in event) {
-        if (comment.role == 'client') {
-          var user = await UserService().getUser(comment.idUser!);
-          comment.client = user;
-        } else if (comment.role == 'tailleur') {
-          var user = await UserService().getUser(comment.idUser!);
-          comment.tailleur = user;
-        }
-        comments.add(comment);
-      }
-      yield comments;
+  void _submitComment() {
+    if (Get.find<AccueilController>().selectedComment.value != null) {
+      ModeleService().updateComment(
+        widget.idModele,
+        Get.find<AccueilController>().selectedComment.value!.id,
+        _commentController.controller.text,
+      );
+      Get.find<AccueilController>().selectedComment.value = null;
+    } else {
+      ModeleService().addComment(
+        widget.idModele,
+        _commentController.controller.text,
+        auth.currentUser!.uid,
+      );
     }
+    _commentController.clear();
   }
-
-  TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Comment>>(
-      stream: _loadData(),
+      stream: _commentController.commentsStream.value,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Scaffold(
-            resizeToAvoidBottomInset: false,
-            backgroundColor: Colors.transparent,
-            body: Column(
-              children: [
-                SizedBox(
-                  height: 400,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      var comment = snapshot.data![index];
-                      final String imgUrl = getRandomProfileImageUrl();
-                      if (comment.role == 'client') {
-                        return Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(imgUrl),
-                            ),
-                            Expanded(
-                              child: ListTile(
-                                title: Text(
-                                  comment.comment!,
-                                  style: TextStyle(color: primaryColor),
-                                ),
-                                subtitle:
-                                    Text('par ${comment.client!.nomPrenom}'),
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: ListTile(
-                              title: Text(
-                                comment.comment!,
-                                style: TextStyle(color: primaryColor),
-                              ),
-                              subtitle:
-                                  Text('By ${comment.tailleur!.nomPrenom}'),
-                            ),
-                          ),
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(imgUrl),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+        return Scaffold(
+          resizeToAvoidBottomInset: true,
+          backgroundColor: Colors.transparent,
+          body: Column(
+            children: [
+              Expanded(
+                child: CommentsList(
+                  commentsSnapshot: snapshot,
+                  idModele: widget.idModele,
                 ),
-                const Spacer(),
-              ],
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-            floatingActionButton: Padding(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 50,
-                      child: TextField(
-                        controller: _controller,
-                        decoration: const InputDecoration(
-                          hintText: 'Votre commentaire',
-                        ),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      final Comment comment = Comment(
-                          idUser: auth.currentUser!.uid,
-                          idModele: widget.idModele,
-                          comment: _controller.text,
-                          role: 'client',
-                          id: '');
-                      comment.createComment();
-                      _controller.clear();
-                    },
-                    icon: auth.currentUser!.isAnonymous
-                        ? const Text('')
-                        : const Icon(
-                            Icons.send,
-                            color: primaryColor,
-                          ),
-                  ),
-                ],
               ),
-            ),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-              child: Text('Une erreur est survenue: ${snapshot.error}'));
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
+              InputField(
+                controller: _commentController.controller,
+                isTyping: _commentController.isTyping,
+                onChanged: _commentController.onChanged,
+                onSubmit: _submitComment,
+              ),
+            ],
+          ),
+        );
       },
     );
   }
+}
+
+class CommentsList extends StatelessWidget {
+  final AsyncSnapshot<List<Comment>> commentsSnapshot;
+  final String idModele;
+
+  const CommentsList({
+    required this.commentsSnapshot,
+    required this.idModele,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (commentsSnapshot.hasData) {
+      return ListView.builder(
+        itemCount: commentsSnapshot.data!.length,
+        itemBuilder: (context, index) {
+          var comment = commentsSnapshot.data![index];
+          final String imgUrl = getRandomProfileImageUrl();
+          return GestureDetector(
+            onLongPress: () {
+              if (comment.idUser == auth.currentUser!.uid) {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return Wrap(
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.edit),
+                          title: Text('Modifier'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Get.find<AccueilController>()
+                                .selectedComment
+                                .value = comment;
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.delete),
+                          title: Text('Supprimer'),
+                          onTap: () {
+                            ModeleService().removeComment(idModele, comment.id);
+                            Navigator.pop(context);
+                          },
+                        ),
+                        const SizedBox(height: 100),
+                      ],
+                    );
+                  },
+                );
+              }
+            },
+            child: FutureBuilder<UserModel>(
+              future: UserService().getUser(comment.idUser),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return commentShimmer();
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Erreur de connexion!'),
+                  );
+                }
+                final user = snapshot.data!;
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(user.profileImage ?? imgUrl),
+                  ),
+                  title: Text('${user.nomPrenom}',
+                      style: TextStyle(color: Colors.white)),
+                  subtitle: Text(comment.comment,
+                      style: TextStyle(color: Colors.white)),
+                  trailing: user.id == auth.currentUser!.uid
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            ModeleService().removeComment(idModele, comment.id);
+                          },
+                        )
+                      : null,
+                );
+              },
+            ),
+          );
+        },
+      );
+    } else if (commentsSnapshot.hasError) {
+      return Center(
+        child: Text('Erreur: ${commentsSnapshot.error}'),
+      );
+    } else {
+      return Center(child: CircularProgressIndicator());
+    }
+  }
+}
+
+class InputField extends StatelessWidget {
+  final TextEditingController controller;
+  final RxBool isTyping;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onSubmit;
+
+  const InputField({
+    required this.controller,
+    required this.isTyping,
+    required this.onChanged,
+    required this.onSubmit,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey,
+      margin: EdgeInsets.only(bottom: 60),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: controller,
+              onChanged: onChanged,
+              decoration: InputDecoration(
+                hintText: 'Votre commentaire',
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
+              ),
+            ),
+          ),
+          Obx(() {
+            return isTyping.value
+                ? IconButton(
+                    onPressed: onSubmit,
+                    icon: Icon(Icons.send, color: primaryColor),
+                  )
+                : SizedBox.shrink();
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+Widget commentShimmer() {
+  return Shimmer.fromColors(
+    baseColor: Colors.grey[300]!,
+    highlightColor: Colors.grey[100]!,
+    child: ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Colors.grey[300],
+      ),
+      title: Container(
+        width: 100,
+        height: 20,
+        color: Colors.grey[300],
+      ),
+      subtitle: Container(
+        width: 100,
+        height: 20,
+        color: Colors.grey[300],
+      ),
+    ),
+  );
 }

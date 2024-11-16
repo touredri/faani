@@ -20,6 +20,7 @@ class AccueilController extends GetxController {
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
   final userController = Get.find<UserController>();
   final homeController = Get.find<HomeController>();
+  final Rx<Comment?> selectedComment = Rx<Comment?>(null);
 
   AccueilController() {
     sewingIcon = SvgPicture.asset(

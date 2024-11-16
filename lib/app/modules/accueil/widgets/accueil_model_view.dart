@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/services/comment_service.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/globale_widgets/list_tailleur_bottom_sheet.dart';
@@ -93,19 +94,21 @@ class HomeItem extends GetView<AccueilController> {
                 FavoriteIcone(
                   docId: modele.id!,
                 ),
+                LikeIcon(docId: modele.id!),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     GestureDetector(
                       onTap: () {
                         showModalBottomSheet(
-                            // isScrollControlled: true,
+                            isScrollControlled: true,
                             backgroundColor:
-                                const Color.fromARGB(255, 252, 248, 248),
+                                const Color.fromARGB(150, 145, 144, 144),
                             context: context,
                             builder: (context) {
                               return Container(
-                                height: 600,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.80,
                                 padding: const EdgeInsets.only(
                                     top: 20, left: 8, right: 8),
                                 child: CommentModal(
@@ -121,13 +124,14 @@ class HomeItem extends GetView<AccueilController> {
                       ),
                     ),
                     StreamBuilder<int>(
-                      stream: CommentService().getNombreMessage(modele.id!),
+                      stream: ModeleService().getCommentCount(modele.id!),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           return Text('${snapshot.data}',
                               style: const TextStyle(color: Colors.white));
                         } else {
-                          return const CircularProgressIndicator();
+                          return const Text('0',
+                              style: TextStyle(color: Colors.white));
                         }
                       },
                     ),

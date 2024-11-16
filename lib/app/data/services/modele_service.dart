@@ -165,4 +165,70 @@ class ModeleService {
     final doc = await collection.doc(id).get();
     return doc.exists;
   }
+
+  Future<void> addLike(String modeleId, String userId) async {
+    final likeCollection = collection.doc(modeleId).collection('likes');
+    await likeCollection.add({'idUser': userId});
+  }
+
+  Future<void> removeLike(String modeleId, String likeId) async {
+    final docRef = collection.doc(modeleId).collection('likes').doc(likeId);
+    await docRef.delete();
+  }
+
+  Future<List<Like>> getLikes(String modeleId) async {
+    final querySnapshot =
+        await collection.doc(modeleId).collection('likes').get();
+    return querySnapshot.docs
+        .map((doc) => Like.fromMap(doc.data(), doc.reference))
+        .toList();
+  }
+
+  Future<int> getLikeCount(String modeleId) async {
+    final querySnapshot =
+        await collection.doc(modeleId).collection('likes').get();
+    return querySnapshot.size;
+  }
+
+  Future<void> addComment(
+      String modeleId, String comment, String userId) async {
+    final commentCollection = collection.doc(modeleId).collection('comments');
+    await commentCollection.add({'comment': comment, 'idUser': userId});
+  }
+
+  Future<void> removeComment(String modeleId, String commentId) async {
+    final docRef =
+        collection.doc(modeleId).collection('comments').doc(commentId);
+    await docRef.delete();
+  }
+
+  Stream<List<Comment>> getComments(String modeleId) {
+    return collection
+        .doc(modeleId)
+        .collection('comments')
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => Comment.fromMap(doc.data(), doc.reference))
+          .toList();
+    });
+  }
+
+  // update comment
+  Future<void> updateComment(
+      String modeleId, String commentId, String comment) async {
+    final docRef =
+        collection.doc(modeleId).collection('comments').doc(commentId);
+    await docRef.update({'comment': comment});
+  }
+
+  Stream<int> getCommentCount(String modeleId) {
+    return collection
+        .doc(modeleId)
+        .collection('comments')
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.size;
+    });
+  }
 }
