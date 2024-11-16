@@ -3,6 +3,7 @@ import 'package:faani/app/modules/ajout_modele/controllers/ajout_modele_controll
 import 'package:faani/app/modules/ajout_modele/widgets/modele_form.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/globale_widgets/list_categorie.dart';
+import 'package:faani/app/modules/globale_widgets/modele_card.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -89,23 +90,18 @@ class MesModelesView extends GetView {
               initState: (_) {},
               id: 'mesModeles',
               builder: (_) {
-                return MasonryGridView.count(
-                  controller: controller.scrollController,
-                  padding: const EdgeInsets.only(bottom: 10),
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 4,
-                  crossAxisSpacing: 4,
-                  itemCount: controller.mesModelesList.value.length,
-                  itemBuilder: (context, index) {
+                return customMansoryGridView(
+                  3,
+                  controller.mesModelesList.value.length,
+                  (context, index) {
                     final modele = controller.mesModelesList.value[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Get.to(() => DetailModeleView(modele),
-                            arguments: modele);
-                      },
-                      child: _buildCard(modele!.fichier[0]!, modele),
-                    );
+                    return buildCard(modele!, context: context, onTap: () {
+                      Get.to(() => DetailModeleView(modele, previousIsProfile: true,),
+                          arguments: modele);
+                    });
                   },
+                  scrollController: controller.scrollController,
+                  padding: 10,
                 );
               },
             ),
@@ -126,7 +122,7 @@ class MesModelesView extends GetView {
 
 Widget _buildCard(String imageUrl, Modele modele) {
   final int idSum = modele.id!.codeUnits.fold(0, (sum, char) => sum + char);
-  final imageHeight = 150.0 + (idSum % 100);
+  final imageHeight = 180.0 + (idSum % 100);
   return Card(
     clipBehavior: Clip.antiAliasWithSaveLayer,
     child: Image.network(

@@ -12,24 +12,50 @@ class DisplayImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // PageController controller = PageController();
+    PageController _controller = PageController();
     return Stack(
       children: [
         PageView(
+          controller: _controller,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20)),
-              child: CachedNetworkImage(
-                imageUrl: modele.fichier[0]!,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
+            for (var image in modele.fichier)
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20)),
+                child: CachedNetworkImage(
+                  imageUrl: image!,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 ),
               ),
-            ),
           ],
+        ),
+        Positioned(
+          bottom: 10,
+          left: 0,
+          right: 0,
+          child: SizedBox(
+              height: 20,
+              width: 200,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SmoothPageIndicator(
+                    controller: _controller,
+                    count: modele.fichier.length,
+                    effect: const ExpandingDotsEffect(
+                      dotColor: Colors.grey,
+                      activeDotColor: primaryColor,
+                      dotHeight: 8,
+                      dotWidth: 8,
+                      expansionFactor: 4,
+                    ),
+                  ),
+                ],
+              )),
         ),
         Positioned(top: 20, child: shadowBackButton(context)),
       ],

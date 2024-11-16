@@ -6,8 +6,6 @@ import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/favorite_icon.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
-import 'package:faani/app/modules/home/controllers/user_controller.dart';
-import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -20,7 +18,9 @@ import '../widgets/icons.dart';
 
 class DetailModeleView extends GetView<DetailModeleController> {
   final Modele modele;
-  const DetailModeleView(this.modele, {super.key});
+  final bool previousIsProfile;
+  const DetailModeleView(this.modele,
+      {this.previousIsProfile = false, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +114,7 @@ class DetailModeleView extends GetView<DetailModeleController> {
                             ),
                           ],
                         ),
+                        previousIsProfile ? 1.5.hs : 0.5.hs,
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.7,
                           child: ElevatedButton(
@@ -133,50 +134,52 @@ class DetailModeleView extends GetView<DetailModeleController> {
                                   : const Text('Envoyer à un tailleur')),
                         ),
                         0.5.hs,
-                        const ListTile(
-                          title: Text(
-                            'Autres modèles',
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey),
+                        if (!previousIsProfile)
+                          const ListTile(
+                            title: Text(
+                              'Autres modèles',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                            ),
+                            trailing: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.grey,
+                            ),
                           ),
-                          trailing: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.grey,
-                          ),
-                        ),
                       ],
                     ),
                   ),
-                  SliverFillRemaining(
-                    child: StreamBuilder(
-                        stream: ModeleService()
-                            .getAllModelesByCategories([modele.idCategorie!]),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else {
-                            return MasonryGridView.count(
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 4,
-                              crossAxisSpacing: 4,
-                              itemCount: snapshot.data!.length,
-                              padding: const EdgeInsets.only(bottom: 5),
-                              itemBuilder: (context, index) {
-                                if (snapshot.data![index].id == modele.id) {
-                                  return const SizedBox.shrink();
-                                }
-                                return buildCard(snapshot.data![index],
-                                    context: context);
-                              },
-                            );
-                          }
-                        }),
-                  )
+                  if (!previousIsProfile)
+                    SliverFillRemaining(
+                      child: StreamBuilder(
+                          stream: ModeleService()
+                              .getAllModelesByCategories([modele.idCategorie!]),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else {
+                              return MasonryGridView.count(
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 4,
+                                crossAxisSpacing: 4,
+                                itemCount: snapshot.data!.length,
+                                padding: const EdgeInsets.only(bottom: 5),
+                                itemBuilder: (context, index) {
+                                  if (snapshot.data![index].id == modele.id) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  return buildCard(snapshot.data![index],
+                                      context: context);
+                                },
+                              );
+                            }
+                          }),
+                    )
                 ],
               ),
             );

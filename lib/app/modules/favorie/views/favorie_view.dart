@@ -67,8 +67,7 @@ class FavorieView extends GetView<FavorieController> {
                     crossAxisSpacing: 4,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      return buildCard(snapshot.data![index],
-                          context: context);
+                      return buildCard(snapshot.data![index], context: context);
                     },
                   );
                 }

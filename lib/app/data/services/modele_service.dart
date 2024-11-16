@@ -89,25 +89,6 @@ class ModeleService {
     });
   }
 
-  Stream<List<Modele>> getAllModeleByTailleurId(String id,
-      {Modele? lastModele}) {
-    Query<Map<String, dynamic>> query =
-        collection.where('idTailleur', isEqualTo: id);
-    if (lastModele != null) {
-      query = query.startAfter([lastModele.id]);
-    }
-    return query.limit(10).snapshots().map((querySnapshot) {
-      try {
-        return querySnapshot.docs.map((doc) {
-          return Modele.fromMap(doc.data(), doc.reference);
-        }).toList();
-      } catch (e) {
-        print('Error occurred while processing query results: $e');
-        return [];
-      }
-    });
-  }
-
   Future<List<Modele>> getAllModeleByTailleur(
       String idTailleur, List<String> idCategories,
       {Modele? lastModele}) async {

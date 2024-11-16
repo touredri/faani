@@ -12,6 +12,7 @@ import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/globale_widgets/animated_pop_up.dart';
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -63,26 +64,20 @@ class CommandeController extends GetxController {
     update(['search']);
   }
 
-  Stream<List<Modele>> init() {
-    return modeleService
-        .getAllModeleByTailleurId(userController.currentUser.value.id!)
-        .map((event) {
-      modeles.clear();
-      modeles.addAll(event);
-      return modeles;
-    });
-  }
-
   // The listener function that will be called when the user scrolls
   void _onScroll() {
     if (scrollController.position.pixels ==
             scrollController.position.maxScrollExtent &&
         modeles.isNotEmpty) {
       modeleService
-          .getAllModeleByTailleurId(userController.currentUser.value.id!,
+          .getAllModeleByTailleur(userController.currentUser.value.id!, [],
               lastModele: modeles.last)
-          .listen((event) {
-        modeles.addAll(event);
+          .then((event) {
+        for (var element in event) {
+          if (!modeles.contains(element)) {
+            modeles.add(element);
+          }
+        }
       });
     }
   }
@@ -251,11 +246,10 @@ class CommandeController extends GetxController {
         ),
       );
     } else if (commande.prix != 0 && userController.isTailleur.value) {
-      Get.snackbar('Erreur', 'Vous ne pouvez pas modifier le prix encore',
-          snackPosition: SnackPosition.BOTTOM);
+      showCustomSnackbar(message: 'Vous ne pouvez pas modifier le prix encore');
     } else {
-      Get.snackbar('Erreur', 'Vous n\'êtes pas autorisé à modifier le prix',
-          snackPosition: SnackPosition.BOTTOM);
+      showCustomSnackbar(
+          message: 'Vous n\'êtes pas autorisé à modifier le prix');
     }
   }
 
@@ -273,11 +267,8 @@ class CommandeController extends GetxController {
             snackPosition: SnackPosition.BOTTOM);
       }
     } else {
-      Get.snackbar(
-        'Erreur',
-        'Vous n\'êtes pas autorisé à modifier la date',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      showCustomSnackbar(
+          message: "Vous n'êtes pas autorisé à modifier la date");
     }
     update();
   }

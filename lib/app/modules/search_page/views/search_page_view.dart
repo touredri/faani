@@ -1,10 +1,7 @@
 import 'package:faani/app/data/models/modele_model.dart';
-import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
-import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import '../controllers/search_page_controller.dart';
 
@@ -53,12 +50,10 @@ class SearchPageView extends GetView<SearchPageController> {
                   child: Text(
                       'Resultat: Le modèle que vous recherchez n\'a été trouvé, utliser d\'autre mot clé.'));
             } else {
-              return MasonryGridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
+              return customMansoryGridView(
+                2,
+                snapshot.data!.length,
+                (context, index) {
                   return buildCard(snapshot.data![index], context: context);
                 },
               );

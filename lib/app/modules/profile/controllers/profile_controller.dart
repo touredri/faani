@@ -131,9 +131,9 @@ class ProfileController extends GetxController {
   void getMesModeles() {
     if (mesModelesList.value.isNotEmpty) {
       ModeleService()
-          .getAllModeleByTailleurId(user!.uid,
+          .getAllModeleByTailleur(user!.uid, [],
               lastModele: mesModelesList.value.last)
-          .listen((event) {
+          .then((event) {
         for (Modele modele in event) {
           if (!mesModelesList.value.contains(modele)) {
             mesModelesList.value.add(modele);
@@ -141,7 +141,7 @@ class ProfileController extends GetxController {
         }
       });
     } else {
-      ModeleService().getAllModeleByTailleurId(user?.uid ?? '').listen((event) {
+      ModeleService().getAllModeleByTailleur(user?.uid ?? '', []).then((event) {
         mesModelesList.value.addAll(event);
       });
     }
