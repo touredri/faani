@@ -36,7 +36,8 @@ Widget iconMessage(Modele modele, BuildContext context, Color color) {
       GestureDetector(
         onTap: () {
           showModalBottomSheet(
-              // isScrollControlled: true,
+              isScrollControlled: true,
+              useRootNavigator: true,
               backgroundColor: const Color.fromARGB(255, 252, 248, 248),
               context: context,
               builder: (context) {

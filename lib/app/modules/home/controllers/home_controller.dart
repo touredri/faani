@@ -9,12 +9,10 @@ import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/views/accueil_view.dart';
 import 'package:faani/app/modules/commande/views/commande_view.dart';
 import 'package:faani/app/modules/favorie/views/favorie_view.dart';
-import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:faani/app/modules/profile/views/profile_view.dart';
 import 'package:faani/app/style/my_theme.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -156,6 +154,8 @@ class HomeController extends GetxController {
       await const FlutterSecureStorage()
           .write(key: 'isAdmin', value: isAdmin.toString());
       this.isAdmin.value = isAdmin;
+    } else {
+      isAdmin.value = check == 'true';
     }
   }
 

@@ -100,6 +100,8 @@ class CommentsList extends StatelessWidget {
               if (comment.idUser == auth.currentUser!.uid) {
                 showModalBottomSheet(
                   context: context,
+                  useRootNavigator: true,
+                  isScrollControlled: true,
                   builder: (context) {
                     return Wrap(
                       children: [

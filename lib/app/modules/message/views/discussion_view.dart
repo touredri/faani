@@ -15,6 +15,7 @@ class DiscussionView extends GetView<DiscussionController> {
   void _showPicker(BuildContext context) {
     showModalBottomSheet(
         context: context,
+        useRootNavigator: true,
         builder: (BuildContext bc) {
           return SafeArea(
             child: Container(

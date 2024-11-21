@@ -102,6 +102,7 @@ class HomeItem extends GetView<AccueilController> {
                       onTap: () {
                         showModalBottomSheet(
                             isScrollControlled: true,
+                            useRootNavigator: true,
                             backgroundColor:
                                 const Color.fromARGB(150, 145, 144, 144),
                             context: context,
