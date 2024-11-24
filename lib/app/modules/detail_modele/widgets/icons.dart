@@ -3,7 +3,7 @@ import 'package:faani/app/data/services/comment_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-import 'package:faani/src/message_modal.dart';
+import 'package:faani/src/comment_modal.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 

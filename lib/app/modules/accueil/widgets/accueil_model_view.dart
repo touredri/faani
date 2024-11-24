@@ -6,7 +6,7 @@ import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/globale_widgets/list_tailleur_bottom_sheet.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/data/models/modele_model.dart';
-import 'package:faani/src/message_modal.dart';
+import 'package:faani/src/comment_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../globale_widgets/favorite_icon.dart';
@@ -107,11 +107,9 @@ class HomeItem extends GetView<AccueilController> {
                                 const Color.fromARGB(150, 145, 144, 144),
                             context: context,
                             builder: (context) {
-                              return Container(
+                              return SizedBox(
                                 height:
                                     MediaQuery.of(context).size.height * 0.80,
-                                padding: const EdgeInsets.only(
-                                    top: 20, left: 8, right: 8),
                                 child: CommentModal(
                                   idModele: modele.id!,
                                 ),

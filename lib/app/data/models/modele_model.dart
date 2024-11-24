@@ -24,24 +24,33 @@ class Like {
 }
 
 class Comment {
-  String id;
+  String? id;
   String comment;
   String idUser;
+  String? type;
+  String? file;
+  Timestamp? createdAt;
 
-  Comment({required this.id, required this.comment, required this.idUser});
+  Comment({this.id, required this.comment, required this.idUser, this.type, this.file, Timestamp? createdAt});
 
   factory Comment.fromMap(Map<String, dynamic> data, DocumentReference documentReference) {
     final id = documentReference.id;
     final comment = data['comment'] as String;
     final idUser = data['idUser'] as String;
+    final type = data['type'] as String?;
+    final file = data['file'] as String?;
+    final createdAt = data['createdAt'] as Timestamp?;
 
-    return Comment(id: id, comment: comment, idUser: idUser);
+    return Comment(id: id, comment: comment, idUser: idUser, type: type, file: file, createdAt: createdAt);
   }
 
   Map<String, dynamic> toMap() {
     return {
       'comment': comment,
       'idUser': idUser,
+      'type': type,
+      'file': file,
+      'createdAt': createdAt,
     };
   }
 }
@@ -55,7 +64,7 @@ class Modele {
   final String idTailleur;
   final String? idCategorie;
   final bool? isPublic;
-  final bool isApproved; // New property
+  final bool isApproved;
 
   Modele({
     required this.id,
@@ -66,7 +75,7 @@ class Modele {
     required this.idTailleur,
     required this.idCategorie,
     required this.isPublic,
-    this.isApproved = false, // Initialize to false
+    this.isApproved = false,
   });
 
   factory Modele.fromMap(

@@ -1,17 +1,16 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/message_modele.dart';
 import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/modules/globale_widgets/message_field/message_field_controller.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
+import 'package:faani/app/modules/utils/utils.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
-class DiscussionController extends GetxController {
+class DiscussionController extends MessageFieldController {
   DiscussionController();
-  final textEditingController = TextEditingController();
   final collection = FirebaseFirestore.instance.collection('messages');
   final UserController userController = Get.find();
   final RxList<MsgContent> msgcontentlist = <MsgContent>[].obs;
@@ -23,36 +22,6 @@ class DiscussionController extends GetxController {
   final RxString token = ''.obs;
   var listener;
   ScrollController msgScrolling = ScrollController();
-
-  sendMessage() async {
-    if (textEditingController.text.isNotEmpty) {
-      final content = MsgContent(
-        id: user!.uid,
-        content: textEditingController.text,
-        type: 'text',
-        addtime: Timestamp.now(),
-      );
-      await collection
-          .doc(doc_id.value)
-          .collection('msglist')
-          .withConverter(
-              fromFirestore: MsgContent.fromMap,
-              toFirestore: (MsgContent msg, options) => msg.toMap())
-          .add(content);
-
-      await collection.doc(doc_id.value).update({
-        'last_msg': textEditingController.text,
-        'last_time': Timestamp.now(),
-      }).then((value) => {
-            sendNotification(
-              token.value,
-              'Nouveau message de ${userController.currentUser.value.nomPrenom}',
-              textEditingController.text,
-            ),
-            textEditingController.clear(),
-          });
-    }
-  }
 
   @override
   void onInit() {
@@ -106,44 +75,6 @@ class DiscussionController extends GetxController {
     super.dispose();
   }
 
-  File? imageFile;
-  final ImagePicker _picker = ImagePicker();
-
-  void pickImageFromGallery() async {
-    final pickImage = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickImage != null) {
-      imageFile = File(pickImage.path);
-      await uploadImage();
-    } else {
-      print('No image selected');
-    }
-  }
-
-  void pickImageFromCamera() async {
-    final pickImage = await _picker.pickImage(source: ImageSource.camera);
-    if (pickImage != null) {
-      imageFile = File(pickImage.path);
-      await uploadImage();
-    } else {
-      print('No image selected');
-    }
-  }
-
-  // function that return random string
-  String randomString(int length) {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    final rnd = Random();
-    final result =
-        List.generate(length, (index) => chars[rnd.nextInt(chars.length)]);
-    return result.join();
-  }
-
-  // function that add extension to the file
-  String addExtension(String path) {
-    final ext = path.split('.').last;
-    return ext;
-  }
-
   Future uploadImage() async {
     if (imageFile == null) return;
     final fileName = '${randomString(10)}.${addExtension(imageFile!.path)}';
@@ -167,7 +98,7 @@ class DiscussionController extends GetxController {
                     toFirestore: (MsgContent msg, options) => msg.toMap())
                 .add(content)
                 .then(
-                  (value) => textEditingController.clear(),
+                  (value) => comment.clear(),
                 );
 
             await collection.doc(doc_id.value).update({
@@ -190,7 +121,87 @@ class DiscussionController extends GetxController {
     }
   }
 
-  void recordVoice() {
-    // implement recordVoice
+  @override
+  Future<void> sendMessageImage(String parentId) async {
+    onSendLoading.value = true;
+    final image = await getAndCropImage();
+    if (image != null) {
+      imageFile = File(image.path);
+      await uploadImage();
+    }
+    onSendLoading.value = false;
+  }
+
+  @override
+  Future<void> sendMessageVoice(String parentId) async {
+    checkAudio();
+    try {
+      final ref = FirebaseStorage.instance
+          .ref('chatAudios')
+          .child('${randomString(10)}.${addExtension(audioFile!.path)}');
+      await ref.putFile(audioFile!).whenComplete(() async {
+        final url = await ref.getDownloadURL();
+        final content = MsgContent(
+          id: user!.uid,
+          content: url,
+          type: 'audio',
+          addtime: Timestamp.now(),
+        );
+        await collection
+            .doc(doc_id.value)
+            .collection('msglist')
+            .withConverter(
+                fromFirestore: MsgContent.fromMap,
+                toFirestore: (MsgContent msg, options) => msg.toMap())
+            .add(content)
+            .then(
+          (value) {
+            comment.clear();
+            recordPath.value = '';
+          },
+        );
+
+        await collection.doc(doc_id.value).update({
+          'last_msg': 'message vocal',
+          'last_time': Timestamp.now(),
+        });
+      });
+      onRecordStop();
+    } catch (e) {
+      print("Failed to upload audio file: $e");
+    }
+  }
+
+  @override
+  Future<void> sendMessageText(String parentId) async {
+    onSendLoading.value = true;
+    if (comment.text.isNotEmpty) {
+      final content = MsgContent(
+        id: user!.uid,
+        content: comment.text,
+        type: 'text',
+        addtime: Timestamp.now(),
+      );
+      await collection
+          .doc(doc_id.value)
+          .collection('msglist')
+          .withConverter(
+              fromFirestore: MsgContent.fromMap,
+              toFirestore: (MsgContent msg, options) => msg.toMap())
+          .add(content);
+
+      await collection.doc(doc_id.value).update({
+        'last_msg': comment.text,
+        'last_time': Timestamp.now(),
+      }).then((value) => {
+            sendNotification(
+              token.value,
+              'Nouveau message de ${userController.currentUser.value.nomPrenom}',
+              comment.text,
+            ),
+            comment.clear(),
+          });
+    }
+    onSendLoading.value = false;
   }
 }

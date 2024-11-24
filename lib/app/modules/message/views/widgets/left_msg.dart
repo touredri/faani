@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/models/message_modele.dart';
+import 'package:faani/app/modules/globale_widgets/message_field/audio.dart';
 import 'package:faani/app/modules/globale_widgets/shimmer.dart';
 import 'package:faani/app/modules/message/views/widgets/show_image.dart';
 import 'package:flutter/material.dart';
@@ -22,36 +23,46 @@ Widget chatLeftItem(MsgContent item, BuildContext context) {
               borderRadius: BorderRadius.circular(10),
             ),
             child: item.type == "text"
-                ? Text(
-                    item.content!,
-                    style: const TextStyle(color: Colors.white),
+                ? SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    child: Text(
+                      item.content!,
+                      overflow: TextOverflow.clip,
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   )
-                : ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 90.w),
-                    child: GestureDetector(
-                        onTap: () {
-                          showImage(item.content!, context);
-                        },
-                        child: CachedNetworkImage(
-                          imageUrl: item.content!,
-                          imageBuilder: (context, imageProvider) => Container(
-                            width: 130.w,
-                            height: 170.w,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
+                : item.type == "image"
+                    ? ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 300.w),
+                        child: GestureDetector(
+                            onTap: () {
+                              showImage(item.content!, context);
+                            },
+                            child: CachedNetworkImage(
+                              imageUrl: item.content!,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                width: 200.w,
+                                height: 170.w,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          placeholder: (context, url) => shimmer(),
-                          errorWidget: (context, url, error) => const Icon(
-                            Icons.error,
-                            color: Colors.red,
-                          ),
-                        )),
-                  ),
+                              placeholder: (context, url) => shimmer(),
+                              errorWidget: (context, url, error) => const Icon(
+                                Icons.error,
+                                color: Colors.red,
+                              ),
+                            )),
+                      )
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.65,
+                        height: 45,
+                        child: AudioPlayer(source: item.content!)),
           ),
           const SizedBox(width: 5),
         ],

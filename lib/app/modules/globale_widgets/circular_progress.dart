@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-SizedBox circularProgress() {
-  return const SizedBox(
+SizedBox circularProgress({Color color = Colors.white}) {
+  return SizedBox(
     height: 20,
     width: 20,
     child: CircularProgressIndicator(
-      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+      valueColor: AlwaysStoppedAnimation<Color>(color),
     ),
   );
 }

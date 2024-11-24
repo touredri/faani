@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/models/message_modele.dart';
+import 'package:faani/app/modules/globale_widgets/message_field/audio.dart';
 import 'package:faani/app/modules/globale_widgets/shimmer.dart';
 import 'package:faani/app/modules/message/views/widgets/show_image.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 Widget chatRightItem(MsgContent item, BuildContext context) {
   return ConstrainedBox(
-    constraints: BoxConstraints(maxWidth: 230.w, minWidth: 50.w),
+    constraints: BoxConstraints(maxWidth: 300.w, minWidth: 50.w),
     child: Container(
       margin: const EdgeInsets.only(top: 5, bottom: 10, right: 10),
       child: Row(
@@ -23,37 +24,47 @@ Widget chatRightItem(MsgContent item, BuildContext context) {
               borderRadius: BorderRadius.circular(10),
             ),
             child: item.type == "text"
-                ? Text(
-                    item.content!,
-                    style: const TextStyle(color: Colors.white),
+                ? ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: 230.w),
+                    child: Text(
+                      item.content!,
+                      overflow: TextOverflow.clip,
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   )
-                : ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 100.w),
-                    child: GestureDetector(
-                        onTap: () {
-                          showImage(item.content!, context);
-                        },
-                        child: CachedNetworkImage(
-                          imageUrl: item.content!,
-                          fit: BoxFit.cover,
-                          imageBuilder: (context, imageProvider) => Container(
-                            width: 130.w,
-                            height: 170.w,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
+                : item.type == "image"
+                    ? ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 300.w),
+                        child: GestureDetector(
+                            onTap: () {
+                              showImage(item.content!, context);
+                            },
+                            child: CachedNetworkImage(
+                              imageUrl: item.content!,
+                              fit: BoxFit.cover,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                width: 200.w,
+                                height: 170.w,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          placeholder: (context, url) => shimmer(),
-                          errorWidget: (context, url, error) => const Icon(
-                            Icons.error,
-                            color: Colors.red,
-                          ),
-                        )),
-                  ),
+                              placeholder: (context, url) => shimmer(),
+                              errorWidget: (context, url, error) => const Icon(
+                                Icons.error,
+                                color: Colors.red,
+                              ),
+                            )),
+                      )
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.65,
+                        height: 45,
+                        child: AudioPlayer(source: item.content!)),
           ),
           const SizedBox(width: 5),
         ],

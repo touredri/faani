@@ -1,14 +1,19 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/modules/globale_widgets/message_field/audio.dart';
+import 'package:faani/app/modules/globale_widgets/message_field/message_field.dart';
 import 'package:flutter/material.dart';
 import 'package:faani/app/data/services/modele_service.dart';
+import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import '../app/firebase/global_function.dart';
 import 'comment_controller.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class CommentModal extends StatefulWidget {
   final String idModele;
@@ -29,24 +34,6 @@ class _CommentModalState extends State<CommentModal> {
         .setCommentsStream(ModeleService().getComments(widget.idModele));
   }
 
-  void _submitComment() {
-    if (Get.find<AccueilController>().selectedComment.value != null) {
-      ModeleService().updateComment(
-        widget.idModele,
-        Get.find<AccueilController>().selectedComment.value!.id,
-        _commentController.controller.text,
-      );
-      Get.find<AccueilController>().selectedComment.value = null;
-    } else {
-      ModeleService().addComment(
-        widget.idModele,
-        _commentController.controller.text,
-        auth.currentUser!.uid,
-      );
-    }
-    _commentController.clear();
-  }
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Comment>>(
@@ -54,7 +41,6 @@ class _CommentModalState extends State<CommentModal> {
       builder: (context, snapshot) {
         return Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: Colors.transparent,
           body: Column(
             children: [
               Expanded(
@@ -63,12 +49,8 @@ class _CommentModalState extends State<CommentModal> {
                   idModele: widget.idModele,
                 ),
               ),
-              InputField(
-                controller: _commentController.controller,
-                isTyping: _commentController.isTyping,
-                onChanged: _commentController.onChanged,
-                onSubmit: _submitComment,
-              ),
+              MessageField<CommentController>(widget.idModele),
+              1.hs,
             ],
           ),
         );
@@ -119,7 +101,8 @@ class CommentsList extends StatelessWidget {
                           leading: Icon(Icons.delete),
                           title: Text('Supprimer'),
                           onTap: () {
-                            ModeleService().removeComment(idModele, comment.id);
+                            ModeleService()
+                                .removeComment(idModele, comment.id!);
                             Navigator.pop(context);
                           },
                         ),
@@ -141,25 +124,71 @@ class CommentsList extends StatelessWidget {
                   );
                 }
                 final user = snapshot.data!;
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(user.profileImage ?? imgUrl),
-                  ),
-                  title: Text('${user.nomPrenom}',
-                      style: TextStyle(color: Colors.white)),
-                  subtitle: Text(comment.comment,
-                      style: TextStyle(color: Colors.white)),
-                  trailing: user.id == auth.currentUser!.uid
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.red,
+                final formattedDate = timeago.format(
+                    (comment.createdAt ?? Timestamp.now()).toDate(),
+                    locale: 'fr_short');
+                return Padding(
+                  padding:
+                      const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                backgroundImage:
+                                    NetworkImage(user.profileImage ?? imgUrl),
+                              ),
+                              2.5.ws,
+                              Text(
+                                '${user.nomPrenom}',
+                              ),
+                            ],
                           ),
-                          onPressed: () {
-                            ModeleService().removeComment(idModele, comment.id);
-                          },
-                        )
-                      : null,
+                          Text(formattedDate,
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ))
+                        ],
+                      ),
+                      1.hs,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: comment.type == "text" || comment.type == null
+                            ? Container(
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                ),
+                                child: Text(
+                                  overflow: TextOverflow.clip,
+                                  comment.comment,
+                                ),
+                              )
+                            : comment.type == "audio"
+                                ? SizedBox(
+                                    height: 45,
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: AudioPlayer(source: comment.file!))
+                                : SizedBox(
+                                    height: 150,
+                                    width: 100,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: CachedNetworkImage(
+                                          imageUrl: comment.file!,
+                                          fit: BoxFit.cover),
+                                    ),
+                                  ),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
@@ -173,55 +202,6 @@ class CommentsList extends StatelessWidget {
     } else {
       return Center(child: CircularProgressIndicator());
     }
-  }
-}
-
-class InputField extends StatelessWidget {
-  final TextEditingController controller;
-  final RxBool isTyping;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onSubmit;
-
-  const InputField({
-    required this.controller,
-    required this.isTyping,
-    required this.onChanged,
-    required this.onSubmit,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.grey,
-      margin: EdgeInsets.only(bottom: 60),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: controller,
-              onChanged: onChanged,
-              decoration: InputDecoration(
-                hintText: 'Votre commentaire',
-                border: OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-              ),
-            ),
-          ),
-          Obx(() {
-            return isTyping.value
-                ? IconButton(
-                    onPressed: onSubmit,
-                    icon: Icon(Icons.send, color: primaryColor),
-                  )
-                : SizedBox.shrink();
-          }),
-        ],
-      ),
-    );
   }
 }
 
