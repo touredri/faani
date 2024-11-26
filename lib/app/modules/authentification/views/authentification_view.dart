@@ -21,14 +21,13 @@ class AuthView extends GetView<AuthController> {
       appBar: AppBar(
         backgroundColor: scaffoldBack,
         elevation: 0,
-        toolbarHeight: auth.currentUser == null ? 10 : 50,
+        toolbarHeight: auth.currentUser == null ? 0 : 50,
         automaticallyImplyLeading: false,
         leading: auth.currentUser == null
             ? null
             : IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
-                  // Get.offAll(() => const HomeView());
                   Get.back();
                 },
               ),
@@ -50,15 +49,15 @@ class AuthView extends GetView<AuthController> {
                   height: 0,
                 ),
               ),
-              3.hs,
+              1.5.hs,
               Text(
-                'Commander sans vous deplacer\nJoindre votre mésure en un clic..',
+                'Explorer des milier de modèles\nPrendre vos mésures en un clic..',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               1.hs, // image
               Container(
-                height: 290,
+                height: 280,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/images/welcome_img.png'),
@@ -67,43 +66,121 @@ class AuthView extends GetView<AuthController> {
                 ),
               ),
               3.hs, // phone number input
-              IntlPhoneField(
-                cursorColor: Theme.of(context).colorScheme.primary,
-                invalidNumberMessage: 'Numéro invalide',
-                decoration: InputDecoration(
-                  errorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+              // IntlPhoneField(
+              //   cursorColor: Theme.of(context).colorScheme.primary,
+              //   invalidNumberMessage: 'Numéro invalide',
+              //   decoration: InputDecoration(
+              //     errorBorder: OutlineInputBorder(
+              //       borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+              //       borderRadius: const BorderRadius.all(Radius.circular(10)),
+              //     ),
+              //     focusedErrorBorder: OutlineInputBorder(
+              //       borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+              //       borderRadius: const BorderRadius.all(Radius.circular(10)),
+              //     ),
+              //     labelText: 'Numéro de téléphone',
+              //   ),
+              //   initialCountryCode: 'ML',
+              //   onChanged: (phone) {
+              //     controller.phoneNumber.value = phone.completeNumber;
+              //   },
+              // ),
+              SizedBox(
+                // height: 50,
+                child: TextField(
+                  controller: controller.emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: 'Votre adresse email',
+                    prefixIcon: const Icon(
+                      Icons.email,
+                      color: Colors.grey,
+                    ),
                   ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  ),
-                  labelText: 'Numéro de téléphone',
+                  onChanged: (value) {
+                    controller.phoneNumber.value = value;
+                  },
                 ),
-                initialCountryCode: 'ML',
-                onChanged: (phone) {
-                  controller.phoneNumber.value = phone.completeNumber;
-                },
               ),
               2.hs, // button sign in
               Obx(() => ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
                     onPressed: () {
-                      controller
-                          .verifyPhoneNumber(controller.phoneNumber.value);
+                      // controller
+                      //     .verifyPhoneNumber(controller.phoneNumber.value);
+                      showCustomSnackbar(
+                          message: 'Essayer de vous connecter avec Google',
+                          backgroundColor: Colors.green);
                     },
                     child: controller.loading.value
                         ? circularProgress()
                         : const Text('S\'identifier'),
                   )),
+              3.hs,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: Colors.grey.withOpacity(0.8),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Text(
+                      'Ou',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: Colors.grey.withOpacity(0.8),
+                    ),
+                  ),
+                ],
+              ),
+              2.hs,
+              InkWell(
+                onTap: () {
+                  controller.signInWithGoogle();
+                },
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 35,
+                        child: Image.asset('assets/images/google_auth.png'),
+                      ),
+                      2.ws,
+                      Text(
+                        'S\'identifier avec Google',
+                        style: TextStyle(
+                            // fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               3.hs, // button sign in anonymously
               if (auth.currentUser == null)
                 Obx(() => OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                       onPressed: () async {
                         controller.isLoading.value = true;

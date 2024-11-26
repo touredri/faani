@@ -7,6 +7,7 @@ import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../data/services/users_service.dart';
 import '../../../firebase/global_function.dart';
@@ -26,6 +27,10 @@ class AuthController extends GetxController {
   late Timer timer;
   TextEditingController smsCodeController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController repeatPasswordController = TextEditingController();
   final String defaultProfileImage = getRandomProfileImageUrl();
 
   // open url
@@ -55,6 +60,7 @@ class AuthController extends GetxController {
   Future<void> verifyPhoneNumber(String phoneNumber) async {
     loading.value = true;
     try {
+      FirebaseAuth.instance.setLanguageCode('en');
       await auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
@@ -190,7 +196,9 @@ class AuthController extends GetxController {
     final UserModel newUser = UserModel(
       id: auth.currentUser!.uid,
       nomPrenom: nameController.text,
-      phoneNumber: phoneNumber.value,
+      phoneNumber: phoneNumber.value.isEmpty ? auth.currentUser!.phoneNumber : phoneNumber.value,
+      email: auth.currentUser!.email ?? '',
+      adress: 'Bamako, Mali',
       profileImage: user!.photoURL ?? defaultProfileImage,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
@@ -265,5 +273,50 @@ class AuthController extends GetxController {
     );
     setUser();
     Get.offAll(() => const HomeView());
+  }
+
+// Connexion avec Google (inchangé)
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        Get.snackbar('Erreur', 'Connexion annulée.');
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCrendential =  await auth.signInWithCredential(credential);
+      nameController.text = userCrendential.user!.displayName!;
+      if (auth.currentUser != null) {
+        final userExists = await checkUserExists();
+        if (userExists) {
+          setUser();
+          Get.offAll(() => const HomeView());
+        } else {
+          Get.offAll(() => const SignUpView());
+        }
+        print(userCrendential.user!.displayName);
+        Get.snackbar('Succès', 'Connexion avec Google réussie !');
+      }
+    } catch (e) {
+      Get.snackbar('Erreur', 'Connexion avec Google échouée : $e');
+    }
+  }
+
+  // verifier si l'email
+  Future<bool> checkUserExistsByEmail(String email) async {
+    try {
+      final List<String> signInMethods = await auth.fetchSignInMethodsForEmail(email);
+      return signInMethods.isNotEmpty;
+    } catch (e) {
+      print('Erreur lors de la vérification de l\'existence de l\'utilisateur : $e');
+      return false;
+    }
   }
 }

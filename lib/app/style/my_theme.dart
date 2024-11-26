@@ -36,7 +36,7 @@ ThemeData buildTheme(BuildContext context) {
       ),
     ),
     colorScheme: const ColorScheme.light(
-      background: Colors.white,
+      surface: Colors.white,
       primary: primaryColor,
       onPrimary: Colors.white,
     ),
@@ -44,24 +44,24 @@ ThemeData buildTheme(BuildContext context) {
     splashColor: Colors.transparent,
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
-        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
           const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
         ),
-        iconColor: MaterialStateProperty.all<Color>(Colors.black),
-        // side: MaterialStateProperty.all<BorderSide>(
+        iconColor: WidgetStateProperty.all<Color>(Colors.black),
+        // side: WidgetStateProperty.all<BorderSide>(
         //   const BorderSide(color: inputBorderColor, width: 1),
         // ),
         splashFactory: InkSplash.splashFactory,
-        foregroundColor: MaterialStateProperty.all<Color>(primaryColor),
-        overlayColor: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) {
-            if (states.contains(MaterialState.pressed)) {
+        foregroundColor: WidgetStateProperty.all<Color>(primaryColor),
+        overlayColor: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.pressed)) {
               return primaryColor.withOpacity(0.1);
             } // The splash color when the button is pressed
             return primaryColor; // Use the component's default.
           },
         ),
-        textStyle: MaterialStateProperty.all<TextStyle>(
+        textStyle: WidgetStateProperty.all<TextStyle>(
           const TextStyle(
             fontFamily: fontFamily,
             fontWeight: FontWeight.w500,
@@ -170,24 +170,25 @@ ThemeData buildTheme(BuildContext context) {
         fontFamily: fontFamily,
         fontWeight: FontWeight.normal,
       ),
-      // filled: true,
-      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-      floatingLabelStyle: const TextStyle(
-        color: primaryColor,
-      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      floatingLabelStyle: const TextStyle(color: primaryColor, fontSize: 12),
       border: const OutlineInputBorder(
         borderSide: BorderSide(color: inputBorderColor, width: 1),
-        borderRadius: BorderRadius.all(Radius.circular(8)),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
       enabledBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: inputBorderColor, width: 1),
-          borderRadius: BorderRadius.all(Radius.circular(8))),
+          borderRadius: BorderRadius.all(Radius.circular(20))),
       focusedBorder: const OutlineInputBorder(
         borderSide: BorderSide(
-          color: inputBorderColor,
+          color: primaryColor,
           width: 1,
         ),
-        borderRadius: BorderRadius.all(Radius.circular(15)),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+      ),
+      disabledBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: inputBorderColor, width: 1),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
     ),
     textSelectionTheme: const TextSelectionThemeData(
