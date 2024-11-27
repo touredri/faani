@@ -1,18 +1,32 @@
 {
   "project_info": {
     "project_number": "224443279523",
+    "firebase_url": "https://faani-afrique-default-rtdb.firebaseio.com",
     "project_id": "faani-afrique",
     "storage_bucket": "faani-afrique.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:224443279523:android:bf0a981568089cf0ff7716",
+        "mobilesdk_app_id": "1:224443279523:android:66cc6847aca086e3ff7716",
         "android_client_info": {
-          "package_name": "com.faani.app.faani"
+          "package_name": "com.example.faani_admin"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "224443279523-2kdlc3g053u1o66eedpi2kpv4gorqg83.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.faani_admin",
+            "certificate_hash": "15a32574d19f63ecc5f26a0b3d4651f50a08f88a"
+          }
+        },
+        {
+          "client_id": "224443279523-jntqepgvi7kum1nvm81ru2ip27khkfar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBE6w2YtJ_jjYoEVm5XWXpKP8b52byE1bY"
@@ -20,7 +34,79 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "224443279523-jntqepgvi7kum1nvm81ru2ip27khkfar.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "224443279523-a9mm3dfmgqq19p3g39di5t1oo73k73ui.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.faani.app.faani"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224443279523:android:bf0a981568089cf0ff7716",
+        "android_client_info": {
+          "package_name": "com.faani.app.faani"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "224443279523-dsvb9c594nj2gh8g3sobsp0p16ekgu5o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.faani.app.faani",
+            "certificate_hash": "15a32574d19f63ecc5f26a0b3d4651f50a08f88a"
+          }
+        },
+        {
+          "client_id": "224443279523-e9t53cqctr1735crnvn2481ed6blohqe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.faani.app.faani",
+            "certificate_hash": "048beb9255a53c947b00e7c044b8cadff26e0cd2"
+          }
+        },
+        {
+          "client_id": "224443279523-lu2obgs9j5o7pq6stelb2s8vdes311bc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.faani.app.faani",
+            "certificate_hash": "d1967741793ed7b2ad00d3de8b7599e16d7b788a"
+          }
+        },
+        {
+          "client_id": "224443279523-jntqepgvi7kum1nvm81ru2ip27khkfar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBE6w2YtJ_jjYoEVm5XWXpKP8b52byE1bY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "224443279523-jntqepgvi7kum1nvm81ru2ip27khkfar.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "224443279523-a9mm3dfmgqq19p3g39di5t1oo73k73ui.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.faani.app.faani"
+              }
+            }
+          ]
         }
       }
     }

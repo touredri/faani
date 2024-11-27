@@ -306,7 +306,6 @@ class AuthController extends GetxController {
             'phone': phoneNumber.value,
           });
         }
-        print(userCrendential.user!.displayName);
         Get.snackbar('Succès', 'Connexion avec Google réussie !');
       }
     } catch (e) {
