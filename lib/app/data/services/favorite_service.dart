@@ -35,4 +35,12 @@ class FavorieService extends GetxService {
             }
         });
   }
+
+  // get user favorite count
+  Stream<int> getFavorieCount(String idUtilisateur) {
+    return collection
+        .where('idUtilisateur', isEqualTo: idUtilisateur)
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.length);
+  }
 }

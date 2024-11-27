@@ -4,7 +4,6 @@ import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
-import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
@@ -16,6 +15,7 @@ void showTailleurModalBottomSheet(BuildContext context, Modele modele) {
     expand: false,
     context: context,
     backgroundColor: Colors.grey[200],
+    useRootNavigator: true,
     builder: (context) {
       return StreamBuilder(
         stream: UserService().getAllTailleur(),

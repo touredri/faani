@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/tailleur_request.dart';
+import 'package:faani/app/data/services/follow.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/tailleur_request_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
@@ -59,6 +60,8 @@ class ProfileController extends GetxController {
   final ScrollController scrollController = ScrollController();
   late int myTotalModeleNumber;
   RxList<String> listSelectedCategorie = <String>[].obs;
+  RxInt followers = 0.obs;
+  RxInt following = 0.obs;
 
   // change language
   void updateLanguage(String language) {
@@ -78,6 +81,13 @@ class ProfileController extends GetxController {
     update(['mesModeles']);
   }
 
+  void getFollowStats() {
+    FollowService().getFollowStats(auth.currentUser!.uid).listen((event) {
+      followers.value = event['followers'] ?? 0;
+      following.value = event['following'] ?? 0;
+    });
+  }
+
   @override
   void onInit() async {
     super.onInit();
@@ -93,6 +103,7 @@ class ProfileController extends GetxController {
     myTotalModeleNumber =
         await ModeleService().getTotalModeleCount(user?.uid ?? '');
     getMesModeles();
+    getFollowStats();
   }
 
   void updateProfile() async {

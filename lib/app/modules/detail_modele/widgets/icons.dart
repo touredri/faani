@@ -1,5 +1,6 @@
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/services/comment_service.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -42,7 +43,7 @@ Widget iconMessage(Modele modele, BuildContext context, Color color) {
               context: context,
               builder: (context) {
                 return Container(
-                  height: 600,
+                  height: 800,
                   padding: const EdgeInsets.only(top: 20, left: 8, right: 8),
                   child: CommentModal(
                     idModele: modele.id!,
@@ -57,15 +58,13 @@ Widget iconMessage(Modele modele, BuildContext context, Color color) {
         ),
       ),
       StreamBuilder<int>(
-        stream: CommentService().getNombreMessage(modele.id!),
+        stream: ModeleService().getCommentCount(modele.id!),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Text('${snapshot.data}',
-                style: const TextStyle(
-                  color: Colors.grey,
-                ));
+                style: const TextStyle(color: Colors.grey));
           } else {
-            return const SizedBox();
+            return const Text('0', style: TextStyle(color: Colors.grey));
           }
         },
       ),

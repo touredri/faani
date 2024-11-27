@@ -132,7 +132,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
                       ],
                     )),
               ),
-              3.hs,
+              5.hs,
               // form to fill habit details
               Container(
                 padding:
@@ -165,8 +165,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
                         counterText: '',
                         labelText: isTailleur
                             ? 'Numéro du client'
-                            : controller
-                                .userController.currentUser.value.phoneNumber!,
+                            : '${controller.userController.currentUser.value.phoneNumber!.substring(0, 7)}XXXX',
                         border: const OutlineInputBorder(),
                       ),
                     ),

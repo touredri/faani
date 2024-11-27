@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
+import 'package:faani/app/data/services/follow.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
-import 'package:faani/app/modules/globale_widgets/list_categorie.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
-import 'package:flutter/scheduler.dart';
 
 class TailorProfilePage extends StatefulWidget {
   final UserModel tailor;
@@ -22,7 +22,7 @@ class TailorProfilePage extends StatefulWidget {
 class _TailorProfilePageState extends State<TailorProfilePage> {
   final _scrollController = ScrollController();
   final List<Modele> _modeles = [];
-  final Set<String> _modeleIds = {}; // To keep track of unique models
+  final Set<String> _modeleIds = {};
   final StreamController<List<Modele>> _streamController = StreamController();
   bool _isLoadingMore = false;
 
@@ -54,31 +54,81 @@ class _TailorProfilePageState extends State<TailorProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(
-                      widget.tailor.profileImage ??
-                          'https://via.placeholder.com/100',
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: NetworkImage(
+                        widget.tailor.profileImage ??
+                            'https://via.placeholder.com/100',
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.tailor.nomPrenom ?? 'Nom Inconnu',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.tailor.nomPrenom ?? 'Nom Inconnu',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    widget.tailor.clientCible ?? 'Confection générale',
-                    style:
-                        const TextStyle(fontSize: 16, color: Colors.blueGrey),
-                  ),
-                ],
-              ),
+                    Text(
+                      widget.tailor.clientCible ?? 'Confection générale',
+                      style:
+                          const TextStyle(fontSize: 16, color: Colors.blueGrey),
+                    ),
+                  ],
+                ),
+                8.ws,
+                // follow stats
+                Column(
+                  children: [
+                    Text(
+                      '8',
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Clients satisfaits',
+                      style:
+                          const TextStyle(fontSize: 15, color: Colors.blueGrey),
+                    ),
+                    3.hs,
+                    StreamBuilder<Map<String, int>>(
+                        stream:
+                            FollowService().getFollowStats(widget.tailor.id!),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Text(
+                              snapshot.data?['followers']?.toString() ?? '0',
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          } else {
+                            return Text(
+                              '0',
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          }
+                        }),
+                    Text(
+                      'Abonnés',
+                      style:
+                          const TextStyle(fontSize: 15, color: Colors.blueGrey),
+                    ),
+                  ],
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             Row(
@@ -144,7 +194,7 @@ class _TailorProfilePageState extends State<TailorProfilePage> {
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(left: 20.0, top: 8),
-          child: Text(value, style: const TextStyle(fontSize: 16)),
+          child: Text(value, style: const TextStyle(fontSize: 13)),
         ),
       ),
     );
@@ -160,12 +210,12 @@ class _TailorProfilePageState extends State<TailorProfilePage> {
           children: [
             Text(
               'À propos',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
             Text(
-              'Ce tailleur n\'a pas encore ajouté de biographie.',
-              style: TextStyle(fontSize: 16),
+              'Ce tailleur n\'a pas encore ajouté de biographie pour le moment..',
+              style: TextStyle(fontSize: 13),
             ),
           ],
         ),

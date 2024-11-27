@@ -111,7 +111,7 @@ class AuthView extends GetView<AuthController> {
                       // controller
                       //     .verifyPhoneNumber(controller.phoneNumber.value);
                       showCustomSnackbar(
-                          message: 'Essayer de vous connecter avec Google',
+                          message: 'Essayer de vous connecter avec Google plutôt',
                           backgroundColor: Colors.green);
                     },
                     child: controller.loading.value

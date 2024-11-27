@@ -173,7 +173,7 @@ class AuthController extends GetxController {
   }
 
   // create user with its information
-  void saveUserInFirestore() async {
+  void saveUserInFirestore(String number) async {
     if (nameController.text.length < 3) {
       Get.snackbar(
         "Error",
@@ -196,7 +196,7 @@ class AuthController extends GetxController {
     final UserModel newUser = UserModel(
       id: auth.currentUser!.uid,
       nomPrenom: nameController.text,
-      phoneNumber: phoneNumber.value.isEmpty ? auth.currentUser!.phoneNumber : phoneNumber.value,
+      phoneNumber: number,
       email: auth.currentUser!.email ?? '',
       adress: 'Bamako, Mali',
       profileImage: user!.photoURL ?? defaultProfileImage,
@@ -256,7 +256,7 @@ class AuthController extends GetxController {
     super.onClose();
   }
 
-  void updateUserName() async {
+  void updateUserName({String number = ''}) async {
     await auth.currentUser!.updateDisplayName(
       nameController.text,
     );
@@ -265,6 +265,7 @@ class AuthController extends GetxController {
         .doc(auth.currentUser!.uid)
         .update({
       'nomPrenom': nameController.text,
+      'phoneNumber': number,
     });
     Get.snackbar(
       "Success",
@@ -291,32 +292,25 @@ class AuthController extends GetxController {
         idToken: googleAuth.idToken,
       );
 
-      final userCrendential =  await auth.signInWithCredential(credential);
+      final userCrendential = await auth.signInWithCredential(credential);
       nameController.text = userCrendential.user!.displayName!;
+      phoneNumber.value = userCrendential.user!.phoneNumber ?? '';
       if (auth.currentUser != null) {
         final userExists = await checkUserExists();
         if (userExists) {
           setUser();
           Get.offAll(() => const HomeView());
         } else {
-          Get.offAll(() => const SignUpView());
+          Get.offAll(() => const SignUpView(), arguments: {
+            'name': nameController.text,
+            'phone': phoneNumber.value,
+          });
         }
         print(userCrendential.user!.displayName);
         Get.snackbar('Succès', 'Connexion avec Google réussie !');
       }
     } catch (e) {
       Get.snackbar('Erreur', 'Connexion avec Google échouée : $e');
-    }
-  }
-
-  // verifier si l'email
-  Future<bool> checkUserExistsByEmail(String email) async {
-    try {
-      final List<String> signInMethods = await auth.fetchSignInMethodsForEmail(email);
-      return signInMethods.isNotEmpty;
-    } catch (e) {
-      print('Erreur lors de la vérification de l\'existence de l\'utilisateur : $e');
-      return false;
     }
   }
 }

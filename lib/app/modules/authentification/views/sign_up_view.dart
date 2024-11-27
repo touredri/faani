@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../globale_widgets/circular_progress.dart';
 import '../controllers/authentification_controller.dart';
 
@@ -15,7 +16,12 @@ class SignUpView extends GetView<AuthController> {
 
   @override
   Widget build(BuildContext context) {
+    final args = Get.arguments;
     Get.put(AuthController());
+    if (args != null) {
+      controller.phoneNumber.value = args['phone'] ?? '';
+      controller.nameController.text = args['name'] ?? '';
+    }
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -47,6 +53,7 @@ class SignUpView extends GetView<AuthController> {
                   border: OutlineInputBorder(),
                 ),
               ),
+              if (controller.phoneNumber.value.isEmpty) _setNumber(context),
               4.hs, // save button
               Obx(() => SizedBox(
                     width: double.infinity,
@@ -56,7 +63,7 @@ class SignUpView extends GetView<AuthController> {
                         final isUserExist = await controller.checkUserExists();
                         if (isUserExist &&
                             controller.nameController.text.isNotEmpty) {
-                          controller.updateUserName();
+                          controller.updateUserName(number: controller.phoneNumber.value);
                         } else if (isUserExist &&
                             controller.nameController.text.isEmpty) {
                           Get.snackbar(
@@ -67,7 +74,8 @@ class SignUpView extends GetView<AuthController> {
                           controller.setUser();
                           Get.offAll(() => const HomeView());
                         } else {
-                          controller.saveUserInFirestore();
+                          controller.saveUserInFirestore(
+                              controller.phoneNumber.value);
                         }
                       },
                       child: controller.loading.value
@@ -125,6 +133,34 @@ class SignUpView extends GetView<AuthController> {
               ],
             )),
       ),
+    );
+  }
+
+  Widget _setNumber(BuildContext context) {
+    return Column(
+      children: [
+        2.hs,
+        IntlPhoneField(
+          controller: controller.phoneNumberController,
+          cursorColor: Theme.of(context).colorScheme.primary,
+          invalidNumberMessage: 'Numéro invalide',
+          decoration: InputDecoration(
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
+            ),
+            labelText: 'Numéro de téléphone',
+          ),
+          initialCountryCode: 'ML',
+          onChanged: (phone) {
+            controller.phoneNumber.value = phone.completeNumber;
+          },
+        ),
+      ],
     );
   }
 }

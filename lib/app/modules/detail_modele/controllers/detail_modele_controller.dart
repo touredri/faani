@@ -1,4 +1,5 @@
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/follow.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,11 @@ class DetailModeleController extends GetxController {
     if (auth.currentUser!.uid == idUser) {
       isAuthor.value = true;
     }
+  }
+
+  Future<bool> isFollow(String id) {
+    update();
+    return FollowService().isFollowing(auth.currentUser!.uid, id);
   }
 
   @override

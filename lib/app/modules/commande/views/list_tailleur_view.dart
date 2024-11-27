@@ -1,4 +1,5 @@
 import 'package:faani/app/data/models/users_model.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/commande/views/tailor_profile_page.dart';
@@ -26,7 +27,7 @@ class ListTailleurView extends GetView {
                 final UserModel tailleur = users[index];
                 return ListTile(
                   title: Text(tailleur.nomPrenom!),
-                  subtitle: const Row(
+                  subtitle: Row(
                     children: [
                       Icon(
                         Icons.star,
@@ -34,7 +35,23 @@ class ListTailleurView extends GetView {
                         size: 23,
                       ),
                       Text(' 125 | '),
-                      Text(' Modèle: 25 '),
+                      FutureBuilder<int>(
+                          future:
+                              ModeleService().getTotalModeleCount(tailleur.id!),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return Text(
+                                "Modèles: ${snapshot.data.toString()}",
+                              );
+                            } else if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text('Modèles: ...');
+                            } else {
+                              return Text(
+                                'Modèles: 0',
+                              );
+                            }
+                          })
                     ],
                   ),
                   leading: CircleAvatar(
@@ -51,7 +68,10 @@ class ListTailleurView extends GetView {
                         Icons.location_on_outlined,
                         size: 25,
                       ),
-                      Text(tailleur.adress!),
+                      Text(
+                        tailleur.adress!,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                   onTap: () {

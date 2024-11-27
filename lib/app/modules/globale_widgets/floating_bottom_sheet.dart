@@ -38,6 +38,7 @@ Future<T> showFloatingModalBottomSheet<T>({
   final result = await showCustomModalBottomSheet(
       context: context,
       builder: builder,
+      useRootNavigator: true,
       containerWidget: (_, animation, child) => FloatingModal(
             child: child,
             horizontalPadding: horizontalPadding,

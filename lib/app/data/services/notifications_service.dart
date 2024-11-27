@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/home/views/home_view.dart';
@@ -39,17 +40,11 @@ class PushNotifications {
 
     // Get the device token
     String? token = await _firebaseMessaging.getToken();
-    print("FCM Token: $token");
-    // apiService.saveFcmToken(token!);
-
-    // Handle token refresh
+    UserService().updateUserToken(auth.currentUser!.uid, token);
     _firebaseMessaging.onTokenRefresh.listen((newToken) async {
       print("Token refreshed: $newToken");
-      // Send the new token to the backend if necessary
-      // apiService.saveFcmToken(newToken);
       bool isUserLoggedin = auth.currentUser != null;
       if (isUserLoggedin) {
-        // update user token
         await UserController().updateUserToken(token);
       }
     });

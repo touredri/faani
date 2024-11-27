@@ -76,7 +76,6 @@ Future commentaire(BuildContext context) {
                       }
                     },
                     onRatingUpdate: (rating) {
-                      // print(rating);
                     },
                   ),
                   2.hs,
@@ -95,12 +94,14 @@ Future commentaire(BuildContext context) {
                           hintText: "Dite nous ce vous en pensez..."),
                     ),
                   ),
-                  2.hs,
+                  3.hs,
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.8,
                       child: ElevatedButton(
                           onPressed: () {
-                            showCustomSnackbar(message: "Merci pour votre avis", backgroundColor: Colors.green);
+                            showCustomSnackbar(
+                                message: "Merci pour votre avis",
+                                backgroundColor: Colors.green);
                             Navigator.pop(context);
                           },
                           child: const Text(

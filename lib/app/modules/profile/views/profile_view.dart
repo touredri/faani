@@ -1,3 +1,7 @@
+import 'package:faani/app/data/services/favorite_service.dart';
+import 'package:faani/app/data/services/follow.dart';
+import 'package:faani/app/data/services/mesure_service.dart';
+import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
 import 'package:faani/app/modules/profile/widgets/build_list.dart';
@@ -74,12 +78,11 @@ class ProfileView extends GetView<ProfileController> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  // 3.hs,
+                                  1.hs,
                                   Row(
                                     children: [
                                       const Icon(
                                         Icons.location_on,
-                                        // color: Colors.white,
                                         size: 15,
                                       ),
                                       const SizedBox(width: 5),
@@ -87,23 +90,50 @@ class ProfileView extends GetView<ProfileController> {
                                         '${controller.userController.currentUser.value.adress ?? 'Bamako, Mali'} ',
                                         style: const TextStyle(
                                           fontSize: 12,
+                                          color: Colors.grey,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  2.hs,
+                                  1.hs,
                                   // activity metrics
                                   Row(
                                     children: [
-                                      const Column(
+                                      Column(
                                         children: [
-                                          Text(
-                                            '21',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                                          StreamBuilder<Map<String, int>>(
+                                              stream: FollowService()
+                                                  .getFollowStats(
+                                                      auth.currentUser!.uid),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.hasData) {
+                                                  int followCount = controller
+                                                          .isTailleur.value
+                                                      ? (snapshot.data?[
+                                                              'followers'] ??
+                                                          0)
+                                                      : (snapshot.data?[
+                                                              'following'] ??
+                                                          0);
+                                                  return Text(
+                                                    followCount.toString(),
+                                                    style: const TextStyle(
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return Text(
+                                                    '0',
+                                                    style: const TextStyle(
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  );
+                                                }
+                                              }),
                                           Text(
                                             'Suivie',
                                             style: TextStyle(
@@ -113,15 +143,33 @@ class ProfileView extends GetView<ProfileController> {
                                         ],
                                       ),
                                       5.ws,
-                                      const Column(
+                                      Column(
                                         children: [
-                                          Text(
-                                            '6',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                                          StreamBuilder<Object>(
+                                              stream: MesureService()
+                                                  .getMesureCount(
+                                                      auth.currentUser!.uid),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.hasData) {
+                                                  return Text(
+                                                    snapshot.data.toString(),
+                                                    style: const TextStyle(
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return Text(
+                                                    '0',
+                                                    style: const TextStyle(
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  );
+                                                }
+                                              }),
                                           Text(
                                             'Mesures',
                                             style: TextStyle(
@@ -131,17 +179,70 @@ class ProfileView extends GetView<ProfileController> {
                                         ],
                                       ),
                                       5.ws,
-                                      const Column(
+                                      Column(
                                         children: [
+                                          controller.isTailleur.value
+                                              ? FutureBuilder<int>(
+                                                  future: ModeleService()
+                                                      .getTotalModeleCount(auth
+                                                          .currentUser!.uid),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.hasData) {
+                                                      return Text(
+                                                        snapshot.data
+                                                            .toString(),
+                                                      );
+                                                    } else if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState
+                                                            .waiting) {
+                                                      return const Text('0');
+                                                    } else {
+                                                      return Text(
+                                                        '0',
+                                                      );
+                                                    }
+                                                  })
+                                              : StreamBuilder<int>(
+                                                  stream: FavorieService()
+                                                      .getFavorieCount(auth
+                                                          .currentUser!.uid),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.hasData) {
+                                                      return Text(
+                                                        snapshot.data
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      );
+                                                    } else if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState
+                                                            .waiting) {
+                                                      return Text(
+                                                        '0',
+                                                        style: TextStyle(
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      return Text(
+                                                        '0',
+                                                        style: TextStyle(
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      );
+                                                    }
+                                                  }),
                                           Text(
-                                            '10',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            'Modèles',
+                                            'Favories',
                                             style: TextStyle(
                                               fontSize: 12,
                                             ),

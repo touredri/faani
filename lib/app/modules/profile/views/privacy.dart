@@ -1,3 +1,4 @@
+import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
@@ -8,7 +9,7 @@ class PrivacyPolicyPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Politique de Confidentialité'),
-        backgroundColor: Colors.teal,
+        backgroundColor: scaffoldBack,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -20,16 +21,15 @@ class PrivacyPolicyPage extends StatelessWidget {
               child: Icon(
                 Icons.privacy_tip,
                 size: 80,
-                color: Colors.teal,
+                color: primaryColor,
               ),
             ),
             const SizedBox(height: 16),
             const Text(
               "Bienvenue chez Faani",
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.teal,
               ),
             ),
             const SizedBox(height: 8),
@@ -48,8 +48,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             _buildSection(
               title: "2. Utilisation de Vos Informations",
-              content:
-                  "Les informations collectées sont utilisées pour :\n\n"
+              content: "Les informations collectées sont utilisées pour :\n\n"
                   "- Fournir, maintenir et améliorer nos services.\n"
                   "- Personnaliser votre expérience utilisateur.\n"
                   "- Protéger Faani et ses utilisateurs contre la fraude et les abus.",
@@ -103,16 +102,15 @@ class PrivacyPolicyPage extends StatelessWidget {
                   "Pour toute question concernant cette politique ou nos pratiques en matière de données :\n\n"
                   "- **Email** : support@faaniapp.com\n"
                   "- **Téléphone** : +123456789\n"
-                  "- **Adresse** : Équipe Confidentialité Faani, [Votre Adresse ICI]",
+                  "- **Adresse** : Équipe Confidentialité Faani, Bamako, Mali",
             ),
             const SizedBox(height: 16),
             Center(
               child: Text(
                 "Merci de faire confiance à Faani !",
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.teal[700],
                 ),
               ),
             ),
@@ -131,15 +129,14 @@ class PrivacyPolicyPage extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.teal[800],
             ),
           ),
           const SizedBox(height: 6),
           Text(
             content,
-            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
           ),
         ],
       ),

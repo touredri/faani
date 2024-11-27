@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:faani/app/data/services/follow.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/favorite_icon.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
+import 'package:faani/app/modules/globale_widgets/list_tailleur_bottom_sheet.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
@@ -33,127 +35,154 @@ class DetailModeleView extends GetView<DetailModeleController> {
             return Center(child: circularProgress());
           } else {
             return Scaffold(
-              body: CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.70,
-                            child: DisplayImage(modele: modele)),
-                        0.5.hs,
-                        ListTile(
-                          leading: CircleAvatar(
-                            radius: 25,
-                            backgroundImage: CachedNetworkImageProvider(
-                                controller.modeleUser.value.profileImage != null
-                                    ? controller.modeleUser.value.profileImage!
-                                    : imgUrl),
-                          ),
-                          title: Text(
-                            controller.modeleUser.value.nomPrenom!,
-                            style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            modele.detail!,
-                            style: const TextStyle(fontSize: 13),
-                          ),
-                          // follow if not author && not already followed
-                          trailing: controller.isAuthor.value
-                              ? // && isNotFollowed
-                              OutlinedButton(
-                                  onPressed: () {
-                                    if (auth.currentUser!.uid ==
-                                        modele.idTailleur) {
-                                      editModal(context, modele);
-                                    } else {
-                                      Get.snackbar('Erreur',
-                                          'Vous ne pouvez pas modifier ce modèle');
-                                    }
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5, vertical: 0),
-                                  ),
-                                  child: const Icon(
-                                    Icons.more_horiz,
-                                    size: 30,
-                                  ),
-                                )
-                              : OutlinedButton(
-                                  onPressed: () {},
-                                  style: OutlinedButton.styleFrom(),
-                                  child: const Text(
-                                    'Suivre',
-                                    style: TextStyle(fontSize: 13),
-                                  )),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            // commentaire
-                            iconMessage(modele, context, Colors.grey),
-                            FavoriteIcone(
-                              docId: modele.id!,
-                              color: Colors.grey,
-                            ),
-                            // share
-                            iconShare(modele),
-                            // save
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 17.0),
-                              child: SizedBox(
-                                height: 50,
-                                width: 50,
-                                child: IconDownload(
-                                  modele: modele,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        previousIsProfile ? 1.5.hs : 0.5.hs,
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.7,
-                          child: ElevatedButton(
+              body: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.70,
+                        child: DisplayImage(modele: modele)),
+                    0.5.hs,
+                    ListTile(
+                      leading: CircleAvatar(
+                        radius: 25,
+                        backgroundImage: CachedNetworkImageProvider(
+                            controller.modeleUser.value.profileImage != null
+                                ? controller.modeleUser.value.profileImage!
+                                : imgUrl),
+                      ),
+                      title: Text(
+                        controller.modeleUser.value.nomPrenom!,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        modele.detail!,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      trailing: controller.isAuthor.value
+                          ? OutlinedButton(
                               onPressed: () {
-                                if (!auth.currentUser!.isAnonymous) {
-                                  Get.to(() => AjoutCommandePage(modele),
-                                      transition: Transition.rightToLeft);
+                                if (auth.currentUser!.uid ==
+                                    modele.idTailleur) {
+                                  editModal(context, modele);
                                 } else {
-                                  showCustomSnackbar(
-                                      message:
-                                          'Vous devez vous connecter pour continuer');
+                                  Get.snackbar('Erreur',
+                                      'Vous ne pouvez pas modifier ce modèle');
                                 }
                               },
-                              child: controller.userController.currentUser.value
-                                      .isTailleur
-                                  ? const Text('Faire pour un client')
-                                  : const Text('Envoyer à un tailleur')),
-                        ),
-                        0.5.hs,
-                        if (!previousIsProfile)
-                          const ListTile(
-                            title: Text(
-                              'Autres modèles',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 0),
+                              ),
+                              child: const Icon(
+                                Icons.more_horiz,
+                                size: 30,
+                              ),
+                            )
+                          : GetBuilder<DetailModeleController>(
+                              init: DetailModeleController(),
+                              builder: (_) {
+                                return OutlinedButton(
+                                    onPressed: () async {
+                                      final bool isFollowing = await controller
+                                          .isFollow(modele.idTailleur);
+                                      FollowService().updateFollowStatus(
+                                          auth.currentUser!.uid,
+                                          modele.idTailleur,
+                                          !isFollowing);
+                                      controller.update();
+                                    },
+                                    style: OutlinedButton.styleFrom(),
+                                    child: FutureBuilder<bool>(
+                                        future: controller
+                                            .isFollow(modele.idTailleur),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return const Text(
+                                              'Suivre',
+                                              style: TextStyle(fontSize: 13),
+                                            );
+                                          } else if (snapshot.hasData) {
+                                            return Text(
+                                              snapshot.data!
+                                                  ? 'Suivi'
+                                                  : 'Suivre',
+                                              style:
+                                                  const TextStyle(fontSize: 13),
+                                            );
+                                          }
+                                          return const Text(
+                                            'Suivre',
+                                            style: TextStyle(fontSize: 13),
+                                          );
+                                        }));
+                              },
                             ),
-                            trailing: Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.grey,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        iconMessage(modele, context, Colors.grey),
+                        FavoriteIcone(
+                          docId: modele.id!,
+                          color: Colors.grey,
+                        ),
+                        iconShare(modele),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 17.0),
+                          child: SizedBox(
+                            height: 50,
+                            width: 50,
+                            child: IconDownload(
+                              modele: modele,
                             ),
                           ),
+                        ),
                       ],
                     ),
-                  ),
-                  if (!previousIsProfile)
-                    SliverFillRemaining(
-                      child: StreamBuilder(
+                    previousIsProfile ? 1.5.hs : 0.5.hs,
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: ElevatedButton(
+                          onPressed: () {
+                            if (!auth.currentUser!.isAnonymous) {
+                              if (controller.userController.currentUser.value
+                                  .isTailleur) {
+                                Get.to(() => AjoutCommandePage(modele),
+                                    transition: Transition.rightToLeft);
+                              } else {
+                                showTailleurModalBottomSheet(context, modele);
+                              }
+                            } else {
+                              showCustomSnackbar(
+                                  message:
+                                      'Vous devez vous connecter pour continuer');
+                            }
+                          },
+                          child: controller
+                                  .userController.currentUser.value.isTailleur
+                              ? const Text('Faire pour un client')
+                              : const Text('Envoyer à un tailleur')),
+                    ),
+                    0.5.hs,
+                    if (!previousIsProfile)
+                      const ListTile(
+                        title: Text(
+                          'Autres modèles',
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                        ),
+                        trailing: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    if (!previousIsProfile)
+                      StreamBuilder(
                           stream: ModeleService()
                               .getAllModelesByCategories([modele.idCategorie!]),
                           builder: (context, snapshot) {
@@ -168,6 +197,7 @@ class DetailModeleView extends GetView<DetailModeleController> {
                                 mainAxisSpacing: 4,
                                 crossAxisSpacing: 4,
                                 itemCount: snapshot.data!.length,
+                                shrinkWrap: true,
                                 padding: const EdgeInsets.only(bottom: 5),
                                 itemBuilder: (context, index) {
                                   if (snapshot.data![index].id == modele.id) {
@@ -179,8 +209,8 @@ class DetailModeleView extends GetView<DetailModeleController> {
                               );
                             }
                           }),
-                    )
-                ],
+                  ],
+                ),
               ),
             );
           }

@@ -61,4 +61,9 @@ class UserService {
   Future<void> updateUserIsTailleur(String id, bool isTailleur) {
     return _usersRef.doc(id).update({'isTailleur': isTailleur});
   }
+
+  // add user following
+  Future<void> addUserFollowing(String userId, userFollowId) {
+    return _usersRef.doc(userId).collection("followers").add({'following': userFollowId});
+  }
 }

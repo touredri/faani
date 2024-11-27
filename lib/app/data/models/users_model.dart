@@ -1,5 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class Follower {
+  String idUser;
+  Follower({required this.idUser});
+}
+
 class UserModel {
   String? id,
       nomPrenom,
@@ -12,6 +17,8 @@ class UserModel {
       sex;
   bool isTailleur;
   DateTime? createdAt, updatedAt;
+  List<String> followers;
+  List<String> following;
 
   UserModel(
       {this.id,
@@ -24,6 +31,8 @@ class UserModel {
       this.isTailleur = false,
       this.sex = '',
       this.token,
+      this.followers = const [],
+      this.following = const [],
       this.createdAt,
       this.updatedAt});
 
@@ -39,6 +48,8 @@ class UserModel {
     final isTailleur = data['isTailleur'];
     final sex = data['sex'];
     final token = data['token'];
+    final followers = List<String>.from(data['followers'] ?? []);
+    final following = List<String>.from(data['following'] ?? []);
     final createdAt = (data['createdAt'] as Timestamp).toDate();
     final updatedAt = (data['updatedAt'] as Timestamp).toDate();
 
@@ -53,6 +64,8 @@ class UserModel {
       isTailleur: isTailleur,
       sex: sex,
       token: token,
+      followers: followers,
+      following: following,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -69,6 +82,8 @@ class UserModel {
       'isTailleur': isTailleur,
       'sex': sex,
       'token': token,
+      'followers': followers,
+      'following': following,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     });
