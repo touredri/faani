@@ -1,5 +1,6 @@
-import 'package:android_intent_plus/android_intent.dart';
-import 'package:android_intent_plus/flag.dart';
+// import 'package:android_intent_plus/android_intent.dart';
+// import 'package:android_intent_plus/flag.dart';
+import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
@@ -20,15 +21,15 @@ class _NotificationParamState extends State<NotificationParam> {
   bool _newModeleAdded = false;
 
   void openNotificationSettings() {
-    const intent = AndroidIntent(
-      action: 'android.settings.APP_NOTIFICATION_SETTINGS',
-      flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
-      arguments: <String, dynamic>{
-        'android.provider.extra.APP_PACKAGE': 'com.faani.app.faani',
-      },
-    );
-    intent.launch();
-    print('openNotificationSettings');
+    // const intent = AndroidIntent(
+    //   action: 'android.settings.APP_NOTIFICATION_SETTINGS',
+    //   flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
+    //   arguments: <String, dynamic>{
+    //     'android.provider.extra.APP_PACKAGE': 'com.faani.app.faani',
+    //   },
+    // );
+    // intent.launch();
+    // NotificationSettings.openNotificationSettings();
   }
 
   Widget _buildSwitchListTile({

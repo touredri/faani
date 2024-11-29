@@ -23,5 +23,6 @@
     "suivi",
     "Tailleur",
     "ventre"
-  ]
+  ],
+  "jdk.jdkhome": "C:\\Program Files\\Java\\jdk-17"
 }

@@ -30,12 +30,13 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.faani.app.faani"
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    compileSdkVersion 34
+    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
     defaultConfig {
@@ -77,9 +78,13 @@ flutter {
 
 dependencies {
     // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
 
     // Add the dependencies for the App Check libraries
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-appcheck-debug")
+    implementation ("com.google.firebase:firebase-auth")
+    implementation ("com.google.firebase:firebase-auth-ktx:23.1.0")
+    implementation ("com.google.android.gms:play-services-auth:21.2.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 }

@@ -2,10 +2,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/style/my_theme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -26,57 +24,45 @@ class IconDownloadState extends State<IconDownload> {
     Directory? directory;
     try {
       if (Platform.isAndroid) {
+        // Vérifier et demander les permissions pour le stockage
         if (await _requestPermission(Permission.storage)) {
-          directory = await getExternalStorageDirectory();
-          if (kDebugMode) {
-            print(directory?.path);
-          }
-          // to create our own folder in /storage/emulated/0/
-          String newPath = '';
-          List<String>? folders = directory?.path.split('/');
-          for (int i = 1; i < folders!.length; i++) {
-            if (folders[i] != 'Android') {
-              newPath += '/${folders[i]}';
-            } else {
-              break;
-            }
-          }
-          newPath += '/Download';
-          directory = Directory(newPath);
-          if (kDebugMode) {
-            print(directory.path);
+          // Chemin public pour enregistrer les images dans la galerie
+          directory = Directory('/storage/emulated/0/Pictures/Faani');
+
+          // Créer le dossier s'il n'existe pas
+          if (!await directory.exists()) {
+            await directory.create(recursive: true);
           }
         } else {
-          return false;
+          return false; // Permission refusée
         }
       } else if (Platform.isIOS) {
-        if (await _requestPermission(Permission.photos)) {
-          directory = await getTemporaryDirectory();
-        } else {
-          return false;
-        }
+        // iOS utilise un chemin temporaire
+        directory = await getTemporaryDirectory();
       }
-      if (directory != null && !await directory.exists()) {
-        await directory.create(recursive: true);
-      }
-      if (directory != null && await directory.exists()) {
-        File saveFile = File('${directory.path}/$name');
+
+      if (directory != null) {
+        // Télécharger et enregistrer l'image
+        File saveFile = File('${directory.path}/$name.jpg');
         await dio.download(url, saveFile.path,
             onReceiveProgress: (downloaded, totalSize) {
           setState(() {
             progress = downloaded / totalSize;
           });
         });
+
+        // Confirmer la sauvegarde
         if (Platform.isIOS) {
-          await ImageGallerySaver.saveFile(saveFile.path,
-              isReturnPathOfIOS: true);
+          // iOS doit sauvegarder via le MediaStore (similaire à Android)
+          await File(saveFile.path).create(recursive: true);
         }
-        return true;
+
+        return true; // Succès
       }
     } catch (e) {
-      print(e);
+      print("Erreur lors de la sauvegarde : $e");
     }
-    return false;
+    return false; // Échec
   }
 
   Future<bool> _requestPermission(Permission permission) async {
@@ -111,7 +97,8 @@ class IconDownloadState extends State<IconDownload> {
         "Erreur",
         "Erreur lors de la sauvegarde de l'image !",
         snackPosition: SnackPosition.BOTTOM,
-      );}
+      );
+    }
 
     setState(() {
       isLoading = true;
@@ -123,13 +110,19 @@ class IconDownloadState extends State<IconDownload> {
     return Scaffold(
       body: Center(
         child: IconButton(
-          icon: const Icon(
-            Icons.download_rounded,
-            color: Colors.grey,
-            size: 30,
-          ),
-          color: primaryColor,
-          onPressed: () => downloadFile(widget.modele.fichier[0]!, 'modele'),
+          icon: isLoading
+              ? CircularProgressIndicator(
+                  value: progress,
+                  backgroundColor: Colors.grey[300],
+                  color: primaryColor,
+                )
+              : Icon(
+                  Icons.download_rounded,
+                  color: Colors.grey,
+                  size: 30,
+                ),
+          onPressed: () => downloadFile(widget.modele.fichier[0]!,
+              'modele_${DateTime.now().millisecondsSinceEpoch}'),
           padding: const EdgeInsets.all(10),
         ),
       ),

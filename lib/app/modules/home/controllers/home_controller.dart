@@ -16,10 +16,11 @@ import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../ajout_modele/views/ajout_modele_view.dart';
 
 class HomeController extends GetxController {
@@ -143,16 +144,16 @@ class HomeController extends GetxController {
   }
 
   // check from admin collection in firestore if user is admin the use flutter secure storage to store is admin value boolean
-  void checkIfUserIsAdmin() async {
-    final check = await const FlutterSecureStorage().read(key: 'isAdmin');
-    if (check != null) {
+    void checkIfUserIsAdmin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final check = prefs.getString('isAdmin');
+    if (check == null) {
       final isAdmin = await FirebaseFirestore.instance
           .collection('admin')
           .doc(auth.currentUser!.uid)
           .get()
           .then((value) => value.exists);
-      await const FlutterSecureStorage()
-          .write(key: 'isAdmin', value: isAdmin.toString());
+      await prefs.setString('isAdmin', isAdmin.toString());
       this.isAdmin.value = isAdmin;
     } else {
       isAdmin.value = check == 'true';

@@ -1,5 +1,5 @@
 name: faani
-version: 1.0.8+9
+version: 1.0.8+10
 publish_to: none
 description: An application to connect tailor and customer, it promote traditional suit. We can book inside and follow best tailor
 environment:
@@ -30,7 +30,6 @@ dependencies:
   path_provider: ^2.1.1
   share_plus: ^10.1.2
   dio: ^5.3.3
-  image_gallery_saver: ^2.0.3
   shimmer: ^3.0.0
   flutter_launcher_icons: ^0.14.1
   flutter_spacer: ^1.0.3
@@ -53,8 +52,7 @@ dependencies:
   flutter_rating_stars: ^1.1.0
   flutter_rating_bar: ^4.0.1
   upgrader: ^11.3.0
-  flutter_secure_storage: ^4.2.1
-  android_intent_plus: ^5.2.0
+  # android_intent_plus: ^5.2.0
   back_button_interceptor: ^8.0.0
   just_audio: ^0.9.42
   flutter_sound: ^9.17.0

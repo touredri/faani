@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/suivi_etat_model.dart';
+import 'package:flutter/services.dart';
 
 class SuiviEtatService {
   final collection = FirebaseFirestore.instance.collection('suiviEtat');
@@ -54,3 +55,16 @@ class SuiviEtatService {
     });
   }
 }
+
+class NotificationSettings {
+  static const MethodChannel _channel = MethodChannel('com.faani.app/notification');
+
+  static Future<void> openNotificationSettings() async {
+    try {
+      await _channel.invokeMethod('openNotificationSettings');
+    } on PlatformException catch (e) {
+      print("Failed to open notification settings: '${e.message}'.");
+    }
+  }
+}
+

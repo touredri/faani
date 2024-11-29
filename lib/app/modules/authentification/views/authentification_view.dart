@@ -111,7 +111,8 @@ class AuthView extends GetView<AuthController> {
                       // controller
                       //     .verifyPhoneNumber(controller.phoneNumber.value);
                       showCustomSnackbar(
-                          message: 'Essayer de vous connecter avec Google plutôt',
+                          message:
+                              'Essayer de vous connecter avec Google plutôt',
                           backgroundColor: Colors.green);
                     },
                     child: controller.loading.value
@@ -162,15 +163,12 @@ class AuthView extends GetView<AuthController> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: 35,
+                        width: 30,
                         child: Image.asset('assets/images/google_auth.png'),
                       ),
                       2.ws,
                       Text(
                         'S\'identifier avec Google',
-                        style: TextStyle(
-                            // fontWeight: FontWeight.bold,
-                            ),
                       ),
                     ],
                   ),
