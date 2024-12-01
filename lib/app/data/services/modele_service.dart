@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/home/controllers/home_controller.dart';
@@ -107,7 +106,10 @@ class ModeleService {
         buildQuery(idCategories).orderBy('id').limit(pageSize);
     if (idTailleur != null) {
       query = query.where('idTailleur', isEqualTo: idTailleur);
+    } else {
+      query = query.where('isPublic', isEqualTo: true);
     }
+    query = query.where('isApproved', isEqualTo: true);
     if (lastModele != null) {
       final lastDoc = await collection.doc(lastModele.id).get();
       if (lastDoc.exists) {
@@ -116,14 +118,6 @@ class ModeleService {
     }
     try {
       final querySnapshot = await query.get();
-      if (querySnapshot.docs.isEmpty) {
-        print(
-            "No documents found. Check if the documents in Firestore match the query criteria.");
-      } else {
-        querySnapshot.docs.forEach((doc) {
-          print("Document found: ${doc.data()}");
-        });
-      }
       final models = querySnapshot.docs.map((doc) {
         return Modele.fromMap(doc.data(), doc.reference);
       }).toList();
@@ -144,7 +138,7 @@ class ModeleService {
 
   Query<Map<String, dynamic>> buildQuery(List<String> idCategories) {
     Query<Map<String, dynamic>> query = collection;
-
+  
     if (idCategories.isNotEmpty) {
       final filteredCategories = List<String>.from(idCategories)
         ..removeWhere((id) => id == "1" || id == "8");
@@ -230,5 +224,17 @@ class ModeleService {
         .map((querySnapshot) {
       return querySnapshot.size;
     });
+  }
+
+  Stream<List<Modele>> getUnapprovedModels() {
+    return collection.where('isApproved', isEqualTo: false).snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        return Modele.fromMap(doc.data(), doc.reference);
+      }).toList();
+    });
+  }
+
+  Future<void> updateModelApprovalStatus(String modeleId, bool status) async {
+    await collection.doc(modeleId).update({'isApproved': status});
   }
 }

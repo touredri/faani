@@ -66,8 +66,8 @@ class AccueilController extends GetxController {
           lastModele: homeController.lastModeleFetch.value);
 
       if (fetchedDocuments.isNotEmpty) {
-        fetchedDocuments
-            .removeWhere((model) => modeles.contains(model) || model.id == null);
+        fetchedDocuments.removeWhere(
+            (model) => modeles.contains(model) || model.id == null);
         modeles.addAll(fetchedDocuments);
         update();
       } else {
@@ -83,7 +83,10 @@ class AccueilController extends GetxController {
 
   Future<void> init() async {
     await loadMore();
-    modeles.shuffle();
+    if (!homeController.isNewUser.value) {
+      modeles.shuffle();
+    }
+    update();
   }
 
   @override

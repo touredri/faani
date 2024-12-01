@@ -213,7 +213,7 @@ class AuthController extends GetxController {
         "Welcome ${newUser.nomPrenom} !",
         snackPosition: SnackPosition.BOTTOM,
       );
-      Get.offAll(() => const HomeView());
+      Get.offAll(() => const HomeView(), arguments: {'isNewUser': true});
       loading.value = false;
     }).catchError((error) {
       Get.snackbar(

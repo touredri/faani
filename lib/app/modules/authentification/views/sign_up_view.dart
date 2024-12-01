@@ -1,6 +1,5 @@
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
-import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/gestures.dart';

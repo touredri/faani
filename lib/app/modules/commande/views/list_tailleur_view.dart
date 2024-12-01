@@ -34,21 +34,23 @@ class ListTailleurView extends GetView {
                         color: Colors.orange,
                         size: 23,
                       ),
-                      Text(' 125 | '),
+                      Text(' 125 | ',style: TextStyle(fontSize: 14),),
                       FutureBuilder<int>(
                           future:
                               ModeleService().getTotalModeleCount(tailleur.id!),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return Text(
+                                style: TextStyle(fontSize: 14),
                                 "Modèles: ${snapshot.data.toString()}",
                               );
                             } else if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const Text('Modèles: ...');
+                              return const Text('Modèles: ...',
+                                  style: TextStyle(fontSize: 14));
                             } else {
                               return Text(
-                                'Modèles: 0',
+                                'Modèles: 0',style: TextStyle(fontSize: 14),
                               );
                             }
                           })

@@ -79,12 +79,13 @@ class AjoutModeleController extends GetxController {
         id: '',
         detail: detailTextController.text.isNotEmpty
             ? detailTextController.text
-            : 'Description non disponible pour le moment',
+            : 'Description non disponible pour le moment ! Le tailleur n\'a pas ajouté de description',
         fichier: imageInfo.map((info) => info['downloadUrl']).toList(),
         imagePath: imageInfo.map((info) => info['path']).toList(),
         genreHabit: selectedGender.value,
         idTailleur: user!.uid,
         idCategorie: selectedCategoryId.value,
+        isApproved: false,
         isPublic: isPublic.value);
     await modele.create();
     images.clear();

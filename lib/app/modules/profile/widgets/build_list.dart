@@ -83,7 +83,8 @@ Widget listBuild(ProfileController controller, BuildContext context) {
                       transition: Transition.rightToLeft),
                 }),
       if (!controller.userController.isTailleur.value &&
-          !auth.currentUser!.isAnonymous)
+          !auth.currentUser!.isAnonymous &&
+          !Get.find<HomeController>().isAdmin.value)
         CustomListTile(
             leadingIcon: controller.becomeTailorIcon,
             title: 'Devenir Tailleur',

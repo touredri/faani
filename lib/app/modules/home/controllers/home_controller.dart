@@ -16,11 +16,11 @@ import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../ajout_modele/views/ajout_modele_view.dart';
 
 class HomeController extends GetxController {
@@ -33,6 +33,7 @@ class HomeController extends GetxController {
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
   RxBool isAdmin = false.obs;
   RxBool hasMoreData = true.obs;
+  RxBool isNewUser = false.obs;
 
   int backPressCounter = 0;
   Timer? backPressTimer;
@@ -104,7 +105,7 @@ class HomeController extends GetxController {
           ),
         ),
         PersistentTabConfig(
-          screen: userController.isTailleur.value
+          screen: userController.isTailleur.value || isAdmin.value
               ? const AjoutModeleView()
               : const AjoutMesure(),
           item: ItemConfig(
@@ -139,12 +140,18 @@ class HomeController extends GetxController {
     modeleService = Get.find<ModeleService>();
     _checkNetworkStatus();
     _monitorNetworkChanges();
-    checkIfUserIsAdmin();
+    _checkIfUserIsAdmin();
+    final arg = Get.arguments;
+    if (arg != null) {
+      if (arg is bool) {
+        isNewUser.value = arg;
+      }
+    }
     super.onInit();
   }
 
-  // check from admin collection in firestore if user is admin the use flutter secure storage to store is admin value boolean
-    void checkIfUserIsAdmin() async {
+  // check from admin collection in firestore if user is admin then use local storage to store isAdmin value
+  void _checkIfUserIsAdmin() async {
     final prefs = await SharedPreferences.getInstance();
     final check = prefs.getString('isAdmin');
     if (check == null) {
@@ -165,7 +172,6 @@ class HomeController extends GetxController {
     var connectivityResult = await Connectivity().checkConnectivity();
     isNetworkAvailable.value = connectivityResult.isNotEmpty &&
         connectivityResult.first != ConnectivityResult.none;
-    // print('Network status: $isNetworkAvailable');
   }
 
   // Monitor network status changes
@@ -175,8 +181,22 @@ class HomeController extends GetxController {
         .listen((List<ConnectivityResult> results) {
       isNetworkAvailable.value =
           results.isNotEmpty && results.first != ConnectivityResult.none;
-      // print('Network status in monitor: $isNetworkAvailable');
+      _showNetworkStatusToast(isNetworkAvailable.value);
     });
+  }
+
+  // Show toast message for network status
+  void _showNetworkStatusToast(bool isConnected) {
+    Fluttertoast.showToast(
+      msg: isConnected
+          ? 'Connection internet établie'
+          : 'Vous n\'avez pas d\'accès à internet',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: isConnected ? Colors.green : Colors.red,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
   }
 
   @override

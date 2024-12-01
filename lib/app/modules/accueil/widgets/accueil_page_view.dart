@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// import 'package:pull_to_refresh_new/pull_to_refresh.dart';
 import '../../globale_widgets/circular_progress.dart';
 import '../controllers/accueil_controller.dart';
 import 'accueil_model_view.dart';
