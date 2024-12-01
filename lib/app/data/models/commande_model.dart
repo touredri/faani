@@ -89,9 +89,10 @@ class Commande {
   final collection = FirebaseFirestore.instance.collection('commandes');
 
   // create
-  Future<void> create() async {
+  Future<String> create() async {
     final docRef = await collection.add(toMap());
     await docRef.update({'id': docRef.id});
+    return docRef.id;
   }
 
   // update

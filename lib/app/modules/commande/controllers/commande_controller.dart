@@ -29,6 +29,7 @@ class CommandeController extends GetxController {
   final SuiviEtatService suiviEtatService = SuiviEtatService();
   final String currentEtat = 'En cours';
   final RxBool isExpanded = false.obs;
+  final RxBool isSending = false.obs;
   final ScrollController scrollController = ScrollController();
   final List<Modele> modeles = [];
   Rx<XFile?> image = Rx<XFile?>(null);
@@ -112,6 +113,7 @@ class CommandeController extends GetxController {
 
   // create a new commande
   Future<void> createCommande(Modele modele, BuildContext context) async {
+    isSending.value = true;
     List<Map<String, String>> imageInfo = await uploadPhoto(image.value!);
     final Commande newCommande = Commande(
       idMesure: mesure.value!.id!,
@@ -138,10 +140,10 @@ class CommandeController extends GetxController {
       datePrevue: DateTime.parse(selectedDate.value),
       dateModifier: DateTime.parse(selectedDate.value),
     );
-    await newCommande.create();
+    final String newCommandeId = await newCommande.create();
     final SuiviEtat newSuiviEtat = SuiviEtat(
       id: '',
-      idCommande: newCommande.id!,
+      idCommande: newCommandeId,
       idEtat: '1',
       date: Timestamp.fromDate(DateTime.now()),
     );
@@ -154,16 +156,16 @@ class CommandeController extends GetxController {
           tailleur.token!,
           userController.currentUser.value.token!,
           'Alert date Prevue',
-          'La date prevue pour l\habit de ${userController.currentUser.value.nomPrenom} est arrivé',
+          'La date prevue pour l\'habit de ${userController.currentUser.value.nomPrenom} est arrivé',
           newCommande.datePrevue);
     }
     await SuiviEtatService().createSuiviEtat(newSuiviEtat);
 
     clearForm();
     animatedPopUp(
-        context,
-        0.3,
-        0.9,
+        Get.context!,
+        0.2,
+        0.8,
         Column(
           children: [
             const Icon(Icons.check_circle, color: Colors.green, size: 50),
@@ -175,21 +177,23 @@ class CommandeController extends GetxController {
                   ? 'Enregistrer avec succès'
                   : 'Envoyé au tailleur avec succès',
               style: const TextStyle(
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(
-              height: 60,
+              height: 20,
             ),
             TextButton(
                 onPressed: () {
+                  Get.back();
                   Get.back();
                   Get.back();
                 },
                 child: const Text('Ok'))
           ],
         ));
+    isSending.value = false;
   }
 
   @override

@@ -7,7 +7,6 @@ import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/views/message_view.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:faani/app/modules/commande/widgets/circle_indicator.dart';

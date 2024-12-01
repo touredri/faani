@@ -41,7 +41,6 @@ class MessageView extends GetView<MessageController> {
             child: const Icon(
               Icons.keyboard_arrow_down_outlined,
               size: 45,
-              // color: primaryColor,
             ),
           )
         ],
@@ -61,6 +60,10 @@ class MessageView extends GetView<MessageController> {
               return const CircularProgressIndicator();
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
+            } else if (snapshot.data!.isEmpty) {
+              return const Center(
+                child: Text('Oups!! Aucune discussion en cours'),
+              );
             } else {
               return ListView.builder(
                 itemBuilder: (context, index) {

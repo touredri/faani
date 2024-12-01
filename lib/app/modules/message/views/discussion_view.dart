@@ -4,9 +4,7 @@ import 'package:faani/app/modules/globale_widgets/shimmer.dart';
 import 'package:faani/app/modules/message/controllers/discussion_controller.dart';
 import 'package:faani/app/modules/message/controllers/message_controller.dart';
 import 'package:faani/app/modules/message/views/widgets/chat_list.dart';
-import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_spacer/flutter_spacer.dart';
 
 import 'package:get/get.dart';
 

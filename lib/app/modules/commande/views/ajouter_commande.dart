@@ -9,6 +9,7 @@ import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/widgets/image_pop_up.dart';
 import 'package:faani/app/modules/commande/widgets/mesure_popup.dart';
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -266,7 +267,9 @@ class AjoutCommandePage extends GetView<CommandeController> {
                         onPressed: () async {
                           controller.createCommande(modele, context);
                         },
-                        child: Text(isTailleur ? 'Enregistrer' : 'Envoyer'),
+                        child: controller.isSending.value
+                            ? circularProgress()
+                            : Text(isTailleur ? 'Enregistrer' : 'Envoyer'),
                       ),
                     ),
                   ],
