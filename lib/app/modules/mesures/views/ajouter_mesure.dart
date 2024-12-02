@@ -3,6 +3,7 @@ import 'package:faani/app/modules/mesures/views/widgets/mesure_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 class AjoutMesure extends GetView {
   const AjoutMesure({super.key});
@@ -31,8 +32,10 @@ class AjoutMesure extends GetView {
                 children: [
                   TextButton(
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const MesurePaveView()));
+                        pushWithoutNavBar(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MesurePaveView()));
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -53,7 +56,7 @@ class AjoutMesure extends GetView {
                             const Text(
                               'Ajout manuel',
                               style:
-                                  TextStyle(fontSize: 18, color: primaryColor),
+                                  TextStyle(fontSize: 15, color: Colors.black),
                             )
                           ],
                         ),
@@ -96,7 +99,7 @@ class AjoutMesure extends GetView {
                             const Text(
                               'Par caméra',
                               style:
-                                  TextStyle(fontSize: 18, color: primaryColor),
+                                  TextStyle(fontSize: 15, color: primaryColor),
                             )
                           ],
                         ),

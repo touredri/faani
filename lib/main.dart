@@ -12,7 +12,7 @@ import 'firebase_options.dart';
 import 'generated/locales.g.dart';
 import 'app/style/my_theme.dart';
 import 'package:get/get.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
+// import 'package:firebase_app_check/firebase_app_check.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,12 +21,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await FirebaseAppCheck.instance.activate(
-    webProvider:
-        ReCaptchaV3Provider('6LcToJ0pAAAAAChLT7Ao7VBy-nt5n56IcMoGi9Np'),
-    androidProvider: AndroidProvider.debug,
-    appleProvider: AppleProvider.appAttest,
-  );
+  // await FirebaseAppCheck.instance.activate(
+  //   webProvider:
+  //       ReCaptchaV3Provider('6LcToJ0pAAAAAChLT7Ao7VBy-nt5n56IcMoGi9Np'),
+  //   androidProvider: AndroidProvider.debug,
+  //   appleProvider: AppleProvider.appAttest,
+  // );
 
   if (auth.currentUser != null) {
     final UserController userController = Get.put(UserController());

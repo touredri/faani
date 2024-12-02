@@ -17,7 +17,7 @@ class ModeleService {
 
   Future<void> create(Modele modele) async {
     final docRef = await collection.add(modele.toMap());
-    modele.id = docRef.id;
+    await docRef.update({'id': docRef.id});
   }
 
   Future<void> update(Modele modele) async {
@@ -108,8 +108,9 @@ class ModeleService {
       query = query.where('idTailleur', isEqualTo: idTailleur);
     } else {
       query = query.where('isPublic', isEqualTo: true);
+      query = query.where('isApproved', isEqualTo: true);
     }
-    query = query.where('isApproved', isEqualTo: true);
+
     if (lastModele != null) {
       final lastDoc = await collection.doc(lastModele.id).get();
       if (lastDoc.exists) {
@@ -136,9 +137,10 @@ class ModeleService {
     }
   }
 
-  Query<Map<String, dynamic>> buildQuery(List<String> idCategories) {
+  Query<Map<String, dynamic>> buildQuery(List<String> idCategories,
+      {String? idTailleur}) {
     Query<Map<String, dynamic>> query = collection;
-  
+
     if (idCategories.isNotEmpty) {
       final filteredCategories = List<String>.from(idCategories)
         ..removeWhere((id) => id == "1" || id == "8");
@@ -227,7 +229,10 @@ class ModeleService {
   }
 
   Stream<List<Modele>> getUnapprovedModels() {
-    return collection.where('isApproved', isEqualTo: false).snapshots().map((querySnapshot) {
+    return collection
+        .where('isApproved', isEqualTo: false)
+        .snapshots()
+        .map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
         return Modele.fromMap(doc.data(), doc.reference);
       }).toList();

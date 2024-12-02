@@ -3,8 +3,10 @@ import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/follow.dart';
 import 'package:faani/app/data/services/modele_service.dart';
+import 'package:faani/app/data/services/tailleur_request_service.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
+import 'package:faani/app/modules/profile/widgets/received_request.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
@@ -25,6 +27,7 @@ class _TailorProfilePageState extends State<TailorProfilePage> {
   final Set<String> _modeleIds = {};
   final StreamController<List<Modele>> _streamController = StreamController();
   bool _isLoadingMore = false;
+  RxInt numberOfWorkers = 0.obs;
 
   @override
   void initState() {
@@ -161,11 +164,11 @@ class _TailorProfilePageState extends State<TailorProfilePage> {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _buildInfoSection(
-                    icon: Icons.work,
-                    label: 'Atélier',
-                    value: '${3} travailleurs',
-                  ),
+                  child: Obx(() => _buildInfoSection(
+                        icon: Icons.work,
+                        label: 'Atélier',
+                        value: '${numberOfWorkers.value} travailleurs',
+                      )),
                 ),
               ],
             ),
@@ -319,6 +322,13 @@ class _TailorProfilePageState extends State<TailorProfilePage> {
       widget.tailor.id!,
       Get.find<CommandeController>().listSelectedCategorie,
     );
+    fetchNumberOfWorker();
     _streamController.add(initialModeles);
+  }
+
+  Future<void> fetchNumberOfWorker() async {
+    final request =
+        await TailleurRequestController().getRequest(widget.tailor.id!);
+    numberOfWorkers.value = request?.nombreTravailleur ?? 1;
   }
 }

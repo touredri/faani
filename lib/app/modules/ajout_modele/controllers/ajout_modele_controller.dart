@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/services/categorie_service.dart';
-import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/ajout_modele/widgets/modele_form.dart';
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,9 +17,10 @@ import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 class AjoutModeleController extends GetxController {
   final images = RxList<XFile>();
   final PageController pageController = PageController();
-  RxString selectedCategoryId = '1'.obs;
+  RxString selectedCategoryId = '2'.obs;
   RxString selectedGender = 'Homme'.obs;
-  RxBool isPublic = false.obs;
+  RxBool isPublic = true.obs;
+  RxBool isLoading = false.obs;
   List<Categorie> categorieList = <Categorie>[];
   final TextEditingController detailTextController = TextEditingController();
 
@@ -72,9 +73,17 @@ class AjoutModeleController extends GetxController {
     return imageInfo;
   }
 
-  void createModel() async {
+  Future<void> createModel() async {
+    isLoading.value = true;
     List<File> imageFiles = images.map((e) => File(e.path)).toList();
     List<Map<String, String>> imageInfo = await uploadImages(imageFiles);
+    if (imageFiles.isEmpty ||
+        imageFiles.length > 2 ||
+        selectedGender.value.isEmpty ||
+        selectedCategoryId.value.isEmpty) {
+      showCustomSnackbar(message: "veuillez remplir tous les champs !!");
+      return;
+    }
     final Modele modele = Modele(
         id: '',
         detail: detailTextController.text.isNotEmpty
@@ -89,6 +98,7 @@ class AjoutModeleController extends GetxController {
         isPublic: isPublic.value);
     await modele.create();
     images.clear();
+    isLoading.value = false;
   }
 
   void fetchCategories() async {
@@ -96,6 +106,8 @@ class AjoutModeleController extends GetxController {
       for (var element in event) {
         categorieList.add(element);
       }
+      categorieList.removeWhere((cat) => cat.id == "1");
+      categorieList.removeWhere((cat) => cat.id == "8");
     });
   }
 

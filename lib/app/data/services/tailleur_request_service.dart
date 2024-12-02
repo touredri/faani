@@ -23,6 +23,15 @@ class TailleurRequestService {
     return null;
   }
 
+  // get request by tailleur id
+  Future<TailleurRequest?> getRequestByUserId(String userId) async {
+    final querySnapshot = await _tailleurRef.where('userId', isEqualTo: userId).get();
+    if (querySnapshot.docs.isNotEmpty) {
+      final doc = querySnapshot.docs.first;
+      return TailleurRequest.fromMap(doc.data() as Map<String, dynamic>);
+    }
+    return null;
+  }
   // get all requests by isApproved status
   Stream<List<TailleurRequest>> getRequestsByApprovalStatus(bool isApproved) {
     return _tailleurRef

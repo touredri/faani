@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/users_service.dart';
@@ -34,7 +35,10 @@ class ListTailleurView extends GetView {
                         color: Colors.orange,
                         size: 23,
                       ),
-                      Text(' 125 | ',style: TextStyle(fontSize: 14),),
+                      Text(
+                        ' 125 | ',
+                        style: TextStyle(fontSize: 14),
+                      ),
                       FutureBuilder<int>(
                           future:
                               ModeleService().getTotalModeleCount(tailleur.id!),
@@ -50,18 +54,19 @@ class ListTailleurView extends GetView {
                                   style: TextStyle(fontSize: 14));
                             } else {
                               return Text(
-                                'Modèles: 0',style: TextStyle(fontSize: 14),
+                                'Modèles: 0',
+                                style: TextStyle(fontSize: 14),
                               );
                             }
                           })
                     ],
                   ),
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        tailleur.profileImage!.isNotEmpty ||
-                                tailleur.profileImage != null
-                            ? tailleur.profileImage!
-                            : getRandomProfileImageUrl()),
+                    backgroundImage: tailleur.profileImage != null &&
+                            tailleur.profileImage!.isNotEmpty
+                        ? CachedNetworkImageProvider(tailleur.profileImage!)
+                        : NetworkImage(getRandomProfileImageUrl())
+                            as ImageProvider,
                   ),
                   trailing: Column(
                     mainAxisSize: MainAxisSize.min,

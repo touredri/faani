@@ -105,7 +105,7 @@ class HomeController extends GetxController {
           ),
         ),
         PersistentTabConfig(
-          screen: userController.isTailleur.value || isAdmin.value
+          screen: (userController.isTailleur.value || isAdmin.value)
               ? const AjoutModeleView()
               : const AjoutMesure(),
           item: ItemConfig(

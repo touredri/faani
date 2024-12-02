@@ -115,6 +115,17 @@ class CommandeController extends GetxController {
   Future<void> createCommande(Modele modele, BuildContext context) async {
     isSending.value = true;
     List<Map<String, String>> imageInfo = await uploadPhoto(image.value!);
+    if (mesure.value?.id == null || selectedDate.value.isEmpty) {
+      showCustomSnackbar(message: 'Veuillez renseigner les mesures');
+    }
+    // give app logo as default photo if no photo is uploaded
+    if (imageInfo.isEmpty) {
+      imageInfo.add({
+        'downloadUrl':
+            'https://firebasestorage.googleapis.com/v0/b/faani-afrique.appspot.com/o/photosHabit%2Ffaani.png?alt=media&token=313edafa-f89f-438a-be5e-468ece978058',
+        'path': 'photosHabit/faani.png',
+      });
+    }
     final Commande newCommande = Commande(
       idMesure: mesure.value!.id!,
       idModele: modele.id!,
@@ -141,27 +152,6 @@ class CommandeController extends GetxController {
       dateModifier: DateTime.parse(selectedDate.value),
     );
     final String newCommandeId = await newCommande.create();
-    final SuiviEtat newSuiviEtat = SuiviEtat(
-      id: '',
-      idCommande: newCommandeId,
-      idEtat: '1',
-      date: Timestamp.fromDate(DateTime.now()),
-    );
-    if (!userController.isTailleur.value) {
-      final UserModel tailleur =
-          await userService.getUser(newCommande.idTailleur);
-      await sendNotification(tailleur.token!, 'Nouvelle commande',
-          'Vous avez une nouvelle commande de ${userController.currentUser.value.nomPrenom}');
-      sendProgrammingNotification(
-          tailleur.token!,
-          userController.currentUser.value.token!,
-          'Alert date Prevue',
-          'La date prevue pour l\'habit de ${userController.currentUser.value.nomPrenom} est arrivé',
-          newCommande.datePrevue);
-    }
-    await SuiviEtatService().createSuiviEtat(newSuiviEtat);
-
-    clearForm();
     animatedPopUp(
         Get.context!,
         0.2,
@@ -193,7 +183,27 @@ class CommandeController extends GetxController {
                 child: const Text('Ok'))
           ],
         ));
+    clearForm();
     isSending.value = false;
+    final SuiviEtat newSuiviEtat = SuiviEtat(
+      id: '',
+      idCommande: newCommandeId,
+      idEtat: '1',
+      date: Timestamp.fromDate(DateTime.now()),
+    );
+    await SuiviEtatService().createSuiviEtat(newSuiviEtat);
+    if (!userController.isTailleur.value) {
+      final UserModel tailleur =
+          await userService.getUser(newCommande.idTailleur);
+      await sendNotification(tailleur.token!, 'Nouvelle commande',
+          'Vous avez une nouvelle commande de ${userController.currentUser.value.nomPrenom}');
+      sendProgrammingNotification(
+          tailleur.token!,
+          userController.currentUser.value.token!,
+          'Alert date Prevue',
+          'La date prevue pour l\'habit de ${userController.currentUser.value.nomPrenom} est arrivé',
+          newCommande.datePrevue);
+    }
   }
 
   @override

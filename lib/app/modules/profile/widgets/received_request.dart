@@ -1,10 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/tailleur_request.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/tailleur_request_service.dart';
 import 'package:faani/app/data/services/users_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
@@ -19,6 +22,25 @@ class TailleurRequestController extends GetxController {
 
   void updateRequestApprovalStatus(String requestId, bool status) {
     service.updateRequestApprovalStatus(requestId, status);
+    // update user isTailleur to true
+    if (status) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(auth.currentUser!.uid)
+          .update({
+        'isTailleur': true,
+      });
+      // send notification to user
+      sendNotification(
+          Get.find<UserController>().currentUser.value.token!,
+          "Statut demande",
+          "Votre requète pour passer au compte tailleur sur Faani a été approuvée. Merci!");
+    }
+  }
+
+  // get request by tailleur id
+  Future<TailleurRequest?> getRequest(String userId) async {
+    return service.getRequestByUserId(userId);
   }
 }
 
@@ -214,7 +236,7 @@ class _ReceivedRequestState extends State<ReceivedRequest>
                   children: [
                     Positioned.fill(
                       child: Image.network(
-                        model.fichier.first!,
+                        model.fichier[0]!,
                         fit: BoxFit.cover,
                       ),
                     ),

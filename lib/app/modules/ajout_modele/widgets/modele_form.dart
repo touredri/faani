@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/modules/ajout_modele/controllers/ajout_modele_controller.dart';
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -206,8 +207,8 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 60),
                     ),
-                    onPressed: () {
-                      controller.createModel();
+                    onPressed: () async {
+                      await controller.createModel();
                       Get.defaultDialog(
                         title: 'Modèle ajouté',
                         middleText: '👍 Votre modèle a été ajouté avec succès',
@@ -215,21 +216,24 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                           TextButton(
                             onPressed: () {
                               Get.back();
+                              Get.back();
                             },
                             child: const Text('OK'),
                           ),
                         ],
                       );
                     },
-                    child: Text(
-                      controller.isPublic.value
-                          ? '   Publier    '
-                          : 'Enregistrer',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: controller.isLoading.value
+                        ? circularProgress()
+                        : Text(
+                            controller.isPublic.value
+                                ? '   Publier    '
+                                : 'Enregistrer',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 )
               ],

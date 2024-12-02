@@ -143,7 +143,10 @@ Widget listBuild(ProfileController controller, BuildContext context) {
           "⭐",
           style: TextStyle(fontSize: 25),
         ),
-        title: const Text('Notez l\'Appli'),
+        title: const Text(
+          'Notez l\'Appli',
+          style: TextStyle(fontSize: 14),
+        ),
         subtitle: Text(
           'Donnez votre avis',
           style: TextStyle(fontSize: 12, color: Colors.grey[800]),
@@ -159,9 +162,9 @@ Widget listBuild(ProfileController controller, BuildContext context) {
           color: Colors.blue,
           size: 30,
         ),
-        title: const Text('Partager Faani App'),
+        title: const Text('Partager Faani App', style: TextStyle(fontSize: 14)),
         subtitle: Text(
-          "Invitez vos amis",
+          "Invitez vos amis à télécharger l'appli",
           style: TextStyle(fontSize: 12, color: Colors.grey[800]),
         ),
         trailing: Icon(Icons.open_in_new, color: Colors.grey[500]),

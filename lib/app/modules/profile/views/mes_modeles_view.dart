@@ -6,7 +6,6 @@ import 'package:faani/app/modules/globale_widgets/list_categorie.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import '../../../style/my_theme.dart';
 
@@ -118,17 +117,4 @@ class MesModelesView extends GetView {
       ),
     );
   }
-}
-
-Widget _buildCard(String imageUrl, Modele modele) {
-  final int idSum = modele.id!.codeUnits.fold(0, (sum, char) => sum + char);
-  final imageHeight = 180.0 + (idSum % 100);
-  return Card(
-    clipBehavior: Clip.antiAliasWithSaveLayer,
-    child: Image.network(
-      imageUrl,
-      height: imageHeight,
-      fit: BoxFit.cover,
-    ),
-  );
 }
