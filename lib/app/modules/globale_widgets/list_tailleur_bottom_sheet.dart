@@ -5,8 +5,8 @@ import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 

@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import '../controllers/ajout_modele_controller.dart';
 
 class AjoutModeleView extends GetView<AjoutModeleController> {
-  const AjoutModeleView({Key? key}) : super(key: key);
+  const AjoutModeleView({super.key});
   @override
   Widget build(BuildContext context) {
     return AjoutModele();

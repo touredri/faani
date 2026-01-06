@@ -9,10 +9,12 @@ class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
   @override
   Widget build(BuildContext context) {
-    Get.put(HomeController());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.pushNotifications.initializeFCM(context);
-    });
+    if (!(controller.fcmInitialized ?? false)) {
+      controller.fcmInitialized = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.pushNotifications.initializeFCM(context);
+      });
+    }
 
     return UpgradeAlert(
       dialogStyle: UpgradeDialogStyle.cupertino,
@@ -20,11 +22,15 @@ class HomeView extends GetView<HomeController> {
           messages: UpgraderMessages(code: 'fr'),
           durationUntilAlertAgain: const Duration(days: 1)),
       child: Scaffold(
-        body: WillPopScope(
-          onWillPop: () => controller.canPop(),
+        body: PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+            controller.canPop();
+          },
           child: PersistentTabView(
             controller: controller.tabController,
-            backgroundColor: scaffoldBack!,
+            backgroundColor: scaffoldBack,
             tabs: controller.tabs(),
             navBarBuilder: (navBarConfig) => Style15BottomNavBar(
               navBarDecoration: const NavBarDecoration(

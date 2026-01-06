@@ -12,11 +12,11 @@ class DisplayImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PageController _controller = PageController();
+    PageController controller = PageController();
     return Stack(
       children: [
         PageView(
-          controller: _controller,
+          controller: controller,
           children: [
             for (var image in modele.fichier)
               ClipRRect(
@@ -44,7 +44,7 @@ class DisplayImage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SmoothPageIndicator(
-                    controller: _controller,
+                    controller: controller,
                     count: modele.fichier.length,
                     effect: const ExpandingDotsEffect(
                       dotColor: Colors.grey,

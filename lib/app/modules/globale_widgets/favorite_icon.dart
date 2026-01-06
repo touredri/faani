@@ -69,8 +69,7 @@ abstract class BaseIconState<T extends BaseIcon> extends State<T> {
 }
 
 class FavoriteIcone extends BaseIcon {
-  const FavoriteIcone({super.key, required String docId, Color color = Colors.white})
-      : super(docId: docId, color: color);
+  const FavoriteIcone({super.key, required super.docId, super.color});
 
   @override
   State<FavoriteIcone> createState() => _FavoriteIconeState();
@@ -118,8 +117,7 @@ class _FavoriteIconeState extends BaseIconState<FavoriteIcone> {
 }
 
 class LikeIcon extends BaseIcon {
-  const LikeIcon({super.key, required String docId, Color color = Colors.white})
-      : super(docId: docId, color: color);
+  const LikeIcon({super.key, required super.docId, super.color});
 
   @override
   State<LikeIcon> createState() => _LikeIconState();

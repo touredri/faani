@@ -148,7 +148,7 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                           labelText: 'Catégorie',
                           border: OutlineInputBorder(),
                         ),
-                        value: controller.selectedCategoryId.value,
+                        initialValue: controller.selectedCategoryId.value,
                         items:
                             controller.categorieList.map((Categorie categorie) {
                           return DropdownMenuItem<String>(
@@ -186,7 +186,7 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                       ),
                       const SizedBox(height: 15),
                       SwitchListTile(
-                        activeColor: primaryColor,
+                        activeThumbColor: primaryColor,
                         title: const Text(
                           'Rendre votre modèle public ?',
                           style: TextStyle(fontSize: 15),

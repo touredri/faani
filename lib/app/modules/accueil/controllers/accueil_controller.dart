@@ -89,20 +89,8 @@ class AccueilController extends GetxController {
     update();
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 
   RefreshController refreshController =
       RefreshController(initialRefresh: false);

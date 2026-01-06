@@ -50,9 +50,9 @@ class SuiviEtatService {
   Future<void> deleteSuiviEtat(String idCommande) async {
     final doc =
         await collection.where('idCommande', isEqualTo: idCommande).get();
-    doc.docs.forEach((element) {
+    for (var element in doc.docs) {
       element.reference.delete();
-    });
+    }
   }
 }
 

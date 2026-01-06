@@ -1,11 +1,13 @@
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 class GererCompte extends GetView<ProfileController> {
+  const GererCompte({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

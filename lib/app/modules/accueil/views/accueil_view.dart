@@ -1,7 +1,5 @@
 import 'package:faani/app/modules/search_page/views/search_page_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import '../../globale_widgets/list_categorie.dart';
 import '../controllers/accueil_controller.dart';

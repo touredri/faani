@@ -1,4 +1,3 @@
-import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/modules/ajout_modele/controllers/ajout_modele_controller.dart';
 import 'package:faani/app/modules/ajout_modele/widgets/modele_form.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';

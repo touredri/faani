@@ -1,12 +1,12 @@
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
-import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import '../../../routes/app_pages.dart';
 import '../../globale_widgets/circular_progress.dart';
 import '../controllers/authentification_controller.dart';
 
@@ -16,7 +16,6 @@ class SignUpView extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     final args = Get.arguments;
-    Get.put(AuthController());
     if (args != null) {
       controller.phoneNumber.value = args['phone'] ?? '';
       controller.nameController.text = args['name'] ?? '';
@@ -62,7 +61,8 @@ class SignUpView extends GetView<AuthController> {
                         final isUserExist = await controller.checkUserExists();
                         if (isUserExist &&
                             controller.nameController.text.isNotEmpty) {
-                          controller.updateUserName(number: controller.phoneNumber.value);
+                          controller.updateUserName(
+                              number: controller.phoneNumber.value);
                         } else if (isUserExist &&
                             controller.nameController.text.isEmpty) {
                           Get.snackbar(
@@ -71,7 +71,7 @@ class SignUpView extends GetView<AuthController> {
                             snackPosition: SnackPosition.BOTTOM,
                           );
                           controller.setUser();
-                          Get.offAll(() => const HomeView());
+                          Get.offAllNamed(Routes.HOME);
                         } else {
                           controller.saveUserInFirestore(
                               controller.phoneNumber.value);

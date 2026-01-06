@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LangueView extends GetView {
-  const LangueView({Key? key}) : super(key: key);
+  const LangueView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

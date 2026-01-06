@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class MesureDialog extends StatefulWidget {
   final List<Mesure> mesures;
 
-  MesureDialog({required this.mesures});
+  const MesureDialog({super.key, required this.mesures});
 
   @override
   _MesureDialogState createState() => _MesureDialogState();
@@ -24,7 +24,7 @@ class _MesureDialogState extends State<MesureDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      child: Container(
+      child: SizedBox(
         height: 300,
         child: Column(
           mainAxisSize: MainAxisSize.min,

@@ -3,8 +3,8 @@ import 'package:faani/app/modules/commande/controllers/commande_controller.dart'
 import 'package:faani/app/modules/commande/views/detail_commande_view.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/services/commande_service.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'commande_container.dart';
@@ -16,7 +16,8 @@ class ListCommande extends StatelessWidget {
 
   OverlayEntry? overlayEntry;
 
-  void showDeleteOverlay(BuildContext context, RenderBox renderBox, String idCommande) {
+  void showDeleteOverlay(
+      BuildContext context, RenderBox renderBox, String idCommande) {
     final size = renderBox.size;
     final position = renderBox.localToGlobal(Offset.zero);
 
@@ -128,7 +129,8 @@ class ListCommande extends StatelessWidget {
                                     onLongPress: () {
                                       final renderBox = context
                                           .findRenderObject() as RenderBox;
-                                      showDeleteOverlay(context, renderBox, commande[index].id!);
+                                      showDeleteOverlay(context, renderBox,
+                                          commande[index].id!);
                                     },
                                     onTap: () {
                                       Get.to(

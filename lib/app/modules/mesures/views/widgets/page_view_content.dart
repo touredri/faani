@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
+import 'package:faani/app/style/spacer.dart';
 
 import '../../../../style/my_theme.dart';
 
@@ -24,7 +24,8 @@ class PageViewContent extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         child: Column(children: [
-          Text(count, style: const TextStyle(fontSize: 20, color: primaryColor)),
+          Text(count,
+              style: const TextStyle(fontSize: 20, color: primaryColor)),
           4.hs,
           SizedBox(
             // image example

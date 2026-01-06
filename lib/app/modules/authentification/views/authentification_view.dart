@@ -1,10 +1,9 @@
 import 'package:faani/app/firebase/global_function.dart';
-import 'package:faani/app/modules/home/controllers/user_controller.dart';
-import 'package:faani/app/modules/home/views/home_view.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import '../../../routes/app_pages.dart';
 import '../../../style/my_theme.dart';
 import '../../globale_widgets/circular_progress.dart';
 import '../controllers/authentification_controller.dart';
@@ -14,8 +13,6 @@ class AuthView extends GetView<AuthController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(AuthController());
-    Get.put(UserController());
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -66,58 +63,39 @@ class AuthView extends GetView<AuthController> {
                 ),
               ),
               3.hs, // phone number input
-              // IntlPhoneField(
-              //   cursorColor: Theme.of(context).colorScheme.primary,
-              //   invalidNumberMessage: 'Numéro invalide',
-              //   decoration: InputDecoration(
-              //     errorBorder: OutlineInputBorder(
-              //       borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
-              //       borderRadius: const BorderRadius.all(Radius.circular(10)),
-              //     ),
-              //     focusedErrorBorder: OutlineInputBorder(
-              //       borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
-              //       borderRadius: const BorderRadius.all(Radius.circular(10)),
-              //     ),
-              //     labelText: 'Numéro de téléphone',
-              //   ),
-              //   initialCountryCode: 'ML',
-              //   onChanged: (phone) {
-              //     controller.phoneNumber.value = phone.completeNumber;
-              //   },
-              // ),
-              SizedBox(
-                // height: 50,
-                child: TextField(
-                  controller: controller.emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: 'Votre adresse email',
-                    prefixIcon: const Icon(
-                      Icons.email,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  onChanged: (value) {
-                    controller.phoneNumber.value = value;
-                  },
+              IntlPhoneField(
+                cursorColor: Theme.of(context).colorScheme.primary,
+                invalidNumberMessage: 'Numéro invalide',
+                decoration: const InputDecoration(
+                  labelText: 'Numéro de téléphone',
                 ),
+                initialCountryCode: 'ML',
+                onChanged: (phone) {
+                  controller.phoneNumber.value = phone.completeNumber;
+                },
               ),
               2.hs, // button sign in
               Obx(() => ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
-                    onPressed: () {
-                      // controller
-                      //     .verifyPhoneNumber(controller.phoneNumber.value);
-                      showCustomSnackbar(
-                          message:
-                              'Essayer de vous connecter avec Google plutôt !!',
-                          backgroundColor: Colors.green);
-                    },
+                    onPressed: controller.loading.value
+                        ? null
+                        : () {
+                            final phone = controller.phoneNumber.value.trim();
+                            if (phone.isEmpty || !phone.startsWith('+')) {
+                              showCustomSnackbar(
+                                message:
+                                    'Entrez un numéro valide (ex: +223xxxxxxxx)',
+                                backgroundColor: Colors.red,
+                              );
+                              return;
+                            }
+                            controller.verifyPhoneNumber(phone);
+                          },
                     child: controller.loading.value
                         ? circularProgress()
-                        : const Text('S\'identifier'),
+                        : const Text('Recevoir le code SMS'),
                   )),
               3.hs,
               Row(
@@ -184,7 +162,7 @@ class AuthView extends GetView<AuthController> {
                         controller.isLoading.value = true;
                         final anonyme = await controller.signInAnonymously();
                         if (anonyme != null) {
-                          Get.offAll(() => const HomeView());
+                          Get.offAllNamed(Routes.HOME);
                         }
                       },
                       child: controller.isLoading.value

@@ -20,7 +20,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../../ajout_modele/views/ajout_modele_view.dart';
 
 class HomeController extends GetxController {
@@ -29,6 +28,7 @@ class HomeController extends GetxController {
   UserController userController = Get.find();
   RxBool isNetworkAvailable = true.obs;
   PushNotifications pushNotifications = PushNotifications();
+  bool? fcmInitialized;
   late final ModeleService modeleService;
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
   RxBool isAdmin = false.obs;
@@ -187,25 +187,18 @@ class HomeController extends GetxController {
 
   // Show toast message for network status
   void _showNetworkStatusToast(bool isConnected) {
-    Fluttertoast.showToast(
-      msg: isConnected
+    if (Get.context == null) return;
+    Get.rawSnackbar(
+      message: isConnected
           ? 'Connection internet établie'
           : 'Vous n\'avez pas d\'accès à internet',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
+      snackPosition: SnackPosition.BOTTOM,
       backgroundColor: isConnected ? Colors.green : Colors.red,
-      textColor: Colors.white,
-      fontSize: 14.0,
+      borderRadius: 12,
+      margin: const EdgeInsets.all(12),
+      duration: const Duration(seconds: 2),
     );
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 }

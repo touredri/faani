@@ -1,6 +1,6 @@
 import 'package:faani/app/modules/mesures/controllers/mesures_controller.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 
 import '../../../../style/my_theme.dart';

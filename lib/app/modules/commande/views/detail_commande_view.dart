@@ -10,9 +10,9 @@ import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/controllers/message_controller.dart';
 import 'package:faani/app/modules/mesures/views/detail_mesure.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:timeline_tile/timeline_tile.dart';
@@ -114,7 +114,7 @@ class DetailCommandeView extends GetView<CommandeController> {
                               )),
                           trailing: TextButton.icon(
                               style: ButtonStyle(
-                                side: MaterialStateProperty.all(
+                                side: WidgetStateProperty.all(
                                   const BorderSide(
                                     color: Colors.transparent,
                                   ),

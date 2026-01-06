@@ -210,7 +210,7 @@ class ProfileController extends GetxController {
     // send notification to admin
     sendNotification(
         "eRKw39mETJCB9IQH4KRmUA:APA91bGqaIbh4ac-M4F2QNVNvYv-uaHXE656DbQLnjcW89KqUYgkfViFRD2cDugEYtzqwV1pc4MGbFirNRFmbYrcNa86JUzgvG3kOOHTEoUVnyilBoAj_0c",
-        "Demande d\'etre tailleur",
+        "Demande d'etre tailleur",
         "Un utilisateur a envoyé une demande pour devenir tailleur");
 
     // update user clientCible property

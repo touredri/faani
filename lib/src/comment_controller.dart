@@ -6,7 +6,6 @@ import 'package:faani/app/modules/globale_widgets/message_field/message_field_co
 import 'package:faani/app/modules/utils/utils.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
 
 class CommentController extends MessageFieldController {
   var isTyping = false.obs;

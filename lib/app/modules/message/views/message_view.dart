@@ -104,11 +104,11 @@ class MessageView extends GetView<MessageController> {
                       ],
                     ),
                     onTap: () async {
-                      final to_user = await UserService().getUser(
+                      final toUser = await UserService().getUser(
                           user!.uid == message.to_id!
                               ? message.from_id!
                               : message.to_id!);
-                      controller.goChat(to_user);
+                      controller.goChat(toUser);
                     },
                     minVerticalPadding: 15,
                   );

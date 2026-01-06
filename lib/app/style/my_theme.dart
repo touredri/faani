@@ -5,18 +5,45 @@ const primaryColor = Color(0xFFF3755F);
 const inputBackgroundColor = Color(0xFFEEF4FC);
 const inputBorderColor = Colors.grey;
 const blackColor = Colors.black;
-var subtextColor = const Color(0xFF000000).withOpacity(0.65);
+final subtextColor = const Color(0xFF000000).withValues(alpha: 0.65);
 const fontFamily = 'Inter';
-var scaffoldBack = Colors.grey[200];
+final Color scaffoldBack = Colors.grey.shade200;
 const subTextColor = Color(0xFF898888);
 
-ThemeData buildTheme(BuildContext context) {
+ThemeData buildTheme() {
   return ThemeData(
     buttonTheme: const ButtonThemeData(
       textTheme: ButtonTextTheme.primary,
     ),
     scaffoldBackgroundColor: scaffoldBack,
-    dialogTheme: const DialogTheme(
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        color: Colors.black,
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.w600,
+        fontSize: 18,
+      ),
+      iconTheme: IconThemeData(color: Colors.black),
+    ),
+    snackBarTheme: const SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      showCloseIcon: true,
+    ),
+    cardTheme: const CardThemeData(
+      surfaceTintColor: Colors.white,
+      margin: EdgeInsets.zero,
+    ),
+    dividerTheme: DividerThemeData(
+      color: Colors.black12,
+      thickness: 1,
+      space: 1,
+    ),
+    dialogTheme: const DialogThemeData(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(15)),
       ),
@@ -56,7 +83,7 @@ ThemeData buildTheme(BuildContext context) {
         overlayColor: WidgetStateProperty.resolveWith<Color>(
           (Set<WidgetState> states) {
             if (states.contains(WidgetState.pressed)) {
-              return primaryColor.withOpacity(0.1);
+              return primaryColor.withValues(alpha: 0.1);
             } // The splash color when the button is pressed
             return primaryColor; // Use the component's default.
           },
@@ -131,7 +158,7 @@ ThemeData buildTheme(BuildContext context) {
         overlayColor: WidgetStateProperty.resolveWith<Color>(
           (Set<WidgetState> states) {
             if (states.contains(WidgetState.pressed)) {
-              return blackColor.withOpacity(0.3);
+              return blackColor.withValues(alpha: 0.3);
             } // The splash color when the button is pressed
             return primaryColor; // Use the component's default.
           },

@@ -1,5 +1,4 @@
 import 'package:faani/app/data/models/modele_model.dart';
-import 'package:faani/app/data/services/comment_service.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

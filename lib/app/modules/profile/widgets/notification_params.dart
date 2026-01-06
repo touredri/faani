@@ -1,9 +1,8 @@
 // import 'package:android_intent_plus/android_intent.dart';
 // import 'package:android_intent_plus/flag.dart';
-import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 
 class NotificationParam extends StatefulWidget {
   const NotificationParam({super.key});

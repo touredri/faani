@@ -8,14 +8,14 @@ import 'package:faani/app/modules/commande/controllers/commande_controller.dart'
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/profile/widgets/received_request.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 
 class TailorProfilePage extends StatefulWidget {
   final UserModel tailor;
 
-  TailorProfilePage({super.key, required this.tailor});
+  const TailorProfilePage({super.key, required this.tailor});
 
   @override
   State<TailorProfilePage> createState() => _TailorProfilePageState();

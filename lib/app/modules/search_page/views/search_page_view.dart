@@ -11,11 +11,11 @@ class SearchPageView extends GetView<SearchPageController> {
   @override
   Widget build(BuildContext context) {
     Get.put(SearchPageController());
-    final ScrollController _scrollController = ScrollController();
+    final ScrollController scrollController = ScrollController();
 
-    _scrollController.addListener(() {
-      if (_scrollController.position.atEdge) {
-        if (_scrollController.position.pixels != 0) {
+    scrollController.addListener(() {
+      if (scrollController.position.atEdge) {
+        if (scrollController.position.pixels != 0) {
           controller.loadMore();
         }
       }
@@ -78,7 +78,7 @@ class SearchPageView extends GetView<SearchPageController> {
                         return buildCard(snapshot.data![index],
                             context: context);
                       },
-                      scrollController: _scrollController,
+                      scrollController: scrollController,
                     );
                   }
                 },

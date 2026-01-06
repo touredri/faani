@@ -3,12 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/modules/authentification/views/authentification_view.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
-import 'package:faani/app/modules/home/views/home_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../routes/app_pages.dart';
 import '../../../data/services/users_service.dart';
 import '../../../firebase/global_function.dart';
 import '../../home/controllers/user_controller.dart';
@@ -60,29 +60,44 @@ class AuthController extends GetxController {
   Future<void> verifyPhoneNumber(String phoneNumber) async {
     loading.value = true;
     try {
-      FirebaseAuth.instance.setLanguageCode('en');
+      FirebaseAuth.instance.setLanguageCode('fr');
       await auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
-          // Handle successful automatic verification
-          // await auth.signInWithCredential(credential);
-          await FirebaseAuth.instance.currentUser!
-              .linkWithCredential(credential);
-          Get.snackbar(
-            "Success",
-            "Phone number verified!",
-            snackPosition: SnackPosition.BOTTOM,
-          );
+          // Auto-verification succeeded (instant validation on some devices).
+          if (auth.currentUser != null) {
+            await auth.currentUser!.linkWithCredential(credential);
+          } else {
+            await auth.signInWithCredential(credential);
+          }
 
-          Get.to(() => const SignUpView());
+          final exists = await checkUserExists();
+          if (exists) {
+            setUser();
+            Get.offAllNamed(Routes.HOME);
+          } else {
+            Get.offAll(() => const SignUpView());
+          }
+          loading.value = false;
         },
         verificationFailed: (FirebaseAuthException e) {
-          // print('********** ${e.message.toString()} **********');
-          Get.snackbar(
-            "Error",
-            e.message.toString(),
-            snackPosition: SnackPosition.BOTTOM,
-          );
+          final code = e.code;
+          final message = e.message ?? e.toString();
+
+          // Common Firebase anti-abuse / quota block.
+          if (code == 'too-many-requests') {
+            showCustomSnackbar(
+              message:
+                  'Trop de tentatives. Firebase a bloqué temporairement les SMS pour cet appareil.\n'
+                  'Attends un moment, ou utilise un numéro de test dans Firebase Console.',
+              backgroundColor: Colors.red,
+            );
+          } else {
+            showCustomSnackbar(
+              message: message,
+              backgroundColor: Colors.red,
+            );
+          }
           isCodeSent.value = false;
           loading.value = false;
         },
@@ -99,10 +114,9 @@ class AuthController extends GetxController {
         },
       );
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
+      showCustomSnackbar(
+        message: e.toString(),
+        backgroundColor: Colors.red,
       );
       loading.value = false;
     }
@@ -133,7 +147,13 @@ class AuthController extends GetxController {
       showCustomSnackbar(
           message: "Numéro de téléphone vérifié avec succès",
           backgroundColor: Colors.green);
-      Get.offAll(() => const SignUpView());
+      final exists = await checkUserExists();
+      if (exists) {
+        setUser();
+        Get.offAllNamed(Routes.HOME);
+      } else {
+        Get.offAll(() => const SignUpView());
+      }
       loading.value = false;
     } catch (e) {
       Get.snackbar(
@@ -177,7 +197,7 @@ class AuthController extends GetxController {
     if (nameController.text.length < 3) {
       Get.snackbar(
         "Error",
-        "S\'il vous plaît, entrez votre nom complet.",
+        "S'il vous plaît, entrez votre nom complet.",
         snackPosition: SnackPosition.BOTTOM,
         borderColor: Colors.red,
       );
@@ -213,7 +233,7 @@ class AuthController extends GetxController {
         "Welcome ${newUser.nomPrenom} !",
         snackPosition: SnackPosition.BOTTOM,
       );
-      Get.offAll(() => const HomeView(), arguments: {'isNewUser': true});
+      Get.offAllNamed(Routes.HOME, arguments: {'isNewUser': true});
       loading.value = false;
     }).catchError((error) {
       Get.snackbar(
@@ -226,7 +246,7 @@ class AuthController extends GetxController {
 
   // get the user & set it to currentUser
   void setUser() async {
-    final UserController userController = Get.put(UserController());
+    final UserController userController = Get.find<UserController>();
     await userController.init();
   }
 
@@ -240,10 +260,6 @@ class AuthController extends GetxController {
     }
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   @override
   void onReady() {
@@ -251,10 +267,6 @@ class AuthController extends GetxController {
     decreaseCounter();
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 
   void updateUserName({String number = ''}) async {
     await auth.currentUser!.updateDisplayName(
@@ -273,7 +285,7 @@ class AuthController extends GetxController {
       snackPosition: SnackPosition.BOTTOM,
     );
     setUser();
-    Get.offAll(() => const HomeView());
+    Get.offAllNamed(Routes.HOME);
   }
 
 // Connexion avec Google (inchangé)
@@ -299,7 +311,7 @@ class AuthController extends GetxController {
         final userExists = await checkUserExists();
         if (userExists) {
           setUser();
-          Get.offAll(() => const HomeView());
+          Get.offAllNamed(Routes.HOME);
         } else {
           Get.offAll(() => const SignUpView(), arguments: {
             'name': nameController.text,

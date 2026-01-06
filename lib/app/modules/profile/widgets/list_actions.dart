@@ -10,13 +10,13 @@ class CustomListTile extends GetView<ProfileController> {
   final void Function()? onTap;
 
   const CustomListTile({
-    Key? key,
+    super.key,
     required this.leadingIcon,
     required this.title,
     // required this.leadingColor,
     this.subTitle = '',
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

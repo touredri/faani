@@ -45,15 +45,15 @@ Future<void> sendNotification(String token, String title, String body) async {
   }
 }
 
-Future<void> sendProgrammingNotification(String t_token, String c_token, String title, String body, DateTime date) async {
+Future<void> sendProgrammingNotification(String tToken, String cToken, String title, String body, DateTime date) async {
   final url = Uri.parse('https://my-faani-admin.onrender.com/api/sendAfter');
 
   try {
     final response = await http.post(
       url,
       body: jsonEncode({
-        't_token': t_token,
-        'c_token': c_token,
+        't_token': tToken,
+        'c_token': cToken,
         'title': title,
         'body': body,
         'date': date.toIso8601String(),

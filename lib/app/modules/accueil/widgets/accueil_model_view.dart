@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:faani/app/data/services/comment_service.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';

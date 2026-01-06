@@ -177,7 +177,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
-                child: Container(
+                child: SizedBox(
                   width: 125,
                   child: Container(
                     width: 124,
@@ -241,7 +241,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
               const SizedBox(
                 height: 10,
               ),
-              Container(
+              SizedBox(
                 height: 400,
                 child: FutureBuilder<List<Modele>>(
                   future: FirebaseFirestore.instance

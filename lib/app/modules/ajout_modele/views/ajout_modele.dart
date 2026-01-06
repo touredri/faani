@@ -1,8 +1,8 @@
 import 'package:faani/app/modules/ajout_modele/controllers/ajout_modele_controller.dart';
 import 'package:faani/app/modules/ajout_modele/widgets/modele_form.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 
 class AjoutModele extends GetView<AjoutModeleController> {

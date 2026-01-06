@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
-import 'package:faani/app/modules/home/views/home_view.dart';
+import 'package:faani/app/routes/app_pages.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -110,7 +110,7 @@ class PushNotifications {
   }
 
   void _handleMessageOpen(BuildContext context, Map<String, dynamic>? data) {
-    Get.to(() => const HomeView());
+    Get.toNamed(Routes.HOME);
     Future.delayed(const Duration(milliseconds: 500), () {
       // Get.to(() => NotificationPage());
       data?.entries.forEach((entry) {

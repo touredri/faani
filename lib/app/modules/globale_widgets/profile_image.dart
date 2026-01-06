@@ -124,7 +124,7 @@ class _BuildProfileImageState extends State<BuildProfileImage> {
               ),
               child: IconButton(
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(const EdgeInsets.all(0)),
+                  padding: WidgetStateProperty.all(const EdgeInsets.all(0)),
                 ),
                 onPressed: changeProfileImage,
                 icon: const Icon(

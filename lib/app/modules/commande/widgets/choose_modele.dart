@@ -1,18 +1,13 @@
-import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/commande/widgets/image_pop_up.dart';
-import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
 import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-import 'package:shimmer/shimmer.dart';
 
 class ChooseModeleView extends GetView<CommandeController> {
   const ChooseModeleView({super.key});

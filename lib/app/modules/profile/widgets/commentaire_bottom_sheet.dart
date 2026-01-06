@@ -1,9 +1,9 @@
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/floating_bottom_sheet.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 
 Future commentaire(BuildContext context) {
   return showFloatingModalBottomSheet(
@@ -75,8 +75,7 @@ Future commentaire(BuildContext context) {
                           );
                       }
                     },
-                    onRatingUpdate: (rating) {
-                    },
+                    onRatingUpdate: (rating) {},
                   ),
                   2.hs,
                   const Text(

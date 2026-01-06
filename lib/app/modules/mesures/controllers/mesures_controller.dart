@@ -34,13 +34,5 @@ class MesuresController extends GetxController {
     isLastPage.value = false;
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 }

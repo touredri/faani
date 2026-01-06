@@ -1,13 +1,12 @@
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
-import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/commande/views/list_tailleur_view.dart';
 import 'package:faani/app/modules/commande/widgets/choose_modele.dart';
 import 'package:faani/app/modules/globale_widgets/animated_seach.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/views/message_view.dart';
 import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:faani/app/modules/commande/widgets/circle_indicator.dart';
 import 'package:faani/app/modules/commande/widgets/list_commande.dart';

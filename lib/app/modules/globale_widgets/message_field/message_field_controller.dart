@@ -279,10 +279,6 @@ abstract class MessageFieldController extends GetxController {
   Future<void> sendMessageVoice(String parentId);
   Future<void> sendMessageText(String parentId);
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
 
   @override
   void onClose() {

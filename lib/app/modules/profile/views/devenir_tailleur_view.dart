@@ -1,8 +1,8 @@
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 
 import 'package:get/get.dart';
 
@@ -61,8 +61,13 @@ class DevenirTailleurView extends GetView<ProfileController> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  items: <String>['Hommes', 'Femmes', 'Garçons', 'Filles', 'Confection générale']
-                      .map((String value) {
+                  items: <String>[
+                    'Hommes',
+                    'Femmes',
+                    'Garçons',
+                    'Filles',
+                    'Confection générale'
+                  ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),

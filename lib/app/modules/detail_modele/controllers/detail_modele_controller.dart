@@ -34,18 +34,6 @@ class DetailModeleController extends GetxController {
     isFollowing.value = !currentStatus;
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 }

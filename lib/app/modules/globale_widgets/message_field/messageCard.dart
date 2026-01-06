@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/modules/globale_widgets/message_field/audio.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -22,7 +22,7 @@ Widget messageCard({
   Function(String userId, String commentId)? onReport,
 }) {
   final formattedDate =
-                            timeago.format(createDate ?? DateTime.now(), locale: 'fr_short');
+      timeago.format(createDate ?? DateTime.now(), locale: 'fr_short');
   return ListTile(
     title: Row(
       children: [

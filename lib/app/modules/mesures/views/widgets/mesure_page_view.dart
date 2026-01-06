@@ -1,6 +1,6 @@
 import 'package:faani/app/modules/mesures/views/widgets/page_view_content.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import '../../../../style/my_theme.dart';
 import '../../controllers/mesures_controller.dart';
@@ -8,7 +8,6 @@ import 'save_mesure.dart';
 
 class MesurePaveView extends StatelessWidget {
   const MesurePaveView({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +111,8 @@ class MesurePaveView extends StatelessWidget {
                           onPressed: () {
                             TextEditingController nameController =
                                 TextEditingController();
-                            dialogBox(context, nameController, mesureController);
+                            dialogBox(
+                                context, nameController, mesureController);
                           },
                           child: textContainer('Terminer'))
                       : TextButton(

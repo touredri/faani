@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-DropdownButtonFormField<String> clientCibleDropdown(Function onSelected()) {
+DropdownButtonFormField<String> clientCibleDropdown(Function Function() onSelected) {
   return DropdownButtonFormField<String>(
                   decoration: InputDecoration(
                     labelText: 'Gender',

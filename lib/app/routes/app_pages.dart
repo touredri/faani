@@ -1,4 +1,3 @@
-import 'package:faani/app/modules/home/mildware/connectivity_mildware.dart';
 import 'package:faani/app/modules/message/views/discussion_view.dart';
 import 'package:get/get.dart';
 

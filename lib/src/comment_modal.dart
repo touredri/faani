@@ -6,9 +6,9 @@ import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/globale_widgets/message_field/audio.dart';
 import 'package:faani/app/modules/globale_widgets/message_field/message_field.dart';
+import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:faani/app/data/services/modele_service.dart';
-import 'package:flutter_spacer/flutter_spacer.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import '../app/firebase/global_function.dart';
@@ -18,7 +18,7 @@ import 'package:timeago/timeago.dart' as timeago;
 class CommentModal extends StatefulWidget {
   final String idModele;
 
-  CommentModal({super.key, required this.idModele});
+  const CommentModal({super.key, required this.idModele});
 
   @override
   _CommentModalState createState() => _CommentModalState();

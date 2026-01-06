@@ -73,7 +73,7 @@ class _MyStepState extends State<MyStep> {
       final UserModel client =
           await UserService().getUser(widget.commande.idUser);
       await sendNotification(client.token!, 'Etat Commande modifié',
-          'L\etat de votre commande a été modifiée par le tailleur à ${widget.commande.etatLibelle}');
+          'Letat de votre commande a été modifiée par le tailleur à ${widget.commande.etatLibelle}');
     }
   }
 

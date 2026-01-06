@@ -53,33 +53,33 @@ class MessageController extends GetxController {
     });
   }
 
-  void goChat(UserModel to_user, {String modeleImg = ''}) async {
-    var from_message = await collection
+  void goChat(UserModel toUser, {String modeleImg = ''}) async {
+    var fromMessage = await collection
         .withConverter(
             fromFirestore: MessageModel.fromMap,
             toFirestore: (MessageModel msg, options) => msg.toMap())
         .where('from_id', isEqualTo: user!.uid)
-        .where('to_id', isEqualTo: to_user.id)
+        .where('to_id', isEqualTo: toUser.id)
         .get();
 
-    var to_message = await collection
+    var toMessage = await collection
         .withConverter(
             fromFirestore: MessageModel.fromMap,
             toFirestore: (MessageModel msg, options) => msg.toMap())
-        .where('from_id', isEqualTo: to_user.id)
+        .where('from_id', isEqualTo: toUser.id)
         .where('to_id', isEqualTo: user!.uid)
         .get();
 
-    if (from_message.docs.isEmpty &&
-        to_message.docs.isEmpty &&
+    if (fromMessage.docs.isEmpty &&
+        toMessage.docs.isEmpty &&
         modeleImg.isNotEmpty) {
-      var msg_data = MessageModel(
+      var msgData = MessageModel(
         from_avatar: user!.photoURL ?? '',
         from_name: user!.displayName,
         from_id: user!.uid,
-        to_avatar: to_user.profileImage,
-        to_name: to_user.nomPrenom,
-        to_id: to_user.id,
+        to_avatar: toUser.profileImage,
+        to_name: toUser.nomPrenom,
+        to_id: toUser.id,
         modele_img: modeleImg,
         message: '',
         last_msg: '',
@@ -90,61 +90,49 @@ class MessageController extends GetxController {
           .withConverter(
               fromFirestore: MessageModel.fromMap,
               toFirestore: (MessageModel msg, options) => msg.toMap())
-          .add(msg_data)
+          .add(msgData)
           .then((value) => {
                 Get.to(() => const DiscussionView(),
                     transition: Transition.rightToLeftWithFade,
                     arguments: {
                       'doc_id': value.id,
-                      'to_id': to_user.id,
-                      'to_name': to_user.nomPrenom,
-                      'to_avatar': to_user.profileImage,
+                      'to_id': toUser.id,
+                      'to_name': toUser.nomPrenom,
+                      'to_avatar': toUser.profileImage,
                       'modele_img': modeleImg,
-                      'token': to_user.token,
+                      'token': toUser.token,
                     })
               });
     } else {
-      if (from_message.docs.isNotEmpty) {
+      if (fromMessage.docs.isNotEmpty) {
         Get.to(() => const DiscussionView(),
             transition: Transition.rightToLeftWithFade,
             arguments: {
-              'doc_id': from_message.docs.first.id,
-              'to_id': to_user.id,
-              'to_name': to_user.nomPrenom,
-              'to_avatar': to_user.profileImage,
+              'doc_id': fromMessage.docs.first.id,
+              'to_id': toUser.id,
+              'to_name': toUser.nomPrenom,
+              'to_avatar': toUser.profileImage,
               'modele_img': modeleImg,
-              'token': to_user.token,
+              'token': toUser.token,
             });
       }
-      if (to_message.docs.isNotEmpty) {
+      if (toMessage.docs.isNotEmpty) {
         Get.to(() => const DiscussionView(),
             transition: Transition.rightToLeftWithFade,
             arguments: {
-              'doc_id': to_message.docs.first.id,
-              'to_id': to_user.id,
-              'to_name': to_user.nomPrenom,
-              'to_avatar': to_user.profileImage,
+              'doc_id': toMessage.docs.first.id,
+              'to_id': toUser.id,
+              'to_name': toUser.nomPrenom,
+              'to_avatar': toUser.profileImage,
               'modele_img': modeleImg,
-              'token': to_user.token,
+              'token': toUser.token,
             });
       }
     }
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 
   void increment() => count.value++;
 }

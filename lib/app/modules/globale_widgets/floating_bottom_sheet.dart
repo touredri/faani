@@ -40,8 +40,8 @@ Future<T> showFloatingModalBottomSheet<T>({
       builder: builder,
       useRootNavigator: true,
       containerWidget: (_, animation, child) => FloatingModal(
-            child: child,
             horizontalPadding: horizontalPadding,
+            child: child,
           ),
       expand: false);
 

@@ -1,5 +1,4 @@
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
-import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 
 class AboutUsPage extends StatelessWidget {

@@ -52,18 +52,6 @@ class FavorieController extends GetxController {
     update();
   }
 
-  @override
-  void onInit() async {
-    super.onInit();
-  }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 }

@@ -10,7 +10,6 @@ class OtpView extends GetView<AuthController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(AuthController());
     return Scaffold(
       appBar: AppBar(
         backgroundColor: scaffoldBack,
