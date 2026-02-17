@@ -87,12 +87,12 @@ class _HomeItemState extends State<HomeItem>
               fadeInDuration: const Duration(milliseconds: 400),
               fadeInCurve: Curves.easeIn,
               placeholder: (context, url) => Shimmer.fromColors(
-                baseColor: const Color(0xFF2A2A2A),
-                highlightColor: const Color(0xFF3A3A3A),
-                child: Container(color: const Color(0xFF2A2A2A)),
+                baseColor: AppColors.shimmerBase,
+                highlightColor: AppColors.shimmerHighlight,
+                child: Container(color: AppColors.shimmerBase),
               ),
               errorWidget: (context, url, error) => Container(
-                color: const Color(0xFF1A1A1A),
+                color: AppColors.backgroundDark,
                 child: const Center(
                   child: Icon(Icons.image_not_supported_outlined,
                       color: AppColors.grey600, size: 40),

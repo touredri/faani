@@ -51,12 +51,12 @@ class AccueilPAgeView extends GetView<AccueilController> {
 
   Widget _buildShimmerLoading() {
     return Shimmer.fromColors(
-      baseColor: const Color(0xFF2A2A2A),
-      highlightColor: const Color(0xFF3A3A3A),
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
       child: Column(
         children: [
           Expanded(
-            child: Container(color: const Color(0xFF2A2A2A)),
+            child: Container(color: AppColors.shimmerBase),
           ),
         ],
       ),

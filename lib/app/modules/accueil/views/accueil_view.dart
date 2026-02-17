@@ -9,17 +9,15 @@ import '../widgets/accueil_page_view.dart';
 class AccueilView extends GetView<AccueilController> {
   const AccueilView({super.key});
 
-  static const _bgColor = Color(0xFF1A1A1A);
-
   @override
   Widget build(BuildContext context) {
     Get.put(AccueilController());
 
     return Scaffold(
-      backgroundColor: _bgColor,
+      backgroundColor: AppColors.backgroundDark,
       appBar: AppBar(
         toolbarHeight: 0,
-        backgroundColor: _bgColor,
+        backgroundColor: AppColors.backgroundDark,
       ),
       body: Stack(
         fit: StackFit.expand,
@@ -41,9 +39,9 @@ class AccueilView extends GetView<AccueilController> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    _bgColor.withValues(alpha: 0.85),
-                    _bgColor.withValues(alpha: 0.4),
-                    _bgColor.withValues(alpha: 0.0),
+                    AppColors.backgroundDark.withValues(alpha: 0.85),
+                    AppColors.backgroundDark.withValues(alpha: 0.4),
+                    AppColors.backgroundDark.withValues(alpha: 0.0),
                   ],
                   stops: const [0.0, 0.6, 1.0],
                 ),
