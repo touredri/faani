@@ -5,150 +5,292 @@ import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/globale_widgets/list_tailleur_bottom_sheet.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/style/app_colors.dart';
+import 'package:faani/app/style/app_spacing.dart';
+import 'package:faani/app/style/app_typography.dart';
 import 'package:faani/src/comment_modal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../globale_widgets/favorite_icon.dart';
 import '../controllers/accueil_controller.dart';
 
-class HomeItem extends GetView<AccueilController> {
+class HomeItem extends StatefulWidget {
   final Modele modele;
   const HomeItem(this.modele, {super.key});
 
   @override
+  State<HomeItem> createState() => _HomeItemState();
+}
+
+class _HomeItemState extends State<HomeItem>
+    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
+  final AccueilController controller = Get.find<AccueilController>();
+  late final AnimationController _doubleTapController;
+  late final Animation<double> _doubleTapScale;
+  bool _showHeart = false;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _doubleTapController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _doubleTapScale = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: 1.2)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.2, end: 1.0)
+            .chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 60,
+      ),
+    ]).animate(_doubleTapController);
+  }
+
+  @override
+  void dispose() {
+    _doubleTapController.dispose();
+    super.dispose();
+  }
+
+  void _onDoubleTap() {
+    HapticFeedback.mediumImpact();
+    setState(() => _showHeart = true);
+    _doubleTapController.forward(from: 0).then((_) {
+      if (mounted) setState(() => _showHeart = false);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Get.put(AccueilController());
+    super.build(context);
+    final size = MediaQuery.sizeOf(context);
+
     return Stack(
+      fit: StackFit.expand,
       children: [
-        Column(
-          children: [
-            SizedBox(
-              width: MediaQuery.sizeOf(context).width,
-              height: MediaQuery.sizeOf(context).height * 0.80,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: CachedNetworkImage(
-                  imageUrl: modele.fichier[0]!,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
-              ),
-            ),
-          ],
-        ),
-        // black opacity on model images
-        SizedBox(
-          height: MediaQuery.sizeOf(context).height,
-          width: MediaQuery.sizeOf(context).width,
+        // ── Full-bleed image ───────────────────────────────────────
+        Positioned.fill(
           child: GestureDetector(
-            onVerticalDragUpdate: (details) {
-              if (details.delta.dy > 0) {
-                controller.pageController.previousPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut);
-              } else if (details.delta.dy < 0) {
-                controller.pageController.nextPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut);
-              }
-            },
-            child: Container(
-              width: double.infinity,
-              height: MediaQuery.sizeOf(context).height,
-              color: Colors.black.withOpacity(0.1),
+            onDoubleTap: _onDoubleTap,
+            child: CachedNetworkImage(
+              imageUrl: widget.modele.fichier[0]!,
+              fit: BoxFit.cover,
+              fadeInDuration: const Duration(milliseconds: 400),
+              fadeInCurve: Curves.easeIn,
+              placeholder: (context, url) => Shimmer.fromColors(
+                baseColor: AppColors.shimmerBase,
+                highlightColor: AppColors.shimmerHighlight,
+                child: Container(color: AppColors.shimmerBase),
+              ),
+              errorWidget: (context, url, error) => Container(
+                color: AppColors.backgroundDark,
+                child: const Center(
+                  child: Icon(Icons.image_not_supported_outlined,
+                      color: AppColors.grey600, size: 40),
+                ),
+              ),
             ),
           ),
         ),
-        // actions icons bar
-        Container(
-          alignment: Alignment.centerRight,
-          child: Container(
-            height: 261,
-            width: 60,
+
+        // ── Bottom gradient overlay ────────────────────────────────
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: size.height * 0.35,
+          child: DecoratedBox(
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(10),
-                bottomLeft: Radius.circular(10),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.3),
+                  Colors.black.withValues(alpha: 0.7),
+                ],
+                stops: const [0.0, 0.4, 1.0],
               ),
-              color: Colors.white.withOpacity(0.0),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    final userController = Get.find<UserController>();
-                    if (userController.isTailleur.value) {
-                      Get.to(() => AjoutCommandePage(modele),
-                          transition: Transition.rightToLeft);
-                    } else {
-                      showTailleurModalBottomSheet(context, modele);
-                    }
-                  },
-                  icon: controller.sewingIcon,
-                ),
-                FavoriteIcone(
-                  docId: modele.id!,
-                ),
-                LikeIcon(docId: modele.id!),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                            isScrollControlled: true,
-                            useRootNavigator: true,
-                            backgroundColor:
-                                const Color.fromARGB(150, 145, 144, 144),
-                            context: context,
-                            builder: (context) {
-                              return SizedBox(
-                                height:
-                                    MediaQuery.sizeOf(context).height * 0.80,
-                                child: CommentModal(
-                                  idModele: modele.id!,
-                                ),
-                              );
-                            });
-                      },
-                      child: const Icon(
-                        Icons.message_outlined,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                    ),
-                    StreamBuilder<int>(
-                      stream: ModeleService().getCommentCount(modele.id!),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Text('${snapshot.data}',
-                              style: const TextStyle(color: Colors.white));
-                        } else {
-                          return const Text('0',
-                              style: TextStyle(color: Colors.white));
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                IconButton(
-                  onPressed: () {
-                    Get.to(() => DetailModeleView(modele),
-                        transition: Transition.rightToLeft);
-                  },
-                  icon: const Icon(
-                    Icons.info,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-              ],
             ),
           ),
+        ),
+
+        // ── Bottom info overlay ───────────────────────────────────
+        Positioned(
+          bottom: AppSpacing.huge,
+          left: AppSpacing.lg,
+          right: 72,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.modele.detail != null &&
+                  widget.modele.detail!.isNotEmpty)
+                Text(
+                  widget.modele.detail!,
+                  style: AppTypography.titleMedium.copyWith(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w600,
+                    shadows: const [
+                      Shadow(
+                        blurRadius: 12,
+                        color: Colors.black54,
+                      ),
+                    ],
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              const SizedBox(height: 6),
+              Text(
+                widget.modele.genreHabit,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.primaryLight,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // ── Right action bar ──────────────────────────────────────
+        Positioned(
+          right: AppSpacing.sm,
+          bottom: AppSpacing.huge,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _ActionButton(
+                icon: controller.sewingIcon,
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  final userController = Get.find<UserController>();
+                  if (userController.isTailleur.value) {
+                    Get.to(() => AjoutCommandePage(widget.modele),
+                        transition: Transition.rightToLeft);
+                  } else {
+                    showTailleurModalBottomSheet(context, widget.modele);
+                  }
+                },
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              FavoriteIcone(docId: widget.modele.id!),
+              const SizedBox(height: AppSpacing.lg),
+              LikeIcon(docId: widget.modele.id!),
+              const SizedBox(height: AppSpacing.lg),
+              _CommentButton(modele: widget.modele),
+              const SizedBox(height: AppSpacing.lg),
+              _ActionButton(
+                icon: const Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.white,
+                  size: 26,
+                ),
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  Get.to(() => DetailModeleView(widget.modele),
+                      transition: Transition.rightToLeft);
+                },
+              ),
+            ],
+          ),
+        ),
+
+        // ── Double-tap heart animation ────────────────────────────
+        if (_showHeart)
+          Center(
+            child: AnimatedBuilder(
+              animation: _doubleTapScale,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _doubleTapScale.value,
+                  child: Icon(
+                    Icons.favorite_rounded,
+                    color: AppColors.primary.withValues(alpha: 0.85),
+                    size: 100,
+                  ),
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Minimal action button wrapper for consistent sizing
+class _ActionButton extends StatelessWidget {
+  final Widget icon;
+  final VoidCallback onTap;
+  const _ActionButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 44,
+        height: 44,
+        child: Center(child: icon),
+      ),
+    );
+  }
+}
+
+/// Comment button with live count
+class _CommentButton extends StatelessWidget {
+  final Modele modele;
+  const _CommentButton({required this.modele});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            showModalBottomSheet(
+              isScrollControlled: true,
+              useRootNavigator: true,
+              backgroundColor: const Color.fromARGB(150, 145, 144, 144),
+              context: context,
+              builder: (context) {
+                return SizedBox(
+                  height: MediaQuery.sizeOf(context).height * 0.80,
+                  child: CommentModal(idModele: modele.id!),
+                );
+              },
+            );
+          },
+          child: const Icon(
+            Icons.message_outlined,
+            color: Colors.white,
+            size: 26,
+          ),
+        ),
+        const SizedBox(height: 2),
+        StreamBuilder<int>(
+          stream: ModeleService().getCommentCount(modele.id!),
+          builder: (context, snapshot) {
+            return Text(
+              snapshot.hasData ? '${snapshot.data}' : '0',
+              style: AppTypography.labelSmall.copyWith(
+                color: AppColors.white.withValues(alpha: 0.8),
+              ),
+            );
+          },
         ),
       ],
     );

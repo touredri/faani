@@ -64,6 +64,11 @@ abstract final class AppColors {
   static const Color overlay = Color(0x66000000);
   static const Color overlayLight = Color(0x1A000000);
 
+  // ── Shimmer / Loading ──────────────────────────────────────────────
+  static const Color shimmerBase = Color(0xFF2A2A2A);
+  static const Color shimmerHighlight = Color(0xFF3A3A3A);
+  static const Color backgroundDark = Color(0xFF1A1A1A);
+
   // ── Light ColorScheme ──────────────────────────────────────────────
   static const ColorScheme lightScheme = ColorScheme(
     brightness: Brightness.light,

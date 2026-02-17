@@ -11,7 +11,7 @@ import '../../../data/models/modele_model.dart';
 class AccueilController extends GetxController {
   RxList<Modele> modeles = <Modele>[].obs;
   final PageController pageController =
-      PageController(initialPage: 0, viewportFraction: 0.87);
+      PageController(initialPage: 0, viewportFraction: 1.0);
   String sewing = 'assets/svg/sewingp.svg';
   late final Widget sewingIcon;
   final selectedTailleur = Rx<UserModel?>(null);

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/services/favorite_service.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../firebase/global_function.dart';
 import '../../style/app_colors.dart';
 
@@ -13,10 +14,13 @@ abstract class BaseIcon extends StatefulWidget {
   const BaseIcon({super.key, required this.docId, this.color = Colors.white});
 }
 
-abstract class BaseIconState<T extends BaseIcon> extends State<T> {
+abstract class BaseIconState<T extends BaseIcon> extends State<T>
+    with SingleTickerProviderStateMixin {
   bool isActive = false;
   final firestore = FirebaseFirestore.instance;
   int count = 0;
+  late final AnimationController _scaleController;
+  late final Animation<double> _scaleAnimation;
 
   void onChange(QuerySnapshot snapshot) {
     if (mounted) {
@@ -29,8 +33,30 @@ abstract class BaseIconState<T extends BaseIcon> extends State<T> {
   @override
   void initState() {
     super.initState();
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 1.3)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.3, end: 1.0)
+            .chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 50,
+      ),
+    ]).animate(_scaleController);
     init();
     getSnapshotStream().listen(onChange);
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
   }
 
   void toggleActive();
@@ -47,18 +73,30 @@ abstract class BaseIconState<T extends BaseIcon> extends State<T> {
       children: <Widget>[
         GestureDetector(
           onTap: () {
+            HapticFeedback.lightImpact();
             toggleActive();
             setState(() {
               isActive = !isActive;
             });
+            _scaleController.forward(from: 0);
           },
-          child: Icon(
-            isActive ? getActiveIcon() : getInactiveIcon(),
-            color: isActive ? AppColors.primary : widget.color,
-            size: 30,
+          child: AnimatedBuilder(
+            animation: _scaleAnimation,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Icon(
+                  isActive ? getActiveIcon() : getInactiveIcon(),
+                  color: isActive ? AppColors.primary : widget.color,
+                  size: 26,
+                ),
+              );
+            },
           ),
         ),
-        Text(count.toString(), style: TextStyle(color: widget.color)),
+        const SizedBox(height: 2),
+        Text(count.toString(),
+            style: TextStyle(color: widget.color, fontSize: 11)),
       ],
     );
   }
