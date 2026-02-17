@@ -9,7 +9,7 @@ import '../widgets/accueil_page_view.dart';
 class AccueilView extends GetView<AccueilController> {
   const AccueilView({super.key});
 
-  static const _bgColor = Color(0xFF333333);
+  static const _bgColor = Color(0xFF1A1A1A);
 
   @override
   Widget build(BuildContext context) {
@@ -35,43 +35,105 @@ class AccueilView extends GetView<AccueilController> {
             left: 0,
             right: 0,
             child: Container(
-              height: 48,
+              height: 56,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    _bgColor.withValues(alpha: 0.7),
+                    _bgColor.withValues(alpha: 0.85),
+                    _bgColor.withValues(alpha: 0.4),
                     _bgColor.withValues(alpha: 0.0),
                   ],
+                  stops: const [0.0, 0.6, 1.0],
                 ),
               ),
               child: Row(
                 children: [
                   Expanded(
                     child: SizedBox(
-                      height: 28,
+                      height: 36,
                       child: CategorieFiltre<AccueilController>(
                         controller: controller,
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Get.to(
-                      () => const SearchPageView(),
-                      transition: Transition.downToUp,
+                  Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: IconButton(
+                      onPressed: () => Get.to(
+                        () => const SearchPageView(),
+                        transition: Transition.downToUp,
+                      ),
+                      icon: const Icon(Icons.search_rounded),
+                      color: AppColors.white,
+                      iconSize: 22,
+                      tooltip: 'Rechercher',
                     ),
-                    icon: const Icon(Icons.search_rounded),
-                    color: AppColors.white,
-                    iconSize: 24,
-                    tooltip: 'Rechercher',
                   ),
                 ],
               ),
             ),
           ),
+
+          // ── Bottom swipe hint ──────────────────────────────────
+          Positioned(
+            bottom: 16,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: _SwipeHint(),
+            ),
+          ),
         ],
       ),
+    );
+  }
+}
+
+/// Animated swipe indicator hint
+class _SwipeHint extends StatefulWidget {
+  @override
+  State<_SwipeHint> createState() => _SwipeHintState();
+}
+
+class _SwipeHintState extends State<_SwipeHint>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0, end: -8).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _animation.value),
+          child: Icon(
+            Icons.keyboard_arrow_up_rounded,
+            color: AppColors.white.withValues(alpha: 0.35),
+            size: 28,
+          ),
+        );
+      },
     );
   }
 }

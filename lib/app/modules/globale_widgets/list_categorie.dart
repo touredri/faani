@@ -135,51 +135,51 @@ class _CategorieFiltreState<T extends GetxController>
 
     return AnimatedContainer(
       duration: AppAnimations.fast,
-      margin: const EdgeInsets.only(right: AppSpacing.xs),
-      child: Material(
-        color: isSelected
-            ? (isOverlayMode
-                ? AppColors.primary.withValues(alpha: 0.9)
-                : AppColors.primary)
-            : (isOverlayMode
-                ? AppColors.black.withValues(alpha: 0.3)
-                : AppColors.surfaceLight),
-        borderRadius: AppRadius.radiusFull,
-        elevation: isSelected ? (isOverlayMode ? 1 : 2) : 0,
-        child: InkWell(
-          onTap: () => _onCategorySelected(categorie, index),
-          borderRadius: AppRadius.radiusFull,
-          splashColor: isOverlayMode
-              ? AppColors.white.withValues(alpha: 0.2)
-              : AppColors.primaryLight,
-          highlightColor: isOverlayMode
-              ? AppColors.white.withValues(alpha: 0.1)
-              : AppColors.primaryLight.withValues(alpha: 0.1),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: isOverlayMode ? AppSpacing.sm : AppSpacing.md,
-              vertical: AppSpacing.xs,
-            ),
-            child: AnimatedDefaultTextStyle(
+      margin: const EdgeInsets.only(right: AppSpacing.sm),
+      child: GestureDetector(
+        onTap: () => _onCategorySelected(categorie, index),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedDefaultTextStyle(
               duration: AppAnimations.fast,
               style: isSelected
-                  ? AppTypography.labelSmall.copyWith(
-                      color: AppColors.onPrimary,
-                      fontWeight: FontWeight.w600,
+                  ? AppTypography.labelMedium.copyWith(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
                     )
-                  : AppTypography.labelSmall.copyWith(
+                  : AppTypography.labelMedium.copyWith(
                       color: isOverlayMode
-                          ? AppColors.white
+                          ? AppColors.white.withValues(alpha: 0.6)
                           : AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.5,
                     ),
-              child: Text(
-                categorie.libelle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
+                ),
+                child: Text(
+                  categorie.libelle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
-          ),
+            const SizedBox(height: 2),
+            AnimatedContainer(
+              duration: AppAnimations.fast,
+              height: 2,
+              width: isSelected ? 20 : 0,
+              decoration: BoxDecoration(
+                color: AppColors.gold,
+                borderRadius: AppRadius.radiusFull,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,6 +1,7 @@
+import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../globale_widgets/circular_progress.dart';
+import 'package:shimmer/shimmer.dart';
 import '../controllers/accueil_controller.dart';
 import 'accueil_model_view.dart';
 
@@ -13,7 +14,7 @@ class AccueilPAgeView extends GetView<AccueilController> {
       future: controller.init(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: circularProgress());
+          return _buildShimmerLoading();
         } else {
           return GetBuilder<AccueilController>(
               init: AccueilController(),
@@ -21,6 +22,8 @@ class AccueilPAgeView extends GetView<AccueilController> {
               builder: (_) {
                 return RefreshIndicator(
                   onRefresh: controller.refreshPage,
+                  color: AppColors.gold,
+                  backgroundColor: AppColors.black,
                   child: PageView.builder(
                     controller: controller.pageController,
                     scrollDirection: Axis.vertical,
@@ -29,7 +32,8 @@ class AccueilPAgeView extends GetView<AccueilController> {
                       if (controller.modeles.isNotEmpty &&
                           index < controller.modeles.length) {
                         final modele = controller.modeles[index];
-                        if (index == controller.modeles.length - 1 && controller.homeController.hasMoreData.value) {
+                        if (index == controller.modeles.length - 1 &&
+                            controller.homeController.hasMoreData.value) {
                           controller.loadMore();
                         }
                         return HomeItem(modele);
@@ -42,6 +46,20 @@ class AccueilPAgeView extends GetView<AccueilController> {
               });
         }
       },
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return Shimmer.fromColors(
+      baseColor: const Color(0xFF2A2A2A),
+      highlightColor: const Color(0xFF3A3A3A),
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(color: const Color(0xFF2A2A2A)),
+          ),
+        ],
+      ),
     );
   }
 }
