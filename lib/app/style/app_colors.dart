@@ -11,11 +11,6 @@ abstract final class AppColors {
   static const Color primaryDark = Color(0xFFD4503C);
   static const Color onPrimary = Colors.white;
 
-  // ── Luxury Accent ──────────────────────────────────────────────────
-  static const Color gold = Color(0xFFD4A853);
-  static const Color goldLight = Color(0xFFF5E6C8);
-  static const Color goldDark = Color(0xFFB8922E);
-
   // ── Neutral ────────────────────────────────────────────────────────
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF121212);

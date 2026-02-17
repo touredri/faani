@@ -22,7 +22,7 @@ class AccueilPAgeView extends GetView<AccueilController> {
               builder: (_) {
                 return RefreshIndicator(
                   onRefresh: controller.refreshPage,
-                  color: AppColors.gold,
+                  color: AppColors.primary,
                   backgroundColor: AppColors.black,
                   child: PageView.builder(
                     controller: controller.pageController,

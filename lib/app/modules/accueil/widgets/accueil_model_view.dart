@@ -154,7 +154,7 @@ class _HomeItemState extends State<HomeItem>
               Text(
                 widget.modele.genreHabit,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.gold,
+                  color: AppColors.primaryLight,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 1.2,
                 ),

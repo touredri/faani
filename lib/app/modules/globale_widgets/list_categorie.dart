@@ -175,7 +175,7 @@ class _CategorieFiltreState<T extends GetxController>
               height: 2,
               width: isSelected ? 20 : 0,
               decoration: BoxDecoration(
-                color: AppColors.gold,
+                color: AppColors.primary,
                 borderRadius: AppRadius.radiusFull,
               ),
             ),
