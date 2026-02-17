@@ -62,6 +62,12 @@ class _ReceivedRequestState extends State<ReceivedRequest>
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final tailleurRequestController = Get.put(TailleurRequestController());
     final modeleService = Get.put(ModeleService());

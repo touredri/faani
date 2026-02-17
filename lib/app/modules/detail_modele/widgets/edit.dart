@@ -35,8 +35,11 @@ Future editModal(BuildContext context, Modele modele) {
             onPressed: () {
               // delete logic here
               // show confirmation dialog
+              final navigatorContext =
+                  Navigator.of(context, rootNavigator: true).context;
               showDialog(
-                context: context,
+                context: navigatorContext,
+                useRootNavigator: true,
                 builder: (context) => AlertDialog(
                   title: const Text('Supprimer le modèle'),
                   content:

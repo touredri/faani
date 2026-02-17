@@ -12,7 +12,7 @@ import 'package:faani/app/modules/favorie/views/favorie_view.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:faani/app/modules/profile/views/profile_view.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,7 +50,7 @@ class HomeController extends GetxController {
     );
     dressIcon = SvgPicture.asset(
       dress,
-      colorFilter: const ColorFilter.mode(primaryColor, BlendMode.srcIn),
+      colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
       width: 26,
       height: 24,
     );
@@ -61,7 +61,10 @@ class HomeController extends GetxController {
       if (backPressCounter == 0) {
         backPressCounter++;
         Timer(Duration(milliseconds: 100), () {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(
+          final context = Get.overlayContext ?? Get.context;
+          final messenger =
+              context == null ? null : ScaffoldMessenger.maybeOf(context);
+          messenger?.showSnackBar(
             SnackBar(
               content: Text('Appuyez de nouveau pour quitter'),
               backgroundColor: Colors.black.withOpacity(0.8),
@@ -87,14 +90,14 @@ class HomeController extends GetxController {
         PersistentTabConfig(
           screen: const AccueilView(),
           item: ItemConfig(
-            activeForegroundColor: primaryColor,
+            activeForegroundColor: AppColors.primary,
             icon: const Icon(Icons.home),
           ),
         ),
         PersistentTabConfig(
           screen: const CommandeView(),
           item: ItemConfig(
-            activeForegroundColor: primaryColor,
+            activeForegroundColor: AppColors.primary,
             icon: sewingIcon,
             inactiveIcon: SvgPicture.asset(
               sewing,
@@ -109,7 +112,7 @@ class HomeController extends GetxController {
               ? const AjoutModeleView()
               : const AjoutMesure(),
           item: ItemConfig(
-            activeForegroundColor: primaryColor,
+            activeForegroundColor: AppColors.primary,
             icon: const Icon(
               Icons.add,
               color: Colors.white,
@@ -119,14 +122,14 @@ class HomeController extends GetxController {
         PersistentTabConfig(
           screen: const FavorieView(),
           item: ItemConfig(
-            activeForegroundColor: primaryColor,
+            activeForegroundColor: AppColors.primary,
             icon: const Icon(Icons.favorite),
           ),
         ),
         PersistentTabConfig(
           screen: const ProfileView(),
           item: ItemConfig(
-            activeForegroundColor: primaryColor,
+            activeForegroundColor: AppColors.primary,
             icon: const Icon(CupertinoIcons.profile_circled),
           ),
         ),
@@ -187,18 +190,20 @@ class HomeController extends GetxController {
 
   // Show toast message for network status
   void _showNetworkStatusToast(bool isConnected) {
-    if (Get.context == null) return;
-    Get.rawSnackbar(
-      message: isConnected
-          ? 'Connection internet établie'
-          : 'Vous n\'avez pas d\'accès à internet',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: isConnected ? Colors.green : Colors.red,
-      borderRadius: 12,
-      margin: const EdgeInsets.all(12),
-      duration: const Duration(seconds: 2),
+    final context = Get.overlayContext ?? Get.context;
+    final messenger =
+        context == null ? null : ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(isConnected
+            ? 'Connection internet établie'
+            : 'Vous n\'avez pas d\'accès à internet'),
+        backgroundColor: isConnected ? Colors.green : Colors.red,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
-
-
 }

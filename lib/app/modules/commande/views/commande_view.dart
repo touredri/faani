@@ -4,8 +4,10 @@ import 'package:faani/app/modules/commande/widgets/choose_modele.dart';
 import 'package:faani/app/modules/globale_widgets/animated_seach.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/views/message_view.dart';
-import 'package:faani/app/style/my_theme.dart';
-import 'package:faani/app/style/spacer.dart';
+import 'package:faani/app/style/app_colors.dart';
+import 'package:faani/app/style/app_radius.dart';
+import 'package:faani/app/style/app_spacing.dart';
+import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:faani/app/modules/commande/widgets/circle_indicator.dart';
@@ -38,14 +40,16 @@ class _CommandeViewState extends State<CommandeView>
   Widget build(BuildContext context) {
     final UserController controller = Get.find();
     final CommandeController commandeController = Get.put(CommandeController());
+    final theme = Theme.of(context);
+    final isTailleur = controller.isTailleur.value;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'A Coudre',
-          style: Theme.of(context)
-              .textTheme
-              .displayMedium!
-              .copyWith(color: Colors.white, fontSize: 22),
+          style: AppTypography.headlineSmall.copyWith(
+            color: AppColors.textOnPrimary,
+          ),
         ),
         actions: [
           GetBuilder<CommandeController>(
@@ -54,60 +58,47 @@ class _CommandeViewState extends State<CommandeView>
             id: 'search',
             builder: (_) {
               return Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: AppSpacing.paddingAllSm,
                 child: AnimatedSearchBar(
                   textEditingController:
                       commandeController.textEditingController,
                   isSearching: commandeController.isSearching,
                   onSearch: commandeController.toggleSearch,
                   controller: commandeController,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               );
             },
           ),
         ],
-        backgroundColor: primaryColor,
+        backgroundColor: theme.colorScheme.primary,
+        iconTheme: const IconThemeData(color: AppColors.white),
         bottom: TabBar(
-            controller: _tabController,
-            indicator: CircleTabIndicator(
-              color: Colors.white,
-              radius: 3,
+          controller: _tabController,
+          indicator: CircleTabIndicator(
+            color: AppColors.white,
+            radius: 3,
+          ),
+          indicatorPadding: const EdgeInsets.only(bottom: 45),
+          labelColor: AppColors.white,
+          unselectedLabelColor: AppColors.white.withValues(alpha: 0.6),
+          labelStyle: AppTypography.labelMedium,
+          unselectedLabelStyle: AppTypography.labelSmall,
+          tabs: [
+            _CommandeTab(
+              icon: isTailleur ? Icons.call_received : Icons.send,
+              label: isTailleur ? 'Reçu' : 'Envoyé',
             ),
-            indicatorPadding: const EdgeInsets.only(bottom: 45),
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white.withOpacity(0.6),
-            tabs: [
-              Tab(
-                  child: Column(
-                children: [
-                  controller.isTailleur.value
-                      ? const Icon(Icons.call_received)
-                      : const Icon(Icons.send),
-                  controller.isTailleur.value
-                      ? const Text('Réçu')
-                      : const Text('Envoyer'),
-                ],
-              )),
-              Tab(
-                  child: Column(
-                children: [
-                  controller.isTailleur.value
-                      ? const Icon(Icons.save_alt)
-                      : const Icon(Icons.people_alt),
-                  controller.isTailleur.value
-                      ? const Text('Enregistrer')
-                      : const Text('Tailleurs'),
-                ],
-              )),
-              const Tab(
-                  child: Column(
-                children: [
-                  Icon(Icons.done_all),
-                  Text('Terminer'),
-                ],
-              ))
-            ]),
+            _CommandeTab(
+              icon: isTailleur ? Icons.save_alt : Icons.people_alt_outlined,
+              label: isTailleur ? 'Enregistré' : 'Tailleurs',
+            ),
+            const _CommandeTab(
+              icon: Icons.done_all,
+              label: 'Terminé',
+            ),
+          ],
+        ),
       ),
       body: GestureDetector(
         onTap: () {
@@ -120,52 +111,63 @@ class _CommandeViewState extends State<CommandeView>
         child: TabBarView(
           controller: _tabController,
           children: [
-            ListCommande(
-              status: 'receive',
-            ),
-            controller.isTailleur.value
-                ? ListCommande(status: 'save')
+            const ListCommande(status: 'receive'),
+            isTailleur
+                ? const ListCommande(status: 'save')
                 : const ListTailleurView(),
-            ListCommande(
-              status: 'finish',
-            ),
+            const ListCommande(status: 'finish'),
           ],
         ),
       ),
-      floatingActionButton: Align(
-        alignment: Alignment.bottomRight,
-        child: Container(
-          margin: EdgeInsets.only(
-              bottom: MediaQuery.of(context).size.height * 0.001),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              FloatingActionButton(
-                heroTag: "fab1",
-                backgroundColor: Colors.grey,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(15)),
-                onPressed: () {
-                  Get.to(() => const MessageView(),
-                      transition: Transition.downToUp);
-                },
-                child: const Icon(Icons.sms, color: Colors.white),
-              ),
-              if (controller.isTailleur.value) 2.5.hs,
-              if (controller.isTailleur.value)
-                FloatingActionButton(
-                  heroTag: "fab2",
-                  onPressed: () {
-                    Get.to(() => const ChooseModeleView(),
-                        transition: Transition.downToUp);
-                  },
-                  child: const Icon(Icons.add),
-                ),
-            ],
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.small(
+            heroTag: 'fab_msg',
+            backgroundColor: AppColors.grey600,
+            elevation: 1,
+            shape: const RoundedRectangleBorder(
+              borderRadius: AppRadius.radiusMd,
+            ),
+            onPressed: () => Get.to(
+              () => const MessageView(),
+              transition: Transition.downToUp,
+            ),
+            child: const Icon(Icons.sms_outlined, color: AppColors.white),
           ),
-        ),
+          if (isTailleur) ...[
+            AppSpacing.gapV12,
+            FloatingActionButton(
+              heroTag: 'fab_add',
+              onPressed: () => Get.to(
+                () => const ChooseModeleView(),
+                transition: Transition.downToUp,
+              ),
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Extracted tab widget to reduce duplication in TabBar.
+class _CommandeTab extends StatelessWidget {
+  const _CommandeTab({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tab(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 20),
+          const SizedBox(height: 2),
+          Text(label),
+        ],
       ),
     );
   }

@@ -1,6 +1,9 @@
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/modules/globale_widgets/empty_state_widget.dart';
+import 'package:faani/app/modules/globale_widgets/error_state_widget.dart';
+import 'package:faani/app/modules/globale_widgets/loading_state_widget.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/search_page_controller.dart';
@@ -12,6 +15,7 @@ class SearchPageView extends GetView<SearchPageController> {
   Widget build(BuildContext context) {
     Get.put(SearchPageController());
     final ScrollController scrollController = ScrollController();
+    final theme = Theme.of(context);
 
     scrollController.addListener(() {
       if (scrollController.position.atEdge) {
@@ -22,70 +26,71 @@ class SearchPageView extends GetView<SearchPageController> {
     });
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () => Get.back(),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: controller.searchController,
-                      onChanged: controller.onTextChange,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: primaryColor),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: primaryColor),
-                        ),
-                        labelText: 'Rechercher',
-                        prefixIcon: Icon(Icons.search, color: Colors.black),
-                        suffixIcon: Icon(Icons.close, color: Colors.grey),
-                      ),
-                    ),
-                  ),
-                ],
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Get.back(),
+        ),
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(right: AppSpacing.lg),
+          child: TextField(
+            controller: controller.searchController,
+            onChanged: controller.onTextChange,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: 'Rechercher un modèle...',
+              prefixIcon: Icon(
+                Icons.search,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-            ),
-            Expanded(
-              child: StreamBuilder<List<Modele>>(
-                stream: controller.searchResultsStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  // else if (Get.find<HomeController>().isOnline.value ==
-                  //     false) {
-                  //   return const Center(child: Text('Pas d\'accès internet'));
-                  // }
-                  else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                        child: Text(
-                            'Resultat: Le modèle que vous recherchez n\'a été trouvé, utliser d\'autre mot clé.'));
-                  } else {
-                    return customMansoryGridView(
-                      2,
-                      snapshot.data!.length,
-                      (context, index) {
-                        return buildCard(snapshot.data![index],
-                            context: context);
-                      },
-                      scrollController: scrollController,
-                    );
-                  }
+              suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.close,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                onPressed: () {
+                  controller.searchController.clear();
+                  controller.onTextChange('');
                 },
               ),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: AppSpacing.sm,
+              ),
             ),
-          ],
+          ),
         ),
+      ),
+      body: StreamBuilder<List<Modele>>(
+        stream: controller.searchResultsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LoadingStateWidget();
+          } else if (snapshot.hasError) {
+            return ErrorStateWidget(
+              message: 'Erreur: ${snapshot.error}',
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const EmptyStateWidget(
+              iconData: Icons.search_off_rounded,
+              title: 'Aucun résultat',
+              description: 'Essayez avec d\'autres mots-clés',
+            );
+          } else {
+            return customMansoryGridView(
+              2,
+              snapshot.data!.length,
+              (context, index) {
+                return buildCard(
+                  snapshot.data![index],
+                  context: context,
+                );
+              },
+              scrollController: scrollController,
+              padding: AppSpacing.xs,
+            );
+          }
+        },
       ),
     );
   }

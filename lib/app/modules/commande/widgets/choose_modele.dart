@@ -1,11 +1,10 @@
-
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/commande/widgets/image_pop_up.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,7 +16,7 @@ class ChooseModeleView extends GetView<CommandeController> {
     Get.put(CommandeController());
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: primaryColor,
+          backgroundColor: AppColors.primary,
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,
@@ -35,7 +34,8 @@ class ChooseModeleView extends GetView<CommandeController> {
         ),
         body: SafeArea(
           child: FutureBuilder<List<Modele>>(
-            future: controller.modeleService.getAllModeleByTailleur(auth.currentUser!.uid, []),
+            future: controller.modeleService
+                .getAllModeleByTailleur(auth.currentUser!.uid, []),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());

@@ -1,4 +1,3 @@
-import 'package:faani/app/style/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
@@ -12,7 +11,7 @@ class OtpView extends GetView<AuthController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: scaffoldBack,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: const Text('Verification du numéro'),
         centerTitle: true,
       ),

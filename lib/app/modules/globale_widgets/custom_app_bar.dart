@@ -1,23 +1,19 @@
+import 'package:faani/app/style/app_colors.dart';
+import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../style/my_theme.dart';
 
 AppBar primaryBackAppBar(String text) {
   return AppBar(
     automaticallyImplyLeading: false,
-    backgroundColor: primaryColor,
+    backgroundColor: AppColors.primary,
     leading: IconButton(
-        onPressed: () {
-          Get.back();
-        },
-        icon: const Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-        )),
+      onPressed: () => Get.back(),
+      icon: const Icon(Icons.arrow_back, color: AppColors.white),
+    ),
     title: Text(
       text,
-      style: const TextStyle(color: Colors.white),
+      style: AppTypography.headlineSmall.copyWith(color: AppColors.white),
     ),
     elevation: 0,
   );
@@ -25,11 +21,7 @@ AppBar primaryBackAppBar(String text) {
 
 AppBar customAppBar(String text) {
   return AppBar(
-    backgroundColor: scaffoldBack,
-    title: Text(
-      text,
-      style: const TextStyle(fontSize: 16),
-    ),
+    title: Text(text),
     centerTitle: true,
   );
 }

@@ -1,10 +1,12 @@
 import 'package:faani/app/firebase/global_function.dart';
-import 'package:faani/app/style/spacer.dart';
+import 'package:faani/app/modules/globale_widgets/app_button.dart';
+import 'package:faani/app/style/app_colors.dart';
+import 'package:faani/app/style/app_spacing.dart';
+import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../routes/app_pages.dart';
-import '../../../style/my_theme.dart';
 import '../../globale_widgets/circular_progress.dart';
 import '../controllers/authentification_controller.dart';
 
@@ -13,58 +15,60 @@ class AuthView extends GetView<AuthController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasUser = auth.currentUser != null;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: scaffoldBack,
-        elevation: 0,
-        toolbarHeight: auth.currentUser == null ? 0 : 50,
-        automaticallyImplyLeading: false,
-        leading: auth.currentUser == null
-            ? null
-            : IconButton(
+      appBar: hasUser
+          ? AppBar(
+              leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  Get.back();
-                },
+                onPressed: () => Get.back(),
               ),
-      ),
+            )
+          : null,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+          padding: AppSpacing.pagePadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
+              if (!hasUser) AppSpacing.gapV24,
+
+              // ── Brand title ──────────────────────────────────────
+              Text(
                 'Faani',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 48,
-                  fontFamily: 'Mochiy Pop One',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
+                style: AppTypography.brandTitle.copyWith(
+                  color: theme.colorScheme.primary,
                 ),
               ),
-              1.5.hs,
+              AppSpacing.gapV12,
+
+              // ── Tagline ──────────────────────────────────────────
               Text(
-                'Explorer des milier de modèles\nPrendre vos mésures en un clic..',
+                'Explorer des milliers de modèles\nPrendre vos mesures en un clic',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              1.hs, // image
-              Container(
-                height: 280,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/welcome_img.png'),
-                    fit: BoxFit.fill,
-                  ),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              3.hs, // phone number input
+              AppSpacing.gapV16,
+
+              // ── Hero image ───────────────────────────────────────
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 260),
+                child: Image.asset(
+                  'assets/images/welcome_img.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+              AppSpacing.gapV32,
+
+              // ── Phone input ──────────────────────────────────────
               IntlPhoneField(
-                cursorColor: Theme.of(context).colorScheme.primary,
+                cursorColor: theme.colorScheme.primary,
                 invalidNumberMessage: 'Numéro invalide',
                 decoration: const InputDecoration(
                   labelText: 'Numéro de téléphone',
@@ -74,90 +78,53 @@ class AuthView extends GetView<AuthController> {
                   controller.phoneNumber.value = phone.completeNumber;
                 },
               ),
-              2.hs, // button sign in
-              Obx(() => ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                    ),
-                    onPressed: controller.loading.value
-                        ? null
-                        : () {
-                            final phone = controller.phoneNumber.value.trim();
-                            if (phone.isEmpty || !phone.startsWith('+')) {
-                              showCustomSnackbar(
-                                message:
-                                    'Entrez un numéro valide (ex: +223xxxxxxxx)',
-                                backgroundColor: Colors.red,
-                              );
-                              return;
-                            }
-                            controller.verifyPhoneNumber(phone);
-                          },
-                    child: controller.loading.value
-                        ? circularProgress()
-                        : const Text('Recevoir le code SMS'),
+              AppSpacing.gapV16,
+
+              // ── SMS button ───────────────────────────────────────
+              Obx(() => AppButton(
+                    label: 'Recevoir le code SMS',
+                    isLoading: controller.loading.value,
+                    isExpanded: true,
+                    onPressed: () {
+                      final phone = controller.phoneNumber.value.trim();
+                      if (phone.isEmpty || !phone.startsWith('+')) {
+                        showCustomSnackbar(
+                          message: 'Entrez un numéro valide (ex: +223xxxxxxxx)',
+                          backgroundColor: AppColors.error,
+                        );
+                        return;
+                      }
+                      controller.verifyPhoneNumber(phone);
+                    },
                   )),
-              3.hs,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 1,
-                      color: Colors.grey.withOpacity(0.8),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Text(
-                      'Ou',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      height: 1,
-                      color: Colors.grey.withOpacity(0.8),
-                    ),
-                  ),
-                ],
-              ),
-              2.hs,
-              InkWell(
-                onTap: () {
-                  controller.signInWithGoogle();
-                },
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 30,
-                        child: Image.asset('assets/images/google_auth.png'),
-                      ),
-                      2.ws,
-                      Text(
-                        'S\'identifier avec Google',
-                      ),
-                    ],
-                  ),
+              AppSpacing.gapV24,
+
+              // ── Divider ──────────────────────────────────────────
+              _OrDivider(theme: theme),
+              AppSpacing.gapV24,
+
+              // ── Google sign-in ────────────────────────────────────
+              OutlinedButton.icon(
+                onPressed: () => controller.signInWithGoogle(),
+                icon: Image.asset(
+                  'assets/images/google_auth.png',
+                  width: 24,
+                  height: 24,
+                ),
+                label: const Text('S\'identifier avec Google'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
                 ),
               ),
-              3.hs, // button sign in anonymously
-              if (auth.currentUser == null)
-                Obx(() => OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                      ),
+              AppSpacing.gapV16,
+
+              // ── Anonymous sign-in ─────────────────────────────────
+              if (!hasUser)
+                Obx(() => AppButton(
+                      label: 'Continuer sans compte',
+                      variant: AppButtonVariant.outline,
+                      isLoading: controller.isLoading.value,
+                      isExpanded: true,
                       onPressed: () async {
                         controller.isLoading.value = true;
                         final anonyme = await controller.signInAnonymously();
@@ -165,14 +132,38 @@ class AuthView extends GetView<AuthController> {
                           Get.offAllNamed(Routes.HOME);
                         }
                       },
-                      child: controller.isLoading.value
-                          ? circularProgress()
-                          : const Text('Continuer sans compte'),
-                    ))
+                    )),
+              AppSpacing.gapV24,
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Horizontal "Ou" divider extracted for readability.
+class _OrDivider extends StatelessWidget {
+  const _OrDivider({required this.theme});
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    final dividerColor = theme.colorScheme.outlineVariant;
+    return Row(
+      children: [
+        Expanded(child: Divider(color: dividerColor)),
+        Padding(
+          padding: AppSpacing.paddingHLg,
+          child: Text(
+            'Ou',
+            style: AppTypography.labelLarge.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        Expanded(child: Divider(color: dividerColor)),
+      ],
     );
   }
 }

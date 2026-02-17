@@ -1,7 +1,7 @@
 // Pop up list mesures to select
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -63,7 +63,7 @@ Future<void> mesuresPopUp(
                           },
                           icon: const Icon(
                             Icons.add,
-                            color: primaryColor,
+                            color: AppColors.primary,
                           ))),
                 ],
               ),

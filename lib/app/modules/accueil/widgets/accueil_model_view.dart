@@ -23,8 +23,8 @@ class HomeItem extends GetView<AccueilController> {
         Column(
           children: [
             SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.80,
+              width: MediaQuery.sizeOf(context).width,
+              height: MediaQuery.sizeOf(context).height * 0.80,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
                 child: CachedNetworkImage(
@@ -41,8 +41,8 @@ class HomeItem extends GetView<AccueilController> {
         ),
         // black opacity on model images
         SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.sizeOf(context).height,
+          width: MediaQuery.sizeOf(context).width,
           child: GestureDetector(
             onVerticalDragUpdate: (details) {
               if (details.delta.dy > 0) {
@@ -57,7 +57,7 @@ class HomeItem extends GetView<AccueilController> {
             },
             child: Container(
               width: double.infinity,
-              height: MediaQuery.of(context).size.height,
+              height: MediaQuery.sizeOf(context).height,
               color: Colors.black.withOpacity(0.1),
             ),
           ),
@@ -108,7 +108,7 @@ class HomeItem extends GetView<AccueilController> {
                             builder: (context) {
                               return SizedBox(
                                 height:
-                                    MediaQuery.of(context).size.height * 0.80,
+                                    MediaQuery.sizeOf(context).height * 0.80,
                                 child: CommentModal(
                                   idModele: modele.id!,
                                 ),

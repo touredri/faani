@@ -3,7 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
+import 'package:faani/app/style/app_spacing.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,6 +16,8 @@ class ProfileImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String imgUrl = getRandomProfileImageUrl();
+    final theme = Theme.of(context);
+
     return user?.photoURL != null
         ? CachedNetworkImage(
             imageUrl: user!.photoURL!,
@@ -22,35 +25,91 @@ class ProfileImage extends StatelessWidget {
               width: width,
               height: height,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                border: Border.all(color: primaryColor, width: 2),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: theme.colorScheme.primary,
+                  width: 2,
+                ),
                 image: DecorationImage(
                   image: imageProvider,
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-            placeholder: (context, url) => const CircularProgressIndicator(),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
+            placeholder: (context, url) => SizedBox(
+              width: width,
+              height: height,
+              child: const Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            ),
+            errorWidget: (context, url, error) => _FallbackAvatar(
+              width: width,
+              height: height,
+            ),
           )
         : Container(
             width: width,
             height: height,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                border: Border.all(color: primaryColor, width: 2)),
-            child: Image.network(imgUrl));
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: theme.colorScheme.primary,
+                width: 2,
+              ),
+            ),
+            child: ClipOval(
+              child: Image.network(
+                imgUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Icon(
+                  Icons.person,
+                  size: width * 0.5,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          );
+  }
+}
+
+class _FallbackAvatar extends StatelessWidget {
+  const _FallbackAvatar({required this.width, required this.height});
+  final double width, height;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: theme.colorScheme.surfaceContainerHighest,
+        border: Border.all(color: theme.colorScheme.primary, width: 2),
+      ),
+      child: Icon(
+        Icons.person,
+        size: width * 0.5,
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+    );
   }
 }
 
 class BuildProfileImage extends StatefulWidget {
   final double width, height;
   final bool showIcon;
-  const BuildProfileImage(
-      {super.key,
-      required this.width,
-      required this.height,
-      this.showIcon = false});
+  const BuildProfileImage({
+    super.key,
+    required this.width,
+    required this.height,
+    this.showIcon = false,
+  });
 
   @override
   State<BuildProfileImage> createState() => _BuildProfileImageState();
@@ -58,46 +117,37 @@ class BuildProfileImage extends StatefulWidget {
 
 class _BuildProfileImageState extends State<BuildProfileImage> {
   void changeProfileImage() async {
-    // Get the URL of the current profile image
     String? oldImageUrl = user!.photoURL;
 
-    // Open the image picker
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      // Create a reference to the location you want to upload to in Firebase Storage
       Reference storageReference = FirebaseStorage.instance
           .ref()
           .child('profile_images')
           .child(image.path.split('/').last);
 
-      // Upload the file to Firebase Storage
       UploadTask uploadTask = storageReference.putFile(File(image.path));
 
-      // Get the URL of the uploaded image
       TaskSnapshot taskSnapshot = await uploadTask;
       String imageUrl = await taskSnapshot.ref.getDownloadURL();
 
-      // Update the user's profile with the new image URL
       await user!.updatePhotoURL(imageUrl);
 
-      // Update the user's profile in Firestore if exists
       final UserModel? checkUser = await UserService().getIfUser(user!.uid);
-      if(checkUser != null){
+      if (checkUser != null) {
         checkUser.profileImage = imageUrl;
         await UserService().updateUser(user!.uid, checkUser);
       }
 
-      // Delete the old image from Firebase Storage
       if (oldImageUrl != null) {
         Reference oldImageRef =
             FirebaseStorage.instance.refFromURL(oldImageUrl);
         try {
           await oldImageRef.delete();
         } catch (e) {
-          // Handle the error here
-          // print('Failed to delete the image: $e');
+          // Silently handle deletion failure
         }
       }
     }
@@ -106,6 +156,8 @@ class _BuildProfileImageState extends State<BuildProfileImage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Stack(
       children: [
         ProfileImage(
@@ -116,20 +168,20 @@ class _BuildProfileImageState extends State<BuildProfileImage> {
           Positioned(
             bottom: 0,
             right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: primaryColor,
-                borderRadius: BorderRadius.circular(70),
-              ),
-              child: IconButton(
-                style: ButtonStyle(
-                  padding: WidgetStateProperty.all(const EdgeInsets.all(0)),
-                ),
-                onPressed: changeProfileImage,
-                icon: const Icon(
-                  Icons.camera_alt,
-                  color: Colors.white,
+            child: Material(
+              color: theme.colorScheme.primary,
+              shape: const CircleBorder(),
+              elevation: 2,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: changeProfileImage,
+                child: const Padding(
+                  padding: EdgeInsets.all(AppSpacing.sm),
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: AppColors.white,
+                    size: 18,
+                  ),
                 ),
               ),
             ),

@@ -9,10 +9,8 @@ import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/modules/message/controllers/message_controller.dart';
 import 'package:faani/app/modules/mesures/views/detail_mesure.dart';
-import 'package:faani/app/style/my_theme.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:timeline_tile/timeline_tile.dart';
@@ -28,7 +26,7 @@ class DetailCommandeView extends GetView<CommandeController> {
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 0,
-          backgroundColor: scaffoldBack,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         ),
         body: FutureBuilder(
             future: controller.fetchCommandeData(commande),
@@ -50,12 +48,12 @@ class DetailCommandeView extends GetView<CommandeController> {
                       Stack(
                         children: [
                           SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.26,
+                              height: MediaQuery.sizeOf(context).height * 0.26,
                               child: DisplayImage(modele: modele)),
                           Container(
                             alignment: Alignment.bottomCenter,
                             margin: EdgeInsets.only(
-                              top: MediaQuery.of(context).size.height * 0.2,
+                              top: MediaQuery.sizeOf(context).height * 0.2,
                             ),
                             child: ElevatedButton.icon(
                               icon: const Icon(
@@ -69,8 +67,8 @@ class DetailCommandeView extends GetView<CommandeController> {
                                     onButtonPressed: () {
                                       Get.back();
                                     },
-                                    size: MediaQuery.of(context).size.height *
-                                        0.8,
+                                    size:
+                                        MediaQuery.sizeOf(context).height * 0.8,
                                     buttonText: '',
                                     isHaveAction: false);
                               },
@@ -246,23 +244,23 @@ class DetailCommandeView extends GetView<CommandeController> {
                                               init: CommandeController(),
                                               initState: (_) {},
                                               builder: (_) {
-                                                return SizedBox(
-                                                  width: 130.sp,
+                                                return Expanded(
                                                   child: Text(
                                                     DateFormat('EEEE d MMMM y',
                                                             'fr_FR')
-                                                        .format(
-                                                            commande.datePrevue)
-                                                        .toString(),
-                                                    overflow: TextOverflow.clip,
-                                                    style: TextStyle(
-                                                      fontSize: 13.sp,
+                                                        .format(commande
+                                                            .datePrevue),
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
                                                     ),
                                                   ),
                                                 );
                                               },
                                             ),
-                                            1.ws,
+                                            const SizedBox(width: 4),
                                             IconButton(
                                                 onPressed: () {
                                                   controller.changeDate(

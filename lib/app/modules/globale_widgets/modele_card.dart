@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/modules/detail_modele/controllers/detail_modele_controller.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
+import 'package:faani/app/style/app_colors.dart';
+import 'package:faani/app/style/app_radius.dart';
+import 'package:faani/app/style/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -14,29 +17,29 @@ Widget buildCard(Modele modele,
   final consistentHeight = 180.0 + (idSum % 100);
   return SizedBox(
     height: consistentHeight,
-    width: MediaQuery.of(context).size.width / 2.2,
     child: Card(
       clipBehavior: Clip.antiAlias,
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
       child: GestureDetector(
         onTap: onTap == null
             ? () {
                 final controller = Get.put(DetailModeleController());
                 controller.getModeleOwner(modele.idTailleur);
                 pushWithoutNavBar(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DetailModeleView(modele)));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailModeleView(modele),
+                  ),
+                );
               }
             : onTap as void Function()?,
         child: CachedNetworkImage(
           imageUrl: modele.fichier[0]!,
           fit: BoxFit.cover,
           placeholder: (context, url) => Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              color: Colors.white,
-            ),
+            baseColor: AppColors.grey300,
+            highlightColor: AppColors.grey100,
+            child: const ColoredBox(color: AppColors.white),
           ),
         ),
       ),
@@ -44,15 +47,19 @@ Widget buildCard(Modele modele,
   );
 }
 
-Widget customMansoryGridView(int crossAxisCount, int itemCount,
-    Widget Function(BuildContext, int) itemBuilder,
-    {ScrollController? scrollController, double padding = 0.0}) {
+Widget customMansoryGridView(
+  int crossAxisCount,
+  int itemCount,
+  Widget Function(BuildContext, int) itemBuilder, {
+  ScrollController? scrollController,
+  double padding = 0.0,
+}) {
   return MasonryGridView.count(
     crossAxisCount: crossAxisCount,
     itemCount: itemCount,
     itemBuilder: itemBuilder,
-    mainAxisSpacing: 4.0,
-    crossAxisSpacing: 4.0,
+    mainAxisSpacing: AppSpacing.xs,
+    crossAxisSpacing: AppSpacing.xs,
     controller: scrollController,
     padding: EdgeInsets.all(padding),
   );

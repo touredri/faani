@@ -58,7 +58,7 @@ class ProfileController extends GetxController {
   RxBool isHasAgent = false.obs;
   final Rx<List<Modele?>> mesModelesList = Rx<List<Modele?>>([]);
   final ScrollController scrollController = ScrollController();
-  late int myTotalModeleNumber;
+  int myTotalModeleNumber = 0;
   RxList<String> listSelectedCategorie = <String>[].obs;
   RxInt followers = 0.obs;
   RxInt following = 0.obs;

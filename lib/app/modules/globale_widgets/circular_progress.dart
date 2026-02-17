@@ -16,7 +16,19 @@ void showCustomSnackbar({
   Color backgroundColor = Colors.red,
   Duration duration = const Duration(seconds: 3),
 }) {
-  ScaffoldMessenger.of(Get.context!).showSnackBar(
+  final context = Get.overlayContext ?? Get.context;
+  if (context == null) {
+    debugPrint('showCustomSnackbar skipped: no active overlay context');
+    return;
+  }
+
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  if (messenger == null) {
+    debugPrint('showCustomSnackbar skipped: no ScaffoldMessenger found');
+    return;
+  }
+
+  messenger.showSnackBar(
     SnackBar(
       content: Text(message),
       backgroundColor: backgroundColor,

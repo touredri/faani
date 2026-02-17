@@ -1,6 +1,6 @@
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/floating_bottom_sheet.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -29,7 +29,7 @@ Future commentaire(BuildContext context) {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        color: primaryColor,
+                        color: AppColors.primary,
                       ),
                     ],
                   ),

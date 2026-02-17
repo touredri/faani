@@ -1,4 +1,4 @@
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/modules/mesures/views/widgets/mesure_page_view.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ class AjoutMesure extends GetView {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: scaffoldBack,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: SizedBox(
         height: double.infinity,
@@ -41,7 +41,8 @@ class AjoutMesure extends GetView {
                         padding: const EdgeInsets.symmetric(
                             vertical: 16.0, horizontal: 28.0),
                         decoration: BoxDecoration(
-                          border: Border.all(color: inputBorderColor, width: 1),
+                          border:
+                              Border.all(color: AppColors.grey300, width: 1),
                           borderRadius:
                               const BorderRadius.all(Radius.circular(16)),
                         ),
@@ -64,8 +65,11 @@ class AjoutMesure extends GetView {
                   2.hs,
                   TextButton(
                       onPressed: () {
+                        final navigatorContext =
+                            Navigator.of(context, rootNavigator: true).context;
                         showDialog(
-                          context: context,
+                          context: navigatorContext,
+                          useRootNavigator: true,
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: const Text('Fonctionnalité en cours'),
@@ -86,7 +90,8 @@ class AjoutMesure extends GetView {
                         padding: const EdgeInsets.symmetric(
                             vertical: 16.0, horizontal: 28.0),
                         decoration: BoxDecoration(
-                          border: Border.all(color: inputBorderColor, width: 1),
+                          border:
+                              Border.all(color: AppColors.grey300, width: 1),
                           borderRadius:
                               const BorderRadius.all(Radius.circular(16)),
                         ),
@@ -94,12 +99,12 @@ class AjoutMesure extends GetView {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Icon(Icons.camera_alt_sharp,
-                                color: primaryColor),
+                                color: AppColors.primary),
                             3.ws,
                             const Text(
                               'Par caméra',
-                              style:
-                                  TextStyle(fontSize: 15, color: primaryColor),
+                              style: TextStyle(
+                                  fontSize: 15, color: AppColors.primary),
                             )
                           ],
                         ),

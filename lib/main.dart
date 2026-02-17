@@ -1,18 +1,33 @@
 import 'package:faani/app/routes/app_pages.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_theme.dart';
 import 'package:faani/generated/locales.g.dart';
 import 'package:faani/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await _initIntl();
   await _initFirebase();
   _configureFirebaseAuthForDev();
   runApp(const MyApp());
+}
+
+Future<void> _initIntl() async {
+  try {
+    await initializeDateFormatting('fr_FR');
+    await initializeDateFormatting('en_US');
+    await initializeDateFormatting('pt_BR');
+    Intl.defaultLocale = 'fr_FR';
+  } catch (e) {
+    debugPrint('Intl locale init skipped/failed: $e');
+  }
 }
 
 void _configureFirebaseAuthForDev() {
@@ -57,14 +72,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Faani',
-      debugShowCheckedModeBanner: false,
-      theme: buildTheme(),
-      initialRoute: AppPages.INITIAL,
-      getPages: AppPages.routes,
-      translationsKeys: AppTranslation.translations,
-      fallbackLocale: const Locale('en', 'US'),
+    return ScreenUtilInit(
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (_, child) {
+        return GetMaterialApp(
+          title: 'Faani',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: ThemeMode.system,
+          initialRoute: AppPages.INITIAL,
+          getPages: AppPages.routes,
+          translationsKeys: AppTranslation.translations,
+          fallbackLocale: const Locale('en', 'US'),
+        );
+      },
     );
   }
 }

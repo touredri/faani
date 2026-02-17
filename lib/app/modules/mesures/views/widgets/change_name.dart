@@ -1,10 +1,13 @@
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../../data/models/mesure_model.dart';
 
-void changeName(Mesure mesure, BuildContext context, TextEditingController controller) {
+void changeName(
+    Mesure mesure, BuildContext context, TextEditingController controller) {
+  final navigatorContext = Navigator.of(context, rootNavigator: true).context;
   showDialog(
-    context: context,
+    context: navigatorContext,
+    useRootNavigator: true,
     builder: (context) {
       return AlertDialog(
         title: const Text('Modifier le nom'),
@@ -13,16 +16,16 @@ void changeName(Mesure mesure, BuildContext context, TextEditingController contr
           autofocus: true,
           decoration: InputDecoration(
             labelText: mesure.nom,
-            labelStyle: const TextStyle(color: primaryColor),
+            labelStyle: const TextStyle(color: AppColors.primary),
             filled: true,
-            fillColor: inputBackgroundColor,
+            fillColor: AppColors.surfaceLight,
             enabledBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
-              borderSide: BorderSide(color: inputBorderColor, width: 2),
+              borderSide: BorderSide(color: AppColors.grey300, width: 2),
             ),
             focusedBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
-              borderSide: BorderSide(color: primaryColor, width: 2),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
           ),
         ),

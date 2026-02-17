@@ -1,6 +1,9 @@
 import 'package:faani/app/data/models/mesure_model.dart';
-import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/modules/globale_widgets/empty_state_widget.dart';
+import 'package:faani/app/modules/globale_widgets/error_state_widget.dart';
+import 'package:faani/app/modules/globale_widgets/loading_state_widget.dart';
+import 'package:faani/app/style/app_spacing.dart';
+import 'package:faani/app/style/app_typography.dart';
 import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,58 +18,71 @@ class MesuresView extends GetView<MesuresController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-        backgroundColor: scaffoldBack,
-        appBar: customAppBar('Mes Mesures'),
-        body: StreamBuilder<List<Mesure>>(
-          stream: MesureService().getAllUserMesure(user!.uid),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const Text('Oups !! Une erreur est survenue');
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.data!.isEmpty) {
-              return const Center(
-                  child: Text(
-                'Aucune mesure disponible! Ajouter pour voir la liste',
-                textAlign: TextAlign.center,
-              ));
-            }
-            final data = snapshot.data!;
-            return ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                final mesure = data[index];
-                return GestureDetector(
-                  onTap: () {
-                    Get.to(() => DetailMesure(id: mesure.id!),
-                        transition: Transition.rightToLeft);
-                  },
-                  child: ListTile(
-                    title: Text(
-                      mesure.nom!,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    subtitle: Text(
-                      DateFormat('yyyy-MM-dd').format(mesure.date!).toString(),
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                  ),
-                );
-              },
+      appBar: AppBar(title: const Text('Mes Mesures')),
+      body: StreamBuilder<List<Mesure>>(
+        stream: MesureService().getAllUserMesure(user!.uid),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const ErrorStateWidget(
+              message: 'Oups ! Une erreur est survenue',
             );
-          },
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LoadingStateWidget();
+          }
+          if (snapshot.data!.isEmpty) {
+            return EmptyStateWidget(
+              iconData: Icons.straighten_outlined,
+              title: 'Aucune mesure disponible',
+              description: 'Ajoutez vos mesures pour les retrouver ici',
+              actionLabel: 'Ajouter une mesure',
+              onAction: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AjoutMesure()),
+              ),
+            );
+          }
+          final data = snapshot.data!;
+          return ListView.separated(
+            padding: AppSpacing.paddingVSm,
+            itemCount: data.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final mesure = data[index];
+              return ListTile(
+                onTap: () => Get.to(
+                  () => DetailMesure(id: mesure.id!),
+                  transition: Transition.rightToLeft,
+                ),
+                title: Text(
+                  mesure.nom!,
+                  style: AppTypography.titleSmall.copyWith(
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                subtitle: Text(
+                  DateFormat('d MMMM yyyy', 'fr_FR').format(mesure.date!),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const AjoutMesure()),
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: primaryColor,
-          onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const AjoutMesure()));
-          },
-          child: const Icon(Icons.add),
-        ));
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }

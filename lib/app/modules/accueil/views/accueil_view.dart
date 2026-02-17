@@ -1,4 +1,5 @@
 import 'package:faani/app/modules/search_page/views/search_page_view.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../globale_widgets/list_categorie.dart';
@@ -8,57 +9,65 @@ import '../widgets/accueil_page_view.dart';
 class AccueilView extends GetView<AccueilController> {
   const AccueilView({super.key});
 
+  static const _bgColor = Color(0xFF333333);
+
   @override
   Widget build(BuildContext context) {
     Get.put(AccueilController());
+
     return Scaffold(
+      backgroundColor: _bgColor,
       appBar: AppBar(
         toolbarHeight: 0,
-        backgroundColor: const Color.fromARGB(255, 51, 51, 51),
+        backgroundColor: _bgColor,
       ),
-      backgroundColor: const Color.fromARGB(255, 51, 51, 51),
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          // list view builder for images & videos in infinite scroll
-          SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.92,
-            child: const AccueilPAgeView(),
+          // ── Full-screen vertical feed ──────────────────────────
+          const Positioned.fill(
+            child: AccueilPAgeView(),
           ),
-          // filter and search icon
-          Container(
-            width: double.infinity,
-            height: 48,
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 51, 51, 51).withOpacity(0.4),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 26,
-                    child: CategorieFiltre<AccueilController>(
-                      controller: controller,
+
+          // ── Top overlay: category filter + search ──────────────
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _bgColor.withValues(alpha: 0.7),
+                    _bgColor.withValues(alpha: 0.0),
+                  ],
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 28,
+                      child: CategorieFiltre<AccueilController>(
+                        controller: controller,
+                      ),
                     ),
                   ),
-                ),
-                IconButton(
-                    style: ButtonStyle(
-                      padding: WidgetStateProperty.all(
-                          const EdgeInsets.symmetric(
-                              horizontal: 0, vertical: 0)),
+                  IconButton(
+                    onPressed: () => Get.to(
+                      () => const SearchPageView(),
+                      transition: Transition.downToUp,
                     ),
-                    onPressed: () {
-                      Get.to(() => const SearchPageView(),
-                          transition: Transition.downToUp);
-                    },
-                    icon: const Icon(
-                      Icons.search,
-                      color: Colors.white,
-                      size: 25,
-                    )),
-              ],
+                    icon: const Icon(Icons.search_rounded),
+                    color: AppColors.white,
+                    iconSize: 24,
+                    tooltip: 'Rechercher',
+                  ),
+                ],
+              ),
             ),
           ),
         ],

@@ -1,11 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../data/models/modele_model.dart';
-import '../../../firebase/global_function.dart';
 import '../../globale_widgets/modele_card.dart';
-import '../../../style/my_theme.dart';
+import '../../../style/app_colors.dart';
 
 class AnonymeProfile extends StatefulWidget {
   const AnonymeProfile({super.key});
@@ -30,33 +28,6 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
   @override
   Widget build(BuildContext context) {
     // final currentUsers = Provider.of<ApplicationState>(context).currentUsers;
-    final String imgUrl = getRandomProfileImageUrl();
-    final profileImage = auth.currentUser!.photoURL != null
-        ? CachedNetworkImage(
-            imageUrl: auth.currentUser!.photoURL!,
-            imageBuilder: (context, imageProvider) => Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                border: Border.all(color: primaryColor, width: 2),
-                image: DecorationImage(
-                  image: imageProvider,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            placeholder: (context, url) => const CircularProgressIndicator(),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-          )
-        : Container(
-            width: 150,
-            height: 150,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                border: Border.all(color: primaryColor, width: 2)),
-            child: Image.network(imgUrl));
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -84,7 +55,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
                 },
                 icon: const Icon(
                   Icons.logout,
-                  color: primaryColor,
+                  color: AppColors.primary,
                 )),
             const Spacer(),
             const Text('Profile'),
@@ -96,7 +67,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
               child: const Text(
                 'A propos',
                 style: TextStyle(
-                    color: primaryColor,
+                    color: AppColors.primary,
                     fontSize: 15,
                     decoration: TextDecoration.underline),
               ),
@@ -116,7 +87,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
                     style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
-                        color: primaryColor),
+                        color: AppColors.primary),
                   )),
               Container(
                 padding: const EdgeInsets.all(10),
@@ -233,7 +204,7 @@ class _AnonymeProfileState extends State<AnonymeProfile> {
                     },
                     icon: const Icon(
                       Icons.arrow_forward,
-                      color: primaryColor,
+                      color: AppColors.primary,
                     ),
                   )
                 ],

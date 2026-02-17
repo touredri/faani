@@ -1,7 +1,7 @@
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/mesures/views/widgets/change_name.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +25,7 @@ class _DetailMesureState extends State<DetailMesure> {
       appBar: AppBar(
         title: const Text('Détail de la mesure'),
         centerTitle: true,
-        backgroundColor: scaffoldBack,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: StreamBuilder(
           stream: MesureService().getById(widget.id),
@@ -76,13 +76,18 @@ class _DetailMesureState extends State<DetailMesure> {
                                   icon: const Icon(
                                     Icons.edit,
                                     size: 30,
-                                    color: primaryColor,
+                                    color: AppColors.primary,
                                   ),
                                 ),
                                 IconButton(
                                   onPressed: () {
+                                    final navigatorContext = Navigator.of(
+                                            context,
+                                            rootNavigator: true)
+                                        .context;
                                     showDialog(
-                                      context: context,
+                                      context: navigatorContext,
+                                      useRootNavigator: true,
                                       builder: (context) {
                                         return AlertDialog(
                                           title: const Text('Supprimer ??'),
@@ -123,7 +128,7 @@ class _DetailMesureState extends State<DetailMesure> {
                       ),
                     ),
                     const Divider(
-                      color: primaryColor,
+                      color: AppColors.primary,
                     ),
                     // list value of mesures
                     Expanded(

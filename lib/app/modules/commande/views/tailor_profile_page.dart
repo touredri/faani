@@ -3,11 +3,10 @@ import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/follow.dart';
 import 'package:faani/app/data/services/modele_service.dart';
-import 'package:faani/app/data/services/tailleur_request_service.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/profile/widgets/received_request.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -48,7 +47,7 @@ class _TailorProfilePageState extends State<TailorProfilePage> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        backgroundColor: scaffoldBack,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text('Profil de ${widget.tailor.nomPrenom}'),
       ),
       body: SingleChildScrollView(
@@ -140,7 +139,16 @@ class _TailorProfilePageState extends State<TailorProfilePage> {
                   child: _buildInfoSection(
                     icon: Icons.phone,
                     label: 'Téléphone',
-                    value: "${widget.tailor.phoneNumber!.substring(0, 8)}...",
+                    value: (() {
+                      final phone = widget.tailor.phoneNumber;
+                      if (phone == null || phone.isEmpty) {
+                        return 'Non renseigné';
+                      }
+                      if (phone.length <= 8) {
+                        return phone;
+                      }
+                      return '${phone.substring(0, 8)}...';
+                    })(),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -190,7 +198,7 @@ class _TailorProfilePageState extends State<TailorProfilePage> {
       child: ListTile(
         title: Row(
           children: [
-            Icon(icon, color: primaryColor),
+            Icon(icon, color: AppColors.primary),
             const SizedBox(width: 8),
             Text(label),
           ],

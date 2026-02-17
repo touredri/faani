@@ -30,7 +30,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.faani.app.faani"
-    compileSdkVersion 34
+    compileSdk = 36
     ndkVersion "25.1.8937393"
 
     compileOptions {

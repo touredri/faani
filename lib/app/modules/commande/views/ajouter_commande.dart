@@ -5,7 +5,7 @@ import 'package:faani/app/data/services/mesure_service.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/widgets/mesure_popup.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -44,10 +44,17 @@ class AjoutCommandePage extends GetView<CommandeController> {
     Get.put(CommandeController());
     final MesureService mesureService = MesureService();
     final bool isTailleur = controller.userController.isTailleur.value;
+    final String? phoneNumber =
+        controller.userController.currentUser.value.phoneNumber;
+    final String maskedPhone = (phoneNumber != null && phoneNumber.length >= 7)
+        ? '${phoneNumber.substring(0, 7)}XXXX'
+        : (phoneNumber?.isNotEmpty ?? false)
+            ? phoneNumber!
+            : 'Numéro du client';
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 0,
-          backgroundColor: primaryColor,
+          backgroundColor: AppColors.primary,
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -80,7 +87,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
               Container(
                 height: 100,
                 padding: const EdgeInsets.symmetric(horizontal: 5),
-                width: MediaQuery.of(context).size.width * 0.95,
+                width: MediaQuery.sizeOf(context).width * 0.95,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -132,7 +139,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
-                width: MediaQuery.of(context).size.width * 0.95,
+                width: MediaQuery.sizeOf(context).width * 0.95,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -158,9 +165,8 @@ class AjoutCommandePage extends GetView<CommandeController> {
                       maxLength: 10,
                       decoration: InputDecoration(
                         counterText: '',
-                        labelText: isTailleur
-                            ? 'Numéro du client'
-                            : '${controller.userController.currentUser.value.phoneNumber!.substring(0, 7)}XXXX',
+                        labelText:
+                            isTailleur ? 'Numéro du client' : maskedPhone,
                         border: const OutlineInputBorder(),
                       ),
                     ),
@@ -180,7 +186,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
                         });
                       },
                       child: Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
+                        width: MediaQuery.sizeOf(context).width * 0.9,
                         height: 60,
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
@@ -219,7 +225,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
                         }
                       },
                       child: Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
+                        width: MediaQuery.sizeOf(context).width * 0.9,
                         height: 60,
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
@@ -256,7 +262,7 @@ class AjoutCommandePage extends GetView<CommandeController> {
                       ),
                     7.hs,
                     SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.7,
+                      width: MediaQuery.sizeOf(context).width * 0.7,
                       child: ElevatedButton(
                         onPressed: () async {
                           controller.createCommande(modele, context);

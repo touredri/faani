@@ -1,6 +1,6 @@
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/message_field/message_field_controller.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -62,9 +62,9 @@ class MessageField<T extends MessageFieldController> extends GetView<T> {
                           ? controller.sendMessageVoice(parentId)
                           : controller.sendMessageText(parentId);
                     },
-                    primaryColor,
+                    AppColors.primary,
                   )
-                : circularProgress(color: primaryColor),
+                : circularProgress(color: AppColors.primary),
           ],
         ),
       ),

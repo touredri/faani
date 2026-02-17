@@ -3,7 +3,6 @@ import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../style/my_theme.dart';
 import '../../globale_widgets/profile_image.dart';
 
 class ModifierProfileView extends GetView<ProfileController> {
@@ -23,7 +22,7 @@ class ModifierProfileView extends GetView<ProfileController> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: scaffoldBack,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(auth.currentUser!.displayName ?? "Anonyme"),
       ),
       body: SingleChildScrollView(

@@ -6,7 +6,7 @@ import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import '../../../style/my_theme.dart';
+import '../../../style/app_colors.dart';
 
 class AjoutModeleForm extends GetView<AjoutModeleController> {
   const AjoutModeleForm({super.key});
@@ -17,14 +17,14 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 0,
-          backgroundColor: primaryColor,
+          backgroundColor: AppColors.primary,
         ),
         body: Obx(
           () => SingleChildScrollView(
             child: Column(
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.47,
+                  height: MediaQuery.sizeOf(context).height * 0.47,
                   child: Stack(
                     children: [
                       PageView(
@@ -115,7 +115,7 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                       controller.images.isEmpty ? 1 : controller.images.length,
                   effect: const ExpandingDotsEffect(
                     dotColor: Colors.grey,
-                    activeDotColor: primaryColor,
+                    activeDotColor: AppColors.primary,
                     dotHeight: 8,
                     dotWidth: 8,
                     expansionFactor: 4,
@@ -186,7 +186,7 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                       ),
                       const SizedBox(height: 15),
                       SwitchListTile(
-                        activeThumbColor: primaryColor,
+                        activeThumbColor: AppColors.primary,
                         title: const Text(
                           'Rendre votre modèle public ?',
                           style: TextStyle(fontSize: 15),
@@ -201,7 +201,7 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 20),
-                  width: MediaQuery.of(context).size.width * 0.8,
+                  width: MediaQuery.sizeOf(context).width * 0.8,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(

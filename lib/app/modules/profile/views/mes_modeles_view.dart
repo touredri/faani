@@ -6,7 +6,7 @@ import 'package:faani/app/modules/globale_widgets/modele_card.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../style/my_theme.dart';
+import '../../../style/app_colors.dart';
 
 class MesModelesView extends GetView {
   const MesModelesView({super.key});
@@ -27,7 +27,7 @@ class MesModelesView extends GetView {
                 Get.back();
               },
             ),
-            backgroundColor: primaryColor,
+            backgroundColor: AppColors.primary,
             expandedHeight: 108.0,
             floating: true,
             snap: true,
@@ -36,7 +36,7 @@ class MesModelesView extends GetView {
                 preferredSize: const Size(double.infinity, 35),
                 child: Container(
                   padding: const EdgeInsets.only(bottom: 10),
-                  color: primaryColor,
+                  color: AppColors.primary,
                   width: MediaQuery.of(context).size.width,
                   height: 35,
                   child: CategorieFiltre<ProfileController>(
@@ -94,7 +94,11 @@ class MesModelesView extends GetView {
                   (context, index) {
                     final modele = controller.mesModelesList.value[index];
                     return buildCard(modele!, context: context, onTap: () {
-                      Get.to(() => DetailModeleView(modele, previousIsProfile: true,),
+                      Get.to(
+                          () => DetailModeleView(
+                                modele,
+                                previousIsProfile: true,
+                              ),
                           arguments: modele);
                     });
                   },
@@ -107,7 +111,7 @@ class MesModelesView extends GetView {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primary,
         onPressed: () {
           Get.put(AjoutModeleController());
           Get.to(() => const AjoutModeleForm());

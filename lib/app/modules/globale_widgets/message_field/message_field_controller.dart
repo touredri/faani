@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/public/flutter_sound_player.dart';
@@ -263,7 +263,7 @@ abstract class MessageFieldController extends GetxController {
       uiSettings: [
         AndroidUiSettings(
             toolbarTitle: 'Send image',
-            toolbarColor: primaryColor,
+            toolbarColor: AppColors.primary,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false),
@@ -278,7 +278,6 @@ abstract class MessageFieldController extends GetxController {
   Future<void> sendMessageImage(String parentId);
   Future<void> sendMessageVoice(String parentId);
   Future<void> sendMessageText(String parentId);
-
 
   @override
   void onClose() {

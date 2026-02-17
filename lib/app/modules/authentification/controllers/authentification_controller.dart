@@ -24,7 +24,7 @@ class AuthController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool resend = false.obs;
   RxInt count = 60.obs;
-  late Timer timer;
+  Timer? timer;
   TextEditingController smsCodeController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -45,9 +45,10 @@ class AuthController extends GetxController {
 
   // timer for resend sms code
   void decreaseCounter() {
+    timer?.cancel();
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (count.value < 1) {
-        timer.cancel();
+        timer?.cancel();
         count.value = 20;
         resend.value = true;
         return;
@@ -156,10 +157,9 @@ class AuthController extends GetxController {
       }
       loading.value = false;
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
+      showCustomSnackbar(
+        message: 'Error: ${e.toString()}',
+        backgroundColor: Colors.red,
       );
       loading.value = false;
     }
@@ -195,11 +195,9 @@ class AuthController extends GetxController {
   // create user with its information
   void saveUserInFirestore(String number) async {
     if (nameController.text.length < 3) {
-      Get.snackbar(
-        "Error",
-        "S'il vous plaît, entrez votre nom complet.",
-        snackPosition: SnackPosition.BOTTOM,
-        borderColor: Colors.red,
+      showCustomSnackbar(
+        message: "S'il vous plaît, entrez votre nom complet.",
+        backgroundColor: Colors.red,
       );
       return;
     }
@@ -228,18 +226,16 @@ class AuthController extends GetxController {
     usersService.createUser(newUser).then((value) {
       // set the user to currentUser
       setUser();
-      Get.snackbar(
-        "Success",
-        "Welcome ${newUser.nomPrenom} !",
-        snackPosition: SnackPosition.BOTTOM,
+      showCustomSnackbar(
+        message: "Welcome ${newUser.nomPrenom} !",
+        backgroundColor: Colors.green,
       );
       Get.offAllNamed(Routes.HOME, arguments: {'isNewUser': true});
       loading.value = false;
     }).catchError((error) {
-      Get.snackbar(
-        "Error",
-        error.toString(),
-        snackPosition: SnackPosition.BOTTOM,
+      showCustomSnackbar(
+        message: error.toString(),
+        backgroundColor: Colors.red,
       );
     });
   }
@@ -260,13 +256,17 @@ class AuthController extends GetxController {
     }
   }
 
-
   @override
   void onReady() {
     super.onReady();
     decreaseCounter();
   }
 
+  @override
+  void onClose() {
+    timer?.cancel();
+    super.onClose();
+  }
 
   void updateUserName({String number = ''}) async {
     await auth.currentUser!.updateDisplayName(
@@ -279,10 +279,9 @@ class AuthController extends GetxController {
       'nomPrenom': nameController.text,
       'phoneNumber': number,
     });
-    Get.snackbar(
-      "Success",
-      "Welcome ${nameController.text} !",
-      snackPosition: SnackPosition.BOTTOM,
+    showCustomSnackbar(
+      message: "Welcome ${nameController.text} !",
+      backgroundColor: Colors.green,
     );
     setUser();
     Get.offAllNamed(Routes.HOME);
@@ -293,7 +292,7 @@ class AuthController extends GetxController {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
-        Get.snackbar('Erreur', 'Connexion annulée.');
+        showCustomSnackbar(message: 'Connexion annulée.');
         return;
       }
 
@@ -318,10 +317,12 @@ class AuthController extends GetxController {
             'phone': phoneNumber.value,
           });
         }
-        Get.snackbar('Succès', 'Connexion avec Google réussie !');
+        showCustomSnackbar(
+            message: 'Connexion avec Google réussie !',
+            backgroundColor: Colors.green);
       }
     } catch (e) {
-      Get.snackbar('Erreur', 'Connexion avec Google échouée : $e');
+      showCustomSnackbar(message: 'Connexion avec Google échouée : $e');
     }
   }
 }

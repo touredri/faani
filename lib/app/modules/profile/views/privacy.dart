@@ -1,4 +1,4 @@
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
@@ -9,7 +9,7 @@ class PrivacyPolicyPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Politique de Confidentialité'),
-        backgroundColor: scaffoldBack,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -21,7 +21,7 @@ class PrivacyPolicyPage extends StatelessWidget {
               child: Icon(
                 Icons.privacy_tip,
                 size: 80,
-                color: primaryColor,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 16),

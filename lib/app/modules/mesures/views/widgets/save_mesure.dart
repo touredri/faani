@@ -5,8 +5,10 @@ import '../../../../firebase/global_function.dart';
 
 void dialogBox(BuildContext context, TextEditingController nameController,
     MesuresController mesureController) {
+  final navigatorContext = Navigator.of(context, rootNavigator: true).context;
   showDialog(
-    context: context,
+    context: navigatorContext,
+    useRootNavigator: true,
     builder: (context) {
       return AlertDialog(
         title: const Text('Entrer un nom pour la mesure'),

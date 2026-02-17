@@ -5,7 +5,7 @@ import 'package:faani/app/data/services/favorite_service.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:flutter/material.dart';
 import '../../firebase/global_function.dart';
-import '../../style/my_theme.dart';
+import '../../style/app_colors.dart';
 
 abstract class BaseIcon extends StatefulWidget {
   final String docId;
@@ -54,7 +54,7 @@ abstract class BaseIconState<T extends BaseIcon> extends State<T> {
           },
           child: Icon(
             isActive ? getActiveIcon() : getInactiveIcon(),
-            color: isActive ? primaryColor : widget.color,
+            color: isActive ? AppColors.primary : widget.color,
             size: 30,
           ),
         ),
@@ -168,7 +168,8 @@ class _LikeIconState extends BaseIconState<LikeIcon> {
         .where('idUser', isEqualTo: user!.uid)
         .get();
     if (likeSnapshot.docs.isNotEmpty) {
-      await ModeleService().removeLike(widget.docId, likeSnapshot.docs.first.id);
+      await ModeleService()
+          .removeLike(widget.docId, likeSnapshot.docs.first.id);
     }
   }
 

@@ -1,3 +1,6 @@
+import 'package:faani/app/style/app_animations.dart';
+import 'package:faani/app/style/app_radius.dart';
+import 'package:faani/app/style/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,38 +25,44 @@ class AnimatedSearchBar extends StatelessWidget {
       id: 'search',
       init: controller,
       builder: (dynamic controller) {
+        final searching = isSearching.value;
         return AnimatedContainer(
-          width:
-              isSearching.value ? MediaQuery.of(context).size.width * 0.8 : 35,
+          width: searching ? MediaQuery.sizeOf(context).width * 0.75 : 40,
           height: 40,
-          duration: const Duration(milliseconds: 300),
+          duration: AppAnimations.normal,
           curve: Curves.easeInOut,
           child: ClipRect(
             child: TextField(
               controller: textEditingController,
+              style: TextStyle(color: color),
               decoration: InputDecoration(
+                filled: false,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.sm,
+                ),
                 border: InputBorder.none,
-                disabledBorder: isSearching.value
+                enabledBorder: searching
                     ? OutlineInputBorder(
                         borderSide: BorderSide(color: color),
+                        borderRadius: AppRadius.radiusMd,
                       )
                     : InputBorder.none,
-                enabledBorder: isSearching.value
+                focusedBorder: searching
                     ? OutlineInputBorder(
-                        borderSide: BorderSide(color: color),
+                        borderSide: BorderSide(color: color, width: 1.5),
+                        borderRadius: AppRadius.radiusMd,
                       )
                     : InputBorder.none,
-                focusedBorder: isSearching.value
-                    ? OutlineInputBorder(
-                        borderSide: BorderSide(color: color),
-                      )
-                    : InputBorder.none,
-                labelText: 'Chercher',
+                hintText: 'Chercher',
+                hintStyle: TextStyle(color: color.withValues(alpha: 0.6)),
                 suffixIcon: IconButton(
-                  padding: const EdgeInsets.all(0),
+                  padding: EdgeInsets.zero,
                   color: color,
-                  icon: Icon(isSearching.value ? Icons.close : Icons.search,
-                      size: 30),
+                  icon: Icon(
+                    searching ? Icons.close : Icons.search,
+                    size: 24,
+                  ),
                   onPressed: () => onSearch(),
                 ),
               ),

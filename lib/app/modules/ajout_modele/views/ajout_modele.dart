@@ -1,6 +1,6 @@
 import 'package:faani/app/modules/ajout_modele/controllers/ajout_modele_controller.dart';
 import 'package:faani/app/modules/ajout_modele/widgets/modele_form.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,7 +14,7 @@ class AjoutModele extends GetView<AjoutModeleController> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primary,
         automaticallyImplyLeading: false,
       ),
       body: Column(
@@ -43,19 +43,21 @@ class AjoutModele extends GetView<AjoutModeleController> {
                 Expanded(
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: primaryColor),
+                      side: const BorderSide(color: AppColors.primary),
                     ),
                     onPressed: () => controller.images.length < 2
                         ? controller.pickOrTakeImage(context, true)
                         : showDialog(
-                            context: context,
+                            context: Navigator.of(context, rootNavigator: true)
+                                .context,
+                            useRootNavigator: true,
                             builder: (BuildContext context) {
                               return const MyAlertDialog();
                             },
                           ),
                     icon: const Icon(
                       Icons.image,
-                      color: primaryColor,
+                      color: AppColors.primary,
                     ),
                     label: const Text('Gallerie'),
                   ),
@@ -64,19 +66,21 @@ class AjoutModele extends GetView<AjoutModeleController> {
                 Expanded(
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: primaryColor),
+                      side: const BorderSide(color: AppColors.primary),
                     ),
                     onPressed: () => controller.images.length < 2
                         ? controller.pickOrTakeImage(context, false)
                         : showDialog(
-                            context: context,
+                            context: Navigator.of(context, rootNavigator: true)
+                                .context,
+                            useRootNavigator: true,
                             builder: (BuildContext context) {
                               return const MyAlertDialog();
                             },
                           ),
                     icon: const Icon(
                       Icons.camera_alt,
-                      color: primaryColor,
+                      color: AppColors.primary,
                     ),
                     label: const Text('Camera'),
                   ),
@@ -99,7 +103,7 @@ class MyAlertDialog extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       icon: const Icon(
         Icons.warning,
-        color: primaryColor,
+        color: AppColors.primary,
       ),
       title: const Text(
         'Vous ne pouvez pas ajouter plus de 2 images',

@@ -2,7 +2,7 @@ import 'package:faani/app/modules/mesures/views/widgets/page_view_content.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../style/my_theme.dart';
+import '../../../../style/app_colors.dart';
 import '../../controllers/mesures_controller.dart';
 import 'save_mesure.dart';
 
@@ -14,8 +14,8 @@ class MesurePaveView extends StatelessWidget {
     final MesuresController mesureController = Get.put(MesuresController());
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: scaffoldBack,
-        surfaceTintColor: scaffoldBack,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
           color: Colors.black,
@@ -139,7 +139,7 @@ Container textContainer(String text) {
       vertical: 4,
     ),
     decoration: BoxDecoration(
-      border: Border.all(color: inputBorderColor, width: 1),
+      border: Border.all(color: AppColors.grey300, width: 1),
       borderRadius: const BorderRadius.all(Radius.circular(10)),
     ),
     child: Text(
@@ -147,7 +147,7 @@ Container textContainer(String text) {
       textAlign: TextAlign.center,
       style: const TextStyle(
         fontSize: 20,
-        color: primaryColor,
+        color: AppColors.primary,
       ),
     ),
   );

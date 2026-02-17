@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:faani/app/data/models/modele_model.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
@@ -114,7 +114,7 @@ class IconDownloadState extends State<IconDownload> {
               ? CircularProgressIndicator(
                   value: progress,
                   backgroundColor: Colors.grey[300],
-                  color: primaryColor,
+                  color: AppColors.primary,
                 )
               : Icon(
                   Icons.download_rounded,
@@ -152,4 +152,4 @@ class IconDownloadState extends State<IconDownload> {
 //                   ],
 //                 ),
 //               )
-//             : 
+//             :

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Favorie {
-  late final String? id;
+  final String? id;
   final String? idModele;
   final String? idUtilisateur;
 
@@ -11,7 +11,8 @@ class Favorie {
     required this.idUtilisateur,
   });
 
-  factory Favorie.fromMap(Map<String, dynamic> data, DocumentReference documentReference) {
+  factory Favorie.fromMap(
+      Map<String, dynamic> data, DocumentReference documentReference) {
     final id = documentReference.id;
     final idModele = data['idModele'] as String;
     final idUtilisateur = data['idUtilisateur'] as String;

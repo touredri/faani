@@ -8,7 +8,7 @@ import 'package:faani/app/modules/profile/views/mes_modeles_view.dart';
 import 'package:faani/app/modules/profile/views/parametre_view.dart';
 import 'package:faani/app/modules/profile/widgets/commentaire_bottom_sheet.dart';
 import 'package:faani/app/modules/profile/widgets/received_request.dart';
-import 'package:faani/app/style/spacer.dart';
+import 'package:faani/app/style/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../mesures/views/mesures_view.dart';
@@ -19,158 +19,118 @@ import 'list_actions.dart';
 Widget listBuild(ProfileController controller, BuildContext context) {
   return Column(
     children: [
-      1.5.hs,
+      AppSpacing.gapV12,
       if (!auth.currentUser!.isAnonymous)
         CustomListTile(
-          leadingIcon: const Icon(
-            Icons.person,
-            color: Colors.blue,
-          ),
-          title: 'Mon profile',
+          leadingIcon: const Icon(Icons.person_outline, color: Colors.blue),
+          title: 'Mon profil',
           subTitle: 'Changez vos informations',
-          onTap: () => {
-            Get.to(const ModifierProfileView(),
-                transition: Transition.rightToLeft)
-          },
+          onTap: () => Get.to(
+            const ModifierProfileView(),
+            transition: Transition.rightToLeft,
+          ),
         ),
       if (auth.currentUser!.isAnonymous)
         CustomListTile(
-            leadingIcon: const Icon(
-              Icons.person_add,
-              color: Colors.blue,
-            ),
-            title: 'S\'inscrire',
-            subTitle: 'Créer un compte pour plus de fonctionnalités',
-            onTap: () => {
-                  Get.to(() => const AuthView(),
-                      transition: Transition.rightToLeft)
-                }),
+          leadingIcon:
+              const Icon(Icons.person_add_outlined, color: Colors.blue),
+          title: 'S\'inscrire',
+          subTitle: 'Créer un compte pour plus de fonctionnalités',
+          onTap: () => Get.to(
+            () => const AuthView(),
+            transition: Transition.rightToLeft,
+          ),
+        ),
       CustomListTile(
-          leadingIcon: controller.measureIcon,
-          title: 'Mes Mesures',
-          subTitle: 'Voir mes mesures',
-          onTap: () => {
-                Get.to(() => const MesuresView(),
-                    transition: Transition.rightToLeft),
-              }),
+        leadingIcon: controller.measureIcon,
+        title: 'Mes Mesures',
+        subTitle: 'Voir mes mesures',
+        onTap: () => Get.to(
+          () => const MesuresView(),
+          transition: Transition.rightToLeft,
+        ),
+      ),
       if (Get.find<HomeController>().isAdmin.value)
         CustomListTile(
-            leadingIcon: controller.becomeTailorIcon,
-            title: 'Gestion tailleurs',
-            subTitle:
-                'Gerer les demandes d\'etre tailleur et les compte tailleurs',
-            onTap: () => {
-                  Get.to(() => const ReceivedRequest(),
-                      transition: Transition.rightToLeft),
-                }),
-      // if (controller.isTailleur.value)
-      //   CustomListTile(
-      //       leadingIcon: controller.scissorIcon,
-      //       title: 'Mon Atelier',
-      //       subTitle: 'Gestion de mon atelier et agents',
-      //       onTap: () {
-      //         Get.to(() => const MonAtelierView(),
-      //             transition: Transition.rightToLeft);
-      //       }),
+          leadingIcon: controller.becomeTailorIcon,
+          title: 'Gestion tailleurs',
+          subTitle: 'Gérer les demandes et comptes tailleurs',
+          onTap: () => Get.to(
+            () => const ReceivedRequest(),
+            transition: Transition.rightToLeft,
+          ),
+        ),
       if (controller.userController.isTailleur.value)
         CustomListTile(
-            leadingIcon: controller.dressIcon,
-            title: 'Mes Modèles',
-            subTitle: 'Gerer mes modèles',
-            onTap: () => {
-                  Get.to(() => const MesModelesView(),
-                      transition: Transition.rightToLeft),
-                }),
+          leadingIcon: controller.dressIcon,
+          title: 'Mes Modèles',
+          subTitle: 'Gérer mes modèles',
+          onTap: () => Get.to(
+            () => const MesModelesView(),
+            transition: Transition.rightToLeft,
+          ),
+        ),
       if (!controller.userController.isTailleur.value &&
           !auth.currentUser!.isAnonymous &&
           !Get.find<HomeController>().isAdmin.value)
         CustomListTile(
-            leadingIcon: controller.becomeTailorIcon,
-            title: 'Devenir Tailleur',
-            subTitle: 'Basculer vers compte tailleur',
-            onTap: () => {
-                  Get.to(() => const DevenirTailleurView(),
-                      transition: Transition.rightToLeft),
-                }),
-      CustomListTile(
-        leadingIcon: const Icon(
-          Icons.settings,
-          color: Colors.grey,
+          leadingIcon: controller.becomeTailorIcon,
+          title: 'Devenir Tailleur',
+          subTitle: 'Basculer vers compte tailleur',
+          onTap: () => Get.to(
+            () => const DevenirTailleurView(),
+            transition: Transition.rightToLeft,
+          ),
         ),
+      const CustomDivider(),
+      CustomListTile(
+        leadingIcon: const Icon(Icons.settings_outlined, color: Colors.grey),
         title: 'Paramètres',
-        subTitle: 'Securité, Langue, etc.',
-        onTap: () {
-          Get.to(() => const ParametreView(),
-              transition: Transition.rightToLeft);
-        },
+        subTitle: 'Sécurité, Langue, etc.',
+        onTap: () => Get.to(
+          () => const ParametreView(),
+          transition: Transition.rightToLeft,
+        ),
       ),
       CustomListTile(
-        leadingIcon: const Icon(
-          Icons.info,
-          color: Colors.blue,
-        ),
-        title: 'A propos',
+        leadingIcon: const Icon(Icons.info_outline, color: Colors.blue),
+        title: 'À propos',
         subTitle: 'En savoir plus sur Faani App',
-        onTap: () {
-          Get.to(() => const AboutUsPage(), transition: Transition.rightToLeft);
-        },
+        onTap: () => Get.to(
+          () => const AboutUsPage(),
+          transition: Transition.rightToLeft,
+        ),
       ),
       CustomListTile(
-        leadingIcon: const Icon(
-          Icons.help,
-          color: Colors.blue,
-        ),
+        leadingIcon: const Icon(Icons.help_outline, color: Colors.blue),
         title: 'Centre d\'aide',
         subTitle: 'FAQ, Contactez-nous',
-        onTap: () {
-          Get.to(() => const AideView(), transition: Transition.rightToLeft);
-        },
-      ),
-      CustomListTile(
-        leadingIcon: const Icon(
-          Icons.send,
-          color: Colors.blueGrey,
+        onTap: () => Get.to(
+          () => const AideView(),
+          transition: Transition.rightToLeft,
         ),
+      ),
+      const CustomDivider(),
+      CustomListTile(
+        leadingIcon:
+            const Icon(Icons.rate_review_outlined, color: Colors.amber),
         title: 'Laissez un commentaire',
         subTitle: 'Comment vous trouvez Faani App',
-        onTap: () {
-          commentaire(context);
-        },
+        onTap: () => commentaire(context),
       ),
-      ListTile(
-        leading: const Text(
-          "⭐",
-          style: TextStyle(fontSize: 25),
-        ),
-        title: const Text(
-          'Notez l\'Appli',
-          style: TextStyle(fontSize: 14),
-        ),
-        subtitle: Text(
-          'Donnez votre avis',
-          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
-        ),
-        trailing: Icon(Icons.open_in_new, color: Colors.grey[500]),
-        onTap: () {
-          controller.rateApp();
-        },
+      CustomListTile(
+        leadingIcon: const Icon(Icons.star_outline, color: Colors.amber),
+        title: 'Notez l\'Appli',
+        subTitle: 'Donnez votre avis',
+        onTap: () => controller.rateApp(),
       ),
-      ListTile(
-        leading: const Icon(
-          Icons.share,
-          color: Colors.blue,
-          size: 30,
-        ),
-        title: const Text('Partager Faani App', style: TextStyle(fontSize: 14)),
-        subtitle: Text(
-          "Invitez vos amis à télécharger l'appli",
-          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
-        ),
-        trailing: Icon(Icons.open_in_new, color: Colors.grey[500]),
-        onTap: () {
-          controller.shareApp();
-        },
+      CustomListTile(
+        leadingIcon: const Icon(Icons.share_outlined, color: Colors.blue),
+        title: 'Partager Faani App',
+        subTitle: 'Invitez vos amis à télécharger l\'appli',
+        onTap: () => controller.shareApp(),
       ),
+      AppSpacing.gapV16,
     ],
   );
 }

@@ -1,6 +1,6 @@
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
-import 'package:faani/app/style/my_theme.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,7 @@ class SignUpView extends GetView<AuthController> {
                 'Faani',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: primaryColor,
+                  color: AppColors.primary,
                   fontSize: 48,
                   fontFamily: 'Mochiy Pop One',
                   fontWeight: FontWeight.w400,
@@ -101,7 +101,7 @@ class SignUpView extends GetView<AuthController> {
                 TextSpan(
                     text: 'Conditions générales',
                     style: const TextStyle(
-                      color: primaryColor,
+                      color: AppColors.primary,
                       fontSize: 15,
                       fontWeight: FontWeight.w100,
                     ),
@@ -120,7 +120,7 @@ class SignUpView extends GetView<AuthController> {
                 TextSpan(
                     text: 'Politique de confidentialité',
                     style: const TextStyle(
-                      color: primaryColor,
+                      color: AppColors.primary,
                       fontSize: 15,
                       fontWeight: FontWeight.w100,
                     ),

@@ -3,7 +3,7 @@ import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../../style/my_theme.dart';
+import '../../../../style/app_colors.dart';
 
 class ModifyMesure extends StatelessWidget {
   final String name;
@@ -37,7 +37,7 @@ class ModifyMesure extends StatelessWidget {
         leading: const BackButton(
           color: Colors.white,
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primary,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -45,7 +45,7 @@ class ModifyMesure extends StatelessWidget {
           child: Column(children: [
             5.hs, // example image display
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.4,
+              height: MediaQuery.sizeOf(context).height * 0.4,
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.asset(
@@ -92,7 +92,7 @@ class ModifyMesure extends StatelessWidget {
                             icon: Icon(Icons.add)),
                         counterText: '',
                         labelText: value,
-                        labelStyle: TextStyle(color: primaryColor),
+                        labelStyle: TextStyle(color: AppColors.primary),
                       ),
                     ),
                   ),
@@ -103,7 +103,7 @@ class ModifyMesure extends StatelessWidget {
             ),
             5.hs, // save button
             SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
+              width: MediaQuery.sizeOf(context).width * 0.7,
               height: 50,
               child: Material(
                 child: ElevatedButton(
