@@ -126,7 +126,7 @@ class _HomeItemState extends State<HomeItem>
 
         // ── Bottom info overlay ───────────────────────────────────
         Positioned(
-          bottom: AppSpacing.huge,
+          bottom: AppSpacing.huge + 30,
           left: AppSpacing.lg,
           right: 72,
           child: Column(
@@ -166,7 +166,7 @@ class _HomeItemState extends State<HomeItem>
         // ── Right action bar ──────────────────────────────────────
         Positioned(
           right: AppSpacing.sm,
-          bottom: AppSpacing.huge,
+          bottom: AppSpacing.huge + 40,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

@@ -50,9 +50,10 @@ class AccueilView extends GetView<AccueilController> {
                 children: [
                   Expanded(
                     child: SizedBox(
-                      height: 36,
+                      height: 20,
                       child: CategorieFiltre<AccueilController>(
                         controller: controller,
+                        isOverlay: true,
                       ),
                     ),
                   ),

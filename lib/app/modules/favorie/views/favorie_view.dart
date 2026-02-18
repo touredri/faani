@@ -34,8 +34,8 @@ class FavorieView extends GetView<FavorieController> {
           child: Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.xs),
             child: SizedBox(
-              height: 32,
-              child: CategorieFiltre(controller: controller),
+              height: 22,
+              child: CategorieFiltre(controller: controller, isOverlay: true,),
             ),
           ),
         ),

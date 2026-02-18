@@ -9,15 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-/// Enhanced category filter optimized for TikTok-style home page with African clothing models.
-///
-/// Features:
-/// - Semi-transparent overlay to avoid interfering with model images
-/// - Compact design for minimal content obstruction
-/// - Smooth animations and micro-interactions
-/// - Smart positioning for vertical video feed
-/// - Performance optimized with const constructors
-/// - Touch-friendly for mobile swipe interactions
 class CategorieFiltre<T extends GetxController> extends StatefulWidget {
   final T controller;
   final bool isOverlay; // For home page overlay mode
@@ -37,8 +28,7 @@ class _CategorieFiltreState<T extends GetxController>
     extends State<CategorieFiltre<T>> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final RxList<Categorie> _categories = <Categorie>[].obs;
-  bool _isLoading = true;
-  bool _isExpanded = false;
+  final RxBool _isLoading = true.obs;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
@@ -71,10 +61,10 @@ class _CategorieFiltreState<T extends GetxController>
     CategorieService().getCategorie().listen(
       (categories) {
         _categories.value = categories;
-        _isLoading = false;
+        _isLoading.value = false;
       },
       onError: (error) {
-        _isLoading = false;
+        _isLoading.value = false;
       },
     );
   }
@@ -115,92 +105,86 @@ class _CategorieFiltreState<T extends GetxController>
 
     // Notify parent controller
     (widget.controller as dynamic).onCategorieSelected(categorie);
-
-    // Auto-collapse on selection in overlay mode
-    if (widget.isOverlay && _isExpanded) {
-      _toggleExpanded();
-    }
-  }
-
-  void _toggleExpanded() {
-    setState(() {
-      _isExpanded = !_isExpanded;
-    });
-    widget.onExpand?.call();
   }
 
   Widget _buildCategoryChip(Categorie categorie, int index) {
     final isSelected = categorie.isSelected;
     final isOverlayMode = widget.isOverlay;
+    final minChipHeight = isOverlayMode ? 28.0 : 36.0;
+
+    final chipForeground = isSelected
+        ? AppColors.white
+        : (isOverlayMode
+            ? AppColors.white.withValues(alpha: 0.86)
+            : AppColors.textSecondary);
 
     return AnimatedContainer(
       duration: AppAnimations.fast,
       margin: const EdgeInsets.only(right: AppSpacing.sm),
-      child: GestureDetector(
-        onTap: () => _onCategorySelected(categorie, index),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedDefaultTextStyle(
-              duration: AppAnimations.fast,
-              style: isSelected
-                  ? AppTypography.labelMedium.copyWith(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.8,
-                    )
-                  : AppTypography.labelMedium.copyWith(
-                      color: isOverlayMode
-                          ? AppColors.white.withValues(alpha: 0.6)
-                          : AppColors.textSecondary,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.5,
-                    ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.xs,
-                ),
-                child: Text(
-                  categorie.libelle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            const SizedBox(height: 2),
-            AnimatedContainer(
-              duration: AppAnimations.fast,
-              height: 2,
-              width: isSelected ? 20 : 0,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: AppRadius.radiusFull,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildExpandButton() {
-    return GestureDetector(
-      onTap: _toggleExpanded,
-      child: AnimatedContainer(
-        duration: AppAnimations.fast,
-        padding: const EdgeInsets.all(AppSpacing.xs),
-        decoration: BoxDecoration(
-          color: widget.isOverlay
-              ? AppColors.black.withValues(alpha: 0.3)
-              : AppColors.surfaceLight,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
           borderRadius: AppRadius.radiusFull,
-        ),
-        child: Icon(
-          _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-          size: 16,
-          color: widget.isOverlay ? AppColors.white : AppColors.textSecondary,
+          onTap: () => _onCategorySelected(categorie, index),
+          child: AnimatedContainer(
+            duration: AppAnimations.fast,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 0,
+            ),
+            constraints: BoxConstraints(minHeight: minChipHeight),
+            decoration: BoxDecoration(
+              gradient: isSelected
+                  ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primary,
+                        AppColors.primaryDark,
+                      ],
+                    )
+                  : null,
+              color: isSelected
+                  ? null
+                  : (isOverlayMode
+                      ? AppColors.white.withValues(alpha: 0.16)
+                      : AppColors.grey100),
+              borderRadius: AppRadius.radiusFull,
+              border: Border.all(
+                color: isSelected
+                    ? AppColors.primaryLight.withValues(alpha: 0.45)
+                    : (isOverlayMode
+                        ? AppColors.white.withValues(alpha: 0.24)
+                        : AppColors.grey300),
+                width: 1,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.28),
+                        blurRadius: 14,
+                        offset: const Offset(0, 6),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Text(
+              categorie.libelle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              strutStyle: const StrutStyle(
+                height: 1.0,
+                forceStrutHeight: true,
+              ),
+              style: AppTypography.labelMedium.copyWith(
+                color: chipForeground,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                letterSpacing: 0.35,
+                height: 1.0,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -208,7 +192,7 @@ class _CategorieFiltreState<T extends GetxController>
 
   Widget _buildLoadingState() {
     return SizedBox(
-      height: widget.isOverlay ? 36 : 50,
+      height: widget.isOverlay ? 34 : 50,
       child: Row(
         children: List.generate(3, (index) => _buildShimmerChip()),
       ),
@@ -218,7 +202,7 @@ class _CategorieFiltreState<T extends GetxController>
   Widget _buildShimmerChip() {
     return Container(
       width: widget.isOverlay ? 60 : 80,
-      height: widget.isOverlay ? 24 : 32,
+      height: widget.isOverlay ? 28 : 32,
       margin: const EdgeInsets.only(right: AppSpacing.xs),
       decoration: BoxDecoration(
         color: widget.isOverlay
@@ -231,7 +215,7 @@ class _CategorieFiltreState<T extends GetxController>
 
   Widget _buildEmptyState() {
     return Container(
-      height: widget.isOverlay ? 36 : 50,
+      height: widget.isOverlay ? 34 : 50,
       alignment: Alignment.center,
       child: Text(
         'Aucune catégorie',
@@ -248,6 +232,7 @@ class _CategorieFiltreState<T extends GetxController>
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       controller: _scrollController,
+      physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.symmetric(
         horizontal: widget.isOverlay ? AppSpacing.sm : AppSpacing.md,
       ),
@@ -269,61 +254,11 @@ class _CategorieFiltreState<T extends GetxController>
               begin: const Offset(0, -0.1),
               end: Offset.zero,
             ).animate(_slideAnimation),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.black.withValues(alpha: 0.6),
-                    AppColors.black.withValues(alpha: 0.3),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Header with expand button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            '🏷️ Filtrer',
-                            style: AppTypography.labelMedium.copyWith(
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const Spacer(),
-                          _buildExpandButton(),
-                        ],
-                      ),
-                    ),
-                    // Category chips
-                    if (_isExpanded) ...[
-                      const SizedBox(height: AppSpacing.xs),
-                      _buildCategoryList(),
-                    ],
-                    // Compact mode indicator
-                    if (!_isExpanded)
-                      Container(
-                        height: 4,
-                        width: 40,
-                        margin:
-                            const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-                        decoration: BoxDecoration(
-                          color: AppColors.white.withValues(alpha: 0.4),
-                          borderRadius: AppRadius.radiusFull,
-                        ),
-                      ),
-                  ],
-                ),
+            child: SizedBox(
+              height: 34,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: _buildCategoryList(),
               ),
             ),
           ),
@@ -351,7 +286,7 @@ class _CategorieFiltreState<T extends GetxController>
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (_isLoading) {
+      if (_isLoading.value) {
         return _buildLoadingState();
       }
 
