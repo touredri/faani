@@ -1,10 +1,16 @@
 import 'package:faani/app/modules/search_page/views/search_page_view.dart';
 import 'package:faani/app/style/app_colors.dart';
+import 'package:faani/app/style/app_spacing.dart';
+import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../globale_widgets/list_categorie.dart';
 import '../controllers/accueil_controller.dart';
-import '../widgets/accueil_page_view.dart';
+import '../widgets/category_feed_view.dart';
+import '../widgets/hero_section.dart';
+import '../widgets/masonry_grid_item.dart';
 
 class AccueilView extends GetView<AccueilController> {
   const AccueilView({super.key});
@@ -14,125 +20,233 @@ class AccueilView extends GetView<AccueilController> {
     Get.put(AccueilController());
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
-      appBar: AppBar(
-        toolbarHeight: 0,
-        backgroundColor: AppColors.backgroundDark,
+      backgroundColor: const Color(0xFF1A1A1A),
+      body: FutureBuilder(
+        future: controller.init(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildShimmerLoading();
+          }
+          return GetBuilder<AccueilController>(
+            builder: (_) => _HybridHomeBody(controller: controller),
+          );
+        },
       ),
-      body: Stack(
-        fit: StackFit.expand,
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return Shimmer.fromColors(
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
+      child: Column(
         children: [
-          // ── Full-screen vertical feed ──────────────────────────
-          const Positioned.fill(
-            child: AccueilPAgeView(),
-          ),
-
-          // ── Top overlay: category filter + search ──────────────
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 56,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.backgroundDark.withValues(alpha: 0.85),
-                    AppColors.backgroundDark.withValues(alpha: 0.4),
-                    AppColors.backgroundDark.withValues(alpha: 0.0),
-                  ],
-                  stops: const [0.0, 0.6, 1.0],
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 20,
-                      child: CategorieFiltre<AccueilController>(
-                        controller: controller,
-                        isOverlay: true,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: IconButton(
-                      onPressed: () => Get.to(
-                        () => const SearchPageView(),
-                        transition: Transition.downToUp,
-                      ),
-                      icon: const Icon(Icons.search_rounded),
-                      color: AppColors.white,
-                      iconSize: 22,
-                      tooltip: 'Rechercher',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // ── Bottom swipe hint ──────────────────────────────────
-          Positioned(
-            bottom: 16,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: _SwipeHint(),
-            ),
-          ),
+          Expanded(child: Container(color: AppColors.shimmerBase)),
         ],
       ),
     );
   }
 }
 
-/// Animated swipe indicator hint
-class _SwipeHint extends StatefulWidget {
+/// The hybrid home body with CustomScrollView + Slivers.
+class _HybridHomeBody extends StatefulWidget {
+  final AccueilController controller;
+  const _HybridHomeBody({required this.controller});
+
   @override
-  State<_SwipeHint> createState() => _SwipeHintState();
+  State<_HybridHomeBody> createState() => _HybridHomeBodyState();
 }
 
-class _SwipeHintState extends State<_SwipeHint>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _animation;
+class _HybridHomeBodyState extends State<_HybridHomeBody> {
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0, end: -8).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      if (widget.controller.homeController.hasMoreData.value) {
+        widget.controller.loadMore();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, _animation.value),
-          child: Icon(
-            Icons.keyboard_arrow_up_rounded,
-            color: AppColors.white.withValues(alpha: 0.35),
-            size: 28,
+    final modeles = widget.controller.modeles;
+
+    return RefreshIndicator(
+      onRefresh: widget.controller.refreshPage,
+      color: AppColors.primary,
+      backgroundColor: const Color(0xFF1A1A1A),
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        slivers: [
+          // ── Pinned category header + search ───────────────────
+          SliverAppBar(
+            pinned: true,
+            floating: true,
+            snap: true,
+            backgroundColor: const Color(0xFF1A1A1A),
+            toolbarHeight: 52,
+            title: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 20,
+                    child: CategorieFiltre<AccueilController>(
+                      controller: widget.controller,
+                      isOverlay: true,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Get.to(
+                    () => const SearchPageView(),
+                    transition: Transition.downToUp,
+                  ),
+                  icon: const Icon(Icons.search_rounded),
+                  color: AppColors.white,
+                  iconSize: 22,
+                  tooltip: 'Rechercher',
+                ),
+              ],
+            ),
+            automaticallyImplyLeading: false,
           ),
-        );
-      },
+
+          // ── Hero section (first model) ────────────────────────
+          if (modeles.isNotEmpty)
+            SliverToBoxAdapter(
+              child: HeroSection(modele: modeles[0]),
+            ),
+
+          // ── "Explorer" section title ──────────────────────────
+          if (modeles.length > 1)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.xxl,
+                  AppSpacing.lg,
+                  AppSpacing.md,
+                ),
+                child: Text(
+                  'EXPLORER',
+                  style: AppTypography.labelMedium.copyWith(
+                    color: const Color(0xFF9E9E9E),
+                    letterSpacing: 2.0,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+
+          // ── Masonry grid ──────────────────────────────────────
+          if (modeles.length > 1)
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+              ),
+              sliver: SliverMasonryGrid.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: AppSpacing.sm,
+                crossAxisSpacing: AppSpacing.sm,
+                childCount: modeles.length - 1,
+                itemBuilder: (context, index) {
+                  final gridIndex = index + 1; // skip hero model
+                  final modele = modeles[gridIndex];
+                  // Vary heights for masonry effect
+                  final idSum = modele.id?.codeUnits
+                          .fold(0, (int sum, int c) => sum + c) ??
+                      0;
+                  final itemHeight = 200.0 + (idSum % 80);
+
+                  return MasonryGridItem(
+                    modele: modele,
+                    height: itemHeight,
+                    onTap: () {
+                      // Open TikTok-like feed filtered by same category
+                      final categoryModeles = modeles
+                          .where((m) =>
+                              m.idCategorie == modele.idCategorie)
+                          .toList();
+                      final feedIndex = categoryModeles.indexOf(modele);
+                      Get.to(
+                        () => CategoryFeedView(
+                          modeles: categoryModeles,
+                          initialIndex: feedIndex >= 0 ? feedIndex : 0,
+                        ),
+                        transition: Transition.cupertino,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+
+          // ── Loading indicator at bottom ────────────────────────
+          SliverToBoxAdapter(
+            child: Obx(() {
+              if (widget.controller.homeController.hasMoreData.value &&
+                  modeles.isNotEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.all(AppSpacing.xxl),
+                  child: Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.grey600,
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox(height: AppSpacing.huge);
+            }),
+          ),
+
+          // ── Empty state ────────────────────────────────────────
+          if (modeles.isEmpty)
+            SliverFillRemaining(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.explore_outlined,
+                      color: AppColors.grey600,
+                      size: 48,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'Aucun modèle disponible',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.grey500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
