@@ -9,14 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
+import 'dart:async';
 import '../../../style/app_colors.dart';
 
 /// Immersive fullscreen hero section for the home page.
 ///
 /// Shows a premium highlight model with editorial typography and CTAs.
 class HeroSection extends StatefulWidget {
-  final Modele modele;
-  const HeroSection({super.key, required this.modele});
+  final List<Modele> modeles;
+  const HeroSection({super.key, required this.modeles});
 
   @override
   State<HeroSection> createState() => _HeroSectionState();
@@ -24,164 +25,202 @@ class HeroSection extends StatefulWidget {
 
 class _HeroSectionState extends State<HeroSection>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _fadeController;
-  late final Animation<double> _fadeAnimation;
+  late final PageController _pageController;
+  Timer? _autoScrollTimer;
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOut,
-    );
-    _fadeController.forward();
+    _pageController = PageController(viewportFraction: 1.0);
+    _startAutoScroll();
+  }
+
+  void _startAutoScroll() {
+    _autoScrollTimer?.cancel();
+    if (widget.modeles.length <= 1) return;
+
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || !_pageController.hasClients) return;
+      final nextIndex = (_currentIndex + 1) % widget.modeles.length;
+      _pageController.animateToPage(
+        nextIndex,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
+    _autoScrollTimer?.cancel();
+    _pageController.dispose();
     super.dispose();
   }
 
   @override
+  void didUpdateWidget(covariant HeroSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.modeles.length != widget.modeles.length) {
+      _currentIndex = 0;
+      _startAutoScroll();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (widget.modeles.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     final size = MediaQuery.sizeOf(context);
 
-    return SizedBox(
-      height: size.height * 0.85,
-      width: double.infinity,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // ── Fullscreen image ──────────────────────────────────
-          Positioned.fill(
-            child: CachedNetworkImage(
-              imageUrl: widget.modele.fichier.isNotEmpty
-                  ? widget.modele.fichier[0]!
-                  : '',
-              fit: BoxFit.cover,
-              fadeInDuration: const Duration(milliseconds: 600),
-              fadeInCurve: Curves.easeIn,
-              placeholder: (context, url) => Shimmer.fromColors(
-                baseColor: AppColors.shimmerBase,
-                highlightColor: AppColors.shimmerHighlight,
-                child: Container(color: AppColors.shimmerBase),
-              ),
-              errorWidget: (context, url, error) => Container(
-                color: AppColors.backgroundDark,
-                child: const Center(
-                  child: Icon(Icons.image_not_supported_outlined,
-                      color: AppColors.grey600, size: 48),
-                ),
-              ),
-            ),
-          ),
-
-          // ── Bottom gradient ──────────────────────────────────
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: size.height * 0.50,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    const Color(0xFF1A1A1A).withValues(alpha: 0.4),
-                    const Color(0xFF1A1A1A).withValues(alpha: 0.85),
-                  ],
-                  stops: const [0.0, 0.4, 1.0],
-                ),
-              ),
-            ),
-          ),
-
-          // ── Content overlay ──────────────────────────────────
-          Positioned(
-            bottom: AppSpacing.huge,
-            left: AppSpacing.xxl,
-            right: AppSpacing.xxl,
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Genre / fabric type
-                  Text(
-                    widget.modele.genreHabit.toUpperCase(),
-                    style: AppTypography.labelMedium.copyWith(
-                      color: const Color(0xFFE0D5C8),
-                      letterSpacing: 2.5,
-                      fontWeight: FontWeight.w500,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        PageView.builder(
+          controller: _pageController,
+          itemCount: widget.modeles.length,
+          onPageChanged: (index) => setState(() => _currentIndex = index),
+          itemBuilder: (context, index) {
+            final modele = widget.modeles[index];
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: CachedNetworkImage(
+                    imageUrl:
+                        modele.fichier.isNotEmpty ? modele.fichier[0]! : '',
+                    fit: BoxFit.cover,
+                    fadeInDuration: const Duration(milliseconds: 600),
+                    fadeInCurve: Curves.easeIn,
+                    placeholder: (context, url) => Shimmer.fromColors(
+                      baseColor: AppColors.shimmerBase,
+                      highlightColor: AppColors.shimmerHighlight,
+                      child: Container(color: AppColors.shimmerBase),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: AppColors.backgroundDark,
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported_outlined,
+                            color: AppColors.grey600, size: 48),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-
-                  // Title / detail
-                  if (widget.modele.detail != null &&
-                      widget.modele.detail!.isNotEmpty)
-                    Text(
-                      widget.modele.detail!,
-                      style: AppTypography.displayMedium.copyWith(
-                        color: const Color(0xFFF5F0EB),
-                        fontWeight: FontWeight.w600,
-                        height: 1.15,
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: size.height * 0.55,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          const Color(0xFF1A1A1A).withValues(alpha: 0.4),
+                          const Color(0xFF1A1A1A).withValues(alpha: 0.9),
+                        ],
+                        stops: const [0.0, 0.45, 1.0],
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  const SizedBox(height: AppSpacing.xxl),
-
-                  // CTAs
-                  Row(
+                  ),
+                ),
+                Positioned(
+                  bottom: AppSpacing.huge,
+                  left: AppSpacing.xxl,
+                  right: AppSpacing.xxl,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // "Voir le modèle"
-                      _HeroCta(
-                        label: 'Voir le modèle',
-                        filled: true,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          Get.to(
-                            () => DetailModeleView(widget.modele),
-                            transition: Transition.rightToLeft,
-                          );
-                        },
+                      Text(
+                        modele.genreHabit.toUpperCase(),
+                        style: AppTypography.labelMedium.copyWith(
+                          color: const Color(0xFFE0D5C8),
+                          letterSpacing: 2.5,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      const SizedBox(width: AppSpacing.md),
-                      // "Trouver un tailleur"
-                      _HeroCta(
-                        label: 'Trouver un tailleur',
-                        filled: false,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          final userController = Get.find<UserController>();
-                          if (userController.isTailleur.value) {
-                            Get.to(
-                              () => DetailModeleView(widget.modele),
-                              transition: Transition.rightToLeft,
-                            );
-                          } else {
-                            showTailleurModalBottomSheet(
-                                context, widget.modele);
-                          }
-                        },
+                      const SizedBox(height: AppSpacing.sm),
+                      if (modele.detail != null && modele.detail!.isNotEmpty)
+                        Text(
+                          modele.detail!,
+                          style: AppTypography.displayMedium.copyWith(
+                            color: const Color(0xFFF5F0EB),
+                            fontWeight: FontWeight.w600,
+                            height: 1.15,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      Row(
+                        children: [
+                          _HeroCta(
+                            label: 'Voir le modèle',
+                            filled: true,
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              Get.to(
+                                () => DetailModeleView(modele),
+                                transition: Transition.rightToLeft,
+                              );
+                            },
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          _HeroCta(
+                            label: 'Trouver un tailleur',
+                            filled: false,
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              final userController = Get.find<UserController>();
+                              if (userController.isTailleur.value) {
+                                Get.to(
+                                  () => DetailModeleView(modele),
+                                  transition: Transition.rightToLeft,
+                                );
+                              } else {
+                                showTailleurModalBottomSheet(context, modele);
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
+            );
+          },
+        ),
+        if (widget.modeles.length > 1)
+          Positioned(
+            bottom: AppSpacing.lg,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(widget.modeles.length, (index) {
+                final isActive = _currentIndex == index;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: isActive ? 18 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? AppColors.white.withValues(alpha: 0.95)
+                        : AppColors.white.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                );
+              }),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

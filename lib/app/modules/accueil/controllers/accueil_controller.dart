@@ -31,6 +31,19 @@ class AccueilController extends GetxController {
     );
   }
 
+  void _jumpToFirstPageIfAttached() {
+    if (pageController.hasClients) {
+      pageController.jumpToPage(0);
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (pageController.hasClients) {
+        pageController.jumpToPage(0);
+      }
+    });
+  }
+
   void onCategorieSelected(Categorie categorie) {
     // Reset pagination state for category change
     modeles.clear();
@@ -47,7 +60,7 @@ class AccueilController extends GetxController {
       listSelectedCategorie.remove("1");
     }
     loadMore();
-    pageController.jumpToPage(0);
+    _jumpToFirstPageIfAttached();
   }
 
   Future<void> refreshPage() async {
@@ -55,7 +68,7 @@ class AccueilController extends GetxController {
     homeController.lastModeleFetch.value = null;
     homeController.hasMoreData.value = true;
     await loadMore();
-    pageController.jumpToPage(0);
+    _jumpToFirstPageIfAttached();
   }
 
   Future<void> loadMore() async {
@@ -89,9 +102,6 @@ class AccueilController extends GetxController {
     update();
   }
 
-
-
-
   RefreshController refreshController =
       RefreshController(initialRefresh: false);
 
@@ -108,6 +118,13 @@ class AccueilController extends GetxController {
     // if failed,use loadFailed(),if no data return,use LoadNodata()
 
     refreshController.loadComplete();
+  }
+
+  @override
+  void onClose() {
+    pageController.dispose();
+    refreshController.dispose();
+    super.onClose();
   }
 }
 

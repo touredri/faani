@@ -96,18 +96,34 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
           parent: BouncingScrollPhysics(),
         ),
         slivers: [
-          // ── Pinned category header + search ───────────────────
+          // ── Hero + transparent sliver appbar overlay ──────────
           SliverAppBar(
             pinned: true,
-            floating: true,
-            snap: true,
-            backgroundColor: const Color(0xFF1A1A1A),
+            floating: false,
+            snap: false,
+            stretch: true,
+            elevation: 3,
+            shadowColor: Colors.black.withValues(alpha: 0.44),
+            scrolledUnderElevation: 6,
+            surfaceTintColor: Colors.transparent,
+            backgroundColor: Colors.transparent,
+            expandedHeight: modeles.isNotEmpty
+                ? MediaQuery.sizeOf(context).height * 0.72
+                : 56,
             toolbarHeight: 52,
+            flexibleSpace: modeles.isNotEmpty
+                ? FlexibleSpaceBar(
+                    collapseMode: CollapseMode.parallax,
+                    background: HeroSection(
+                      modeles: modeles.take(5).toList(),
+                    ),
+                  )
+                : null,
             title: Row(
               children: [
                 Expanded(
                   child: SizedBox(
-                    height: 20,
+                    height: 22,
                     child: CategorieFiltre<AccueilController>(
                       controller: widget.controller,
                       isOverlay: true,
@@ -128,12 +144,6 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
             ),
             automaticallyImplyLeading: false,
           ),
-
-          // ── Hero section (first model) ────────────────────────
-          if (modeles.isNotEmpty)
-            SliverToBoxAdapter(
-              child: HeroSection(modele: modeles[0]),
-            ),
 
           // ── "Explorer" section title ──────────────────────────
           if (modeles.length > 1)
@@ -182,8 +192,7 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
                     onTap: () {
                       // Open TikTok-like feed filtered by same category
                       final categoryModeles = modeles
-                          .where((m) =>
-                              m.idCategorie == modele.idCategorie)
+                          .where((m) => m.idCategorie == modele.idCategorie)
                           .toList();
                       final feedIndex = categoryModeles.indexOf(modele);
                       Get.to(
