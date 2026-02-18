@@ -53,20 +53,22 @@ class _EditorialGridItemState extends State<EditorialGridItem> {
               fit: StackFit.expand,
               children: [
                 // ── Image ────────────────────────────────────────────────
-                CachedNetworkImage(
-                  imageUrl: widget.modele.fichier[0]!,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: EditorialTheme.surfaceDark,
-                    highlightColor: EditorialTheme.surfaceMuted,
-                    child: Container(color: EditorialTheme.surfaceDark),
+                if (widget.modele.fichier.isNotEmpty &&
+                    widget.modele.fichier[0] != null)
+                  CachedNetworkImage(
+                    imageUrl: widget.modele.fichier[0]!,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Shimmer.fromColors(
+                      baseColor: EditorialTheme.surfaceDark,
+                      highlightColor: EditorialTheme.surfaceMuted,
+                      child: Container(color: EditorialTheme.surfaceDark),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: EditorialTheme.surfaceDark,
+                      child: const Icon(Icons.image_not_supported_outlined,
+                          color: EditorialTheme.offWhite50, size: 24),
+                    ),
                   ),
-                  errorWidget: (context, url, error) => Container(
-                    color: EditorialTheme.surfaceDark,
-                    child: const Icon(Icons.image_not_supported_outlined,
-                        color: EditorialTheme.offWhite50, size: 24),
-                  ),
-                ),
 
                 // ── Bottom gradient overlay ──────────────────────────────
                 Positioned(

@@ -24,26 +24,27 @@ class HeroSection extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           // ── Background image ──────────────────────────────────────────
-          ClipRRect(
-            child: CachedNetworkImage(
-              imageUrl: modele.fichier[0]!,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                color: EditorialTheme.surfaceDark,
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 1.5,
-                    color: EditorialTheme.offWhite50,
+          if (modele.fichier.isNotEmpty && modele.fichier[0] != null)
+            ClipRRect(
+              child: CachedNetworkImage(
+                imageUrl: modele.fichier[0]!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: EditorialTheme.surfaceDark,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1.5,
+                      color: EditorialTheme.offWhite50,
+                    ),
                   ),
                 ),
-              ),
-              errorWidget: (context, url, error) => Container(
-                color: EditorialTheme.surfaceDark,
-                child: const Icon(Icons.image_not_supported_outlined,
-                    color: EditorialTheme.offWhite50, size: 40),
+                errorWidget: (context, url, error) => Container(
+                  color: EditorialTheme.surfaceDark,
+                  child: const Icon(Icons.image_not_supported_outlined,
+                      color: EditorialTheme.offWhite50, size: 40),
+                ),
               ),
             ),
-          ),
 
           // ── Gradient overlay ──────────────────────────────────────────
           Container(

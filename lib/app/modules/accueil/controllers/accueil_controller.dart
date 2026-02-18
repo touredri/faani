@@ -99,7 +99,7 @@ class AccueilController extends GetxController {
   void _updateHybridState() {
     if (modeles.isNotEmpty) {
       heroModele.value = modeles.first;
-      gridModeles.value = modeles.length > 1 ? modeles.sublist(1) : [];
+      gridModeles.value = modeles.sublist(1);
     }
   }
 
