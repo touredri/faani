@@ -59,7 +59,9 @@ class _MasonryGridItemState extends State<MasonryGridItem> {
               children: [
                 // ── Image ────────────────────────────────────────
                 CachedNetworkImage(
-                  imageUrl: widget.modele.fichier[0]!,
+                  imageUrl: widget.modele.fichier.isNotEmpty
+                      ? widget.modele.fichier[0]!
+                      : '',
                   fit: BoxFit.cover,
                   fadeInDuration: const Duration(milliseconds: 400),
                   fadeInCurve: Curves.easeIn,

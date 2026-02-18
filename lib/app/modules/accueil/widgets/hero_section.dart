@@ -60,7 +60,9 @@ class _HeroSectionState extends State<HeroSection>
           // ── Fullscreen image ──────────────────────────────────
           Positioned.fill(
             child: CachedNetworkImage(
-              imageUrl: widget.modele.fichier[0]!,
+              imageUrl: widget.modele.fichier.isNotEmpty
+                  ? widget.modele.fichier[0]!
+                  : '',
               fit: BoxFit.cover,
               fadeInDuration: const Duration(milliseconds: 600),
               fadeInCurve: Curves.easeIn,
