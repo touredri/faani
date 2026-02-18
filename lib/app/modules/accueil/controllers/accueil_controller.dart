@@ -24,6 +24,16 @@ class AccueilController extends GetxController {
   final Rx<Modele?> lastModeleFetch = Rx<Modele?>(null);
   final userController = Get.find<UserController>();
 
+  // ── Hybrid layout state ───────────────────────────────────────────────
+  /// The hero model shown at the top of the home page.
+  final Rx<Modele?> heroModele = Rx<Modele?>(null);
+
+  /// Grid models (everything after the hero).
+  RxList<Modele> gridModeles = <Modele>[].obs;
+
+  /// Whether the initial data load is in progress.
+  RxBool isLoading = true.obs;
+
   AccueilController() {
     sewingIcon = SvgPicture.asset(
       sewing,
@@ -72,6 +82,7 @@ class AccueilController extends GetxController {
         if (libelle == 'Tous') modeles.clear();
         modeles.addAll(fetchedDocuments);
         lastModeleFetch.value = modeles.last;
+        _updateHybridState();
         update();
       }
     } catch (e) {
@@ -79,7 +90,17 @@ class AccueilController extends GetxController {
         Get.snackbar('Network Error', e.message,
             snackPosition: SnackPosition.TOP);
       }
-    } finally {}
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Splits the loaded models into hero + grid for the hybrid layout.
+  void _updateHybridState() {
+    if (modeles.isNotEmpty) {
+      heroModele.value = modeles.first;
+      gridModeles.value = modeles.length > 1 ? modeles.sublist(1) : [];
+    }
   }
 
   void genreChange() {
@@ -94,8 +115,11 @@ class AccueilController extends GetxController {
   }
 
   Future<void> init() async {
+    isLoading.value = true;
     await loadMore(userController.currentUser.value.sex ?? '', '');
     modeles.shuffle();
+    _updateHybridState();
+    isLoading.value = false;
   }
 
   @override
