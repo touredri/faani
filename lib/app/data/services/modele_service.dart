@@ -8,12 +8,84 @@ import 'package:get/get.dart';
 class ModeleService {
   static final ModeleService _singleton = ModeleService._internal();
 
+  static final Map<String, _ModeleCacheEntry> _feedCache =
+      <String, _ModeleCacheEntry>{};
+  static final Map<String, _ModeleCacheEntry> _searchCache =
+      <String, _ModeleCacheEntry>{};
+
   factory ModeleService() => _singleton;
 
   ModeleService._internal();
 
   final collection = FirebaseFirestore.instance.collection('modele');
   DocumentSnapshot? lastDoc;
+
+  String _cacheKeyFromCategories(List<String> idCategories,
+      {String? prefix = 'feed'}) {
+    final sorted = List<String>.from(idCategories)..sort();
+    return '$prefix:${sorted.join(',')}';
+  }
+
+  List<Modele> _mergeById(List<Modele> existing, List<Modele> incoming) {
+    final merged = <Modele>[];
+    final seenIds = <String>{};
+
+    for (final model in incoming) {
+      final id = model.id;
+      if (id == null || id.isEmpty || seenIds.contains(id)) continue;
+      merged.add(model);
+      seenIds.add(id);
+    }
+
+    for (final model in existing) {
+      final id = model.id;
+      if (id == null || id.isEmpty || seenIds.contains(id)) continue;
+      merged.add(model);
+      seenIds.add(id);
+    }
+
+    return merged;
+  }
+
+  List<Modele> getCachedFeed(List<String> idCategories) {
+    final key = _cacheKeyFromCategories(idCategories);
+    return List<Modele>.from(_feedCache[key]?.items ?? <Modele>[]);
+  }
+
+  void setCachedFeed(List<String> idCategories, List<Modele> models) {
+    final key = _cacheKeyFromCategories(idCategories);
+    _feedCache[key] = _ModeleCacheEntry(
+      items: List<Modele>.from(models),
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  Future<List<Modele>> refreshCachedFeedFirstPage(List<String> idCategories,
+      {int pageSize = 5}) async {
+    final fresh = await _getModeles(
+      idCategories,
+      pageSize: pageSize,
+    );
+    final existing = getCachedFeed(idCategories);
+    final merged = _mergeById(existing, fresh);
+    setCachedFeed(idCategories, merged);
+    return merged;
+  }
+
+  List<Modele> getCachedSearch(String query) {
+    final normalized = query.trim().toLowerCase();
+    if (normalized.isEmpty) return <Modele>[];
+    return List<Modele>.from(_searchCache[normalized]?.items ?? <Modele>[]);
+  }
+
+  void setCachedSearch(String query, List<Modele> models) {
+    final normalized = query.trim().toLowerCase();
+    if (normalized.isEmpty) return;
+    _searchCache[normalized] = _ModeleCacheEntry(
+      items: List<Modele>.from(models),
+      updatedAt: DateTime.now(),
+    );
+  }
 
   Future<void> create(Modele modele) async {
     final docRef = await collection.add(modele.toMap());
@@ -125,10 +197,27 @@ class ModeleService {
 
       if (idTailleur == null) {
         final accueilController = Get.find<AccueilController>();
-        models
-            .removeWhere((model) => accueilController.modeles.contains(model));
-        Get.find<HomeController>().lastModeleFetch.value =
-            models.isNotEmpty ? models.last : null;
+        final existingIds = accueilController.modeles
+            .map((modele) => modele.id)
+            .whereType<String>()
+            .toSet();
+        final pageSeenIds = <String>{};
+
+        models.removeWhere((model) {
+          final id = model.id;
+          if (id == null || id.isEmpty) return true;
+          if (existingIds.contains(id)) return true;
+          if (!pageSeenIds.add(id)) return true;
+          return false;
+        });
+
+        if (querySnapshot.docs.isNotEmpty) {
+          final lastRawDoc = querySnapshot.docs.last;
+          Get.find<HomeController>().lastModeleFetch.value =
+              Modele.fromMap(lastRawDoc.data(), lastRawDoc.reference);
+        } else {
+          Get.find<HomeController>().lastModeleFetch.value = null;
+        }
       }
       return models;
     } catch (e) {
@@ -242,4 +331,14 @@ class ModeleService {
   Future<void> updateModelApprovalStatus(String modeleId, bool status) async {
     await collection.doc(modeleId).update({'isApproved': status});
   }
+}
+
+class _ModeleCacheEntry {
+  final List<Modele> items;
+  final DateTime updatedAt;
+
+  _ModeleCacheEntry({
+    required this.items,
+    required this.updatedAt,
+  });
 }

@@ -9,7 +9,8 @@ class Like {
 
   Like({required this.id, required this.idUser});
 
-  factory Like.fromMap(Map<String, dynamic> data, DocumentReference documentReference) {
+  factory Like.fromMap(
+      Map<String, dynamic> data, DocumentReference documentReference) {
     final id = documentReference.id;
     final idUser = data['idUser'] as String;
 
@@ -31,9 +32,16 @@ class Comment {
   String? file;
   Timestamp? createdAt;
 
-  Comment({this.id, required this.comment, required this.idUser, this.type, this.file, Timestamp? createdAt});
+  Comment(
+      {this.id,
+      required this.comment,
+      required this.idUser,
+      this.type,
+      this.file,
+      Timestamp? createdAt});
 
-  factory Comment.fromMap(Map<String, dynamic> data, DocumentReference documentReference) {
+  factory Comment.fromMap(
+      Map<String, dynamic> data, DocumentReference documentReference) {
     final id = documentReference.id;
     final comment = data['comment'] as String;
     final idUser = data['idUser'] as String;
@@ -41,7 +49,13 @@ class Comment {
     final file = data['file'] as String?;
     final createdAt = data['createdAt'] as Timestamp?;
 
-    return Comment(id: id, comment: comment, idUser: idUser, type: type, file: file, createdAt: createdAt);
+    return Comment(
+        id: id,
+        comment: comment,
+        idUser: idUser,
+        type: type,
+        file: file,
+        createdAt: createdAt);
   }
 
   Map<String, dynamic> toMap() {
@@ -60,6 +74,9 @@ class Modele {
   final String? detail;
   final List<String?> fichier;
   final List<String?>? imagePath;
+  final Timestamp? createdAt;
+  final int likeCount;
+  final int viewCount;
   final String genreHabit;
   final String idTailleur;
   final String? idCategorie;
@@ -71,6 +88,9 @@ class Modele {
     required this.detail,
     required this.fichier,
     required this.imagePath,
+    this.createdAt,
+    this.likeCount = 0,
+    this.viewCount = 0,
     required this.genreHabit,
     required this.idTailleur,
     required this.idCategorie,
@@ -83,7 +103,11 @@ class Modele {
     final id = documentReference.id;
     final detail = data['detail'] as String;
     final fichier = List<String>.from(data['fichier'] as List);
-    final imagePath = data['imagePath'] != null ? List<String>.from(data['imagePath']) : null;
+    final imagePath =
+        data['imagePath'] != null ? List<String>.from(data['imagePath']) : null;
+    final createdAt = data['createdAt'] as Timestamp?;
+    final likeCount = data['likeCount'] as int? ?? 0;
+    final viewCount = data['viewCount'] as int? ?? 0;
     final genreHabit = data['genreHabit'] as String;
     final idTailleur = data['idTailleur'] as String;
     final idCategorie = data['idCategorie'] as String;
@@ -95,6 +119,9 @@ class Modele {
       detail: detail,
       fichier: fichier,
       imagePath: imagePath,
+      createdAt: createdAt,
+      likeCount: likeCount,
+      viewCount: viewCount,
       genreHabit: genreHabit,
       idTailleur: idTailleur,
       idCategorie: idCategorie,
@@ -108,6 +135,9 @@ class Modele {
       'detail': detail,
       'fichier': fichier,
       'imagePath': imagePath,
+      'createdAt': createdAt,
+      'likeCount': likeCount,
+      'viewCount': viewCount,
       'genreHabit': genreHabit,
       'idTailleur': idTailleur,
       'idCategorie': idCategorie,
@@ -117,11 +147,22 @@ class Modele {
   }
 
   factory Modele.fromDocumentSnapshot(DocumentSnapshot doc) {
+    Timestamp? createdAt;
+    try {
+      createdAt = doc['createdAt'] as Timestamp?;
+    } catch (_) {
+      createdAt = null;
+    }
+
     return Modele(
       id: doc.id,
       detail: doc['detail'],
       fichier: List<String>.from(doc['fichier']),
-      imagePath: doc['imagePath'] != null ? List<String>.from(doc['imagePath']) : null,
+      imagePath:
+          doc['imagePath'] != null ? List<String>.from(doc['imagePath']) : null,
+      createdAt: createdAt,
+      likeCount: doc['likeCount'] ?? 0,
+      viewCount: doc['viewCount'] ?? 0,
       genreHabit: doc['genreHabit'],
       idTailleur: doc['idTailleur'],
       idCategorie: doc['idCategorie'],

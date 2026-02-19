@@ -35,40 +35,47 @@ class HomeView extends GetView<HomeController> {
             if (didPop) return;
             controller.canPop();
           },
-          child: PersistentTabView(
-            controller: controller.tabController,
-            backgroundColor: theme.scaffoldBackgroundColor,
-            tabs: controller.tabs(),
-            navBarBuilder: (navBarConfig) => Style15BottomNavBar(
-              navBarDecoration: NavBarDecoration(
-                color: navBarConfig.selectedIndex == 0
-                    ? Colors.transparent
-                    : theme.scaffoldBackgroundColor,
-                borderRadius: navBarConfig.selectedIndex == 0
-                    ? BorderRadius.circular(AppRadius.full)
-                    : const BorderRadius.only(
-                        topLeft: Radius.circular(AppRadius.xl),
-                        topRight: Radius.circular(AppRadius.xl),
-                      ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: navBarConfig.selectedIndex == 0
-                      ? AppSpacing.lg
-                      : AppSpacing.sm,
-                  vertical: navBarConfig.selectedIndex == 0
-                      ? AppSpacing.xxs
-                      : AppSpacing.xs,
-                ),
-                boxShadow: navBarConfig.selectedIndex == 0
-                    ? [
-                        BoxShadow(
-                          color: AppColors.black.withValues(alpha: 0.22),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ]
-                    : null,
+          child: Obx(
+            () => PersistentTabView(
+              controller: controller.tabController,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              tabs: controller.tabs(
+                isHomeTabActive: controller.selectedNavIndex.value == 0,
               ),
-              navBarConfig: navBarConfig,
+              onTabChanged: (index) {
+                controller.selectedNavIndex.value = index;
+              },
+              navBarBuilder: (navBarConfig) => Style15BottomNavBar(
+                navBarDecoration: NavBarDecoration(
+                  color: navBarConfig.selectedIndex == 0
+                      ? Colors.transparent
+                      : theme.scaffoldBackgroundColor,
+                  borderRadius: navBarConfig.selectedIndex == 0
+                      ? BorderRadius.circular(AppRadius.full)
+                      : const BorderRadius.only(
+                          topLeft: Radius.circular(AppRadius.xl),
+                          topRight: Radius.circular(AppRadius.xl),
+                        ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: navBarConfig.selectedIndex == 0
+                        ? AppSpacing.lg
+                        : AppSpacing.sm,
+                    vertical: navBarConfig.selectedIndex == 0
+                        ? AppSpacing.xxs
+                        : AppSpacing.xs,
+                  ),
+                  boxShadow: navBarConfig.selectedIndex == 0
+                      ? [
+                          BoxShadow(
+                            color: AppColors.black.withValues(alpha: 0.22),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ]
+                      : null,
+                ),
+                navBarConfig: navBarConfig,
+              ),
             ),
           ),
         ),

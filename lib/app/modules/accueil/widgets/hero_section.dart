@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/engagement_tracking_service.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/globale_widgets/list_tailleur_bottom_sheet.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'dart:async';
+import 'package:video_player/video_player.dart';
 import '../../../style/app_colors.dart';
 
 /// Immersive fullscreen hero section for the home page.
@@ -17,7 +19,12 @@ import '../../../style/app_colors.dart';
 /// Shows a premium highlight model with editorial typography and CTAs.
 class HeroSection extends StatefulWidget {
   final List<Modele> modeles;
-  const HeroSection({super.key, required this.modeles});
+  final ValueChanged<Modele>? onModelOpened;
+  const HeroSection({
+    super.key,
+    required this.modeles,
+    this.onModelOpened,
+  });
 
   @override
   State<HeroSection> createState() => _HeroSectionState();
@@ -34,6 +41,16 @@ class _HeroSectionState extends State<HeroSection>
     super.initState();
     _pageController = PageController(viewportFraction: 1.0);
     _startAutoScroll();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final first = widget.modeles.isNotEmpty ? widget.modeles.first : null;
+      if (first?.id != null) {
+        EngagementTrackingService.instance.trackImpression(
+          first!.id!,
+          source: 'hero_carousel',
+          categoryId: first.idCategorie,
+        );
+      }
+    });
   }
 
   void _startAutoScroll() {
@@ -81,31 +98,27 @@ class _HeroSectionState extends State<HeroSection>
         PageView.builder(
           controller: _pageController,
           itemCount: widget.modeles.length,
-          onPageChanged: (index) => setState(() => _currentIndex = index),
+          onPageChanged: (index) {
+            setState(() => _currentIndex = index);
+            final modele = widget.modeles[index];
+            if (modele.id != null) {
+              EngagementTrackingService.instance.trackImpression(
+                modele.id!,
+                source: 'hero_carousel',
+                categoryId: modele.idCategorie,
+              );
+            }
+          },
           itemBuilder: (context, index) {
             final modele = widget.modeles[index];
             return Stack(
               fit: StackFit.expand,
               children: [
                 Positioned.fill(
-                  child: CachedNetworkImage(
-                    imageUrl:
+                  child: _HeroMediaBackground(
+                    mediaUrl:
                         modele.fichier.isNotEmpty ? modele.fichier[0]! : '',
-                    fit: BoxFit.cover,
-                    fadeInDuration: const Duration(milliseconds: 600),
-                    fadeInCurve: Curves.easeIn,
-                    placeholder: (context, url) => Shimmer.fromColors(
-                      baseColor: AppColors.shimmerBase,
-                      highlightColor: AppColors.shimmerHighlight,
-                      child: Container(color: AppColors.shimmerBase),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: AppColors.backgroundDark,
-                      child: const Center(
-                        child: Icon(Icons.image_not_supported_outlined,
-                            color: AppColors.grey600, size: 48),
-                      ),
-                    ),
+                    autoplay: _currentIndex == index,
                   ),
                 ),
                 Positioned(
@@ -164,6 +177,14 @@ class _HeroSectionState extends State<HeroSection>
                             filled: true,
                             onTap: () {
                               HapticFeedback.lightImpact();
+                              if (modele.id != null) {
+                                EngagementTrackingService.instance.trackOpen(
+                                  modele.id!,
+                                  source: 'hero_cta',
+                                  categoryId: modele.idCategorie,
+                                );
+                              }
+                              widget.onModelOpened?.call(modele);
                               Get.to(
                                 () => DetailModeleView(modele),
                                 transition: Transition.rightToLeft,
@@ -176,8 +197,17 @@ class _HeroSectionState extends State<HeroSection>
                             filled: false,
                             onTap: () {
                               HapticFeedback.lightImpact();
+                              if (modele.id != null) {
+                                EngagementTrackingService.instance
+                                    .trackOrderIntent(
+                                  modele.id!,
+                                  source: 'hero_cta',
+                                  categoryId: modele.idCategorie,
+                                );
+                              }
                               final userController = Get.find<UserController>();
                               if (userController.isTailleur.value) {
+                                widget.onModelOpened?.call(modele);
                                 Get.to(
                                   () => DetailModeleView(modele),
                                   transition: Transition.rightToLeft,
@@ -221,6 +251,133 @@ class _HeroSectionState extends State<HeroSection>
             ),
           ),
       ],
+    );
+  }
+}
+
+class _HeroMediaBackground extends StatefulWidget {
+  const _HeroMediaBackground({
+    required this.mediaUrl,
+    required this.autoplay,
+  });
+
+  final String mediaUrl;
+  final bool autoplay;
+
+  @override
+  State<_HeroMediaBackground> createState() => _HeroMediaBackgroundState();
+}
+
+class _HeroMediaBackgroundState extends State<_HeroMediaBackground> {
+  VideoPlayerController? _videoController;
+  Future<void>? _initializeVideo;
+
+  bool get _isVideo {
+    final lower = widget.mediaUrl.toLowerCase();
+    return lower.endsWith('.mp4') ||
+        lower.endsWith('.mov') ||
+        lower.endsWith('.webm') ||
+        lower.contains('video');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initVideoIfNeeded();
+  }
+
+  @override
+  void didUpdateWidget(covariant _HeroMediaBackground oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.mediaUrl != widget.mediaUrl) {
+      _disposeVideo();
+      _initVideoIfNeeded();
+      return;
+    }
+
+    if (_videoController != null) {
+      if (widget.autoplay) {
+        _videoController!.play();
+      } else {
+        _videoController!.pause();
+      }
+    }
+  }
+
+  void _initVideoIfNeeded() {
+    if (!_isVideo || widget.mediaUrl.isEmpty) return;
+
+    final controller =
+        VideoPlayerController.networkUrl(Uri.parse(widget.mediaUrl));
+    _videoController = controller;
+    _initializeVideo = controller.initialize().then((_) async {
+      await controller.setLooping(true);
+      await controller.setVolume(0);
+      if (widget.autoplay) {
+        await controller.play();
+      }
+      if (mounted) setState(() {});
+    });
+  }
+
+  void _disposeVideo() {
+    _videoController?.dispose();
+    _videoController = null;
+    _initializeVideo = null;
+  }
+
+  @override
+  void dispose() {
+    _disposeVideo();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isVideo && _videoController != null) {
+      return FutureBuilder<void>(
+        future: _initializeVideo,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              _videoController!.value.isInitialized) {
+            return FittedBox(
+              fit: BoxFit.cover,
+              clipBehavior: Clip.hardEdge,
+              child: SizedBox(
+                width: _videoController!.value.size.width,
+                height: _videoController!.value.size.height,
+                child: VideoPlayer(_videoController!),
+              ),
+            );
+          }
+
+          return Shimmer.fromColors(
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
+            child: Container(color: AppColors.shimmerBase),
+          );
+        },
+      );
+    }
+
+    return CachedNetworkImage(
+      imageUrl: widget.mediaUrl,
+      fit: BoxFit.cover,
+      fadeInDuration: const Duration(milliseconds: 600),
+      fadeInCurve: Curves.easeIn,
+      placeholder: (context, url) => Shimmer.fromColors(
+        baseColor: AppColors.shimmerBase,
+        highlightColor: AppColors.shimmerHighlight,
+        child: Container(color: AppColors.shimmerBase),
+      ),
+      errorWidget: (context, url, error) => Container(
+        color: AppColors.backgroundDark,
+        child: const Center(
+          child: Icon(Icons.image_not_supported_outlined,
+              color: AppColors.grey600, size: 48),
+        ),
+      ),
     );
   }
 }

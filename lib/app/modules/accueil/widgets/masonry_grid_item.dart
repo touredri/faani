@@ -8,6 +8,7 @@ import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:video_player/video_player.dart';
 
 /// A single masonry grid item card for the home exploration grid.
 ///
@@ -31,6 +32,17 @@ class MasonryGridItem extends StatefulWidget {
 
 class _MasonryGridItemState extends State<MasonryGridItem> {
   bool _pressed = false;
+
+  bool get _hasVideoMedia {
+    final media = widget.modele.fichier.isNotEmpty
+        ? (widget.modele.fichier[0] ?? '')
+        : '';
+    final lower = media.toLowerCase();
+    return lower.endsWith('.mp4') ||
+        lower.endsWith('.mov') ||
+        lower.endsWith('.webm') ||
+        lower.contains('video');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,25 +70,10 @@ class _MasonryGridItemState extends State<MasonryGridItem> {
               fit: StackFit.expand,
               children: [
                 // ── Image ────────────────────────────────────────
-                CachedNetworkImage(
-                  imageUrl: widget.modele.fichier.isNotEmpty
+                _MasonryMedia(
+                  mediaUrl: widget.modele.fichier.isNotEmpty
                       ? widget.modele.fichier[0]!
                       : '',
-                  fit: BoxFit.cover,
-                  fadeInDuration: const Duration(milliseconds: 400),
-                  fadeInCurve: Curves.easeIn,
-                  placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: AppColors.grey200,
-                    highlightColor: AppColors.grey100,
-                    child: Container(color: AppColors.grey200),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: AppColors.grey200,
-                    child: const Center(
-                      child: Icon(Icons.image_not_supported_outlined,
-                          color: AppColors.grey400, size: 28),
-                    ),
-                  ),
                 ),
 
                 // ── Bottom gradient overlay ──────────────────────
@@ -153,9 +150,120 @@ class _MasonryGridItemState extends State<MasonryGridItem> {
                       ),
                     ),
                   ),
+
+                if (_hasVideoMedia)
+                  Positioned(
+                    bottom: AppSpacing.sm,
+                    right: AppSpacing.sm,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.play_arrow_rounded,
+                        color: AppColors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MasonryMedia extends StatefulWidget {
+  const _MasonryMedia({required this.mediaUrl});
+
+  final String mediaUrl;
+
+  @override
+  State<_MasonryMedia> createState() => _MasonryMediaState();
+}
+
+class _MasonryMediaState extends State<_MasonryMedia> {
+  VideoPlayerController? _videoController;
+  Future<void>? _initializeVideo;
+
+  bool get _isVideo {
+    final lower = widget.mediaUrl.toLowerCase();
+    return lower.endsWith('.mp4') ||
+        lower.endsWith('.mov') ||
+        lower.endsWith('.webm') ||
+        lower.contains('video');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isVideo && widget.mediaUrl.isNotEmpty) {
+      final controller =
+          VideoPlayerController.networkUrl(Uri.parse(widget.mediaUrl));
+      _videoController = controller;
+      _initializeVideo = controller.initialize().then((_) async {
+        await controller.setLooping(true);
+        await controller.setVolume(0);
+        await controller.play();
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isVideo && _videoController != null) {
+      return FutureBuilder<void>(
+        future: _initializeVideo,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              _videoController!.value.isInitialized) {
+            return FittedBox(
+              fit: BoxFit.cover,
+              clipBehavior: Clip.hardEdge,
+              child: SizedBox(
+                width: _videoController!.value.size.width,
+                height: _videoController!.value.size.height,
+                child: VideoPlayer(_videoController!),
+              ),
+            );
+          }
+
+          return Shimmer.fromColors(
+            baseColor: AppColors.grey200,
+            highlightColor: AppColors.grey100,
+            child: Container(color: AppColors.grey200),
+          );
+        },
+      );
+    }
+
+    return CachedNetworkImage(
+      imageUrl: widget.mediaUrl,
+      fit: BoxFit.cover,
+      fadeInDuration: const Duration(milliseconds: 400),
+      fadeInCurve: Curves.easeIn,
+      placeholder: (context, url) => Shimmer.fromColors(
+        baseColor: AppColors.grey200,
+        highlightColor: AppColors.grey100,
+        child: Container(color: AppColors.grey200),
+      ),
+      errorWidget: (context, url, error) => Container(
+        color: AppColors.grey200,
+        child: const Center(
+          child: Icon(Icons.image_not_supported_outlined,
+              color: AppColors.grey400, size: 28),
         ),
       ),
     );

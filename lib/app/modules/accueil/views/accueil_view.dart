@@ -2,6 +2,7 @@ import 'package:faani/app/modules/search_page/views/search_page_view.dart';
 import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
+import 'package:faani/app/data/services/engagement_tracking_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -85,6 +86,11 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
   @override
   Widget build(BuildContext context) {
     final modeles = widget.controller.modeles;
+    final heroModeles = widget.controller.getHeroCandidates(limit: 5);
+    final heroIds =
+        heroModeles.map((modele) => modele.id).whereType<String>().toSet();
+    final explorationModeles =
+        widget.controller.getExplorationCandidates(excludeModeleIds: heroIds);
 
     return RefreshIndicator(
       onRefresh: widget.controller.refreshPage,
@@ -115,7 +121,10 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
                 ? FlexibleSpaceBar(
                     collapseMode: CollapseMode.parallax,
                     background: HeroSection(
-                      modeles: modeles.take(5).toList(),
+                      modeles: heroModeles,
+                      onModelOpened: (modele) {
+                        widget.controller.registerModelOpened(modele.id);
+                      },
                     ),
                   )
                 : null,
@@ -146,7 +155,7 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
           ),
 
           // ── "Explorer" section title ──────────────────────────
-          if (modeles.length > 1)
+          if (explorationModeles.isNotEmpty)
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(
@@ -167,7 +176,7 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
             ),
 
           // ── Masonry grid ──────────────────────────────────────
-          if (modeles.length > 1)
+          if (explorationModeles.isNotEmpty)
             SliverPadding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.sm,
@@ -176,10 +185,9 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
                 crossAxisCount: 2,
                 mainAxisSpacing: AppSpacing.sm,
                 crossAxisSpacing: AppSpacing.sm,
-                childCount: modeles.length - 1,
+                childCount: explorationModeles.length,
                 itemBuilder: (context, index) {
-                  final gridIndex = index + 1; // skip hero model
-                  final modele = modeles[gridIndex];
+                  final modele = explorationModeles[index];
                   // Vary heights for masonry effect
                   final idSum = modele.id?.codeUnits
                           .fold(0, (int sum, int c) => sum + c) ??
@@ -190,8 +198,14 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
                     modele: modele,
                     height: itemHeight,
                     onTap: () {
+                      widget.controller.registerModelOpened(modele.id);
+                      if (modele.id != null) {
+                        EngagementTrackingService.instance.trackOpen(modele.id!,
+                            source: 'home_grid',
+                            categoryId: modele.idCategorie);
+                      }
                       // Open TikTok-like feed filtered by same category
-                      final categoryModeles = modeles
+                      final categoryModeles = explorationModeles
                           .where((m) => m.idCategorie == modele.idCategorie)
                           .toList();
                       final feedIndex = categoryModeles.indexOf(modele);

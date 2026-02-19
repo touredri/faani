@@ -25,6 +25,7 @@ import '../../ajout_modele/views/ajout_modele_view.dart';
 class HomeController extends GetxController {
   PersistentTabController tabController =
       PersistentTabController(initialIndex: 0);
+  final RxInt selectedNavIndex = 0.obs;
   UserController userController = Get.find();
   RxBool isNetworkAvailable = true.obs;
   PushNotifications pushNotifications = PushNotifications();
@@ -86,25 +87,27 @@ class HomeController extends GetxController {
     }
   }
 
-  List<PersistentTabConfig> tabs() => [
+  List<PersistentTabConfig> tabs({required bool isHomeTabActive}) => [
         PersistentTabConfig(
           screen: const AccueilView(),
           item: ItemConfig(
-            activeForegroundColor: AppColors.primary,
+            activeForegroundColor:
+                isHomeTabActive ? AppColors.white : AppColors.primary,
+            inactiveForegroundColor:
+                isHomeTabActive ? AppColors.white : Colors.grey,
             icon: const Icon(Icons.home),
+            inactiveIcon: const Icon(Icons.home_outlined),
           ),
         ),
         PersistentTabConfig(
           screen: const CommandeView(),
           item: ItemConfig(
-            activeForegroundColor: AppColors.primary,
-            icon: sewingIcon,
-            inactiveIcon: SvgPicture.asset(
-              sewing,
-              colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-              width: 26,
-              height: 26,
-            ),
+            activeForegroundColor:
+                isHomeTabActive ? AppColors.white : AppColors.primary,
+            inactiveForegroundColor:
+                isHomeTabActive ? AppColors.white : Colors.grey,
+            icon: const Icon(Icons.content_cut),
+            inactiveIcon: const Icon(Icons.content_cut_outlined),
           ),
         ),
         PersistentTabConfig(
@@ -112,25 +115,40 @@ class HomeController extends GetxController {
               ? const AjoutModeleView()
               : const AjoutMesure(),
           item: ItemConfig(
-            activeForegroundColor: AppColors.primary,
-            icon: const Icon(
-              Icons.add,
-              color: Colors.white,
+            activeForegroundColor:
+                isHomeTabActive ? AppColors.transparent : AppColors.white,
+            inactiveForegroundColor:
+                isHomeTabActive ? AppColors.white : AppColors.primary,
+            icon: Icon(
+              Icons.add_circle_outline,
+              color: isHomeTabActive ? AppColors.white : AppColors.primary,
+            ),
+            inactiveIcon: Icon(
+              Icons.add_circle_outline,
+              color: isHomeTabActive ? AppColors.white : AppColors.primary,
             ),
           ),
         ),
         PersistentTabConfig(
           screen: const FavorieView(),
           item: ItemConfig(
-            activeForegroundColor: AppColors.primary,
+            activeForegroundColor:
+                isHomeTabActive ? AppColors.white : AppColors.primary,
+            inactiveForegroundColor:
+                isHomeTabActive ? AppColors.white : Colors.grey,
             icon: const Icon(Icons.favorite),
+            inactiveIcon: const Icon(Icons.favorite_border),
           ),
         ),
         PersistentTabConfig(
           screen: const ProfileView(),
           item: ItemConfig(
-            activeForegroundColor: AppColors.primary,
-            icon: const Icon(CupertinoIcons.profile_circled),
+            activeForegroundColor:
+                isHomeTabActive ? AppColors.white : AppColors.primary,
+            inactiveForegroundColor:
+                isHomeTabActive ? AppColors.white : Colors.grey,
+            icon: const Icon(Icons.person),
+            inactiveIcon: const Icon(Icons.person_outline),
           ),
         ),
       ];
