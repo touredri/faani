@@ -125,7 +125,8 @@ class _BuildProfileImageState extends State<BuildProfileImage> {
     if (image != null) {
       Reference storageReference = FirebaseStorage.instance
           .ref()
-          .child('profile_images')
+          .child('images')
+          .child('profiles')
           .child(image.path.split('/').last);
 
       UploadTask uploadTask = storageReference.putFile(File(image.path));

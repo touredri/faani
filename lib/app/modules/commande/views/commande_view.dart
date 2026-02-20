@@ -10,7 +10,6 @@ import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:faani/app/modules/commande/widgets/circle_indicator.dart';
 import 'package:faani/app/modules/commande/widgets/list_commande.dart';
 
 class CommandeView extends StatefulWidget {
@@ -44,62 +43,7 @@ class _CommandeViewState extends State<CommandeView>
     final isTailleur = controller.isTailleur.value;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'A Coudre',
-          style: AppTypography.headlineSmall.copyWith(
-            color: AppColors.textOnPrimary,
-          ),
-        ),
-        actions: [
-          GetBuilder<CommandeController>(
-            init: CommandeController(),
-            initState: (_) {},
-            id: 'search',
-            builder: (_) {
-              return Padding(
-                padding: AppSpacing.paddingAllSm,
-                child: AnimatedSearchBar(
-                  textEditingController:
-                      commandeController.textEditingController,
-                  isSearching: commandeController.isSearching,
-                  onSearch: commandeController.toggleSearch,
-                  controller: commandeController,
-                  color: AppColors.white,
-                ),
-              );
-            },
-          ),
-        ],
-        backgroundColor: theme.colorScheme.primary,
-        iconTheme: const IconThemeData(color: AppColors.white),
-        bottom: TabBar(
-          controller: _tabController,
-          indicator: CircleTabIndicator(
-            color: AppColors.white,
-            radius: 3,
-          ),
-          indicatorPadding: const EdgeInsets.only(bottom: 45),
-          labelColor: AppColors.white,
-          unselectedLabelColor: AppColors.white.withValues(alpha: 0.6),
-          labelStyle: AppTypography.labelMedium,
-          unselectedLabelStyle: AppTypography.labelSmall,
-          tabs: [
-            _CommandeTab(
-              icon: isTailleur ? Icons.call_received : Icons.send,
-              label: isTailleur ? 'Reçu' : 'Envoyé',
-            ),
-            _CommandeTab(
-              icon: isTailleur ? Icons.save_alt : Icons.people_alt_outlined,
-              label: isTailleur ? 'Enregistré' : 'Tailleurs',
-            ),
-            const _CommandeTab(
-              icon: Icons.done_all,
-              label: 'Terminé',
-            ),
-          ],
-        ),
-      ),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: GestureDetector(
         onTap: () {
           if (commandeController.isSearching.value) {
@@ -108,15 +52,116 @@ class _CommandeViewState extends State<CommandeView>
             FocusScope.of(context).unfocus();
           }
         },
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            const ListCommande(status: 'receive'),
-            isTailleur
-                ? const ListCommande(status: 'save')
-                : const ListTailleurView(),
-            const ListCommande(status: 'finish'),
-          ],
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.md,
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'A Coudre',
+                            style: AppTypography.headlineMedium.copyWith(
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            isTailleur
+                                ? 'Gérez vos commandes reçues et enregistrées'
+                                : 'Suivez vos commandes et trouvez des tailleurs',
+                            style: AppTypography.bodySmall.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    GetBuilder<CommandeController>(
+                      id: 'search',
+                      builder: (_) {
+                        return AnimatedSearchBar(
+                          textEditingController:
+                              commandeController.textEditingController,
+                          isSearching: commandeController.isSearching,
+                          onSearch: commandeController.toggleSearch,
+                          controller: commandeController,
+                          color: theme.colorScheme.primary,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: AppSpacing.paddingHLg,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: AppRadius.radiusXl,
+                    border: Border.all(
+                      color: AppColors.border.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.xs),
+                    child: TabBar(
+                      controller: _tabController,
+                      indicator: BoxDecoration(
+                        color: theme.colorScheme.primary,
+                        borderRadius: AppRadius.radiusLg,
+                      ),
+                      labelColor: AppColors.white,
+                      unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+                      labelStyle: AppTypography.labelMedium,
+                      unselectedLabelStyle: AppTypography.labelSmall,
+                      dividerColor: Colors.transparent,
+                      tabs: [
+                        _CommandeTab(
+                          icon: isTailleur ? Icons.call_received : Icons.send,
+                          label: isTailleur ? 'Reçu' : 'Envoyé',
+                        ),
+                        _CommandeTab(
+                          icon: isTailleur
+                              ? Icons.save_alt
+                              : Icons.people_alt_outlined,
+                          label: isTailleur ? 'Enregistré' : 'Tailleurs',
+                        ),
+                        const _CommandeTab(
+                          icon: Icons.done_all,
+                          label: 'Terminé',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    const ListCommande(status: 'receive'),
+                    isTailleur
+                        ? const ListCommande(status: 'save')
+                        : const ListTailleurView(),
+                    const ListCommande(status: 'finish'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: Column(
@@ -124,8 +169,9 @@ class _CommandeViewState extends State<CommandeView>
         children: [
           FloatingActionButton.small(
             heroTag: 'fab_msg',
-            backgroundColor: AppColors.grey600,
-            elevation: 1,
+            backgroundColor: theme.colorScheme.surface,
+            foregroundColor: theme.colorScheme.onSurface,
+            elevation: 1.5,
             shape: const RoundedRectangleBorder(
               borderRadius: AppRadius.radiusMd,
             ),
@@ -133,12 +179,14 @@ class _CommandeViewState extends State<CommandeView>
               () => const MessageView(),
               transition: Transition.downToUp,
             ),
-            child: const Icon(Icons.sms_outlined, color: AppColors.white),
+            child: const Icon(Icons.sms_outlined),
           ),
           if (isTailleur) ...[
             AppSpacing.gapV12,
             FloatingActionButton(
               heroTag: 'fab_add',
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: AppColors.white,
               onPressed: () => Get.to(
                 () => const ChooseModeleView(),
                 transition: Transition.downToUp,
@@ -161,13 +209,16 @@ class _CommandeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tab(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20),
-          const SizedBox(height: 2),
-          Text(label),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 20),
+            const SizedBox(height: 2),
+            Text(label),
+          ],
+        ),
       ),
     );
   }

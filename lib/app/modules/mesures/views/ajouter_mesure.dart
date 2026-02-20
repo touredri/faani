@@ -19,7 +19,7 @@ class AjoutMesure extends GetView {
         child: Column(
           children: [
             SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
+                height: MediaQuery.of(context).size.height * 0.55,
                 child: Image.asset(
                   'assets/images/measurement.png',
                   width: double.infinity,

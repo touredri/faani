@@ -39,7 +39,7 @@ class MesurePaveView extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.8,
+              height: MediaQuery.of(context).size.height * 0.75,
               child: PageView(
                 onPageChanged: (index) {
                   if (index == 7) {

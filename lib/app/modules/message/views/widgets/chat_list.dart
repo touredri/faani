@@ -11,25 +11,27 @@ class ChatList extends GetView<DiscussionController> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Container(
-          padding: EdgeInsets.only(bottom: 50.h),
-          child: CustomScrollView(
-            reverse: true,
-            controller: controller.msgScrolling,
-            slivers: [
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final item = controller.msgcontentlist[index];
-                    return item.id == user!.uid
-                        ? chatRightItem(item, context)
-                        : chatLeftItem(item, context);
-                  },
-                  childCount: controller.msgcontentlist.length,
-                ),
-              ),
-            ],
+    return Obx(() {
+      if (controller.msgcontentlist.isEmpty) {
+        return const Center(
+          child: Text(
+            'Démarrez la conversation 👋',
+            style: TextStyle(fontSize: 13, color: Colors.grey),
           ),
-        ));
+        );
+      }
+
+      return ListView.builder(
+        controller: controller.msgScrolling,
+        padding: EdgeInsets.only(top: 8.h, bottom: 12.h),
+        itemCount: controller.msgcontentlist.length,
+        itemBuilder: (context, index) {
+          final item = controller.msgcontentlist[index];
+          return item.id == user!.uid
+              ? chatRightItem(item, context)
+              : chatLeftItem(item, context);
+        },
+      );
+    });
   }
 }

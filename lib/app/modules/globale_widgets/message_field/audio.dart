@@ -123,7 +123,7 @@ class _AudioPlayer extends State<AudioPlayer> {
       canSetValue = position.inMilliseconds > 0;
       canSetValue &= position.inMilliseconds < duration.inMilliseconds;
     }
-    double width = widgetWidth - _controlSize;
+    final width = (widgetWidth - _controlSize).clamp(120.0, double.infinity);
     String playerTxt = '00:00';
     if (duration != null) {
       playerTxt = DateFormat('mm:ss', 'en_US')
@@ -134,26 +134,29 @@ class _AudioPlayer extends State<AudioPlayer> {
       width: width,
       child: Row(
         children: [
-          Slider(
-            activeColor:
-                _fromCache ? Colors.green : Theme.of(context).primaryColor,
-            inactiveColor: (_fromCache
-                ? Colors.green
-                : Theme.of(context).colorScheme.secondary),
-            onChanged: (double v) {
-              if (duration != null) {
-                final double position = v * duration.inMilliseconds;
-                _audioPlayer.seek(Duration(milliseconds: position.round()));
-              }
-            },
-            value: canSetValue && duration != null
-                ? position.inMilliseconds / duration.inMilliseconds
-                : 0.0,
+          Expanded(
+            child: Slider(
+              activeColor:
+                  _fromCache ? Colors.green : Theme.of(context).primaryColor,
+              inactiveColor: (_fromCache
+                  ? Colors.green
+                  : Theme.of(context).colorScheme.secondary),
+              onChanged: (double v) {
+                if (duration != null) {
+                  final double position = v * duration.inMilliseconds;
+                  _audioPlayer.seek(Duration(milliseconds: position.round()));
+                }
+              },
+              value: canSetValue && duration != null
+                  ? position.inMilliseconds / duration.inMilliseconds
+                  : 0.0,
+            ),
           ),
+          const SizedBox(width: 4),
           Text(
             playerTxt,
             style: const TextStyle(
-              fontSize: 14.0,
+              fontSize: 12.0,
               color: Colors.black,
             ),
           ),

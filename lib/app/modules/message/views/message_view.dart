@@ -6,9 +6,12 @@ import 'package:faani/app/modules/globale_widgets/empty_state_widget.dart';
 import 'package:faani/app/modules/globale_widgets/error_state_widget.dart';
 import 'package:faani/app/modules/globale_widgets/image_display.dart';
 import 'package:faani/app/modules/globale_widgets/loading_state_widget.dart';
+import 'package:faani/app/style/app_colors.dart';
+import 'package:faani/app/style/app_radius.dart';
 import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../controllers/message_controller.dart';
@@ -18,24 +21,66 @@ class MessageView extends GetView<MessageController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(MessageController());
+    if (!Get.isRegistered<MessageController>()) {
+      Get.put(MessageController());
+    }
+    final messageController = Get.find<MessageController>();
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Discussions'),
+        backgroundColor: theme.colorScheme.surface,
+        systemOverlayStyle: theme.brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
+        title: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                borderRadius: AppRadius.radiusMd,
+              ),
+              child: Icon(
+                Icons.chat_bubble_rounded,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Discussions',
+                    style: AppTypography.titleLarge.copyWith(
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    'Messagerie avec vos clients et tailleurs',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           GetBuilder<MessageController>(
-            init: MessageController(),
-            initState: (_) {},
             id: 'search',
             builder: (_) {
               return AnimatedSearchBar(
-                textEditingController: controller.textEditingController,
-                isSearching: controller.isSearching,
-                onSearch: controller.toggleSearch,
-                controller: controller,
+                textEditingController: messageController.textEditingController,
+                isSearching: messageController.isSearching,
+                onSearch: messageController.toggleSearch,
+                controller: messageController,
                 color: theme.colorScheme.onSurface,
               );
             },
@@ -50,97 +95,155 @@ class MessageView extends GetView<MessageController> {
       ),
       body: GestureDetector(
         onTap: () {
-          if (controller.isSearching.value) {
-            controller.toggleSearch();
-            controller.textEditingController.clear();
+          if (messageController.isSearching.value) {
+            messageController.toggleSearch();
+            messageController.textEditingController.clear();
             FocusScope.of(context).unfocus();
           }
         },
         child: StreamBuilder<List<MessageModel>>(
-          stream: controller.getMessages(),
+          stream: messageController.getMessages(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const LoadingStateWidget();
+              return const LoadingStateWidget(
+                  message: 'Chargement des discussions...');
             } else if (snapshot.hasError) {
               return ErrorStateWidget(
                 message: 'Erreur: ${snapshot.error}',
               );
-            } else if (snapshot.data!.isEmpty) {
+            }
+
+            final baseMessages = snapshot.data ?? <MessageModel>[];
+            if (baseMessages.isEmpty) {
               return const EmptyStateWidget(
                 iconData: Icons.chat_bubble_outline_rounded,
                 title: 'Aucune discussion',
                 description: 'Vos conversations apparaîtront ici',
               );
-            } else {
-              return ListView.separated(
-                padding: AppSpacing.paddingVSm,
-                itemCount: snapshot.data!.length,
-                separatorBuilder: (_, __) => const Divider(
-                  height: 1,
-                  indent: 80,
-                ),
-                itemBuilder: (context, index) {
-                  final message = snapshot.data![index];
-                  final isIncoming = user!.uid == message.to_id!;
-                  final contactName =
-                      isIncoming ? message.from_name! : message.to_name!;
+            }
 
-                  return ListTile(
-                    contentPadding: AppSpacing.paddingHLg,
-                    leading: CircleAvatar(
-                      radius: 28,
-                      child: ClipOval(
-                        child: imageCacheNetwork(
-                          context,
-                          message.modele_img!,
-                        ),
-                      ),
-                    ),
-                    title: Text(
-                      contactName,
-                      style: AppTypography.titleSmall.copyWith(
-                        color: theme.colorScheme.onSurface,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      message.last_msg!,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          DateFormat('HH:mm', 'fr_FR')
-                              .format(message.last_time!.toDate()),
-                          style: AppTypography.labelSmall.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        AppSpacing.gapV4,
-                        Icon(
-                          Icons.check,
-                          size: 16,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ],
-                    ),
+            return Obx(() {
+              final messages = messageController.filterMessages(baseMessages);
+              if (messages.isEmpty) {
+                return const EmptyStateWidget(
+                  iconData: Icons.search_off_rounded,
+                  title: 'Aucun résultat',
+                  description: 'Essayez un autre nom ou mot-clé',
+                );
+              }
+
+              return ListView.separated(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                  AppSpacing.lg,
+                  AppSpacing.massive,
+                ),
+                itemCount: messages.length,
+                separatorBuilder: (_, __) =>
+                    const SizedBox(height: AppSpacing.sm),
+                itemBuilder: (context, index) {
+                  final message = messages[index];
+                  final isIncoming = user?.uid == message.to_id;
+                  final contactName = isIncoming
+                      ? (message.from_name ?? 'Contact')
+                      : (message.to_name ?? 'Contact');
+                  final preview = (message.last_msg ?? '').trim().isEmpty
+                      ? 'Nouvelle discussion'
+                      : message.last_msg!.trim();
+                  final time = message.last_time != null
+                      ? DateFormat('HH:mm', 'fr_FR')
+                          .format(message.last_time!.toDate())
+                      : '--:--';
+
+                  return InkWell(
+                    borderRadius: AppRadius.radiusLg,
                     onTap: () async {
-                      final contactId =
-                          isIncoming ? message.from_id! : message.to_id!;
+                      final contactId = isIncoming
+                          ? message.from_id ?? ''
+                          : message.to_id ?? '';
+                      if (contactId.isEmpty) return;
                       final toUser = await UserService().getUser(contactId);
-                      controller.goChat(toUser);
+                      await messageController.goChat(
+                        toUser,
+                        modeleImg: message.modele_img ?? '',
+                      );
                     },
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: AppRadius.radiusLg,
+                        border: Border.all(
+                          color: AppColors.border.withValues(alpha: 0.45),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: AppSpacing.paddingAllMd,
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: AppRadius.radiusMd,
+                              child: SizedBox(
+                                width: 54,
+                                height: 54,
+                                child: imageCacheNetwork(
+                                  context,
+                                  message.modele_img ?? '',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    contactName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTypography.titleSmall.copyWith(
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    preview,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  time,
+                                  style: AppTypography.labelSmall.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                Icon(
+                                  Icons.done_all_rounded,
+                                  size: 16,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   );
                 },
               );
-            }
+            });
           },
         ),
       ),

@@ -5,7 +5,9 @@ import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/profile_image.dart';
 import 'package:faani/app/modules/profile/widgets/build_list.dart';
+import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/app_radius.dart';
+import 'package:faani/app/style/app_shadows.dart';
 import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +41,7 @@ class ProfileView extends GetView<ProfileController> {
           ),
 
           // ── Bottom safe area padding ──────────────────────────
-          const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 45)),
         ],
       ),
     );
@@ -54,88 +56,75 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final phone =
+        controller.userController.currentUser.value.phoneNumber?.trim() ?? '';
+
     return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary,
-      ),
+      decoration: const BoxDecoration(color: AppColors.primary),
       child: SafeArea(
         bottom: false,
         child: Column(
           children: [
             AppSpacing.gapV16,
-            // ── Avatar + info card ──────────────────────────────
+            // ── Identity card ───────────────────────────────────
             Container(
               margin: AppSpacing.paddingHLg,
               padding: AppSpacing.paddingAllLg,
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface,
                 borderRadius: AppRadius.radiusLg,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x14000000),
-                    blurRadius: 12,
-                    offset: Offset(0, 4),
-                  ),
-                ],
+                boxShadow: AppShadows.md,
               ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const BuildProfileImage(width: 80, height: 80),
+                  const BuildProfileImage(width: 88, height: 88),
                   AppSpacing.gapH16,
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // ── Name ────────────────────────────────
+                        Text(
+                          controller.isTailleur.value
+                              ? 'Compte tailleur'
+                              : 'Compte client',
+                          style: AppTypography.labelSmall.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        AppSpacing.gapV4,
                         Text(
                           auth.currentUser!.displayName ?? 'Anonyme',
                           style: AppTypography.titleLarge.copyWith(
                             color: theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         AppSpacing.gapV4,
-
-                        // ── Location ────────────────────────────
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on_outlined,
-                              size: 14,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                            AppSpacing.gapH4,
-                            Expanded(
-                              child: Text(
-                                controller.userController.currentUser.value
-                                        .adress ??
-                                    'Bamako, Mali',
-                                style: AppTypography.bodySmall.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                        _InfoPill(
+                          icon: Icons.location_on_outlined,
+                          text: controller
+                                      .userController.currentUser.value.adress
+                                      ?.trim()
+                                      .isNotEmpty ==
+                                  true
+                              ? controller
+                                  .userController.currentUser.value.adress!
+                                  .trim()
+                              : 'Bamako, Mali',
+                          theme: theme,
                         ),
-                        AppSpacing.gapV12,
-
-                        // ── Stats row ───────────────────────────
+                        AppSpacing.gapV8,
                         Row(
                           children: [
-                            _FollowStat(
-                              controller: controller,
-                              theme: theme,
-                            ),
-                            AppSpacing.gapH20,
-                            _MesureStat(theme: theme),
-                            AppSpacing.gapH20,
-                            _ThirdStat(
-                              controller: controller,
+                            _InfoPill(
+                              icon: Icons.phone_outlined,
+                              text: phone.isNotEmpty ? phone : 'Non renseigné',
                               theme: theme,
                             ),
                           ],
@@ -146,9 +135,92 @@ class _ProfileHeader extends StatelessWidget {
                 ],
               ),
             ),
+
+            AppSpacing.gapV12,
+
+            Container(
+              margin: AppSpacing.paddingHLg,
+              padding: AppSpacing.paddingAllMd,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: AppRadius.radiusLg,
+                boxShadow: AppShadows.sm,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _FollowStat(
+                      controller: controller,
+                      theme: theme,
+                    ),
+                  ),
+                  Container(
+                    width: 1,
+                    height: 34,
+                    color: theme.colorScheme.outline.withValues(alpha: 0.35),
+                  ),
+                  Expanded(child: _MesureStat(theme: theme)),
+                  Container(
+                    width: 1,
+                    height: 34,
+                    color: theme.colorScheme.outline.withValues(alpha: 0.35),
+                  ),
+                  Expanded(
+                    child: _ThirdStat(
+                      controller: controller,
+                      theme: theme,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             AppSpacing.gapV16,
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _InfoPill extends StatelessWidget {
+  const _InfoPill({
+    required this.icon,
+    required this.text,
+    required this.theme,
+  });
+
+  final IconData icon;
+  final String text;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 13,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          AppSpacing.gapH4,
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.labelSmall.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -177,7 +249,7 @@ class _StatColumn extends StatelessWidget {
             color: theme.colorScheme.onSurface,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 3),
         Text(
           label,
           style: AppTypography.labelSmall.copyWith(
@@ -204,7 +276,7 @@ class _FollowStat extends StatelessWidget {
             : (snapshot.data?['following'] ?? 0);
         return _StatColumn(
           value: count.toString(),
-          label: 'Suivis',
+          label: controller.isTailleur.value ? 'Abonnés' : 'Suivis',
           theme: theme,
         );
       },

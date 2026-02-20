@@ -17,19 +17,9 @@ class FavorieController extends GetxController {
       for (Favorie fav in event) {
         var modele = await ModeleService()
             .getModelByIdAndCategories(fav.idModele!, listSelectedCategorie);
-        // if (modele.idCategorie == "1" || modele.idCategorie == "8") {
-        //   print("**********************added ${modele.idCategorie}");
-        // }
-        // if (listSelectedCategorie.isNotEmpty) {
-        //   if (listSelectedCategorie.contains(modele.idCategorie)) {
-        //     print("**********************added");
-        //     models.add(modele);
-        //   }
-        // } else {
         if (modele != null) {
           models.add(modele);
         }
-        // }
       }
       yield models;
     }
@@ -37,21 +27,27 @@ class FavorieController extends GetxController {
 
   // category selected
   void onCategorieSelected(Categorie categorie) {
-    print("**********************added ${categorie.id}");
-    if (listSelectedCategorie.contains(categorie.id)) {
-      listSelectedCategorie.remove(categorie.id);
-    } else {
-      listSelectedCategorie.add(categorie.id);
+    if (categorie.id == 'all') {
+      listSelectedCategorie.clear();
+      selectedCategorie.value = null;
+      update();
+      return;
     }
-    // if (categorie.id == "1" && listSelectedCategorie.contains("8")) {
-    //   listSelectedCategorie.remove("8");
-    // } else if (categorie.id == "8" && listSelectedCategorie.contains("1")) {
-    //   listSelectedCategorie.remove("1");
-    // }
-    loadData();
+
+    if (listSelectedCategorie.contains(categorie.id)) {
+      listSelectedCategorie.clear();
+      selectedCategorie.value = null;
+    } else {
+      listSelectedCategorie.assignAll([categorie.id]);
+      selectedCategorie.value = categorie;
+
+      if (categorie.id == '1') {
+        listSelectedCategorie.remove('8');
+      } else if (categorie.id == '8') {
+        listSelectedCategorie.remove('1');
+      }
+    }
+
     update();
   }
-
-
-
 }

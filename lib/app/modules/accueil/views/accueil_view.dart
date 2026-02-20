@@ -3,10 +3,12 @@ import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
 import 'package:faani/app/data/services/engagement_tracking_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:faani/app/data/models/modele_model.dart';
 import '../../globale_widgets/list_categorie.dart';
 import '../controllers/accueil_controller.dart';
 import '../widgets/category_feed_view.dart';
@@ -18,19 +20,18 @@ class AccueilView extends GetView<AccueilController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(AccueilController());
+    if (!Get.isRegistered<AccueilController>()) {
+      Get.put(AccueilController());
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
-      body: FutureBuilder(
-        future: controller.init(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: GetBuilder<AccueilController>(
+        builder: (_) {
+          if (!controller.isInitialized.value && controller.modeles.isEmpty) {
             return _buildShimmerLoading();
           }
-          return GetBuilder<AccueilController>(
-            builder: (_) => _HybridHomeBody(controller: controller),
-          );
+          return _HybridHomeBody(controller: controller);
         },
       ),
     );
@@ -60,6 +61,7 @@ class _HybridHomeBody extends StatefulWidget {
 
 class _HybridHomeBodyState extends State<_HybridHomeBody> {
   final ScrollController _scrollController = ScrollController();
+  final Set<String> _prefetchedMediaUrls = <String>{};
 
   @override
   void initState() {
@@ -75,11 +77,35 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 300) {
-      if (widget.controller.homeController.hasMoreData.value) {
-        widget.controller.loadMore();
-      }
+    if (!_scrollController.hasClients) return;
+    final maxExtent = _scrollController.position.maxScrollExtent;
+    if (maxExtent <= 0) return;
+
+    final progress = _scrollController.position.pixels / maxExtent;
+    if (progress >= 0.60) {
+      widget.controller.loadMore();
+    }
+  }
+
+  bool _isVideo(String mediaUrl) {
+    final lower = mediaUrl.toLowerCase();
+    return lower.endsWith('.mp4') ||
+        lower.endsWith('.mov') ||
+        lower.endsWith('.webm') ||
+        lower.contains('video');
+  }
+
+  void _prefetchGridImages(List<Modele> modeles) {
+    if (!mounted || modeles.isEmpty) return;
+
+    final targets = modeles.take(8);
+    for (final model in targets) {
+      final mediaUrl =
+          model.fichier.isNotEmpty ? (model.fichier.first ?? '') : '';
+      if (mediaUrl.isEmpty || _isVideo(mediaUrl)) continue;
+      if (!_prefetchedMediaUrls.add(mediaUrl)) continue;
+
+      precacheImage(CachedNetworkImageProvider(mediaUrl), context);
     }
   }
 
@@ -87,10 +113,17 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
   Widget build(BuildContext context) {
     final modeles = widget.controller.modeles;
     final heroModeles = widget.controller.getHeroCandidates(limit: 5);
+    final isNoCategorySelected =
+        widget.controller.listSelectedCategorie.isEmpty;
     final heroIds =
         heroModeles.map((modele) => modele.id).whereType<String>().toSet();
-    final explorationModeles =
-        widget.controller.getExplorationCandidates(excludeModeleIds: heroIds);
+    final explorationModeles = widget.controller.getExplorationCandidates(
+      excludeModeleIds: isNoCategorySelected ? <String>{} : heroIds,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _prefetchGridImages(explorationModeles);
+    });
 
     return RefreshIndicator(
       onRefresh: widget.controller.refreshPage,

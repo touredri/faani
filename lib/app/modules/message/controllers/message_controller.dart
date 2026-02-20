@@ -10,129 +10,193 @@ import 'package:rxdart/rxdart.dart';
 class MessageController extends GetxController {
   final TextEditingController textEditingController = TextEditingController();
   final RxBool isSearching = false.obs;
-  final count = 0.obs;
-  final collection = FirebaseFirestore.instance.collection('messages');
+  final RxString searchQuery = ''.obs;
+  final CollectionReference<Map<String, dynamic>> _rawCollection =
+      FirebaseFirestore.instance.collection('messages');
+
+  CollectionReference<MessageModel> get collection =>
+      _rawCollection.withConverter<MessageModel>(
+        fromFirestore: (snapshot, options) =>
+            MessageModel.fromMap(snapshot, options),
+        toFirestore: (MessageModel msg, options) => msg.toMap(),
+      );
   final RxString modeleImage = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    textEditingController.addListener(_onSearchTextChanged);
+  }
+
+  @override
+  void onClose() {
+    textEditingController.removeListener(_onSearchTextChanged);
+    textEditingController.dispose();
+    super.onClose();
+  }
+
+  void _onSearchTextChanged() {
+    searchQuery.value = textEditingController.text.trim().toLowerCase();
+  }
 
   void onSearch() {
     isSearching.value = !isSearching.value;
     if (!isSearching.value) {
       textEditingController.clear();
+      searchQuery.value = '';
     }
   }
 
   void toggleSearch() {
-    isSearching.value = !isSearching.value;
+    onSearch();
     update(['search']);
   }
 
   Stream<List<MessageModel>> getMessages() {
-    // Query where 'from_id' is equal to 'user!.uid'
+    final currentUserId = user?.uid;
+    if (currentUserId == null) {
+      return Stream.value(<MessageModel>[]);
+    }
+
     Stream<List<MessageModel>> fromStream = collection
-        .withConverter(
-            fromFirestore: MessageModel.fromMap,
-            toFirestore: (MessageModel msg, options) => msg.toMap())
         .where('from_id', isEqualTo: user!.uid)
         .orderBy('last_time', descending: true)
         .snapshots()
         .map((event) => event.docs.map((e) => e.data()).toList());
 
-    // Query where 'to_id' is equal to 'user!.uid'
     Stream<List<MessageModel>> toStream = collection
-        .withConverter(
-            fromFirestore: MessageModel.fromMap,
-            toFirestore: (MessageModel msg, options) => msg.toMap())
         .where('to_id', isEqualTo: user!.uid)
+        .orderBy('last_time', descending: true)
         .snapshots()
         .map((event) => event.docs.map((e) => e.data()).toList());
 
-    // Merge the two streams
-    return CombineLatestStream.combine2(fromStream, toStream,
-        (List<MessageModel> list1, List<MessageModel> list2) {
-      return list1 + list2;
-    });
+    return CombineLatestStream.combine2(
+      fromStream,
+      toStream,
+      (List<MessageModel> list1, List<MessageModel> list2) {
+        final merged = <String, MessageModel>{};
+        for (final message in [...list1, ...list2]) {
+          final fromId = message.from_id ?? '';
+          final toId = message.to_id ?? '';
+          if (fromId.isEmpty || toId.isEmpty) {
+            continue;
+          }
+          final key =
+              fromId.compareTo(toId) <= 0 ? '$fromId|$toId' : '$toId|$fromId';
+          final previous = merged[key];
+          if (previous == null) {
+            merged[key] = message;
+            continue;
+          }
+          final previousTime = previous.last_time?.millisecondsSinceEpoch ?? 0;
+          final currentTime = message.last_time?.millisecondsSinceEpoch ?? 0;
+          if (currentTime > previousTime) {
+            merged[key] = message;
+          }
+        }
+
+        final result = merged.values.toList()
+          ..sort(
+            (a, b) => (b.last_time?.millisecondsSinceEpoch ?? 0)
+                .compareTo(a.last_time?.millisecondsSinceEpoch ?? 0),
+          );
+        return result;
+      },
+    );
   }
 
-  void goChat(UserModel toUser, {String modeleImg = ''}) async {
-    var fromMessage = await collection
-        .withConverter(
-            fromFirestore: MessageModel.fromMap,
-            toFirestore: (MessageModel msg, options) => msg.toMap())
+  List<MessageModel> filterMessages(List<MessageModel> messages) {
+    final query = searchQuery.value;
+    if (query.isEmpty) {
+      return messages;
+    }
+
+    return messages.where((message) {
+      final fromName = (message.from_name ?? '').toLowerCase();
+      final toName = (message.to_name ?? '').toLowerCase();
+      final lastMsg = (message.last_msg ?? '').toLowerCase();
+      return fromName.contains(query) ||
+          toName.contains(query) ||
+          lastMsg.contains(query);
+    }).toList();
+  }
+
+  Future<void> goChat(UserModel toUser, {String modeleImg = ''}) async {
+    final currentUser = user;
+    if (currentUser == null) {
+      return;
+    }
+
+    final fromMessage = await collection
         .where('from_id', isEqualTo: user!.uid)
         .where('to_id', isEqualTo: toUser.id)
         .get();
 
-    var toMessage = await collection
-        .withConverter(
-            fromFirestore: MessageModel.fromMap,
-            toFirestore: (MessageModel msg, options) => msg.toMap())
+    final toMessage = await collection
         .where('from_id', isEqualTo: toUser.id)
         .where('to_id', isEqualTo: user!.uid)
         .get();
 
-    if (fromMessage.docs.isEmpty &&
-        toMessage.docs.isEmpty &&
-        modeleImg.isNotEmpty) {
-      var msgData = MessageModel(
-        from_avatar: user!.photoURL ?? '',
-        from_name: user!.displayName,
-        from_id: user!.uid,
-        to_avatar: toUser.profileImage,
-        to_name: toUser.nomPrenom,
-        to_id: toUser.id,
-        modele_img: modeleImg,
-        message: '',
-        last_msg: '',
-        last_time: Timestamp.now(),
-        msg_num: 0,
+    final existingDocId = fromMessage.docs.isNotEmpty
+        ? fromMessage.docs.first.id
+        : (toMessage.docs.isNotEmpty ? toMessage.docs.first.id : null);
+
+    if (existingDocId != null) {
+      _openDiscussion(
+        docId: existingDocId,
+        toUser: toUser,
+        modeleImg: modeleImg,
       );
-      collection
-          .withConverter(
-              fromFirestore: MessageModel.fromMap,
-              toFirestore: (MessageModel msg, options) => msg.toMap())
-          .add(msgData)
-          .then((value) => {
-                Get.to(() => const DiscussionView(),
-                    transition: Transition.rightToLeftWithFade,
-                    arguments: {
-                      'doc_id': value.id,
-                      'to_id': toUser.id,
-                      'to_name': toUser.nomPrenom,
-                      'to_avatar': toUser.profileImage,
-                      'modele_img': modeleImg,
-                      'token': toUser.token,
-                    })
-              });
-    } else {
-      if (fromMessage.docs.isNotEmpty) {
-        Get.to(() => const DiscussionView(),
-            transition: Transition.rightToLeftWithFade,
-            arguments: {
-              'doc_id': fromMessage.docs.first.id,
-              'to_id': toUser.id,
-              'to_name': toUser.nomPrenom,
-              'to_avatar': toUser.profileImage,
-              'modele_img': modeleImg,
-              'token': toUser.token,
-            });
-      }
-      if (toMessage.docs.isNotEmpty) {
-        Get.to(() => const DiscussionView(),
-            transition: Transition.rightToLeftWithFade,
-            arguments: {
-              'doc_id': toMessage.docs.first.id,
-              'to_id': toUser.id,
-              'to_name': toUser.nomPrenom,
-              'to_avatar': toUser.profileImage,
-              'modele_img': modeleImg,
-              'token': toUser.token,
-            });
-      }
+      return;
     }
+
+    if (modeleImg.isEmpty) {
+      Get.snackbar(
+        'Information',
+        'Veuillez sélectionner un modèle pour démarrer',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    final msgData = MessageModel(
+      from_avatar: currentUser.photoURL ?? '',
+      from_name: currentUser.displayName,
+      from_id: currentUser.uid,
+      to_avatar: toUser.profileImage,
+      to_name: toUser.nomPrenom,
+      to_id: toUser.id,
+      modele_img: modeleImg,
+      message: '',
+      last_msg: '',
+      last_time: Timestamp.now(),
+      msg_num: 0,
+    );
+
+    final created = await collection.add(msgData);
+    _openDiscussion(
+      docId: created.id,
+      toUser: toUser,
+      modeleImg: modeleImg,
+    );
   }
 
-
-
-
-  void increment() => count.value++;
+  void _openDiscussion({
+    required String docId,
+    required UserModel toUser,
+    required String modeleImg,
+  }) {
+    Get.to(
+      () => const DiscussionView(),
+      transition: Transition.rightToLeftWithFade,
+      arguments: {
+        'doc_id': docId,
+        'to_id': toUser.id,
+        'to_name': toUser.nomPrenom,
+        'to_avatar': toUser.profileImage,
+        'modele_img': modeleImg,
+        'token': toUser.token,
+      },
+    );
+  }
 }

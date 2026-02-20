@@ -16,6 +16,7 @@ class AccueilController extends GetxController {
   RxList<Modele> modeles = <Modele>[].obs;
   final RxBool isInitialized = false.obs;
   final RxBool isRefreshingCache = false.obs;
+  final RxBool isLoadingMore = false.obs;
   final RxMap<String, double> userCategoryWeights = <String, double>{}.obs;
   final PageController pageController =
       PageController(initialPage: 0, viewportFraction: 1.0);
@@ -39,6 +40,7 @@ class AccueilController extends GetxController {
   static const Duration _recentOpenedTtl = Duration(hours: 18);
   static const Duration _recentShownTtl = Duration(hours: 2);
   bool _isLoadingPreferences = false;
+  bool _hasStartedInit = false;
   Timer? _persistRecentOpenedTimer;
 
   AccueilController() {
@@ -64,25 +66,50 @@ class AccueilController extends GetxController {
   }
 
   void onCategorieSelected(Categorie categorie) {
+    if (categorie.id == 'all') {
+      listSelectedCategorie.clear();
+      selectedCategorie.value = null;
+
+      modeles.clear();
+      isInitialized.value = false;
+      homeController.hasMoreData.value = true;
+      homeController.lastModeleFetch.value = null;
+
+      EngagementTrackingService.instance
+          .trackCategoryClick('all', source: 'home_filter');
+      init();
+      _jumpToFirstPageIfAttached();
+      update();
+      return;
+    }
+
+    final isAlreadySelected = listSelectedCategorie.contains(categorie.id);
+
+    if (isAlreadySelected) {
+      listSelectedCategorie.clear();
+      selectedCategorie.value = null;
+    } else {
+      listSelectedCategorie.assignAll([categorie.id]);
+      selectedCategorie.value = categorie;
+
+      if (categorie.id == "1") {
+        listSelectedCategorie.remove("8");
+      } else if (categorie.id == "8") {
+        listSelectedCategorie.remove("1");
+      }
+    }
+
     // Reset pagination state for category change
     modeles.clear();
     isInitialized.value = false;
     homeController.hasMoreData.value = true;
     homeController.lastModeleFetch.value = null;
-    if (listSelectedCategorie.contains(categorie.id)) {
-      listSelectedCategorie.remove(categorie.id);
-    } else {
-      listSelectedCategorie.add(categorie.id);
-    }
-    if (categorie.id == "1" && listSelectedCategorie.contains("8")) {
-      listSelectedCategorie.remove("2");
-    } else if (categorie.id == "8" && listSelectedCategorie.contains("1")) {
-      listSelectedCategorie.remove("1");
-    }
+
     EngagementTrackingService.instance
         .trackCategoryClick(categorie.id, source: 'home_filter');
     init();
     _jumpToFirstPageIfAttached();
+    update();
   }
 
   List<Modele> getHeroCandidates({int limit = 5}) {
@@ -176,7 +203,7 @@ class AccueilController extends GetxController {
       noveltyScale: noveltyScale,
     );
     candidates
-      ..sort((a, b) {
+      .sort((a, b) {
         final aScore = _normalizedExplorationScore(
               a,
               normalizedBaseScores,
@@ -632,6 +659,7 @@ class AccueilController extends GetxController {
   Future<void> refreshPage() async {
     modeles.clear();
     isInitialized.value = false;
+    isLoadingMore.value = false;
     homeController.lastModeleFetch.value = null;
     homeController.hasMoreData.value = true;
     await loadMore();
@@ -639,10 +667,17 @@ class AccueilController extends GetxController {
   }
 
   Future<void> loadMore() async {
+    if (isLoadingMore.value || !homeController.hasMoreData.value) {
+      return;
+    }
+
+    isLoadingMore.value = true;
     try {
       List<Modele> fetchedDocuments;
+      final isNoFilter = listSelectedCategorie.isEmpty;
       fetchedDocuments = await homeController.modeleService.getRandomModeles(
           listSelectedCategorie,
+          pageSize: isNoFilter ? 12 : 8,
           lastModele: homeController.lastModeleFetch.value);
 
       if (fetchedDocuments.isNotEmpty) {
@@ -670,10 +705,18 @@ class AccueilController extends GetxController {
         Get.snackbar('Network Error', e.message,
             snackPosition: SnackPosition.TOP);
       }
-    } finally {}
+    } finally {
+      isLoadingMore.value = false;
+    }
   }
 
   Future<void> init() async {
+    if (_hasStartedInit && isInitialized.value) {
+      _refreshFeedInBackground();
+      return;
+    }
+    _hasStartedInit = true;
+
     _loadRecentOpenedMemory();
     _loadUserPreferenceWeights();
 
@@ -750,6 +793,12 @@ class AccueilController extends GetxController {
     // if failed,use loadFailed(),if no data return,use LoadNodata()
 
     refreshController.loadComplete();
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    init();
   }
 
   @override

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/modele_model.dart';
-import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
@@ -168,8 +167,12 @@ class ModeleService {
   }
 
   Future<List<Modele>> getRandomModeles(List<String> idCategories,
-      {Modele? lastModele}) async {
-    return _getModeles(idCategories, lastModele: lastModele, pageSize: 5);
+      {Modele? lastModele, int pageSize = 8}) async {
+    return _getModeles(
+      idCategories,
+      lastModele: lastModele,
+      pageSize: pageSize,
+    );
   }
 
   Future<List<Modele>> _getModeles(List<String> idCategories,
@@ -196,21 +199,6 @@ class ModeleService {
       }).toList();
 
       if (idTailleur == null) {
-        final accueilController = Get.find<AccueilController>();
-        final existingIds = accueilController.modeles
-            .map((modele) => modele.id)
-            .whereType<String>()
-            .toSet();
-        final pageSeenIds = <String>{};
-
-        models.removeWhere((model) {
-          final id = model.id;
-          if (id == null || id.isEmpty) return true;
-          if (existingIds.contains(id)) return true;
-          if (!pageSeenIds.add(id)) return true;
-          return false;
-        });
-
         if (querySnapshot.docs.isNotEmpty) {
           final lastRawDoc = querySnapshot.docs.last;
           Get.find<HomeController>().lastModeleFetch.value =

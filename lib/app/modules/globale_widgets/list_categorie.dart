@@ -92,19 +92,29 @@ class _CategorieFiltreState<T extends GetxController>
     // Haptic feedback for better UX
     HapticFeedback.lightImpact();
 
-    setState(() {
-      // Single selection mode - clear others
-      for (var cat in _categories) {
-        cat.isSelected = false;
-      }
-      categorie.isSelected = true;
-    });
+    (widget.controller as dynamic).onCategorieSelected(categorie);
 
     // Scroll to center with smooth animation
     _scrollToCenter(index);
 
-    // Notify parent controller
-    (widget.controller as dynamic).onCategorieSelected(categorie);
+    setState(_syncSelectionFromController);
+  }
+
+  void _syncSelectionFromController() {
+    List<String> selectedIds = <String>[];
+    final dynamic controller = widget.controller as dynamic;
+    try {
+      final dynamic raw = controller.listSelectedCategorie;
+      if (raw != null) {
+        selectedIds = List<String>.from(raw);
+      }
+    } catch (_) {
+      selectedIds = <String>[];
+    }
+
+    for (final cat in _categories) {
+      cat.isSelected = selectedIds.contains(cat.id);
+    }
   }
 
   Widget _buildCategoryChip(Categorie categorie, int index) {
@@ -229,6 +239,16 @@ class _CategorieFiltreState<T extends GetxController>
   }
 
   Widget _buildCategoryList() {
+    final allCategorie = Categorie(id: 'all', libelle: 'Tous');
+    bool isAllSelected = true;
+    try {
+      final dynamic raw = (widget.controller as dynamic).listSelectedCategorie;
+      isAllSelected = List<String>.from(raw).isEmpty;
+    } catch (_) {
+      isAllSelected = true;
+    }
+    allCategorie.isSelected = isAllSelected;
+
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       controller: _scrollController,
@@ -236,9 +256,12 @@ class _CategorieFiltreState<T extends GetxController>
       padding: EdgeInsets.symmetric(
         horizontal: widget.isOverlay ? AppSpacing.sm : AppSpacing.md,
       ),
-      itemCount: _categories.length,
+      itemCount: _categories.length + 1,
       itemBuilder: (context, index) {
-        return _buildCategoryChip(_categories[index], index);
+        if (index == 0) {
+          return _buildCategoryChip(allCategorie, 0);
+        }
+        return _buildCategoryChip(_categories[index - 1], index);
       },
     );
   }
@@ -286,6 +309,8 @@ class _CategorieFiltreState<T extends GetxController>
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      _syncSelectionFromController();
+
       if (_isLoading.value) {
         return _buildLoadingState();
       }

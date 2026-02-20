@@ -35,7 +35,10 @@ class CommentController extends MessageFieldController {
     }
     final fileName = '${randomString(10)}.${addExtension(imageFile!.path)}';
     try {
-      final ref = FirebaseStorage.instance.ref('commentImages').child(fileName);
+      final ref = FirebaseStorage.instance
+          .ref('images')
+          .child('comments')
+          .child(fileName);
       ref.putFile(imageFile!).whenComplete(() async {
         final url = await ref.getDownloadURL();
         final comment = Comment(
@@ -63,7 +66,10 @@ class CommentController extends MessageFieldController {
   Future<void> sendMessageVoice(String parentId) async {
     checkAudio();
     final fileName = '${randomString(10)}.m4a';
-    final ref = FirebaseStorage.instance.ref('commentAudios').child(fileName);
+    final ref = FirebaseStorage.instance
+        .ref('audios')
+        .child('comments')
+        .child(fileName);
     try {
       ref.putFile(File(recordPath.value)).whenComplete(() async {
         final url = await ref.getDownloadURL();

@@ -61,7 +61,8 @@ class AjoutModeleController extends GetxController {
     for (var image in image) {
       final ref = FirebaseStorage.instance
           .ref()
-          .child('modeles')
+          .child('images')
+          .child('models')
           .child(image.path.split('/').last);
       await ref.putFile(image);
       final url = await ref.getDownloadURL();
@@ -116,7 +117,6 @@ class AjoutModeleController extends GetxController {
     super.onInit();
     fetchCategories();
   }
-
 
   @override
   void onClose() {

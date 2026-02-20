@@ -8,7 +8,6 @@ import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:video_player/video_player.dart';
 
 /// A single masonry grid item card for the home exploration grid.
 ///
@@ -188,9 +187,6 @@ class _MasonryMedia extends StatefulWidget {
 }
 
 class _MasonryMediaState extends State<_MasonryMedia> {
-  VideoPlayerController? _videoController;
-  Future<void>? _initializeVideo;
-
   bool get _isVideo {
     final lower = widget.mediaUrl.toLowerCase();
     return lower.endsWith('.mp4') ||
@@ -200,52 +196,25 @@ class _MasonryMediaState extends State<_MasonryMedia> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    if (_isVideo && widget.mediaUrl.isNotEmpty) {
-      final controller =
-          VideoPlayerController.networkUrl(Uri.parse(widget.mediaUrl));
-      _videoController = controller;
-      _initializeVideo = controller.initialize().then((_) async {
-        await controller.setLooping(true);
-        await controller.setVolume(0);
-        await controller.play();
-        if (mounted) setState(() {});
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _videoController?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_isVideo && _videoController != null) {
-      return FutureBuilder<void>(
-        future: _initializeVideo,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              _videoController!.value.isInitialized) {
-            return FittedBox(
-              fit: BoxFit.cover,
-              clipBehavior: Clip.hardEdge,
-              child: SizedBox(
-                width: _videoController!.value.size.width,
-                height: _videoController!.value.size.height,
-                child: VideoPlayer(_videoController!),
-              ),
-            );
-          }
-
-          return Shimmer.fromColors(
-            baseColor: AppColors.grey200,
-            highlightColor: AppColors.grey100,
-            child: Container(color: AppColors.grey200),
-          );
-        },
+    if (_isVideo) {
+      return Container(
+        color: AppColors.grey300,
+        child: Center(
+          child: Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.35),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.play_arrow_rounded,
+              color: AppColors.white,
+              size: 22,
+            ),
+          ),
+        ),
       );
     }
 

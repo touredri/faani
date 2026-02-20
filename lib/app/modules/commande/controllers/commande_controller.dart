@@ -99,7 +99,8 @@ class CommandeController extends GetxController {
       final File file = File(image.path);
       final ref = FirebaseStorage.instance
           .ref()
-          .child('photosHabit')
+          .child('images')
+          .child('habits')
           .child(file.path.split('/').last);
       await ref.putFile(file);
       final url = await ref.getDownloadURL();
@@ -122,8 +123,8 @@ class CommandeController extends GetxController {
     if (imageInfo.isEmpty) {
       imageInfo.add({
         'downloadUrl':
-            'https://firebasestorage.googleapis.com/v0/b/faani-afrique.appspot.com/o/photosHabit%2Ffaani.png?alt=media&token=313edafa-f89f-438a-be5e-468ece978058',
-        'path': 'photosHabit/faani.png',
+            'https://firebasestorage.googleapis.com/v0/b/faani-afrique.appspot.com/o/images%2Fhabits%2Ffaani.png?alt=media&token=313edafa-f89f-438a-be5e-468ece978058',
+        'path': 'images/habits/faani.png',
       });
     }
     final Commande newCommande = Commande(
@@ -211,7 +212,6 @@ class CommandeController extends GetxController {
     super.onInit();
     scrollController.addListener(_onScroll);
   }
-
 
   @override
   void onClose() {
