@@ -106,24 +106,35 @@ class ProfileController extends GetxController {
     getFollowStats();
   }
 
-  void updateProfile() async {
+  Future<void> updateProfile() async {
     isLoading.value = true;
-    await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
-      'nomPrenom': nomPrenomController.text.isEmpty
-          ? user!.displayName
-          : nomPrenomController.text,
-      'adress': villeQuartierController.text.isEmpty
-          ? userController.currentUser.value.adress
-          : villeQuartierController.text,
-      'sex': selectedGenreCible.value,
-    }).then((value) {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .update({
+        'nomPrenom': nomPrenomController.text.isEmpty
+            ? user!.displayName
+            : nomPrenomController.text,
+        'adress': villeQuartierController.text.isEmpty
+            ? userController.currentUser.value.adress
+            : villeQuartierController.text,
+        'sex': selectedGenreCible.value,
+      });
+
+      showCustomSnackbar(
+        message: 'Profil mis à jour avec succès',
+        backgroundColor: Colors.green,
+      );
+
+      if (Get.isOverlaysOpen ?? false) {
+        Get.back();
+      }
+    } catch (_) {
+      showCustomSnackbar(message: 'Erreur lors de la mise à jour du profil');
+    } finally {
       isLoading.value = false;
-      Get.snackbar('Succès', 'Profil mis à jour avec succès');
-      Get.back();
-    }).catchError((error) {
-      isLoading.value = false;
-      Get.snackbar('Erreur', 'Erreur lors de la mise à jour du profil');
-    });
+    }
   }
 
   void rateApp() {
