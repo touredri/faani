@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:224443279523:android:66cc6847aca086e3ff7716",
+        "mobilesdk_app_id": "1:224443279523:android:a6b63c090d9e445fff7716",
         "android_client_info": {
-          "package_name": "com.example.faani_admin"
+          "package_name": "com.faani.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "224443279523-2kdlc3g053u1o66eedpi2kpv4gorqg83.apps.googleusercontent.com",
+          "client_id": "224443279523-aq8r10obg6v0m013bua79ausmnrffv3j.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.faani_admin",
-            "certificate_hash": "15a32574d19f63ecc5f26a0b3d4651f50a08f88a"
+            "package_name": "com.faani.app",
+            "certificate_hash": "6c5f8c29e83ba1cad83b2543034d863eca2a91ae"
           }
         },
         {
@@ -59,27 +59,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "224443279523-dsvb9c594nj2gh8g3sobsp0p16ekgu5o.apps.googleusercontent.com",
+          "client_id": "224443279523-octvigmps5p0ovnv90mj58vtanh0m3n2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.faani.app.faani",
-            "certificate_hash": "15a32574d19f63ecc5f26a0b3d4651f50a08f88a"
-          }
-        },
-        {
-          "client_id": "224443279523-e9t53cqctr1735crnvn2481ed6blohqe.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.faani.app.faani",
-            "certificate_hash": "048beb9255a53c947b00e7c044b8cadff26e0cd2"
-          }
-        },
-        {
-          "client_id": "224443279523-lu2obgs9j5o7pq6stelb2s8vdes311bc.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.faani.app.faani",
-            "certificate_hash": "d1967741793ed7b2ad00d3de8b7599e16d7b788a"
+            "certificate_hash": "6c5f8c29e83ba1cad83b2543034d863eca2a91ae"
           }
         },
         {

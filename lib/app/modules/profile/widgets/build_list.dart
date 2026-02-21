@@ -1,5 +1,4 @@
 import 'package:faani/app/firebase/global_function.dart';
-import 'package:faani/app/modules/authentification/views/authentification_view.dart';
 import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:faani/app/modules/profile/views/about.dart';
@@ -14,6 +13,7 @@ import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:faani/app/routes/app_pages.dart';
 import '../../mesures/views/mesures_view.dart';
 import '../views/devenir_tailleur_view.dart';
 import '../views/modifier_profile_view.dart';
@@ -45,9 +45,9 @@ Widget listBuild(ProfileController controller, BuildContext context) {
                   const Icon(Icons.person_add_outlined, color: Colors.blue),
               title: 'S\'inscrire',
               subTitle: 'Créer un compte pour plus de fonctionnalités',
-              onTap: () => Get.to(
-                () => const AuthView(),
-                transition: Transition.rightToLeft,
+              onTap: () => Get.toNamed(
+                Routes.AUTH,
+                preventDuplicates: false,
               ),
             ),
           const CustomDivider(),

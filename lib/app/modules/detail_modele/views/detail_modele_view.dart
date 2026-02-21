@@ -219,6 +219,7 @@ class _RelatedModelsGrid extends StatelessWidget {
             left: AppSpacing.xs,
             right: AppSpacing.xs,
             bottom: AppSpacing.sm,
+            top: AppSpacing.sm,
           ),
           itemBuilder: (context, index) {
             if (snapshot.data![index].id == currentModele.id) {

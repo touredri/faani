@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/services/favorite_service.dart';
 import 'package:faani/app/data/services/modele_service.dart';
+import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../firebase/global_function.dart';
@@ -19,6 +20,7 @@ abstract class BaseIconState<T extends BaseIcon> extends State<T>
   bool isActive = false;
   final firestore = FirebaseFirestore.instance;
   int count = 0;
+  StreamSubscription<QuerySnapshot>? _countSubscription;
   late final AnimationController _scaleController;
   late final Animation<double> _scaleAnimation;
 
@@ -50,11 +52,21 @@ abstract class BaseIconState<T extends BaseIcon> extends State<T>
       ),
     ]).animate(_scaleController);
     init();
-    getSnapshotStream().listen(onChange);
+    _countSubscription = getSnapshotStream().listen(
+      onChange,
+      onError: (Object error, StackTrace stackTrace) {
+        if (!mounted) return;
+        setState(() {
+          count = 0;
+        });
+        debugPrint('BaseIcon stream error: $error');
+      },
+    );
   }
 
   @override
   void dispose() {
+    _countSubscription?.cancel();
     _scaleController.dispose();
     super.dispose();
   }
@@ -127,15 +139,27 @@ class _FavoriteIconeState extends BaseIconState<FavoriteIcone> {
           isActive = true;
         });
       }
+    }).catchError((_) {
+      if (!mounted) return;
+      setState(() => isActive = false);
     });
   }
 
   @override
   void toggleActive() {
+    if (user == null || user!.isAnonymous) {
+      showCustomSnackbar(message: 'Connectez-vous pour ajouter aux favoris');
+      return;
+    }
+
     if (isActive) {
-      FavorieService().delete(widget.docId);
+      FavorieService().removeFavorite(widget.docId).catchError((_) {
+        showCustomSnackbar(message: 'Action non autorisée');
+      });
     } else {
-      FavorieService().create(widget.docId);
+      FavorieService().addFavorite(widget.docId).catchError((_) {
+        showCustomSnackbar(message: 'Action non autorisée');
+      });
     }
   }
 
@@ -176,6 +200,9 @@ class _LikeIconState extends BaseIconState<LikeIcon> {
           isActive = true;
         });
       }
+    }).catchError((_) {
+      if (!mounted) return;
+      setState(() => isActive = false);
     });
   }
 
@@ -189,25 +216,34 @@ class _LikeIconState extends BaseIconState<LikeIcon> {
   }
 
   void addLike() async {
-    if (user == null) {
+    if (user == null || user!.isAnonymous) {
+      showCustomSnackbar(message: 'Connectez-vous pour liker ce modèle');
       return;
     }
-    await ModeleService().addLike(widget.docId, user!.uid);
+    try {
+      await ModeleService().addLike(widget.docId, user!.uid);
+    } catch (_) {
+      showCustomSnackbar(message: 'Action non autorisée');
+    }
   }
 
   void removeLike() async {
     if (user == null) {
       return;
     }
-    final likeSnapshot = await firestore
-        .collection('modele')
-        .doc(widget.docId)
-        .collection('likes')
-        .where('idUser', isEqualTo: user!.uid)
-        .get();
-    if (likeSnapshot.docs.isNotEmpty) {
-      await ModeleService()
-          .removeLike(widget.docId, likeSnapshot.docs.first.id);
+    try {
+      final likeSnapshot = await firestore
+          .collection('modele')
+          .doc(widget.docId)
+          .collection('likes')
+          .where('idUser', isEqualTo: user!.uid)
+          .get();
+      if (likeSnapshot.docs.isNotEmpty) {
+        await ModeleService()
+            .removeLike(widget.docId, likeSnapshot.docs.first.id);
+      }
+    } catch (_) {
+      showCustomSnackbar(message: 'Action non autorisée');
     }
   }
 

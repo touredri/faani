@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/users_model.dart';
-import 'package:faani/app/modules/authentification/views/authentification_view.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_udid/flutter_udid.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../routes/app_pages.dart';
 import '../../../data/services/users_service.dart';
@@ -16,6 +20,7 @@ import '../views/otp_view.dart';
 import '../views/sign_up_view.dart';
 
 class AuthController extends GetxController {
+  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
   RxString phoneNumber = ''.obs;
   RxString verificationId = ''.obs;
   RxBool isCodeSent = false.obs;
@@ -24,6 +29,7 @@ class AuthController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool resend = false.obs;
   RxInt count = 60.obs;
+  bool _phoneVerificationRetriedWithRecaptcha = false;
   Timer? timer;
   TextEditingController smsCodeController = TextEditingController();
   TextEditingController nameController = TextEditingController();
@@ -72,33 +78,23 @@ class AuthController extends GetxController {
             await auth.signInWithCredential(credential);
           }
 
-          final exists = await checkUserExists();
-          if (exists) {
-            setUser();
-            Get.offAllNamed(Routes.HOME);
-          } else {
-            Get.offAll(() => const SignUpView());
-          }
+          await _routeAfterSuccessfulAuth();
+          _phoneVerificationRetriedWithRecaptcha = false;
           loading.value = false;
         },
-        verificationFailed: (FirebaseAuthException e) {
-          final code = e.code;
-          final message = e.message ?? e.toString();
-
-          // Common Firebase anti-abuse / quota block.
-          if (code == 'too-many-requests') {
-            showCustomSnackbar(
-              message:
-                  'Trop de tentatives. Firebase a bloqué temporairement les SMS pour cet appareil.\n'
-                  'Attends un moment, ou utilise un numéro de test dans Firebase Console.',
-              backgroundColor: Colors.red,
-            );
-          } else {
-            showCustomSnackbar(
-              message: message,
-              backgroundColor: Colors.red,
-            );
+        verificationFailed: (FirebaseAuthException e) async {
+          if (_shouldRetryWithRecaptcha(e) &&
+              !_phoneVerificationRetriedWithRecaptcha) {
+            _phoneVerificationRetriedWithRecaptcha = true;
+            await FirebaseAuth.instance.setSettings(forceRecaptchaFlow: true);
+            await verifyPhoneNumber(phoneNumber);
+            return;
           }
+
+          showCustomSnackbar(
+            message: _buildAuthErrorMessage(e, context: 'phone'),
+            backgroundColor: Colors.red,
+          );
           isCodeSent.value = false;
           loading.value = false;
         },
@@ -106,6 +102,7 @@ class AuthController extends GetxController {
           // Store verification ID and set code sent flag
           this.verificationId.value = verificationId;
           isCodeSent.value = true;
+          _phoneVerificationRetriedWithRecaptcha = false;
           loading.value = false;
           Get.to(() => const OtpView()); // navigate to otp view to enter code
         },
@@ -128,6 +125,7 @@ class AuthController extends GetxController {
     smsCodeController.clear();
     resend.value = false;
     count.value = 60;
+    _phoneVerificationRetriedWithRecaptcha = false;
     decreaseCounter();
     verifyPhoneNumber(phoneNumber.value);
   }
@@ -148,13 +146,7 @@ class AuthController extends GetxController {
       showCustomSnackbar(
           message: "Numéro de téléphone vérifié avec succès",
           backgroundColor: Colors.green);
-      final exists = await checkUserExists();
-      if (exists) {
-        setUser();
-        Get.offAllNamed(Routes.HOME);
-      } else {
-        Get.offAll(() => const SignUpView());
-      }
+      await _routeAfterSuccessfulAuth();
       loading.value = false;
     } catch (e) {
       showCustomSnackbar(
@@ -224,6 +216,7 @@ class AuthController extends GetxController {
     // Call the create user function from the users service
     final UserService usersService = UserService();
     usersService.createUser(newUser).then((value) {
+      _bindCurrentDevice(newUser.id ?? auth.currentUser!.uid);
       // set the user to currentUser
       setUser();
       showCustomSnackbar(
@@ -248,8 +241,17 @@ class AuthController extends GetxController {
 
   Future<void> signOut() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('isAdmin');
+
+      final currentUid = auth.currentUser?.uid;
+      if (currentUid != null && currentUid.isNotEmpty) {
+        await prefs.remove('isAdmin_$currentUid');
+      }
+
+      await GoogleSignIn().signOut();
       await FirebaseAuth.instance.signOut();
-      Get.offAll(() => const AuthView());
+      Get.offAllNamed(Routes.AUTH);
       showCustomSnackbar(message: "Déconnecté avec succès");
     } catch (e) {
       showCustomSnackbar(message: e.toString());
@@ -278,7 +280,9 @@ class AuthController extends GetxController {
         .update({
       'nomPrenom': nameController.text,
       'phoneNumber': number,
+      'updatedAt': FieldValue.serverTimestamp(),
     });
+    await _bindCurrentDevice(auth.currentUser!.uid);
     showCustomSnackbar(
       message: "Welcome ${nameController.text} !",
       backgroundColor: Colors.green,
@@ -304,25 +308,186 @@ class AuthController extends GetxController {
       );
 
       final userCrendential = await auth.signInWithCredential(credential);
-      nameController.text = userCrendential.user!.displayName!;
-      phoneNumber.value = userCrendential.user!.phoneNumber ?? '';
+      nameController.text = _resolveDisplayName(userCrendential.user);
+      phoneNumber.value = userCrendential.user?.phoneNumber ?? '';
       if (auth.currentUser != null) {
-        final userExists = await checkUserExists();
-        if (userExists) {
-          setUser();
-          Get.offAllNamed(Routes.HOME);
-        } else {
-          Get.offAll(() => const SignUpView(), arguments: {
-            'name': nameController.text,
-            'phone': phoneNumber.value,
-          });
-        }
+        await _routeAfterSuccessfulAuth(fromGoogle: true);
         showCustomSnackbar(
             message: 'Connexion avec Google réussie !',
             backgroundColor: Colors.green);
       }
     } catch (e) {
-      showCustomSnackbar(message: 'Connexion avec Google échouée : $e');
+      showCustomSnackbar(
+        message: _buildAuthErrorMessage(e, context: 'google'),
+        backgroundColor: Colors.red,
+      );
     }
+  }
+
+  bool _shouldRetryWithRecaptcha(FirebaseAuthException e) {
+    final code = e.code.toLowerCase();
+    final msg = (e.message ?? '').toLowerCase();
+    return code.contains('invalid-app-credential') ||
+        code == '39' ||
+        msg.contains('code 39') ||
+        msg.contains('invalid app credential') ||
+        msg.contains('app credential');
+  }
+
+  String _buildAuthErrorMessage(Object error, {required String context}) {
+    if (error is FirebaseAuthException) {
+      final code = error.code;
+      final msg = (error.message ?? '').toLowerCase();
+
+      if (code == 'too-many-requests') {
+        return 'Trop de tentatives. Réessaie plus tard ou utilise un numéro de test Firebase.';
+      }
+
+      if (code == 'invalid-app-credential' ||
+          code == '39' ||
+          msg.contains('code 39') ||
+          msg.contains('app credential')) {
+        return 'Erreur code 39: échec de vérification de l\'application Android. '
+            'Vérifie SHA-1/SHA-256 du certificat de signature (upload + Play App Signing) dans Firebase, '
+            'puis télécharge un build récent. Un fallback reCAPTCHA a été tenté automatiquement.';
+      }
+
+      if (code == 'network-request-failed') {
+        return 'Réseau indisponible. Vérifie la connexion internet puis réessaie.';
+      }
+
+      if (code == 'app-not-authorized' || code == 'operation-not-allowed') {
+        return 'Cette méthode de connexion n\'est pas autorisée dans Firebase Console pour ce projet.';
+      }
+
+      return error.message ?? 'Échec de connexion (${context.toUpperCase()}).';
+    }
+
+    if (error is PlatformException) {
+      final all =
+          '${error.code} ${error.message} ${error.details}'.toLowerCase();
+      if (all.contains('apiexception: 10') ||
+          all.contains('developer_error') ||
+          all.contains('code 39')) {
+        return 'Échec Google/Phone Auth lié à la configuration OAuth Android. '
+            'Vérifie le package, SHA-1/SHA-256 et les clients OAuth dans Firebase/Google Cloud.';
+      }
+      return error.message ?? 'Erreur plateforme (${context.toUpperCase()}).';
+    }
+
+    return 'Erreur de connexion (${context.toUpperCase()}): $error';
+  }
+
+  String _resolveDisplayName(User? authUser) {
+    final fromGoogle = authUser?.displayName?.trim() ?? '';
+    if (fromGoogle.isNotEmpty) return fromGoogle;
+
+    final fromEmail = authUser?.email?.split('@').first.trim() ?? '';
+    if (fromEmail.isNotEmpty) return fromEmail;
+
+    return 'Utilisateur Faani';
+  }
+
+  Future<void> _routeAfterSuccessfulAuth({bool fromGoogle = false}) async {
+    final currentUid = auth.currentUser?.uid;
+    if (currentUid == null) return;
+
+    final UserService usersService = UserService();
+    final UserModel? existing = await usersService.getIfUser(currentUid);
+
+    if (existing == null) {
+      final authUser = auth.currentUser;
+      nameController.text = _resolveDisplayName(authUser);
+      phoneNumber.value = authUser?.phoneNumber ?? '';
+      Get.offAll(
+        () => const SignUpView(),
+        arguments: {
+          'name': nameController.text,
+          'phone': phoneNumber.value,
+        },
+      );
+      return;
+    }
+
+    final isAllowed = await _enforceSingleDevicePolicy(existing);
+    if (!isAllowed) return;
+
+    final hasPhone = (existing.phoneNumber ?? '').trim().isNotEmpty;
+    if (fromGoogle && !hasPhone) {
+      nameController.text = (existing.nomPrenom ?? '').trim().isNotEmpty
+          ? existing.nomPrenom!.trim()
+          : _resolveDisplayName(auth.currentUser);
+      phoneNumber.value = '';
+      Get.offAll(
+        () => const SignUpView(),
+        arguments: {
+          'name': nameController.text,
+          'phone': '',
+        },
+      );
+      return;
+    }
+
+    setUser();
+    Get.offAllNamed(Routes.HOME);
+  }
+
+  Future<bool> _enforceSingleDevicePolicy(UserModel existingUser) async {
+    final uid = auth.currentUser?.uid;
+    if (uid == null) return false;
+
+    final currentDeviceId = await _getCurrentDeviceId();
+    final currentDeviceLabel = await _getCurrentDeviceLabel();
+    final savedDeviceId = (existingUser.activeDeviceId ?? '').trim();
+
+    if (savedDeviceId.isNotEmpty && savedDeviceId != currentDeviceId) {
+      showCustomSnackbar(
+        message:
+            'Session transférée vers cet appareil. L\'ancien téléphone sera déconnecté automatiquement.',
+      );
+    }
+
+    await UserService().updateActiveDevice(
+      uid: uid,
+      deviceId: currentDeviceId,
+      deviceLabel: currentDeviceLabel,
+    );
+    return true;
+  }
+
+  Future<void> _bindCurrentDevice(String uid) async {
+    final currentDeviceId = await _getCurrentDeviceId();
+    final currentDeviceLabel = await _getCurrentDeviceLabel();
+    await UserService().updateActiveDevice(
+      uid: uid,
+      deviceId: currentDeviceId,
+      deviceLabel: currentDeviceLabel,
+    );
+  }
+
+  Future<String> _getCurrentDeviceId() async {
+    try {
+      final id = await FlutterUdid.consistentUdid;
+      if (id.trim().isNotEmpty) {
+        return id;
+      }
+    } catch (_) {}
+
+    final fallback = auth.currentUser?.uid ?? DateTime.now().toIso8601String();
+    return 'fallback-$fallback';
+  }
+
+  Future<String> _getCurrentDeviceLabel() async {
+    try {
+      if (Platform.isAndroid) {
+        final info = await _deviceInfo.androidInfo;
+        return '${info.brand} ${info.model}'.trim();
+      }
+      if (Platform.isIOS) {
+        final info = await _deviceInfo.iosInfo;
+        return '${info.name} ${info.model}'.trim();
+      }
+    } catch (_) {}
+    return 'unknown-device';
   }
 }

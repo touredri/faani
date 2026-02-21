@@ -138,16 +138,14 @@ class ProfileController extends GetxController {
   }
 
   void rateApp() {
-    const url =
-        'https://play.google.com/store/apps/details?id=com.faani.app.faani';
+    const url = 'https://play.google.com/store/apps/details?id=com.faani.app';
     if (Platform.isAndroid) {
       launchUrl(Uri.parse(url));
     }
   }
 
   void shareApp() {
-    Share.share(
-        'https://play.google.com/store/apps/details?id=com.faani.app.faani');
+    Share.share('https://play.google.com/store/apps/details?id=com.faani.app');
   }
 
   void getMesModeles() {

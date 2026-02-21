@@ -18,23 +18,25 @@ class FavorieService extends GetxService {
   }
 
   // create favorie
-  void create(String idModele) async {
+  Future<void> addFavorite(String idModele) async {
     await collection.add({'idModele': idModele, 'idUtilisateur': user!.uid});
   }
 
   // delete a favorite
-  void delete(String idModele) async {
-    final snapshot = collection
+  Future<void> removeFavorite(String idModele) async {
+    final snapshot = await collection
         .where('idModele', isEqualTo: idModele)
         .where('idUtilisateur', isEqualTo: user!.uid)
         .get();
-    snapshot.then((value) => {
-          for (var doc in value.docs)
-            {
-              collection.doc(doc.id).delete(),
-            }
-        });
+
+    for (final doc in snapshot.docs) {
+      await collection.doc(doc.id).delete();
+    }
   }
+
+  Future<void> create(String idModele) async => addFavorite(idModele);
+
+  Future<void> delete(String idModele) async => removeFavorite(idModele);
 
   // get user favorite count
   Stream<int> getFavorieCount(String idUtilisateur) {

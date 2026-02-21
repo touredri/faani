@@ -3,8 +3,6 @@ import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'accueil_model_view.dart';
 
-/// TikTok-like vertical feed filtered by category.
-///
 /// Opens when a user taps a masonry grid item. Scrolls through
 /// other models in the same category.
 class CategoryFeedView extends StatefulWidget {

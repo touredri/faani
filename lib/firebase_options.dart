@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBE6w2YtJ_jjYoEVm5XWXpKP8b52byE1bY',
-    appId: '1:224443279523:android:bf0a981568089cf0ff7716',
+    appId: '1:224443279523:android:a6b63c090d9e445fff7716',
     messagingSenderId: '224443279523',
     projectId: 'faani-afrique',
     storageBucket: 'faani-afrique.appspot.com',
@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '224443279523',
     projectId: 'faani-afrique',
     storageBucket: 'faani-afrique.appspot.com',
-    iosBundleId: 'com.faani.app.faani',
+    iosBundleId: 'com.faani.app',
   );
 }

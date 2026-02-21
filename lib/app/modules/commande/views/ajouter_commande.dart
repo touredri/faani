@@ -7,6 +7,7 @@ import 'package:faani/app/modules/commande/widgets/mesure_popup.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/spacer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -172,18 +173,45 @@ class AjoutCommandePage extends GetView<CommandeController> {
                     ),
                     2.hs,
                     GestureDetector(
-                      onTap: () {
-                        mesureService
-                            .getAllUserMesure(
-                                controller.userController.currentUser.value.id!)
-                            .listen((event) {
-                          mesuresPopUp(
-                              context: context,
-                              mesures: event,
-                              onMesureSelected: (Mesure mesure) {
-                                controller.mesure.value = mesure;
-                              });
-                        });
+                      onTap: () async {
+                        String? userId =
+                            controller.userController.currentUser.value.id;
+
+                        if (userId == null || userId.isEmpty) {
+                          await controller.userController.init();
+                          userId =
+                              controller.userController.currentUser.value.id;
+                        }
+
+                        userId ??= FirebaseAuth.instance.currentUser?.uid;
+
+                        if (userId == null || userId.isEmpty) {
+                          showCustomSnackbar(
+                            message:
+                                'Veuillez vous reconnecter pour charger vos mesures',
+                          );
+                          return;
+                        }
+
+                        final List<Mesure> mesures =
+                            await mesureService.getAllUserMesure(userId).first;
+
+                        if (!context.mounted) return;
+
+                        if (mesures.isEmpty) {
+                          showCustomSnackbar(
+                            message: 'Aucune mesure trouvée pour ce compte',
+                          );
+                          return;
+                        }
+
+                        mesuresPopUp(
+                          context: context,
+                          mesures: mesures,
+                          onMesureSelected: (Mesure mesure) {
+                            controller.mesure.value = mesure;
+                          },
+                        );
                       },
                       child: Container(
                         width: MediaQuery.sizeOf(context).width * 0.9,

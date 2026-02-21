@@ -24,7 +24,7 @@ class _NotificationParamState extends State<NotificationParam> {
     //   action: 'android.settings.APP_NOTIFICATION_SETTINGS',
     //   flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
     //   arguments: <String, dynamic>{
-    //     'android.provider.extra.APP_PACKAGE': 'com.faani.app.faani',
+    //     'android.provider.extra.APP_PACKAGE': 'com.faani.app',
     //   },
     // );
     // intent.launch();

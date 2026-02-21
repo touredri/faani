@@ -1,4 +1,4 @@
-package com.faani.app.faani
+package com.faani.app
 
 import android.content.Intent
 import android.os.Bundle

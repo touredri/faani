@@ -5,6 +5,7 @@ import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/globale_widgets/list_tailleur_bottom_sheet.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/style/app_radius.dart';
 import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
@@ -126,7 +127,7 @@ class _HomeItemState extends State<HomeItem>
 
         // ── Bottom info overlay ───────────────────────────────────
         Positioned(
-          bottom: AppSpacing.huge + 30,
+          bottom: AppSpacing.huge + 10,
           left: AppSpacing.lg,
           right: 72,
           child: Column(
@@ -253,6 +254,52 @@ class _CommentButton extends StatelessWidget {
   final Modele modele;
   const _CommentButton({required this.modele});
 
+  Future<void> _openComments(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (modalContext) {
+        final theme = Theme.of(modalContext);
+        return FractionallySizedBox(
+          heightFactor: 0.9,
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+            ),
+            child: Column(
+              children: [
+                AppSpacing.gapV8,
+                Container(
+                  width: 42,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.outlineVariant,
+                    borderRadius: AppRadius.radiusFull,
+                  ),
+                ),
+                AppSpacing.gapV8,
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    child: CommentModal(idModele: modele.id!),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -261,33 +308,36 @@ class _CommentButton extends StatelessWidget {
         GestureDetector(
           onTap: () {
             HapticFeedback.lightImpact();
-            showModalBottomSheet(
-              isScrollControlled: true,
-              useRootNavigator: true,
-              backgroundColor: const Color.fromARGB(150, 145, 144, 144),
-              context: context,
-              builder: (context) {
-                return SizedBox(
-                  height: MediaQuery.sizeOf(context).height * 0.80,
-                  child: CommentModal(idModele: modele.id!),
-                );
-              },
-            );
+            _openComments(context);
           },
-          child: const Icon(
-            Icons.message_outlined,
-            color: Colors.white,
-            size: 26,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            child: const Icon(
+              Icons.message_outlined,
+              color: Colors.white,
+              size: 26,
+            ),
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 4),
         StreamBuilder<int>(
           stream: ModeleService().getCommentCount(modele.id!),
           builder: (context, snapshot) {
+            final int count = snapshot.data ?? 0;
             return Text(
-              snapshot.hasData ? '${snapshot.data}' : '0',
+              '$count',
               style: AppTypography.labelSmall.copyWith(
-                color: AppColors.white.withValues(alpha: 0.8),
+                color: AppColors.white.withValues(alpha: 0.92),
+                fontWeight: FontWeight.w600,
+                shadows: const [
+                  Shadow(
+                    blurRadius: 8,
+                    color: Colors.black54,
+                  ),
+                ],
               ),
             );
           },

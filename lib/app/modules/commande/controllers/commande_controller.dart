@@ -114,11 +114,42 @@ class CommandeController extends GetxController {
 
   // create a new commande
   Future<void> createCommande(Modele modele, BuildContext context) async {
+    if (image.value == null) {
+      showCustomSnackbar(message: 'Veuillez ajouter une photo de l\'habit');
+      return;
+    }
+
+    if (mesure.value?.id == null || selectedDate.value.isEmpty) {
+      showCustomSnackbar(message: 'Veuillez renseigner les mesures et la date');
+      return;
+    }
+
+    final currentUser = auth.currentUser;
+    if (currentUser == null) {
+      showCustomSnackbar(message: 'Veuillez vous reconnecter');
+      return;
+    }
+
+    if (userController.currentUser.value.id == null ||
+        userController.currentUser.value.id!.isEmpty) {
+      await userController.init();
+    }
+
+    final String resolvedUserId =
+        (userController.currentUser.value.id ?? '').isNotEmpty
+            ? userController.currentUser.value.id!
+            : currentUser.uid;
+
+    final bool isTailleurFlow = userController.isTailleur.value;
+    final selectedTailleur =
+        Get.find<AccueilController>().selectedTailleur.value;
+    if (!isTailleurFlow && selectedTailleur == null) {
+      showCustomSnackbar(message: 'Veuillez choisir un tailleur');
+      return;
+    }
+
     isSending.value = true;
     List<Map<String, String>> imageInfo = await uploadPhoto(image.value!);
-    if (mesure.value?.id == null || selectedDate.value.isEmpty) {
-      showCustomSnackbar(message: 'Veuillez renseigner les mesures');
-    }
     // give app logo as default photo if no photo is uploaded
     if (imageInfo.isEmpty) {
       imageInfo.add({
@@ -130,14 +161,12 @@ class CommandeController extends GetxController {
     final Commande newCommande = Commande(
       idMesure: mesure.value!.id!,
       idModele: modele.id!,
-      isSelfAdded: userController.isTailleur.value ? true : false,
-      idTailleur: userController.isTailleur.value
-          ? userController.currentUser.value.id!
-          : Get.find<AccueilController>().selectedTailleur.value!.id!,
-      numeroClient: userController.isTailleur.value
+      isSelfAdded: isTailleurFlow ? true : false,
+      idTailleur: isTailleurFlow ? resolvedUserId : selectedTailleur!.id!,
+      numeroClient: isTailleurFlow
           ? int.parse(numeroController.text)
           : int.parse(userController.currentUser.value.phoneNumber!),
-      nomClient: userController.isTailleur.value
+      nomClient: isTailleurFlow
           ? nomController.text
           : userController.currentUser.value.nomPrenom!,
       photoHabit: imageInfo[0]['downloadUrl']!,
@@ -146,9 +175,7 @@ class CommandeController extends GetxController {
       idCategorie: modele.idCategorie!,
       modeleImage: modele.fichier[0]!,
       id: '',
-      idUser: !userController.isTailleur.value
-          ? userController.currentUser.value.id!
-          : '',
+      idUser: !isTailleurFlow ? resolvedUserId : '',
       datePrevue: DateTime.parse(selectedDate.value),
       dateModifier: DateTime.parse(selectedDate.value),
     );
@@ -193,7 +220,7 @@ class CommandeController extends GetxController {
       date: Timestamp.fromDate(DateTime.now()),
     );
     await SuiviEtatService().createSuiviEtat(newSuiviEtat);
-    if (!userController.isTailleur.value) {
+    if (!isTailleurFlow) {
       final UserModel tailleur =
           await userService.getUser(newCommande.idTailleur);
       await sendNotification(tailleur.token!, 'Nouvelle commande',

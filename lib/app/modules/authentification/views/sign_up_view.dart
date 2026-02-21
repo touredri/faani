@@ -58,6 +58,26 @@ class SignUpView extends GetView<AuthController> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () async {
+                        final fullName = controller.nameController.text.trim();
+                        final phone = controller.phoneNumber.value.trim();
+
+                        if (fullName.length < 3) {
+                          showCustomSnackbar(
+                            message: 'Veuillez saisir votre nom complet.',
+                            backgroundColor: Colors.red,
+                          );
+                          return;
+                        }
+
+                        if (phone.isEmpty || !phone.startsWith('+')) {
+                          showCustomSnackbar(
+                            message:
+                                'Numéro requis après connexion Google (ex: +223xxxxxxxx).',
+                            backgroundColor: Colors.red,
+                          );
+                          return;
+                        }
+
                         final isUserExist = await controller.checkUserExists();
                         if (isUserExist &&
                             controller.nameController.text.isNotEmpty) {

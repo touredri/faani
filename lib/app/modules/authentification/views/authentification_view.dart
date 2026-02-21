@@ -15,6 +15,10 @@ class AuthView extends GetView<AuthController> {
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<AuthController>()) {
+      Get.put(AuthController());
+    }
+
     final theme = Theme.of(context);
     final hasUser = auth.currentUser != null;
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'app_colors.dart';
 import 'app_radius.dart';
 import 'app_spacing.dart';
@@ -37,7 +38,8 @@ abstract final class AppTheme {
     required Brightness brightness,
   }) {
     final bool isLight = brightness == Brightness.light;
-    final Color textColor = isLight ? AppColors.textPrimary : AppColors.textOnDark;
+    final Color textColor =
+        isLight ? AppColors.textPrimary : AppColors.textOnDark;
     final Color subtextColor =
         isLight ? AppColors.textSecondary : AppColors.textOnDarkSecondary;
 
@@ -60,6 +62,9 @@ abstract final class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
+        systemOverlayStyle: brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         centerTitle: true,
         titleTextStyle: AppTypography.headlineSmall.copyWith(color: textColor),
         iconTheme: IconThemeData(color: textColor),
@@ -226,7 +231,8 @@ abstract final class AppTheme {
         minVerticalPadding: AppSpacing.sm,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusSm),
         titleTextStyle: AppTypography.titleSmall.copyWith(color: textColor),
-        subtitleTextStyle: AppTypography.bodySmall.copyWith(color: subtextColor),
+        subtitleTextStyle:
+            AppTypography.bodySmall.copyWith(color: subtextColor),
       ),
 
       // ── Date Picker ──────────────────────────────────────────────

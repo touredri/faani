@@ -237,7 +237,6 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
                             source: 'home_grid',
                             categoryId: modele.idCategorie);
                       }
-                      // Open TikTok-like feed filtered by same category
                       final categoryModeles = explorationModeles
                           .where((m) => m.idCategorie == modele.idCategorie)
                           .toList();

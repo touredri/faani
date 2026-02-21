@@ -15,44 +15,77 @@ import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 void showTailleurModalBottomSheet(BuildContext context, Modele modele) {
+  final TextEditingController searchController = TextEditingController();
+
   showCupertinoModalBottomSheet(
     expand: false,
     context: context,
     useRootNavigator: true,
     builder: (context) {
       final theme = Theme.of(context);
-      return StreamBuilder(
-        stream: UserService().getAllTailleur(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(
-              height: 300,
-              child: LoadingStateWidget(),
-            );
-          } else if (snapshot.data!.isEmpty) {
-            return const SizedBox(
-              height: 300,
-              child: EmptyStateWidget(
-                iconData: Icons.person_search_outlined,
-                title: 'Aucun tailleur disponible',
-              ),
-            );
-          } else {
-            final List<UserModel> listTailleur =
-                snapshot.data as List<UserModel>;
+      return StatefulBuilder(builder: (context, setModalState) {
+        final String query = searchController.text.trim().toLowerCase();
+
+        return StreamBuilder<List<UserModel>>(
+          stream: UserService().getAllTailleur(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                height: 300,
+                child: LoadingStateWidget(),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return const SizedBox(
+                height: 300,
+                child: EmptyStateWidget(
+                  iconData: Icons.error_outline,
+                  title: 'Erreur de chargement des tailleurs',
+                ),
+              );
+            }
+
+            final List<UserModel> allTailleurs = snapshot.data ?? <UserModel>[];
+            final List<UserModel> filteredTailleurs = query.isEmpty
+                ? allTailleurs
+                : allTailleurs.where((tailleur) {
+                    final String nom = (tailleur.nomPrenom ?? '').toLowerCase();
+                    final String cible =
+                        (tailleur.clientCible ?? '').toLowerCase();
+                    final String adresse =
+                        (tailleur.adress ?? '').toLowerCase();
+                    return nom.contains(query) ||
+                        cible.contains(query) ||
+                        adresse.contains(query);
+                  }).toList();
+
+            if (allTailleurs.isEmpty) {
+              return const SizedBox(
+                height: 300,
+                child: EmptyStateWidget(
+                  iconData: Icons.person_search_outlined,
+                  title: 'Aucun tailleur disponible',
+                ),
+              );
+            }
+
             return Scaffold(
               appBar: AppBar(
                 automaticallyImplyLeading: false,
                 elevation: 0,
-                centerTitle: true,
+                titleSpacing: AppSpacing.lg,
                 title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 48,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.outlineVariant,
-                        borderRadius: AppRadius.radiusFull,
+                    Center(
+                      child: Container(
+                        width: 48,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.outlineVariant,
+                          borderRadius: AppRadius.radiusFull,
+                        ),
                       ),
                     ),
                     AppSpacing.gapV12,
@@ -62,53 +95,130 @@ void showTailleurModalBottomSheet(BuildContext context, Modele modele) {
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              body: ListView.separated(
-                padding: AppSpacing.paddingVSm,
-                itemCount: listTailleur.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final UserModel tailleur = listTailleur[index];
-                  return ListTile(
-                    title: Text(
-                      tailleur.nomPrenom!,
-                      style: AppTypography.titleSmall.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    subtitle: Text(
-                      'Couture pour ${tailleur.clientCible!}',
+                    AppSpacing.gapV4,
+                    Text(
+                      '${filteredTailleurs.length} résultat${filteredTailleurs.length > 1 ? 's' : ''}',
                       style: AppTypography.bodySmall.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    trailing: Icon(
-                      Icons.chevron_right,
-                      color: theme.colorScheme.onSurfaceVariant,
+                  ],
+                ),
+                actions: [
+                  IconButton(
+                    onPressed: () => Navigator.of(context).maybePop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                  AppSpacing.gapH8,
+                ],
+              ),
+              body: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 2, 16, 10),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (_) => setModalState(() {}),
+                      textInputAction: TextInputAction.search,
+                      decoration: InputDecoration(
+                        hintText: 'Rechercher par nom, cible ou adresse',
+                        prefixIcon: const Icon(Icons.search_rounded),
+                        suffixIcon: query.isEmpty
+                            ? null
+                            : IconButton(
+                                onPressed: () {
+                                  searchController.clear();
+                                  setModalState(() {});
+                                },
+                                icon: const Icon(Icons.close_rounded),
+                              ),
+                        isDense: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
-                    onTap: () {
-                      Get.find<AccueilController>().selectedTailleur.value =
-                          tailleur;
-                      if (auth.currentUser!.isAnonymous) {
-                        showCustomSnackbar(
-                          message:
-                              'Vous devez vous connecter pour faire une commande',
-                        );
-                      } else {
-                        Get.to(() => AjoutCommandePage(modele),
-                            transition: Transition.rightToLeft);
-                      }
-                    },
-                  );
-                },
+                  ),
+                  Expanded(
+                    child: filteredTailleurs.isEmpty
+                        ? const EmptyStateWidget(
+                            iconData: Icons.search_off_rounded,
+                            title: 'Aucun résultat pour cette recherche',
+                          )
+                        : ListView.separated(
+                            padding: AppSpacing.paddingVSm,
+                            itemCount: filteredTailleurs.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 2),
+                            itemBuilder: (context, index) {
+                              final UserModel tailleur =
+                                  filteredTailleurs[index];
+                              final String nom =
+                                  (tailleur.nomPrenom ?? '').trim().isEmpty
+                                      ? 'Tailleur'
+                                      : tailleur.nomPrenom!.trim();
+                              final String cible =
+                                  (tailleur.clientCible ?? '').trim().isEmpty
+                                      ? 'Tous'
+                                      : tailleur.clientCible!.trim();
+                              final String adresse =
+                                  (tailleur.adress ?? '').trim().isEmpty
+                                      ? 'Adresse non renseignée'
+                                      : tailleur.adress!.trim();
+
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  child: Text(
+                                    nom.characters.first.toUpperCase(),
+                                    style: AppTypography.labelLarge,
+                                  ),
+                                ),
+                                title: Text(
+                                  nom,
+                                  style: AppTypography.titleSmall.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'Couture pour $cible • $adresse',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                trailing: Icon(
+                                  Icons.chevron_right,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                onTap: () {
+                                  Get.find<AccueilController>()
+                                      .selectedTailleur
+                                      .value = tailleur;
+
+                                  Navigator.of(context).maybePop();
+
+                                  if (auth.currentUser!.isAnonymous) {
+                                    showCustomSnackbar(
+                                      message:
+                                          'Vous devez vous connecter pour faire une commande',
+                                    );
+                                  } else {
+                                    Get.to(() => AjoutCommandePage(modele),
+                                        transition: Transition.rightToLeft);
+                                  }
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
             );
-          }
-        },
-      );
+          },
+        );
+      });
     },
   );
 }

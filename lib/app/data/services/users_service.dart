@@ -62,8 +62,24 @@ class UserService {
     return _usersRef.doc(id).update({'isTailleur': isTailleur});
   }
 
+  Future<void> updateActiveDevice({
+    required String uid,
+    required String deviceId,
+    required String deviceLabel,
+  }) {
+    return _usersRef.doc(uid).update({
+      'activeDeviceId': deviceId,
+      'activeDeviceLabel': deviceLabel,
+      'lastLoginAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   // add user following
   Future<void> addUserFollowing(String userId, userFollowId) {
-    return _usersRef.doc(userId).collection("followers").add({'following': userFollowId});
+    return _usersRef
+        .doc(userId)
+        .collection("followers")
+        .add({'following': userFollowId});
   }
 }

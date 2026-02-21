@@ -13,10 +13,12 @@ class UserModel {
       phoneNumber,
       adress,
       profileImage,
+      activeDeviceId,
+      activeDeviceLabel,
       token,
       sex;
   bool isTailleur;
-  DateTime? createdAt, updatedAt;
+  DateTime? createdAt, updatedAt, lastLoginAt;
   List<String> followers;
   List<String> following;
 
@@ -28,11 +30,14 @@ class UserModel {
       required this.phoneNumber,
       this.adress = '',
       this.profileImage,
+      this.activeDeviceId,
+      this.activeDeviceLabel,
       this.isTailleur = false,
       this.sex = '',
       this.token,
       this.followers = const [],
       this.following = const [],
+      this.lastLoginAt,
       this.createdAt,
       this.updatedAt});
 
@@ -45,13 +50,22 @@ class UserModel {
     final phoneNumber = data['phoneNumber'];
     final adress = data['adress'];
     final profileImage = data['profileImage'];
+    final activeDeviceId = data['activeDeviceId'];
+    final activeDeviceLabel = data['activeDeviceLabel'];
     final isTailleur = data['isTailleur'];
     final sex = data['sex'];
     final token = data['token'];
     final followers = List<String>.from(data['followers'] ?? []);
     final following = List<String>.from(data['following'] ?? []);
-    final createdAt = (data['createdAt'] as Timestamp).toDate();
-    final updatedAt = (data['updatedAt'] as Timestamp).toDate();
+    final createdAtTs = data['createdAt'];
+    final updatedAtTs = data['updatedAt'];
+    final lastLoginAtTs = data['lastLoginAt'];
+    final createdAt =
+        createdAtTs is Timestamp ? createdAtTs.toDate() : DateTime.now();
+    final updatedAt =
+        updatedAtTs is Timestamp ? updatedAtTs.toDate() : DateTime.now();
+    final lastLoginAt =
+        lastLoginAtTs is Timestamp ? lastLoginAtTs.toDate() : null;
 
     return UserModel(
       id: id,
@@ -61,11 +75,14 @@ class UserModel {
       phoneNumber: phoneNumber,
       adress: adress,
       profileImage: profileImage,
+      activeDeviceId: activeDeviceId,
+      activeDeviceLabel: activeDeviceLabel,
       isTailleur: isTailleur,
       sex: sex,
       token: token,
       followers: followers,
       following: following,
+      lastLoginAt: lastLoginAt,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -79,11 +96,14 @@ class UserModel {
       'phoneNumber': phoneNumber,
       'adress': adress,
       'profileImage': profileImage,
+      'activeDeviceId': activeDeviceId,
+      'activeDeviceLabel': activeDeviceLabel,
       'isTailleur': isTailleur,
       'sex': sex,
       'token': token,
       'followers': followers,
       'following': following,
+      'lastLoginAt': lastLoginAt,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     });
@@ -97,9 +117,12 @@ class UserModel {
     String? phoneNumber,
     String? adress,
     String? profileImage,
+    String? activeDeviceId,
+    String? activeDeviceLabel,
     bool? isTailleur,
     String? sex,
     String? token,
+    DateTime? lastLoginAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -111,9 +134,12 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       adress: adress ?? this.adress,
       profileImage: profileImage ?? this.profileImage,
+      activeDeviceId: activeDeviceId ?? this.activeDeviceId,
+      activeDeviceLabel: activeDeviceLabel ?? this.activeDeviceLabel,
       isTailleur: isTailleur ?? this.isTailleur,
       sex: sex ?? this.sex,
       token: token ?? this.token,
+      lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
