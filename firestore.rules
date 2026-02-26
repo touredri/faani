@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function phoneIndexPath(phoneE164) {
+      return /databases/$(database)/documents/phone_index/$(phoneE164);
+    }
+
+    // Identity mapping: one phoneE164 -> one uid
+    match /phone_index/{phoneE164} {
+      allow read: if isSignedIn();
+
+      // First bind: can only be created by the owner uid.
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.phoneE164 == phoneE164
+        && !exists(phoneIndexPath(phoneE164));
+
+      // Update/delete only by the same owner uid.
+      allow update, delete: if isSignedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.phoneE164 == phoneE164;
+    }
+
+    // User profile docs
+    match /users/{uid} {
+      allow read: if isSignedIn();
+
+      // Owner can create/update his own profile.
+      // If phoneE164 is written, corresponding phone_index doc must belong to same uid.
+      allow create, update: if isSelf(uid)
+        && request.resource.data.id == uid
+        && (
+          !(request.resource.data.phoneE164 is string)
+          || request.resource.data.phoneE164.size() == 0
+          || (
+            exists(phoneIndexPath(request.resource.data.phoneE164))
+            && get(phoneIndexPath(request.resource.data.phoneE164)).data.uid == uid
+          )
+        );
+
+      allow delete: if isSelf(uid);
+    }
+
+    // Temporary compatibility fallback for other app collections.
+    // Tighten this progressively per collection.
+    match /{document=**} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}

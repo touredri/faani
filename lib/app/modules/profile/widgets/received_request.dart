@@ -1785,7 +1785,7 @@ class _ReceivedRequestState extends State<ReceivedRequest>
             runSpacing: 8,
             children: thresholdChoices.map((threshold) {
               return ChoiceChip(
-                label: Text('Seuil ${threshold}%'),
+                label: Text('Seuil $threshold%'),
                 selected: _auditTrendThreshold == threshold,
                 onSelected: (_) {
                   setState(() {

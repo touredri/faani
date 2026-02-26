@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/models/user_role.dart';
 import 'package:faani/app/data/services/access_control_service.dart';
+import 'package:faani/app/data/services/user_identity_binding_service.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,11 +19,18 @@ import '../../../routes/app_pages.dart';
 import '../../../data/services/users_service.dart';
 import '../../../firebase/global_function.dart';
 import '../../home/controllers/user_controller.dart';
+import '../../home/controllers/home_controller.dart';
+import '../../accueil/controllers/accueil_controller.dart';
+import '../../commande/controllers/commande_controller.dart';
+import '../../favorie/controllers/favorie_controller.dart';
+import '../../profile/controllers/profile_controller.dart';
 import '../views/otp_view.dart';
 import '../views/sign_up_view.dart';
 
 class AuthController extends GetxController {
   final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  final UserIdentityBindingService _identityBindingService =
+      UserIdentityBindingService();
   RxString phoneNumber = ''.obs;
   RxString verificationId = ''.obs;
   RxBool isCodeSent = false.obs;
@@ -219,6 +227,10 @@ class AuthController extends GetxController {
     // Call the create user function from the users service
     final UserService usersService = UserService();
     usersService.createUser(newUser).then((value) {
+      _bindIdentitySafely(
+        phoneNumber: number,
+        email: newUser.email ?? auth.currentUser?.email ?? '',
+      );
       _bindCurrentDevice(newUser.id ?? auth.currentUser!.uid);
       // set the user to currentUser
       setUser();
@@ -244,6 +256,8 @@ class AuthController extends GetxController {
 
   Future<void> signOut() async {
     try {
+      await _disposeHomeFlowControllers();
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('isAdmin');
 
@@ -253,12 +267,35 @@ class AuthController extends GetxController {
       }
       await AccessControlService().clearCachedRoleForCurrentUser();
 
+      Get.offAllNamed(Routes.AUTH);
+      await Future.delayed(const Duration(milliseconds: 120));
+
       await GoogleSignIn().signOut();
       await FirebaseAuth.instance.signOut();
-      Get.offAllNamed(Routes.AUTH);
       showCustomSnackbar(message: "Déconnecté avec succès");
     } catch (e) {
       showCustomSnackbar(message: e.toString());
+    }
+  }
+
+  Future<void> _disposeHomeFlowControllers() async {
+    if (Get.isRegistered<ProfileController>()) {
+      Get.delete<ProfileController>(force: true);
+    }
+    if (Get.isRegistered<CommandeController>()) {
+      Get.delete<CommandeController>(force: true);
+    }
+    if (Get.isRegistered<FavorieController>()) {
+      Get.delete<FavorieController>(force: true);
+    }
+    if (Get.isRegistered<AccueilController>()) {
+      Get.delete<AccueilController>(force: true);
+    }
+    if (Get.isRegistered<HomeController>()) {
+      Get.delete<HomeController>(force: true);
+    }
+    if (Get.isRegistered<UserController>()) {
+      Get.delete<UserController>(force: true);
     }
   }
 
@@ -286,6 +323,10 @@ class AuthController extends GetxController {
       'phoneNumber': number,
       'updatedAt': FieldValue.serverTimestamp(),
     });
+    await _bindIdentitySafely(
+      phoneNumber: number,
+      email: auth.currentUser?.email ?? '',
+    );
     await _bindCurrentDevice(auth.currentUser!.uid);
     showCustomSnackbar(
       message: "Welcome ${nameController.text} !",
@@ -416,6 +457,16 @@ class AuthController extends GetxController {
     final isAllowed = await _enforceSingleDevicePolicy(existing);
     if (!isAllowed) return;
 
+    final existingPhone = (existing.phoneNumber ?? '').trim();
+    if (existingPhone.isNotEmpty) {
+      await _bindIdentitySafely(
+        phoneNumber: existingPhone,
+        email: existing.email ?? auth.currentUser?.email ?? '',
+      );
+    } else {
+      await _identityBindingService.syncCurrentUserIdentityFromFirestore();
+    }
+
     final hasPhone = (existing.phoneNumber ?? '').trim().isNotEmpty;
     if (fromGoogle && !hasPhone) {
       nameController.text = (existing.nomPrenom ?? '').trim().isNotEmpty
@@ -493,5 +544,22 @@ class AuthController extends GetxController {
       }
     } catch (_) {}
     return 'unknown-device';
+  }
+
+  Future<void> _bindIdentitySafely({
+    required String phoneNumber,
+    required String email,
+  }) async {
+    try {
+      await _identityBindingService.bindCurrentUserIdentity(
+        phoneNumber: phoneNumber,
+        email: email,
+      );
+    } catch (e) {
+      showCustomSnackbar(
+        message: 'Vérification identité: ${e.toString()}',
+        backgroundColor: Colors.orange,
+      );
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
@@ -62,6 +63,7 @@ class ProfileController extends GetxController {
   RxList<String> listSelectedCategorie = <String>[].obs;
   RxInt followers = 0.obs;
   RxInt following = 0.obs;
+  StreamSubscription<Map<String, int>>? _followStatsSubscription;
 
   // change language
   void updateLanguage(String language) {
@@ -82,9 +84,16 @@ class ProfileController extends GetxController {
   }
 
   void getFollowStats() {
-    FollowService().getFollowStats(auth.currentUser!.uid).listen((event) {
+    _followStatsSubscription?.cancel();
+    final currentUid = auth.currentUser?.uid;
+    if (currentUid == null || currentUid.isEmpty) return;
+
+    _followStatsSubscription =
+        FollowService().getFollowStats(currentUid).listen((event) {
       followers.value = event['followers'] ?? 0;
       following.value = event['following'] ?? 0;
+    }, onError: (_) {
+      if (auth.currentUser == null) return;
     });
   }
 
@@ -227,5 +236,11 @@ class ProfileController extends GetxController {
         .collection('users')
         .doc(user!.uid)
         .update({'clientCible': selectedClientCible.value});
+  }
+
+  @override
+  void onClose() {
+    _followStatsSubscription?.cancel();
+    super.onClose();
   }
 }

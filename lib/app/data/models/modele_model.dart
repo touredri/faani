@@ -147,27 +147,53 @@ class Modele {
   }
 
   factory Modele.fromDocumentSnapshot(DocumentSnapshot doc) {
-    Timestamp? createdAt;
-    try {
-      createdAt = doc['createdAt'] as Timestamp?;
-    } catch (_) {
-      createdAt = null;
+    final data = (doc.data() as Map<String, dynamic>?) ?? <String, dynamic>{};
+
+    int asInt(dynamic value) {
+      if (value is int) return value;
+      return int.tryParse(value?.toString() ?? '') ?? 0;
     }
+
+    bool asBool(dynamic value, {bool fallback = false}) {
+      if (value is bool) return value;
+      if (value is String) {
+        final normalized = value.trim().toLowerCase();
+        if (normalized == 'true') return true;
+        if (normalized == 'false') return false;
+      }
+      return fallback;
+    }
+
+    String asString(dynamic value, {String fallback = ''}) {
+      final result = (value ?? '').toString().trim();
+      return result.isEmpty ? fallback : result;
+    }
+
+    final rawFichier = data['fichier'];
+    final fichier = rawFichier is List
+        ? rawFichier.map((item) => item?.toString()).toList()
+        : <String>[];
+
+    final rawImagePath = data['imagePath'];
+    final imagePath = rawImagePath is List
+        ? rawImagePath.map((item) => item?.toString()).toList()
+        : null;
+
+    final createdAt = data['createdAt'] as Timestamp?;
 
     return Modele(
       id: doc.id,
-      detail: doc['detail'],
-      fichier: List<String>.from(doc['fichier']),
-      imagePath:
-          doc['imagePath'] != null ? List<String>.from(doc['imagePath']) : null,
+      detail: asString(data['detail']),
+      fichier: fichier,
+      imagePath: imagePath,
       createdAt: createdAt,
-      likeCount: doc['likeCount'] ?? 0,
-      viewCount: doc['viewCount'] ?? 0,
-      genreHabit: doc['genreHabit'],
-      idTailleur: doc['idTailleur'],
-      idCategorie: doc['idCategorie'],
-      isPublic: doc['isPublic'],
-      isApproved: doc['isApproved'] ?? false, // New property
+      likeCount: asInt(data['likeCount']),
+      viewCount: asInt(data['viewCount']),
+      genreHabit: asString(data['genreHabit']),
+      idTailleur: asString(data['idTailleur']),
+      idCategorie: asString(data['idCategorie']),
+      isPublic: asBool(data['isPublic']),
+      isApproved: asBool(data['isApproved']), // New property
     );
   }
 

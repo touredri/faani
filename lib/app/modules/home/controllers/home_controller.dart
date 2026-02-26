@@ -262,6 +262,10 @@ class HomeController extends GetxController {
       if (activeDeviceId != currentDeviceId) {
         await _forceSignOutBySessionTransfer();
       }
+    }, onError: (_) {
+      if (auth.currentUser == null) {
+        _deviceSessionSubscription?.cancel();
+      }
     });
   }
 
