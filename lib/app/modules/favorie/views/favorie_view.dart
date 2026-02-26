@@ -6,7 +6,6 @@ import 'package:faani/app/style/app_radius.dart';
 import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import '../../../data/models/modele_model.dart';

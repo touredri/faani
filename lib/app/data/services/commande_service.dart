@@ -43,6 +43,16 @@ class CommandeService {
     });
   }
 
+  Stream<List<Commande>> getAllCommandeForAdmin() {
+    return collection.snapshots().map((snapshot) {
+      final commandes = snapshot.docs
+          .map((doc) => Commande.fromMap(doc.data(), doc.reference))
+          .toList();
+      commandes.sort((a, b) => b.dateAjout.compareTo(a.dateAjout));
+      return commandes;
+    });
+  }
+
   // get all commande by status and take 1 for receive and 2 for finish
   Stream<List<Commande>> getAllCommandeByEtat(int number) {
     return getAllCommande().asyncMap((commandes) async {

@@ -141,6 +141,18 @@ class CommandeController extends GetxController {
             : currentUser.uid;
 
     final bool isTailleurFlow = userController.isTailleur.value;
+    if (isTailleurFlow) {
+      final clientName = nomController.text.trim();
+      final clientPhone = numeroController.text.trim();
+      final parsedPhone = int.tryParse(clientPhone);
+      if (clientName.isEmpty || clientPhone.isEmpty || parsedPhone == null) {
+        showCustomSnackbar(
+          message: 'Veuillez renseigner un nom et un numéro client valide',
+        );
+        return;
+      }
+    }
+
     final selectedTailleur =
         Get.find<AccueilController>().selectedTailleur.value;
     if (!isTailleurFlow && selectedTailleur == null) {
@@ -164,7 +176,7 @@ class CommandeController extends GetxController {
       isSelfAdded: isTailleurFlow ? true : false,
       idTailleur: isTailleurFlow ? resolvedUserId : selectedTailleur!.id!,
       numeroClient: isTailleurFlow
-          ? int.parse(numeroController.text)
+          ? int.tryParse(numeroController.text) ?? 0
           : int.parse(userController.currentUser.value.phoneNumber!),
       nomClient: isTailleurFlow
           ? nomController.text

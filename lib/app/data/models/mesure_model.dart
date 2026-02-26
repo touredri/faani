@@ -62,6 +62,7 @@ class Mesure {
   Future<void> create() async {
     final docRef = await collection.add(toMap());
     await docRef.update({'id': docRef.id});
+    id = docRef.id;
   }
 
   Future<void> update() async {

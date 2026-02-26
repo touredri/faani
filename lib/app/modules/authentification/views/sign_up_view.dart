@@ -15,10 +15,14 @@ class SignUpView extends GetView<AuthController> {
 
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.isRegistered<AuthController>()
+        ? Get.find<AuthController>()
+        : Get.put(AuthController(), permanent: true);
+
     final args = Get.arguments;
     if (args != null) {
-      controller.phoneNumber.value = args['phone'] ?? '';
-      controller.nameController.text = args['name'] ?? '';
+      authController.phoneNumber.value = args['phone'] ?? '';
+      authController.nameController.text = args['name'] ?? '';
     }
     return Scaffold(
       body: SafeArea(
@@ -45,21 +49,23 @@ class SignUpView extends GetView<AuthController> {
               ),
               5.hs, // input name
               TextField(
-                controller: controller.nameController,
+                controller: authController.nameController,
                 decoration: const InputDecoration(
                   labelText: 'Nom Prenom',
                   border: OutlineInputBorder(),
                 ),
               ),
-              if (controller.phoneNumber.value.isEmpty) _setNumber(context),
+              if (authController.phoneNumber.value.isEmpty)
+                _setNumber(context, authController),
               4.hs, // save button
               Obx(() => SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () async {
-                        final fullName = controller.nameController.text.trim();
-                        final phone = controller.phoneNumber.value.trim();
+                        final fullName =
+                            authController.nameController.text.trim();
+                        final phone = authController.phoneNumber.value.trim();
 
                         if (fullName.length < 3) {
                           showCustomSnackbar(
@@ -78,26 +84,27 @@ class SignUpView extends GetView<AuthController> {
                           return;
                         }
 
-                        final isUserExist = await controller.checkUserExists();
+                        final isUserExist =
+                            await authController.checkUserExists();
                         if (isUserExist &&
-                            controller.nameController.text.isNotEmpty) {
-                          controller.updateUserName(
-                              number: controller.phoneNumber.value);
+                            authController.nameController.text.isNotEmpty) {
+                          authController.updateUserName(
+                              number: authController.phoneNumber.value);
                         } else if (isUserExist &&
-                            controller.nameController.text.isEmpty) {
+                            authController.nameController.text.isEmpty) {
                           Get.snackbar(
                             "Success",
                             "Bienvenue ${auth.currentUser!.displayName} !",
                             snackPosition: SnackPosition.BOTTOM,
                           );
-                          controller.setUser();
+                          authController.setUser();
                           Get.offAllNamed(Routes.HOME);
                         } else {
-                          controller.saveUserInFirestore(
-                              controller.phoneNumber.value);
+                          authController.saveUserInFirestore(
+                              authController.phoneNumber.value);
                         }
                       },
-                      child: controller.loading.value
+                      child: authController.loading.value
                           ? circularProgress()
                           : const Text('Enregistrer'),
                     ),
@@ -107,7 +114,7 @@ class SignUpView extends GetView<AuthController> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         child: RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
@@ -127,7 +134,7 @@ class SignUpView extends GetView<AuthController> {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        controller.openUrl(
+                        authController.openUrl(
                             'https://github.com/touredri/faani#readme');
                       }),
                 const TextSpan(
@@ -146,7 +153,7 @@ class SignUpView extends GetView<AuthController> {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        controller.openUrl(
+                        authController.openUrl(
                             'https://github.com/touredri/faani#readme');
                       }),
               ],
@@ -155,12 +162,12 @@ class SignUpView extends GetView<AuthController> {
     );
   }
 
-  Widget _setNumber(BuildContext context) {
+  Widget _setNumber(BuildContext context, AuthController authController) {
     return Column(
       children: [
         2.hs,
         IntlPhoneField(
-          controller: controller.phoneNumberController,
+          controller: authController.phoneNumberController,
           cursorColor: Theme.of(context).colorScheme.primary,
           invalidNumberMessage: 'Numéro invalide',
           decoration: InputDecoration(
@@ -176,7 +183,7 @@ class SignUpView extends GetView<AuthController> {
           ),
           initialCountryCode: 'ML',
           onChanged: (phone) {
-            controller.phoneNumber.value = phone.completeNumber;
+            authController.phoneNumber.value = phone.completeNumber;
           },
         ),
       ],

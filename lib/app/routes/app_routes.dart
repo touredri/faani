@@ -15,6 +15,7 @@ abstract class Routes {
   static const DISCUSSION = _Paths.DISCUSSION;
   static const DETAIL_MODELE = _Paths.DETAIL_MODELE;
   static const SEARCH_PAGE = _Paths.SEARCH_PAGE;
+  static const ADMIN_PANEL = _Paths.ADMIN_PANEL;
 }
 
 abstract class _Paths {
@@ -32,4 +33,5 @@ abstract class _Paths {
   static const DISCUSSION = '/discussion';
   static const DETAIL_MODELE = '/detail-modele';
   static const SEARCH_PAGE = '/search-page';
+  static const ADMIN_PANEL = '/admin-panel';
 }

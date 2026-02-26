@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/users_model.dart';
+import 'package:faani/app/data/models/user_role.dart';
+import 'package:faani/app/data/services/access_control_service.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -207,6 +209,7 @@ class AuthController extends GetxController {
       id: auth.currentUser!.uid,
       nomPrenom: nameController.text,
       phoneNumber: number,
+      role: AppUserRole.client,
       email: auth.currentUser!.email ?? '',
       adress: 'Bamako, Mali',
       profileImage: user!.photoURL ?? defaultProfileImage,
@@ -248,6 +251,7 @@ class AuthController extends GetxController {
       if (currentUid != null && currentUid.isNotEmpty) {
         await prefs.remove('isAdmin_$currentUid');
       }
+      await AccessControlService().clearCachedRoleForCurrentUser();
 
       await GoogleSignIn().signOut();
       await FirebaseAuth.instance.signOut();

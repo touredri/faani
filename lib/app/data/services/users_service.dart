@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app/data/models/user_role.dart';
 import '../models/users_model.dart';
 
 class UserService {
@@ -54,12 +55,34 @@ class UserService {
             .toList());
   }
 
+  Stream<List<UserModel>> getAllUsers() {
+    return _usersRef.snapshots().map((event) => event.docs
+        .map((e) =>
+            UserModel.fromMap(e.data() as Map<String, dynamic>, e.reference))
+        .toList());
+  }
+
   void updateUserToken(String uid, String? token) {
     _usersRef.doc(uid).update({'token': token});
   }
 
   Future<void> updateUserIsTailleur(String id, bool isTailleur) {
-    return _usersRef.doc(id).update({'isTailleur': isTailleur});
+    return _usersRef.doc(id).update({
+      'isTailleur': isTailleur,
+      'role': isTailleur
+          ? appUserRoleToString(AppUserRole.tailor)
+          : appUserRoleToString(AppUserRole.client),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> updateUserRole(String id, AppUserRole role) {
+    final isTailleur = role == AppUserRole.tailor;
+    return _usersRef.doc(id).update({
+      'role': appUserRoleToString(role),
+      'isTailleur': isTailleur,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 
   Future<void> updateActiveDevice({

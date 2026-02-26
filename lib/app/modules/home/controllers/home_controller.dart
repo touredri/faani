@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/services/access_control_service.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/notifications_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
@@ -190,19 +191,9 @@ class HomeController extends GetxController {
       await prefs.remove('isAdmin');
     }
 
-    final cacheKey = 'isAdmin_$uid';
-    final check = prefs.getString(cacheKey);
-    if (check == null) {
-      final isAdmin = await FirebaseFirestore.instance
-          .collection('admin')
-          .doc(uid)
-          .get()
-          .then((value) => value.exists);
-      await prefs.setString(cacheKey, isAdmin.toString());
-      this.isAdmin.value = isAdmin;
-    } else {
-      isAdmin.value = check == 'true';
-    }
+    final isUserAdmin =
+        await AccessControlService().isCurrentUserAdmin(forceRefresh: true);
+    isAdmin.value = isUserAdmin;
   }
 
   // Initial network status check
@@ -277,6 +268,7 @@ class HomeController extends GetxController {
   Future<void> _forceSignOutBySessionTransfer() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('isAdmin');
+    await AccessControlService().clearCachedRoleForCurrentUser();
 
     final uid = auth.currentUser?.uid;
     if (uid != null && uid.isNotEmpty) {

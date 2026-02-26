@@ -5,8 +5,8 @@ import 'package:faani/app/modules/profile/views/about.dart';
 import 'package:faani/app/modules/profile/views/aide_view.dart';
 import 'package:faani/app/modules/profile/views/mes_modeles_view.dart';
 import 'package:faani/app/modules/profile/views/parametre_view.dart';
+import 'package:faani/app/modules/profile/views/tailor_clients_view.dart';
 import 'package:faani/app/modules/profile/widgets/commentaire_bottom_sheet.dart';
-import 'package:faani/app/modules/profile/widgets/received_request.dart';
 import 'package:faani/app/style/app_radius.dart';
 import 'package:faani/app/style/app_shadows.dart';
 import 'package:faani/app/style/app_spacing.dart';
@@ -66,8 +66,20 @@ Widget listBuild(ProfileController controller, BuildContext context) {
               leadingIcon: controller.becomeTailorIcon,
               title: 'Gestion tailleurs',
               subTitle: 'Gérer les demandes et comptes tailleurs',
+              onTap: () => Get.toNamed(
+                Routes.ADMIN_PANEL,
+                preventDuplicates: false,
+              ),
+            ),
+          if (controller.userController.isTailleur.value) const CustomDivider(),
+          if (controller.userController.isTailleur.value)
+            CustomListTile(
+              leadingIcon:
+                  const Icon(Icons.groups_outlined, color: Colors.teal),
+              title: 'Mes Clients',
+              subTitle: 'Gérer clients, mesures et habits',
               onTap: () => Get.to(
-                () => const ReceivedRequest(),
+                () => const TailorClientsView(),
                 transition: Transition.rightToLeft,
               ),
             ),

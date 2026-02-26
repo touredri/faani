@@ -12,6 +12,7 @@ import '../modules/commande/views/commande_view.dart';
 import '../modules/favorie/bindings/favorie_binding.dart';
 import '../modules/favorie/views/favorie_view.dart';
 import '../modules/home/bindings/home_binding.dart';
+import '../modules/home/mildware/admin_mildware.dart';
 import '../modules/home/mildware/auth_mildware.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/message/bindings/message_binding.dart';
@@ -20,6 +21,7 @@ import '../modules/mesures/bindings/mesures_binding.dart';
 import '../modules/mesures/views/mesures_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
+import '../modules/profile/widgets/received_request.dart';
 import '../modules/search_page/bindings/search_page_binding.dart';
 import '../modules/search_page/views/search_page_view.dart';
 
@@ -86,6 +88,11 @@ class AppPages {
       name: _Paths.SEARCH_PAGE,
       page: () => const SearchPageView(),
       binding: SearchPageBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_PANEL,
+      page: () => const ReceivedRequest(),
+      middlewares: [AuthMiddleware(), AdminMiddleware()],
     ),
   ];
 }

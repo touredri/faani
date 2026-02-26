@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app/data/models/user_role.dart';
 
 class Follower {
   String idUser;
@@ -17,6 +18,7 @@ class UserModel {
       activeDeviceLabel,
       token,
       sex;
+  AppUserRole role;
   bool isTailleur;
   DateTime? createdAt, updatedAt, lastLoginAt;
   List<String> followers;
@@ -35,6 +37,7 @@ class UserModel {
       this.isTailleur = false,
       this.sex = '',
       this.token,
+      this.role = AppUserRole.client,
       this.followers = const [],
       this.following = const [],
       this.lastLoginAt,
@@ -53,6 +56,7 @@ class UserModel {
     final activeDeviceId = data['activeDeviceId'];
     final activeDeviceLabel = data['activeDeviceLabel'];
     final isTailleur = data['isTailleur'];
+    final roleRaw = data['role']?.toString();
     final sex = data['sex'];
     final token = data['token'];
     final followers = List<String>.from(data['followers'] ?? []);
@@ -78,6 +82,9 @@ class UserModel {
       activeDeviceId: activeDeviceId,
       activeDeviceLabel: activeDeviceLabel,
       isTailleur: isTailleur,
+      role: (roleRaw ?? '').trim().isNotEmpty
+          ? appUserRoleFromString(roleRaw)
+          : (isTailleur == true ? AppUserRole.tailor : AppUserRole.client),
       sex: sex,
       token: token,
       followers: followers,
@@ -99,6 +106,7 @@ class UserModel {
       'activeDeviceId': activeDeviceId,
       'activeDeviceLabel': activeDeviceLabel,
       'isTailleur': isTailleur,
+      'role': appUserRoleToString(role),
       'sex': sex,
       'token': token,
       'followers': followers,
@@ -120,6 +128,7 @@ class UserModel {
     String? activeDeviceId,
     String? activeDeviceLabel,
     bool? isTailleur,
+    AppUserRole? role,
     String? sex,
     String? token,
     DateTime? lastLoginAt,
@@ -137,6 +146,7 @@ class UserModel {
       activeDeviceId: activeDeviceId ?? this.activeDeviceId,
       activeDeviceLabel: activeDeviceLabel ?? this.activeDeviceLabel,
       isTailleur: isTailleur ?? this.isTailleur,
+      role: role ?? this.role,
       sex: sex ?? this.sex,
       token: token ?? this.token,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,

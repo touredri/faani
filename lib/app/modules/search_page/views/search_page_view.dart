@@ -135,55 +135,128 @@ class _SearchPageViewState extends State<SearchPageView> {
             );
           }
 
+          Widget buildActiveSearchHeader() {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.sm,
+                AppSpacing.lg,
+                AppSpacing.xs,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.sm,
+                      children: [
+                        InputChip(
+                          avatar: const Icon(
+                            Icons.filter_alt_outlined,
+                            size: 16,
+                          ),
+                          label: Text('Recherche: $queryText'),
+                          onDeleted: () {
+                            controller.searchController.clear();
+                            controller.onTextChange('');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Tooltip(
+                    message: 'Effacer les filtres actifs',
+                    child: TextButton.icon(
+                      onPressed: () {
+                        controller.searchController.clear();
+                        controller.onTextChange('');
+                      },
+                      icon: const Icon(Icons.filter_alt_off_outlined),
+                      label: const Text('Effacer les filtres actifs'),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
           if (controller.isInitialLoading.value) {
-            return const LoadingStateWidget(
-              message: 'Recherche en cours...',
+            return Column(
+              children: [
+                buildActiveSearchHeader(),
+                const Expanded(
+                  child: LoadingStateWidget(
+                    message: 'Recherche en cours...',
+                  ),
+                ),
+              ],
             );
           }
 
           if (controller.hasError.value) {
-            return ErrorStateWidget(
-              message: 'Erreur: ${controller.errorMessage.value}',
-              onRetry: controller.retrySearch,
+            return Column(
+              children: [
+                buildActiveSearchHeader(),
+                Expanded(
+                  child: ErrorStateWidget(
+                    message: 'Erreur: ${controller.errorMessage.value}',
+                    onRetry: controller.retrySearch,
+                  ),
+                ),
+              ],
             );
           }
 
           if (controller.results.isEmpty) {
-            return const EmptyStateWidget(
-              iconData: Icons.search_off_rounded,
-              title: 'Aucun résultat',
-              description: 'Essayez avec d\'autres mots-clés',
+            return Column(
+              children: [
+                buildActiveSearchHeader(),
+                const Expanded(
+                  child: EmptyStateWidget(
+                    iconData: Icons.search_off_rounded,
+                    title: 'Aucun résultat',
+                    description: 'Essayez avec d\'autres mots-clés',
+                  ),
+                ),
+              ],
             );
           }
 
-          return Stack(
+          return Column(
             children: [
-              customMansoryGridView(
-                2,
-                controller.results.length,
-                (context, index) {
-                  return buildCard(
-                    controller.results[index],
-                    context: context,
-                  );
-                },
-                scrollController: _scrollController,
-                padding: AppSpacing.xs,
-              ),
-              if (controller.isLoadingMore.value &&
-                  controller.hasMoreData.value)
-                const Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: AppSpacing.md,
-                  child: Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+              buildActiveSearchHeader(),
+              Expanded(
+                child: Stack(
+                  children: [
+                    customMansoryGridView(
+                      2,
+                      controller.results.length,
+                      (context, index) {
+                        return buildCard(
+                          controller.results[index],
+                          context: context,
+                        );
+                      },
+                      scrollController: _scrollController,
+                      padding: AppSpacing.xs,
                     ),
-                  ),
+                    if (controller.isLoadingMore.value &&
+                        controller.hasMoreData.value)
+                      const Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: AppSpacing.md,
+                        child: Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
+              ),
             ],
           );
         },
