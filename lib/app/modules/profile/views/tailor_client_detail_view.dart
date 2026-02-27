@@ -66,7 +66,7 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
           IconButton(
             onPressed: _shareClientSheet,
             icon: const Icon(Icons.ios_share_outlined),
-            tooltip: 'Partager fiche client',
+            tooltip: 'Partager la fiche client',
           ),
         ],
       ),
@@ -121,6 +121,25 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
+              }
+
+              if (snapshot.hasError) {
+                return Container(
+                  padding: AppSpacing.paddingAllMd,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: AppRadius.radiusLg,
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.16),
+                    ),
+                  ),
+                  child: Text(
+                    'Erreur lors du chargement des mesures',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                );
               }
 
               final measures = snapshot.data ?? <TailorClientMeasure>[];
@@ -178,11 +197,12 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
                                 IconButton(
                                   onPressed: () =>
                                       _openEditMeasureDialog(measure),
+                                  tooltip: 'Modifier',
                                   icon: const Icon(Icons.edit_outlined),
                                 ),
                                 IconButton(
-                                  onPressed: () =>
-                                      _measureService.deleteMeasure(measure.id),
+                                  onPressed: () => _deleteMeasure(measure),
+                                  tooltip: 'Supprimer',
                                   icon: const Icon(Icons.delete_outline),
                                 ),
                               ],
@@ -223,7 +243,7 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
                                 onPressed: () =>
                                     _startOrderFromMeasure(measure),
                                 icon: const Icon(Icons.add_shopping_cart),
-                                label: const Text('Créer commande'),
+                                label: const Text('Créer une commande'),
                               ),
                             ),
                           ],
@@ -334,28 +354,34 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
                   return int.tryParse(ctrl.text.trim()) ?? 0;
                 }
 
-                final updated = measure.copyWith(
-                  label: label,
-                  garmentType: selectedGarmentType,
-                  epaule: parseController(epauleController),
-                  bras: parseController(brasController),
-                  poignet: parseController(poignetController),
-                  poitrine: parseController(poitrineController),
-                  taille: parseController(tailleController),
-                  hanche: parseController(hancheController),
-                  ventre: parseController(ventreController),
-                  longueur: parseController(longueurController),
-                  notes: notesController.text.trim(),
-                  updatedAt: DateTime.now(),
-                );
-                await _measureService.updateMeasure(updated);
-                if (mounted) {
-                  Navigator.of(context).pop();
+                try {
+                  final updated = measure.copyWith(
+                    label: label,
+                    garmentType: selectedGarmentType,
+                    epaule: parseController(epauleController),
+                    bras: parseController(brasController),
+                    poignet: parseController(poignetController),
+                    poitrine: parseController(poitrineController),
+                    taille: parseController(tailleController),
+                    hanche: parseController(hancheController),
+                    ventre: parseController(ventreController),
+                    longueur: parseController(longueurController),
+                    notes: notesController.text.trim(),
+                    updatedAt: DateTime.now(),
+                  );
+                  await _measureService.updateMeasure(updated);
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
+                  _showClientDetailSnack(
+                    'Mesure mise à jour',
+                    backgroundColor: Colors.green,
+                  );
+                } catch (_) {
+                  _showClientDetailSnack(
+                    'Erreur lors de la mise à jour de la mesure',
+                  );
                 }
-                _showClientDetailSnack(
-                  'Mesure mise à jour',
-                  backgroundColor: Colors.green,
-                );
               },
               child: const Text('Mettre à jour'),
             ),
@@ -363,6 +389,17 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
         );
       },
     );
+
+    labelController.dispose();
+    epauleController.dispose();
+    brasController.dispose();
+    poignetController.dispose();
+    poitrineController.dispose();
+    tailleController.dispose();
+    hancheController.dispose();
+    ventreController.dispose();
+    longueurController.dispose();
+    notesController.dispose();
   }
 
   Future<void> _startOrderFromMeasure(TailorClientMeasure measure) async {
@@ -388,20 +425,27 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
       updateDate: DateTime.now(),
     );
 
-    await legacyMesure.create();
+    try {
+      await legacyMesure.create();
 
-    final commandeController = Get.isRegistered<CommandeController>()
-        ? Get.find<CommandeController>()
-        : Get.put(CommandeController());
+      final commandeController = Get.isRegistered<CommandeController>()
+          ? Get.find<CommandeController>()
+          : Get.put(CommandeController());
 
-    final sanitizedPhone =
-        widget.client.phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
-    commandeController.clearForm();
-    commandeController.mesure.value = legacyMesure;
-    commandeController.nomController.text = widget.client.name;
-    commandeController.numeroController.text = sanitizedPhone;
+      final sanitizedPhone =
+          widget.client.phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
+      commandeController.clearForm();
+      commandeController.mesure.value = legacyMesure;
+      commandeController.nomController.text = widget.client.name;
+      commandeController.numeroController.text = sanitizedPhone;
 
-    Get.to(() => const ChooseModeleView(), transition: Transition.rightToLeft);
+      Get.to(() => const ChooseModeleView(),
+          transition: Transition.rightToLeft);
+    } catch (_) {
+      _showClientDetailSnack(
+        'Impossible de créer la commande pour le moment',
+      );
+    }
   }
 
   Future<void> _duplicateMeasure(TailorClientMeasure measure) async {
@@ -412,50 +456,58 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
       createdAt: now,
       updatedAt: now,
     );
-    await _measureService.createMeasure(duplicated);
-    _showClientDetailSnack(
-      'Mesure dupliquée',
-      backgroundColor: Colors.green,
-    );
+    try {
+      await _measureService.createMeasure(duplicated);
+      _showClientDetailSnack(
+        'Mesure dupliquée',
+        backgroundColor: Colors.green,
+      );
+    } catch (_) {
+      _showClientDetailSnack('Erreur lors de la duplication de la mesure');
+    }
   }
 
   Future<void> _shareClientSheet() async {
     final currentUser = user;
     if (currentUser == null) return;
 
-    final measures = await _measureService
-        .getMeasuresByClient(
-          tailorId: currentUser.uid,
-          clientId: widget.client.id,
-        )
-        .first;
+    try {
+      final measures = await _measureService
+          .getMeasuresByClient(
+            tailorId: currentUser.uid,
+            clientId: widget.client.id,
+          )
+          .first;
 
-    final buffer = StringBuffer()
-      ..writeln('Fiche Client - ${widget.client.name}')
-      ..writeln(
-          'Téléphone: ${widget.client.phoneNumber.isEmpty ? '-' : widget.client.phoneNumber}')
-      ..writeln(
-          'Notes: ${widget.client.notes.isEmpty ? '-' : widget.client.notes}')
-      ..writeln('')
-      ..writeln('Mesures (${measures.length})')
-      ..writeln('-----------------------------');
+      final buffer = StringBuffer()
+        ..writeln('Fiche Client - ${widget.client.name}')
+        ..writeln(
+            'Téléphone: ${widget.client.phoneNumber.isEmpty ? '-' : widget.client.phoneNumber}')
+        ..writeln(
+            'Notes: ${widget.client.notes.isEmpty ? '-' : widget.client.notes}')
+        ..writeln('')
+        ..writeln('Mesures (${measures.length})')
+        ..writeln('-----------------------------');
 
-    for (final measure in measures) {
-      buffer
-        ..writeln('${measure.garmentType} - ${measure.label}')
-        ..writeln(
-            'Épaule ${measure.epaule}, Bras ${measure.bras}, Poignet ${measure.poignet}')
-        ..writeln(
-            'Poitrine ${measure.poitrine}, Taille ${measure.taille}, Hanche ${measure.hanche}')
-        ..writeln('Ventre ${measure.ventre}, Longueur ${measure.longueur}')
-        ..writeln('Notes: ${measure.notes.isEmpty ? '-' : measure.notes}')
-        ..writeln('');
+      for (final measure in measures) {
+        buffer
+          ..writeln('${measure.garmentType} - ${measure.label}')
+          ..writeln(
+              'Épaule ${measure.epaule}, Bras ${measure.bras}, Poignet ${measure.poignet}')
+          ..writeln(
+              'Poitrine ${measure.poitrine}, Taille ${measure.taille}, Hanche ${measure.hanche}')
+          ..writeln('Ventre ${measure.ventre}, Longueur ${measure.longueur}')
+          ..writeln('Notes: ${measure.notes.isEmpty ? '-' : measure.notes}')
+          ..writeln('');
+      }
+
+      await Share.share(
+        buffer.toString(),
+        subject: 'Fiche client ${widget.client.name}',
+      );
+    } catch (_) {
+      _showClientDetailSnack('Impossible de partager la fiche client');
     }
-
-    await Share.share(
-      buffer.toString(),
-      subject: 'Fiche client ${widget.client.name}',
-    );
   }
 
   Future<void> _openCreateMeasureDialog() async {
@@ -545,34 +597,40 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
                   return int.tryParse(ctrl.text.trim()) ?? 0;
                 }
 
-                final now = DateTime.now();
-                final measure = TailorClientMeasure(
-                  id: '',
-                  tailorId: uid,
-                  clientId: widget.client.id,
-                  label: label,
-                  garmentType: selectedGarmentType,
-                  epaule: parseController(epauleController),
-                  bras: parseController(brasController),
-                  poignet: parseController(poignetController),
-                  poitrine: parseController(poitrineController),
-                  taille: parseController(tailleController),
-                  hanche: parseController(hancheController),
-                  ventre: parseController(ventreController),
-                  longueur: parseController(longueurController),
-                  notes: notesController.text.trim(),
-                  createdAt: now,
-                  updatedAt: now,
-                );
+                try {
+                  final now = DateTime.now();
+                  final measure = TailorClientMeasure(
+                    id: '',
+                    tailorId: uid,
+                    clientId: widget.client.id,
+                    label: label,
+                    garmentType: selectedGarmentType,
+                    epaule: parseController(epauleController),
+                    bras: parseController(brasController),
+                    poignet: parseController(poignetController),
+                    poitrine: parseController(poitrineController),
+                    taille: parseController(tailleController),
+                    hanche: parseController(hancheController),
+                    ventre: parseController(ventreController),
+                    longueur: parseController(longueurController),
+                    notes: notesController.text.trim(),
+                    createdAt: now,
+                    updatedAt: now,
+                  );
 
-                await _measureService.createMeasure(measure);
-                if (mounted) {
-                  Navigator.of(context).pop();
+                  await _measureService.createMeasure(measure);
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
+                  _showClientDetailSnack(
+                    'Mesure enregistrée',
+                    backgroundColor: Colors.green,
+                  );
+                } catch (_) {
+                  _showClientDetailSnack(
+                    'Erreur lors de l\'enregistrement de la mesure',
+                  );
                 }
-                _showClientDetailSnack(
-                  'Mesure enregistrée',
-                  backgroundColor: Colors.green,
-                );
               },
               child: const Text('Enregistrer'),
             ),
@@ -580,6 +638,17 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
         );
       },
     );
+
+    labelController.dispose();
+    epauleController.dispose();
+    brasController.dispose();
+    poignetController.dispose();
+    poitrineController.dispose();
+    tailleController.dispose();
+    hancheController.dispose();
+    ventreController.dispose();
+    longueurController.dispose();
+    notesController.dispose();
   }
 
   Widget _measureInput(TextEditingController controller, String label) {
@@ -588,5 +657,46 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
       keyboardType: TextInputType.number,
       decoration: InputDecoration(labelText: label),
     );
+  }
+
+  Future<void> _deleteMeasure(TailorClientMeasure measure) async {
+    final shouldDelete = await _confirmDeleteMeasure(measure.label);
+    if (!shouldDelete) return;
+
+    try {
+      await _measureService.deleteMeasure(measure.id);
+      _showClientDetailSnack(
+        'Mesure supprimée',
+        backgroundColor: Colors.orange,
+      );
+    } catch (_) {
+      _showClientDetailSnack('Impossible de supprimer cette mesure');
+    }
+  }
+
+  Future<bool> _confirmDeleteMeasure(String label) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Supprimer cette mesure ?'),
+          content: Text(
+            'La mesure "$label" sera supprimée définitivement.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Supprimer'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
   }
 }

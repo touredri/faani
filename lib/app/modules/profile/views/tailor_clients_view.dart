@@ -84,57 +84,55 @@ class _TailorClientsViewState extends State<TailorClientsView> {
                         });
                       },
                     ),
-                    const Text('Uniquement avec image habit'),
+                    const Text('Uniquement avec image d\'habit'),
                   ],
                 ),
                 if (hasActiveFilters) ...[
-                  Row(
+                  Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Expanded(
-                        child: Wrap(
-                          spacing: AppSpacing.sm,
-                          runSpacing: AppSpacing.sm,
-                          children: [
-                            if (hasSearchFilter)
-                              InputChip(
-                                avatar: const Icon(
-                                  Icons.filter_alt_outlined,
-                                  size: 16,
-                                ),
-                                label: Text('Recherche: $searchText'),
-                                onDeleted: () {
-                                  setState(() {
-                                    _searchController.clear();
-                                  });
-                                },
-                              ),
-                            if (_withGarmentImageOnly)
-                              InputChip(
-                                avatar: const Icon(
-                                  Icons.filter_alt_outlined,
-                                  size: 16,
-                                ),
-                                label: const Text('Avec image habit'),
-                                onDeleted: () {
-                                  setState(() {
-                                    _withGarmentImageOnly = false;
-                                  });
-                                },
-                              ),
-                          ],
+                      if (hasSearchFilter)
+                        InputChip(
+                          avatar: const Icon(
+                            Icons.filter_alt_outlined,
+                            size: 16,
+                          ),
+                          label: Text('Recherche: $searchText'),
+                          onDeleted: () {
+                            setState(() {
+                              _searchController.clear();
+                            });
+                          },
                         ),
-                      ),
+                      if (_withGarmentImageOnly)
+                        InputChip(
+                          avatar: const Icon(
+                            Icons.filter_alt_outlined,
+                            size: 16,
+                          ),
+                          label: const Text('Avec image d\'habit'),
+                          onDeleted: () {
+                            setState(() {
+                              _withGarmentImageOnly = false;
+                            });
+                          },
+                        ),
                       Tooltip(
                         message: 'Effacer les filtres actifs',
-                        child: TextButton.icon(
+                        child: ActionChip(
+                          avatar: const Icon(
+                            Icons.filter_alt_off_outlined,
+                            size: 16,
+                          ),
+                          label: const Text('Effacer'),
                           onPressed: () {
                             setState(() {
                               _searchController.clear();
                               _withGarmentImageOnly = false;
                             });
                           },
-                          icon: const Icon(Icons.filter_alt_off_outlined),
-                          label: const Text('Effacer les filtres actifs'),
                         ),
                       ),
                     ],
@@ -150,6 +148,17 @@ class _TailorClientsViewState extends State<TailorClientsView> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Erreur lors du chargement des clients',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            );
           }
 
           final clients = snapshot.data ?? <TailorClient>[];
@@ -241,10 +250,12 @@ class _TailorClientsViewState extends State<TailorClientsView> {
                       ),
                       IconButton(
                         onPressed: () => _openEditClientSheet(client),
+                        tooltip: 'Modifier client',
                         icon: const Icon(Icons.edit_outlined),
                       ),
                       IconButton(
                         onPressed: () => _deleteClient(client),
+                        tooltip: 'Supprimer client',
                         icon: const Icon(Icons.delete_outline),
                       ),
                     ],
@@ -282,6 +293,33 @@ class _TailorClientsViewState extends State<TailorClientsView> {
         width: 56,
         height: 56,
         fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) {
+            return child;
+          }
+          return Container(
+            width: 56,
+            height: 56,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            alignment: Alignment.center,
+            child: const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              borderRadius: AppRadius.radiusMd,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
+            child: const Icon(Icons.broken_image_outlined),
+          );
+        },
       ),
     );
   }
@@ -291,6 +329,7 @@ class _TailorClientsViewState extends State<TailorClientsView> {
     final phoneController = TextEditingController();
     final notesController = TextEditingController();
     XFile? selectedImage;
+    bool isSaving = false;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -348,7 +387,7 @@ class _TailorClientsViewState extends State<TailorClientsView> {
                           });
                         },
                         icon: const Icon(Icons.image_outlined),
-                        label: const Text('Image habit'),
+                        label: const Text('Image d\'habit'),
                       ),
                       AppSpacing.gapH8,
                       if (selectedImage != null)
@@ -359,53 +398,69 @@ class _TailorClientsViewState extends State<TailorClientsView> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        final uid = user?.uid;
-                        if (uid == null) return;
-                        final clientName = nameController.text.trim();
-                        if (clientName.isEmpty) {
-                          _showSnack('Nom requis');
-                          return;
-                        }
+                      onPressed: isSaving
+                          ? null
+                          : () async {
+                              setSheetState(() {
+                                isSaving = true;
+                              });
+                              try {
+                                final uid = user?.uid;
+                                if (uid == null) return;
+                                final clientName = nameController.text.trim();
+                                if (clientName.isEmpty) {
+                                  _showSnack('Nom requis');
+                                  return;
+                                }
 
-                        final now = DateTime.now();
-                        final baseClient = TailorClient(
-                          id: '',
-                          tailorId: uid,
-                          name: clientName,
-                          phoneNumber: phoneController.text.trim(),
-                          notes: notesController.text.trim(),
-                          createdAt: now,
-                          updatedAt: now,
-                        );
-                        final newId =
-                            await _clientService.createClient(baseClient);
+                                final now = DateTime.now();
+                                final baseClient = TailorClient(
+                                  id: '',
+                                  tailorId: uid,
+                                  name: clientName,
+                                  phoneNumber: phoneController.text.trim(),
+                                  notes: notesController.text.trim(),
+                                  createdAt: now,
+                                  updatedAt: now,
+                                );
+                                final newId = await _clientService
+                                    .createClient(baseClient);
 
-                        if (selectedImage != null) {
-                          final upload =
-                              await _clientService.uploadGarmentImage(
-                            image: selectedImage!,
-                            tailorId: uid,
-                            clientId: newId,
-                          );
-                          await _clientService.updateClient(
-                            baseClient.copyWith(
-                              id: newId,
-                              garmentImageUrl: upload['downloadUrl'],
-                              garmentImagePath: upload['path'],
-                              updatedAt: DateTime.now(),
-                            ),
-                          );
-                        }
+                                if (selectedImage != null) {
+                                  final upload =
+                                      await _clientService.uploadGarmentImage(
+                                    image: selectedImage!,
+                                    tailorId: uid,
+                                    clientId: newId,
+                                  );
+                                  await _clientService.updateClient(
+                                    baseClient.copyWith(
+                                      id: newId,
+                                      garmentImageUrl: upload['downloadUrl'],
+                                      garmentImagePath: upload['path'],
+                                      updatedAt: DateTime.now(),
+                                    ),
+                                  );
+                                }
 
-                        if (mounted) {
-                          Navigator.of(context).pop();
-                        }
-                        _showSnack(
-                          'Client ajouté avec succès',
-                          backgroundColor: Colors.green,
-                        );
-                      },
+                                if (mounted) {
+                                  Navigator.of(context).pop();
+                                }
+                                _showSnack(
+                                  'Client ajouté avec succès',
+                                  backgroundColor: Colors.green,
+                                );
+                              } catch (_) {
+                                _showSnack(
+                                    'Erreur lors de la création du client');
+                              } finally {
+                                if (mounted) {
+                                  setSheetState(() {
+                                    isSaving = false;
+                                  });
+                                }
+                              }
+                            },
                       child: const Text('Enregistrer'),
                     ),
                   ),
@@ -416,14 +471,25 @@ class _TailorClientsViewState extends State<TailorClientsView> {
         );
       },
     );
+
+    nameController.dispose();
+    phoneController.dispose();
+    notesController.dispose();
   }
 
   Future<void> _deleteClient(TailorClient client) async {
-    await _clientService.deleteClient(client);
-    _showSnack(
-      'Client supprimé',
-      backgroundColor: Colors.orange,
-    );
+    final shouldDelete = await _confirmDeleteClient(client);
+    if (!shouldDelete) return;
+
+    try {
+      await _clientService.deleteClient(client);
+      _showSnack(
+        'Client supprimé',
+        backgroundColor: Colors.orange,
+      );
+    } catch (_) {
+      _showSnack('Impossible de supprimer ce client pour le moment');
+    }
   }
 
   Future<void> _openEditClientSheet(TailorClient client) async {
@@ -431,6 +497,7 @@ class _TailorClientsViewState extends State<TailorClientsView> {
     final phoneController = TextEditingController(text: client.phoneNumber);
     final notesController = TextEditingController(text: client.notes);
     XFile? selectedImage;
+    bool isSaving = false;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -499,41 +566,58 @@ class _TailorClientsViewState extends State<TailorClientsView> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        final updatedName = nameController.text.trim();
-                        if (updatedName.isEmpty) {
-                          _showSnack('Nom requis');
-                          return;
-                        }
+                      onPressed: isSaving
+                          ? null
+                          : () async {
+                              setSheetState(() {
+                                isSaving = true;
+                              });
+                              try {
+                                final updatedName = nameController.text.trim();
+                                if (updatedName.isEmpty) {
+                                  _showSnack('Nom requis');
+                                  return;
+                                }
 
-                        TailorClient updatedClient = client.copyWith(
-                          name: updatedName,
-                          phoneNumber: phoneController.text.trim(),
-                          notes: notesController.text.trim(),
-                          updatedAt: DateTime.now(),
-                        );
+                                TailorClient updatedClient = client.copyWith(
+                                  name: updatedName,
+                                  phoneNumber: phoneController.text.trim(),
+                                  notes: notesController.text.trim(),
+                                  updatedAt: DateTime.now(),
+                                );
 
-                        if (selectedImage != null) {
-                          final upload =
-                              await _clientService.replaceGarmentImage(
-                            client: client,
-                            image: selectedImage!,
-                          );
-                          updatedClient = updatedClient.copyWith(
-                            garmentImageUrl: upload['downloadUrl'],
-                            garmentImagePath: upload['path'],
-                          );
-                        }
+                                if (selectedImage != null) {
+                                  final upload =
+                                      await _clientService.replaceGarmentImage(
+                                    client: client,
+                                    image: selectedImage!,
+                                  );
+                                  updatedClient = updatedClient.copyWith(
+                                    garmentImageUrl: upload['downloadUrl'],
+                                    garmentImagePath: upload['path'],
+                                  );
+                                }
 
-                        await _clientService.updateClient(updatedClient);
-                        if (mounted) {
-                          Navigator.of(context).pop();
-                        }
-                        _showSnack(
-                          'Client mis à jour',
-                          backgroundColor: Colors.green,
-                        );
-                      },
+                                await _clientService
+                                    .updateClient(updatedClient);
+                                if (mounted) {
+                                  Navigator.of(context).pop();
+                                }
+                                _showSnack(
+                                  'Client mis à jour',
+                                  backgroundColor: Colors.green,
+                                );
+                              } catch (_) {
+                                _showSnack(
+                                    'Erreur lors de la mise à jour du client');
+                              } finally {
+                                if (mounted) {
+                                  setSheetState(() {
+                                    isSaving = false;
+                                  });
+                                }
+                              }
+                            },
                       child: const Text('Mettre à jour'),
                     ),
                   ),
@@ -544,5 +628,35 @@ class _TailorClientsViewState extends State<TailorClientsView> {
         );
       },
     );
+
+    nameController.dispose();
+    phoneController.dispose();
+    notesController.dispose();
+  }
+
+  Future<bool> _confirmDeleteClient(TailorClient client) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Supprimer ce client ?'),
+          content: Text(
+            'Cette action supprimera ${client.name} et ne pourra pas être annulée.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Supprimer'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
   }
 }

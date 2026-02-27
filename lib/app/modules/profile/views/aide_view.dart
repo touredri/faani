@@ -8,7 +8,7 @@ class AideView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: customAppBar('Centre d\'Aide'),
+      appBar: customAppBar('Centre d\'aide'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -24,7 +24,7 @@ class AideView extends StatelessWidget {
             ),
             _buildSectionText(
                 'Bienvenue sur Faani, votre application dédiée à la promotion des vêtements '
-                'pour tailleurs. Découvrez comment utiliser notre plateforme pour ajouter '
+                'pour les tailleurs. Découvrez comment utiliser notre plateforme pour ajouter '
                 'vos créations, les partager avec le monde et attirer plus de clients. '
                 'Faani vous offre une vitrine numérique pour exposer vos talents et '
                 'faciliter la gestion de vos commandes.'),
@@ -91,7 +91,7 @@ class AideView extends StatelessWidget {
             ),
             _buildSectionText(
                 'Nous sommes à l\'écoute de vos suggestions pour améliorer cette application. '
-                'N\'hésitez pas à nous envoyer vos idées et vos commentaires. Votre feedback est '
+                'N\'hésitez pas à nous envoyer vos idées et vos commentaires. Vos retours sont '
                 'précieux pour nous aider à créer une meilleure expérience utilisateur et à '
                 'répondre à vos besoins.'),
           ],

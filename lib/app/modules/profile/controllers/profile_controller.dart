@@ -55,7 +55,7 @@ class ProfileController extends GetxController {
   final TextEditingController selectedNombreTravailleur =
       TextEditingController();
   RxString selectedCountry = 'Mali'.obs;
-  RxString selectedClientCible = 'Homme'.obs;
+  RxString selectedClientCible = 'Hommes'.obs;
   RxBool isHasAgent = false.obs;
   final Rx<List<Modele?>> mesModelesList = Rx<List<Modele?>>([]);
   final ScrollController scrollController = ScrollController();
@@ -179,63 +179,107 @@ class ProfileController extends GetxController {
   // become a tailleur
   void becomeTailleur() async {
     isLoading.value = true;
-    final bool isRequestExist =
-        await TailleurRequestService().isRequestExist(user!.uid);
-    if (isRequestExist) {
-      showCustomSnackbar(
-          message: "Vous avez déjà envoyé une demande! Veuillez patienter");
-      isLoading.value = false;
-      return;
-    }
-    if (userController.currentUser.value.adress == null ||
-        userController.currentUser.value.adress!.isEmpty) {
-      showCustomSnackbar(
-          message: "Veuillez renseigner votre adresse dans votre profil");
-      isLoading.value = false;
-      return;
-    }
-    if (ville.text.isEmpty ||
-        quartier.text.isEmpty ||
-        selectedClientCible.value.isEmpty ||
-        selectedCountry.value.isEmpty) {
-      showCustomSnackbar(message: 'Veuillez renseigner tous les champs');
-      isLoading.value = false;
-      return;
-    }
-    final TailleurRequest request = TailleurRequest(
-      userId: user!.uid,
-      nomAtelier: nomAtelier.text,
-      clientCible: selectedClientCible.value,
-      pays: selectedCountry.value,
-      ville: ville.text,
-      quartier: quartier.text,
-      nombreTravailleur: int.parse(selectedNombreTravailleur.text),
-      numAtelier: int.parse(numAtelier.text),
-    );
-    await TailleurRequestService().createRequest(request);
-    isLoading.value = false;
-    showCustomSnackbar(
-        message: 'Demande envoyée avec succès', backgroundColor: Colors.green);
-    nomAtelier.clear();
-    ville.clear();
-    quartier.clear();
-    numAtelier.clear();
-    selectedCountry.value = '';
-    selectedClientCible.value = '';
-    Get.back();
-    Get.back();
+    try {
+      final uid = user?.uid;
+      if (uid == null || uid.isEmpty) {
+        showCustomSnackbar(
+            message: 'Session expirée. Veuillez vous reconnecter');
+        return;
+      }
 
-    // send notification to admin
-    sendNotification(
-        "eRKw39mETJCB9IQH4KRmUA:APA91bGqaIbh4ac-M4F2QNVNvYv-uaHXE656DbQLnjcW89KqUYgkfViFRD2cDugEYtzqwV1pc4MGbFirNRFmbYrcNa86JUzgvG3kOOHTEoUVnyilBoAj_0c",
-        "Demande d'etre tailleur",
-        "Un utilisateur a envoyé une demande pour devenir tailleur");
+      final bool isRequestExist =
+          await TailleurRequestService().isRequestExist(uid);
+      if (isRequestExist) {
+        showCustomSnackbar(
+            message: "Vous avez déjà envoyé une demande. Veuillez patienter.");
+        return;
+      }
+      if (userController.currentUser.value.adress == null ||
+          userController.currentUser.value.adress!.isEmpty) {
+        showCustomSnackbar(
+            message: "Veuillez renseigner votre adresse dans votre profil");
+        return;
+      }
 
-    // update user clientCible property
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .update({'clientCible': selectedClientCible.value});
+      final atelierName = nomAtelier.text.trim();
+      final city = ville.text.trim();
+      final district = quartier.text.trim();
+      final workshopNumber = int.tryParse(numAtelier.text.trim());
+      final workersCount = isHasAgent.value
+          ? int.tryParse(selectedNombreTravailleur.text.trim())
+          : 0;
+      final selectedTarget = selectedClientCible.value.trim();
+      final selectedCountryValue = selectedCountry.value.trim();
+
+      if (atelierName.isEmpty ||
+          city.isEmpty ||
+          district.isEmpty ||
+          selectedTarget.isEmpty ||
+          selectedCountryValue.isEmpty) {
+        showCustomSnackbar(message: 'Veuillez renseigner tous les champs');
+        return;
+      }
+
+      if (workshopNumber == null || workshopNumber <= 0) {
+        showCustomSnackbar(message: 'Le numéro de l\'atelier est invalide');
+        return;
+      }
+
+      if (isHasAgent.value && (workersCount == null || workersCount <= 0)) {
+        showCustomSnackbar(
+            message: 'Veuillez renseigner un nombre de travailleurs valide');
+        return;
+      }
+
+      final TailleurRequest request = TailleurRequest(
+        userId: uid,
+        nomAtelier: atelierName,
+        clientCible: selectedTarget,
+        pays: selectedCountryValue,
+        ville: city,
+        quartier: district,
+        nombreTravailleur: workersCount ?? 0,
+        numAtelier: workshopNumber,
+      );
+
+      await TailleurRequestService().createRequest(request);
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .update({'clientCible': selectedTarget});
+
+      showCustomSnackbar(
+          message: 'Demande envoyée avec succès',
+          backgroundColor: Colors.green);
+
+      nomAtelier.clear();
+      ville.clear();
+      quartier.clear();
+      numAtelier.clear();
+      selectedNombreTravailleur.clear();
+      selectedCountry.value = 'Mali';
+      selectedClientCible.value = 'Hommes';
+
+      if (Get.isOverlaysOpen ?? false) {
+        Get.back();
+      }
+      if (Get.isOverlaysOpen ?? false) {
+        Get.back();
+      }
+
+      sendNotification(
+          "eRKw39mETJCB9IQH4KRmUA:APA91bGqaIbh4ac-M4F2QNVNvYv-uaHXE656DbQLnjcW89KqUYgkfViFRD2cDugEYtzqwV1pc4MGbFirNRFmbYrcNa86JUzgvG3kOOHTEoUVnyilBoAj_0c",
+          "Demande d'être tailleur",
+          "Un utilisateur a envoyé une demande pour devenir tailleur");
+    } catch (_) {
+      showCustomSnackbar(
+        message:
+            'Erreur lors de l\'envoi de la demande. Veuillez réessayer plus tard.',
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override

@@ -7,7 +7,7 @@ class AboutUsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar('A Propos de Faani'),
+      appBar: customAppBar('À propos de Faani'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(

@@ -53,7 +53,7 @@ Widget listBuild(ProfileController controller, BuildContext context) {
           const CustomDivider(),
           CustomListTile(
             leadingIcon: controller.measureIcon,
-            title: 'Mes Mesures',
+            title: 'Mes mesures',
             subTitle: 'Voir mes mesures',
             onTap: () => Get.to(
               () => const MesuresView(),
@@ -76,7 +76,7 @@ Widget listBuild(ProfileController controller, BuildContext context) {
             CustomListTile(
               leadingIcon:
                   const Icon(Icons.groups_outlined, color: Colors.teal),
-              title: 'Mes Clients',
+              title: 'Mes clients',
               subTitle: 'Gérer clients, mesures et habits',
               onTap: () => Get.to(
                 () => const TailorClientsView(),
@@ -87,7 +87,7 @@ Widget listBuild(ProfileController controller, BuildContext context) {
           if (controller.userController.isTailleur.value)
             CustomListTile(
               leadingIcon: controller.dressIcon,
-              title: 'Mes Modèles',
+              title: 'Mes modèles',
               subTitle: 'Gérer mes modèles',
               onTap: () => Get.to(
                 () => const MesModelesView(),
@@ -103,8 +103,8 @@ Widget listBuild(ProfileController controller, BuildContext context) {
               !Get.find<HomeController>().isAdmin.value)
             CustomListTile(
               leadingIcon: controller.becomeTailorIcon,
-              title: 'Devenir Tailleur',
-              subTitle: 'Basculer vers compte tailleur',
+              title: 'Devenir tailleur',
+              subTitle: 'Passer en compte tailleur',
               onTap: () => Get.to(
                 () => const DevenirTailleurView(),
                 transition: Transition.rightToLeft,
@@ -130,7 +130,7 @@ Widget listBuild(ProfileController controller, BuildContext context) {
           CustomListTile(
             leadingIcon: const Icon(Icons.info_outline, color: Colors.blue),
             title: 'À propos',
-            subTitle: 'En savoir plus sur Faani App',
+            subTitle: 'En savoir plus sur Faani',
             onTap: () => Get.to(
               () => const AboutUsPage(),
               transition: Transition.rightToLeft,
@@ -151,21 +151,21 @@ Widget listBuild(ProfileController controller, BuildContext context) {
             leadingIcon:
                 const Icon(Icons.rate_review_outlined, color: Colors.amber),
             title: 'Laissez un commentaire',
-            subTitle: 'Comment vous trouvez Faani App',
+            subTitle: 'Dites-nous ce que vous pensez de Faani',
             onTap: () => commentaire(context),
           ),
           const CustomDivider(),
           CustomListTile(
             leadingIcon: const Icon(Icons.star_outline, color: Colors.amber),
-            title: 'Notez l\'Appli',
+            title: 'Notez l\'application',
             subTitle: 'Donnez votre avis',
             onTap: () => controller.rateApp(),
           ),
           const CustomDivider(),
           CustomListTile(
             leadingIcon: const Icon(Icons.share_outlined, color: Colors.blue),
-            title: 'Partager Faani App',
-            subTitle: 'Invitez vos amis à télécharger l\'appli',
+            title: 'Partager Faani',
+            subTitle: 'Invitez vos proches à télécharger l\'application',
             onTap: () => controller.shareApp(),
           ),
         ],

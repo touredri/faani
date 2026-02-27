@@ -13,7 +13,7 @@ class DevenirTailleurView extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     Get.find<ProfileController>();
     return Scaffold(
-      appBar: primaryBackAppBar('Compte Tailleur'),
+      appBar: primaryBackAppBar('Compte tailleur'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Center(
@@ -40,14 +40,15 @@ class DevenirTailleurView extends GetView<ProfileController> {
                 height: 55,
                 child: TextFormField(
                   controller: controller.numAtelier,
+                  keyboardType: TextInputType.number,
                   validator: (String? value) {
                     if (value!.isEmpty) {
-                      return 'Veuillez entrer le numero de l\'atelier';
+                      return 'Veuillez entrer le numéro de l\'atelier';
                     }
                     return null;
                   },
                   decoration: const InputDecoration(
-                    labelText: 'Numero de l\'atelier',
+                    labelText: 'Numéro de l\'atelier',
                   ),
                 ),
               ),
@@ -55,8 +56,9 @@ class DevenirTailleurView extends GetView<ProfileController> {
               SizedBox(
                 height: 55,
                 child: DropdownButtonFormField<String>(
+                  initialValue: controller.selectedClientCible.value,
                   decoration: InputDecoration(
-                    labelText: 'Client Cible',
+                    labelText: 'Client cible',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -82,21 +84,22 @@ class DevenirTailleurView extends GetView<ProfileController> {
               SizedBox(
                 height: 55,
                 child: DropdownButtonFormField<String>(
+                  initialValue: controller.selectedCountry.value,
                   decoration: InputDecoration(
-                    labelText: 'Pays où vous ètes',
+                    labelText: 'Pays où vous êtes',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   items: <String>[
                     'Mali',
-                    'Guninée',
-                    'Senegal',
-                    'Cote d\'Ivoir',
+                    'Guinée',
+                    'Sénégal',
+                    'Côte d\'Ivoire',
                     'Niger',
                     'Burkina Faso',
                     'Togo',
-                    'Benin'
+                    'Bénin'
                   ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -132,8 +135,9 @@ class DevenirTailleurView extends GetView<ProfileController> {
               SizedBox(
                 height: 55,
                 child: DropdownButtonFormField<String>(
+                  initialValue: controller.isHasAgent.value ? 'Oui' : 'Non',
                   decoration: InputDecoration(
-                    labelText: 'Des gens travaille pour vous ?',
+                    labelText: 'Des gens travaillent pour vous ?',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -145,20 +149,23 @@ class DevenirTailleurView extends GetView<ProfileController> {
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
-                    controller.isHasAgent.value = newValue == 'Non';
+                    controller.isHasAgent.value = newValue == 'Oui';
+                    if (newValue == 'Non') {
+                      controller.selectedNombreTravailleur.clear();
+                    }
                   },
                 ),
               ),
               3.hs,
               Obx(() => Visibility(
-                    visible: !controller.isHasAgent.value,
+                    visible: controller.isHasAgent.value,
                     child: SizedBox(
                       height: 55,
                       child: TextField(
                         controller: controller.selectedNombreTravailleur,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          labelText: 'Nombre de travailleur',
+                          labelText: 'Nombre de travailleurs',
                         ),
                       ),
                     ),
@@ -187,7 +194,7 @@ class DevenirTailleurView extends GetView<ProfileController> {
             width: MediaQuery.of(context).size.width * 0.9,
             child: const Text(
               textAlign: TextAlign.center,
-              'Basculer vers un compte Tailleur vous offre plein d\'avantage',
+              'Le passage en compte tailleur vous offre de nombreux avantages.',
               style: TextStyle(overflow: TextOverflow.clip, fontSize: 13),
             ),
           ),

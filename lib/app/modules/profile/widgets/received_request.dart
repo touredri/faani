@@ -241,14 +241,14 @@ class _ReceivedRequestState extends State<ReceivedRequest>
 
         if (snapshot.data != true) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Console Admin')),
+            appBar: AppBar(title: const Text('Console admin')),
             body: _buildUnauthorizedState(theme),
           );
         }
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Console Admin'),
+            title: const Text('Console admin'),
             bottom: TabBar(
               isScrollable: true,
               controller: _tabController,
@@ -370,7 +370,7 @@ class _ReceivedRequestState extends State<ReceivedRequest>
                                 ),
                                 _buildMetricCard(
                                   theme,
-                                  title: 'Demandes Tailleur',
+                                  title: 'Demandes tailleur',
                                   value: '$pendingRequests',
                                   subtitle: 'En attente',
                                   icon: Icons.pending_actions_outlined,
@@ -544,7 +544,7 @@ class _ReceivedRequestState extends State<ReceivedRequest>
                           ),
                           AppSpacing.gapV4,
                           Text(
-                            'Travailleurs: ${request.nombreTravailleur} • N° atelier: ${request.numAtelier}',
+                            'Travailleurs: ${request.nombreTravailleur} • N° d\'atelier: ${request.numAtelier}',
                             style: AppTypography.bodySmall.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -697,14 +697,14 @@ class _ReceivedRequestState extends State<ReceivedRequest>
                         showCustomSnackbar(
                           message: account.isTailleur
                               ? 'Compte retiré des tailleurs'
-                              : 'Compte passé en tailleur',
+                              : 'Compte promu en tailleur',
                         );
                       },
                       icon: const Icon(Icons.manage_accounts_outlined),
                       label: Text(
                         account.isTailleur
-                            ? 'Retirer Tailleur'
-                            : 'Promouvoir Tailleur',
+                            ? 'Retirer le rôle tailleur'
+                            : 'Promouvoir en tailleur',
                       ),
                     ),
                   ),
@@ -781,7 +781,7 @@ class _ReceivedRequestState extends State<ReceivedRequest>
                   ),
                   AppSpacing.gapV4,
                   Text(
-                    'Tailleur ID: ${order.idTailleur} • Client ID: ${(order.idUser).isEmpty ? '-' : order.idUser}',
+                    'ID tailleur: ${order.idTailleur} • ID client: ${(order.idUser).isEmpty ? '-' : order.idUser}',
                     style: AppTypography.bodySmall.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
