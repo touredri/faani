@@ -27,8 +27,7 @@ class SuiviEtatService {
     if (doc.docs.isEmpty) {
       throw Exception('Document does not exist!');
     } else {
-      return SuiviEtat.fromMap(
-          doc.docs.first.data(), doc.docs.first.reference);
+      return SuiviEtat.fromMap(doc.docs.first.data(), doc.docs.first.reference);
     }
   }
 
@@ -57,7 +56,8 @@ class SuiviEtatService {
 }
 
 class NotificationSettings {
-  static const MethodChannel _channel = MethodChannel('com.faani.app/notification');
+  static const MethodChannel _channel =
+      MethodChannel('com.touredri.faani/notification');
 
   static Future<void> openNotificationSettings() async {
     try {
@@ -67,4 +67,3 @@ class NotificationSettings {
     }
   }
 }
-

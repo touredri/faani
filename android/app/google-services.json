@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "224443279523-poc613iqk06gju98cn11hrv5vrsigkjo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.faani.app",
+            "certificate_hash": "c105f56b593e0ec0a6c0ec8c4b7f86890055893d"
+          }
+        },
+        {
           "client_id": "224443279523-jntqepgvi7kum1nvm81ru2ip27khkfar.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -52,18 +60,26 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:224443279523:android:bf0a981568089cf0ff7716",
+        "mobilesdk_app_id": "1:224443279523:android:74f9f2b89fe1951aff7716",
         "android_client_info": {
-          "package_name": "com.faani.app.faani"
+          "package_name": "com.touredri.faani"
         }
       },
       "oauth_client": [
         {
-          "client_id": "224443279523-octvigmps5p0ovnv90mj58vtanh0m3n2.apps.googleusercontent.com",
+          "client_id": "224443279523-mj5i0a0io1am8334hhrvle8cdrqk1ngn.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.faani.app.faani",
-            "certificate_hash": "6c5f8c29e83ba1cad83b2543034d863eca2a91ae"
+            "package_name": "com.touredri.faani",
+            "certificate_hash": "fad6596b57f9a32980db849d4d76958e8a15c306"
+          }
+        },
+        {
+          "client_id": "224443279523-vd8v0mj9ov9i9vem0k55rs4gapu3r9p0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touredri.faani",
+            "certificate_hash": "363684381382ab73df1e5b1a675ea8fcabc902aa"
           }
         },
         {
