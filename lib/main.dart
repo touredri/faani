@@ -13,6 +13,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 
+const bool _enableDebugAppCheck =
+    bool.fromEnvironment('ENABLE_DEBUG_APP_CHECK', defaultValue: false);
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -66,10 +69,15 @@ Future<void> _initFirebase() async {
         break;
     }
 
-    await FirebaseAppCheck.instance.activate(
-      androidProvider:
-          kReleaseMode ? AndroidProvider.playIntegrity : AndroidProvider.debug,
-    );
+    if (kReleaseMode || _enableDebugAppCheck) {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: kReleaseMode
+            ? AndroidProvider.playIntegrity
+            : AndroidProvider.debug,
+      );
+    } else {
+      debugPrint('Firebase App Check skipped for local debug build.');
+    }
   } catch (e) {
     debugPrint('Firebase init skipped/failed: $e');
   }

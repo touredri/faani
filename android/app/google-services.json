@@ -8,58 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:224443279523:android:a6b63c090d9e445fff7716",
-        "android_client_info": {
-          "package_name": "com.faani.app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "224443279523-aq8r10obg6v0m013bua79ausmnrffv3j.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.faani.app",
-            "certificate_hash": "6c5f8c29e83ba1cad83b2543034d863eca2a91ae"
-          }
-        },
-        {
-          "client_id": "224443279523-poc613iqk06gju98cn11hrv5vrsigkjo.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.faani.app",
-            "certificate_hash": "c105f56b593e0ec0a6c0ec8c4b7f86890055893d"
-          }
-        },
-        {
-          "client_id": "224443279523-jntqepgvi7kum1nvm81ru2ip27khkfar.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBE6w2YtJ_jjYoEVm5XWXpKP8b52byE1bY"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "224443279523-jntqepgvi7kum1nvm81ru2ip27khkfar.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "224443279523-a9mm3dfmgqq19p3g39di5t1oo73k73ui.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.faani.app.faani"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:224443279523:android:74f9f2b89fe1951aff7716",
         "android_client_info": {
           "package_name": "com.touredri.faani"
@@ -98,13 +46,6 @@
             {
               "client_id": "224443279523-jntqepgvi7kum1nvm81ru2ip27khkfar.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "224443279523-a9mm3dfmgqq19p3g39di5t1oo73k73ui.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.faani.app.faani"
-              }
             }
           ]
         }

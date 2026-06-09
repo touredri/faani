@@ -89,17 +89,20 @@ class AuthView extends GetView<AuthController> {
                     label: 'Recevoir le code SMS',
                     isLoading: controller.loading.value,
                     isExpanded: true,
-                    onPressed: () {
-                      final phone = controller.phoneNumber.value.trim();
-                      if (phone.isEmpty || !phone.startsWith('+')) {
-                        showCustomSnackbar(
-                          message: 'Entrez un numéro valide (ex: +223xxxxxxxx)',
-                          backgroundColor: AppColors.error,
-                        );
-                        return;
-                      }
-                      controller.verifyPhoneNumber(phone);
-                    },
+                    onPressed: controller.googleLoading.value
+                        ? null
+                        : () {
+                            final phone = controller.phoneNumber.value.trim();
+                            if (phone.isEmpty || !phone.startsWith('+')) {
+                              showCustomSnackbar(
+                                message:
+                                    'Entrez un numéro valide (ex: +223xxxxxxxx)',
+                                backgroundColor: AppColors.error,
+                              );
+                              return;
+                            }
+                            controller.verifyPhoneNumber(phone);
+                          },
                   )),
               AppSpacing.gapV24,
 
@@ -108,18 +111,39 @@ class AuthView extends GetView<AuthController> {
               AppSpacing.gapV24,
 
               // ── Google sign-in ────────────────────────────────────
-              OutlinedButton.icon(
-                onPressed: () => controller.signInWithGoogle(),
-                icon: Image.asset(
-                  'assets/images/google_auth.png',
-                  width: 24,
-                  height: 24,
-                ),
-                label: const Text('S\'identifier avec Google'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                ),
-              ),
+              Obx(() {
+                final isBusy = controller.googleLoading.value;
+                return OutlinedButton(
+                  onPressed:
+                      isBusy ? null : () => controller.signInWithGoogle(),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 48),
+                  ),
+                  child: isBusy
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              theme.colorScheme.primary,
+                            ),
+                          ),
+                        )
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/images/google_auth.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            const Text('S\'identifier avec Google'),
+                          ],
+                        ),
+                );
+              }),
               AppSpacing.gapV16,
 
               // ── Anonymous sign-in ─────────────────────────────────
@@ -129,13 +153,20 @@ class AuthView extends GetView<AuthController> {
                       variant: AppButtonVariant.outline,
                       isLoading: controller.isLoading.value,
                       isExpanded: true,
-                      onPressed: () async {
-                        controller.isLoading.value = true;
-                        final anonyme = await controller.signInAnonymously();
-                        if (anonyme != null) {
-                          Get.offAllNamed(Routes.HOME);
-                        }
-                      },
+                      onPressed: controller.googleLoading.value
+                          ? null
+                          : () async {
+                              controller.isLoading.value = true;
+                              try {
+                                final anonyme =
+                                    await controller.signInAnonymously();
+                                if (anonyme != null) {
+                                  Get.offAllNamed(Routes.HOME);
+                                }
+                              } finally {
+                                controller.isLoading.value = false;
+                              }
+                            },
                     )),
               AppSpacing.gapV24,
             ],

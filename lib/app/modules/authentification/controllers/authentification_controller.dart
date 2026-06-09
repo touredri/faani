@@ -30,6 +30,12 @@ import '../views/sign_up_view.dart';
 class AuthController extends GetxController {
   static const String _testPhoneNumber = '+22393734481';
   static const String _testOtpCode = '020202';
+  static const String _googleWebClientId =
+      '224443279523-jntqepgvi7kum1nvm81ru2ip27khkfar.apps.googleusercontent.com';
+  static const Duration _googleAuthTimeout = Duration(seconds: 60);
+  static const Duration _firebaseAuthTimeout = Duration(seconds: 45);
+  static const Duration _firestoreReadTimeout = Duration(seconds: 30);
+  static const Duration _deviceUpdateTimeout = Duration(seconds: 20);
 
   final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
   final UserIdentityBindingService _identityBindingService =
@@ -40,6 +46,7 @@ class AuthController extends GetxController {
   RxString smsCode = ''.obs;
   RxBool loading = false.obs;
   RxBool isLoading = false.obs;
+  RxBool googleLoading = false.obs;
   RxBool resend = false.obs;
   RxInt count = 60.obs;
   bool _phoneVerificationRetriedWithRecaptcha = false;
@@ -220,13 +227,13 @@ class AuthController extends GetxController {
     try {
       final result = await auth.signInAnonymously();
       if (result.user != null) {
-        print('User created successfully');
+        debugPrint('User created successfully');
         setUser();
         return result.user;
       }
     } catch (e) {
       debugPrint(e.toString());
-      print(
+      debugPrint(
           'Failed to create user anonymously ! error: ************** $e **************');
     }
     return null;
@@ -374,36 +381,75 @@ class AuthController extends GetxController {
     Get.offAllNamed(Routes.HOME);
   }
 
-// Connexion avec Google (inchangé)
+// Connexion avec Google
   Future<void> signInWithGoogle() async {
+    if (googleLoading.value) return;
+
+    googleLoading.value = true;
+    debugPrint('[Auth][Google] Starting Google sign-in');
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: const ['email', 'profile'],
+        serverClientId: _googleWebClientId,
+      );
+      debugPrint('[Auth][Google] Opening account picker');
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
+        debugPrint('[Auth][Google] Account picker cancelled');
         showCustomSnackbar(message: 'Connexion annulée.');
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      debugPrint('[Auth][Google] Account selected: ${googleUser.email}');
+      debugPrint('[Auth][Google] Requesting Google authentication tokens');
+      final GoogleSignInAuthentication googleAuth = await _withAuthTimeout(
+        googleUser.authentication,
+        timeout: _googleAuthTimeout,
+        step: AuthTimeoutStep.googleTokens,
+      );
+      debugPrint('[Auth][Google] Tokens received: '
+          'idToken=${googleAuth.idToken != null}, '
+          'accessToken=${googleAuth.accessToken != null}');
+
+      if (googleAuth.idToken == null && googleAuth.accessToken == null) {
+        throw const AuthConfigurationException(
+          'Google n\'a renvoyé ni idToken ni accessToken. '
+          'Vérifie le client OAuth Web et les SHA Android dans Firebase.',
+        );
+      }
+
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final userCrendential = await auth.signInWithCredential(credential);
-      nameController.text = _resolveDisplayName(userCrendential.user);
-      phoneNumber.value = userCrendential.user?.phoneNumber ?? '';
+      debugPrint('[Auth][Google] Signing in with Firebase credential');
+      final userCredential = await _withAuthTimeout(
+        auth.signInWithCredential(credential),
+        timeout: _firebaseAuthTimeout,
+        step: AuthTimeoutStep.firebaseSignIn,
+      );
+      nameController.text = _resolveDisplayName(userCredential.user);
+      phoneNumber.value = userCredential.user?.phoneNumber ?? '';
       if (auth.currentUser != null) {
+        debugPrint('[Auth][Google] Firebase sign-in succeeded: '
+            '${auth.currentUser!.uid}');
+        debugPrint('[Auth][Google] Routing after successful auth');
         await _routeAfterSuccessfulAuth(fromGoogle: true);
+        debugPrint('[Auth][Google] Routing completed');
         showCustomSnackbar(
             message: 'Connexion avec Google réussie !',
             backgroundColor: Colors.green);
       }
     } catch (e) {
+      debugPrint('[Auth][Google] Sign-in failed: $e');
       showCustomSnackbar(
         message: _buildAuthErrorMessage(e, context: 'google'),
         backgroundColor: Colors.red,
       );
+    } finally {
+      googleLoading.value = false;
+      debugPrint('[Auth][Google] Google sign-in flow ended');
     }
   }
 
@@ -459,10 +505,36 @@ class AuthController extends GetxController {
       if (all.contains('apiexception: 10') ||
           all.contains('developer_error') ||
           all.contains('code 39')) {
-        return 'Échec Google/Phone Auth lié à la configuration OAuth Android. '
-            'Vérifie le package, SHA-1/SHA-256 et les clients OAuth dans Firebase/Google Cloud.';
+        return 'Échec Google lié à la configuration OAuth Android. '
+            'Vérifie le package com.touredri.faani, les SHA-1/SHA-256 Play App Signing '
+            'et les clients OAuth dans Firebase/Google Cloud.';
       }
       return error.message ?? 'Erreur plateforme (${context.toUpperCase()}).';
+    }
+
+    if (error is AuthStepTimeoutException) {
+      switch (error.step) {
+        case AuthTimeoutStep.googleTokens:
+          return 'Google n\'a pas renvoyé les jetons de connexion. '
+              'Vérifie que les SHA Play App Signing sont bien dans Firebase, que Google est activé dans Authentication, '
+              'puis réessaie avec un autre compte Google.';
+        case AuthTimeoutStep.firebaseSignIn:
+          return 'Firebase Auth ne finalise pas la connexion Google. '
+              'Vérifie le fournisseur Google dans Firebase Authentication et les clients OAuth Android/Web.';
+        case AuthTimeoutStep.firestoreProfile:
+          return 'Connexion Google réussie, mais la récupération du profil prend trop de temps. '
+              'Vérifie Firestore/App Check puis réessaie.';
+        case AuthTimeoutStep.deviceUpdate:
+          return 'Connexion Google réussie, mais la mise à jour de l\'appareil a pris trop de temps.';
+      }
+    }
+
+    if (error is AuthConfigurationException) {
+      return error.message;
+    }
+
+    if (error is TimeoutException) {
+      return 'Une étape de connexion a pris trop de temps. Réessaie dans quelques secondes.';
     }
 
     return 'Erreur de connexion (${context.toUpperCase()}): $error';
@@ -486,9 +558,15 @@ class AuthController extends GetxController {
     if (currentUid == null) return;
 
     final UserService usersService = UserService();
-    final UserModel? existing = await usersService.getIfUser(currentUid);
+    debugPrint('[Auth] Reading Firestore user: $currentUid');
+    final UserModel? existing = await _withAuthTimeout(
+      usersService.getIfUser(currentUid),
+      timeout: _firestoreReadTimeout,
+      step: AuthTimeoutStep.firestoreProfile,
+    );
 
     if (existing == null) {
+      debugPrint('[Auth] No Firestore user found, opening sign-up');
       final authUser = auth.currentUser;
       final authPhone = (authUser?.phoneNumber ?? '').trim();
       nameController.text = _resolveDisplayName(authUser);
@@ -504,6 +582,7 @@ class AuthController extends GetxController {
       return;
     }
 
+    debugPrint('[Auth] Firestore user found, enforcing device policy');
     final isAllowed = await _enforceSingleDevicePolicy(existing);
     if (!isAllowed) return;
 
@@ -519,6 +598,7 @@ class AuthController extends GetxController {
 
     final hasPhone = (existing.phoneNumber ?? '').trim().isNotEmpty;
     if (fromGoogle && !hasPhone) {
+      debugPrint('[Auth] Existing Google user has no phone, opening sign-up');
       nameController.text = (existing.nomPrenom ?? '').trim().isNotEmpty
           ? existing.nomPrenom!.trim()
           : _resolveDisplayName(auth.currentUser);
@@ -533,6 +613,7 @@ class AuthController extends GetxController {
       return;
     }
 
+    debugPrint('[Auth] Opening home');
     setUser();
     Get.offAllNamed(Routes.HOME);
   }
@@ -556,22 +637,38 @@ class AuthController extends GetxController {
       );
     }
 
-    await UserService().updateActiveDevice(
-      uid: uid,
-      deviceId: currentDeviceId,
-      deviceLabel: currentDeviceLabel,
-    );
+    try {
+      await _withAuthTimeout(
+        UserService().updateActiveDevice(
+          uid: uid,
+          deviceId: currentDeviceId,
+          deviceLabel: currentDeviceLabel,
+        ),
+        timeout: _deviceUpdateTimeout,
+        step: AuthTimeoutStep.deviceUpdate,
+      );
+    } catch (e) {
+      debugPrint('[Auth] Active device update skipped: $e');
+    }
     return true;
   }
 
   Future<void> _bindCurrentDevice(String uid) async {
     final currentDeviceId = await _getCurrentDeviceId();
     final currentDeviceLabel = await _getCurrentDeviceLabel();
-    await UserService().updateActiveDevice(
-      uid: uid,
-      deviceId: currentDeviceId,
-      deviceLabel: currentDeviceLabel,
-    );
+    try {
+      await _withAuthTimeout(
+        UserService().updateActiveDevice(
+          uid: uid,
+          deviceId: currentDeviceId,
+          deviceLabel: currentDeviceLabel,
+        ),
+        timeout: _deviceUpdateTimeout,
+        step: AuthTimeoutStep.deviceUpdate,
+      );
+    } catch (e) {
+      debugPrint('[Auth] Active device update skipped: $e');
+    }
   }
 
   Future<String> _getCurrentDeviceId() async {
@@ -616,4 +713,40 @@ class AuthController extends GetxController {
       );
     }
   }
+
+  Future<T> _withAuthTimeout<T>(
+    Future<T> future, {
+    required Duration timeout,
+    required AuthTimeoutStep step,
+  }) {
+    return future.timeout(
+      timeout,
+      onTimeout: () => throw AuthStepTimeoutException(step),
+    );
+  }
+}
+
+enum AuthTimeoutStep {
+  googleTokens,
+  firebaseSignIn,
+  firestoreProfile,
+  deviceUpdate,
+}
+
+class AuthStepTimeoutException implements Exception {
+  AuthStepTimeoutException(this.step);
+
+  final AuthTimeoutStep step;
+
+  @override
+  String toString() => 'AuthStepTimeoutException($step)';
+}
+
+class AuthConfigurationException implements Exception {
+  const AuthConfigurationException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
 }
