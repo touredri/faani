@@ -45,9 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<NSPhotoLibraryUsageDescription>Allow access to photo library</NSPhotoLibraryUsageDescription>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow access to photo library</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow access to camera</string>
+	<string>Faani utilise la caméra pour estimer vos mesures corporelles en vous guidant dans le cadre.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow access to microphone</string>
 </dict>

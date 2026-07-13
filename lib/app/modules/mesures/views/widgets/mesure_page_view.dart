@@ -11,7 +11,10 @@ class MesurePaveView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MesuresController mesureController = Get.put(MesuresController());
+    final MesuresController mesureController =
+        Get.isRegistered<MesuresController>()
+            ? Get.find<MesuresController>()
+            : Get.put(MesuresController());
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,

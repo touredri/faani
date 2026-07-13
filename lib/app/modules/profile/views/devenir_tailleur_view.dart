@@ -1,17 +1,17 @@
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
-import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
+import 'package:faani/app/modules/profile/controllers/tailor_onboarding_controller.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-class DevenirTailleurView extends GetView<ProfileController> {
+class DevenirTailleurView extends GetView<TailorOnboardingController> {
   const DevenirTailleurView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Get.find<ProfileController>();
+    Get.find<TailorOnboardingController>();
     return Scaffold(
       appBar: primaryBackAppBar('Compte tailleur'),
       body: SingleChildScrollView(
@@ -56,7 +56,7 @@ class DevenirTailleurView extends GetView<ProfileController> {
               SizedBox(
                 height: 55,
                 child: DropdownButtonFormField<String>(
-                  initialValue: controller.selectedClientCible.value,
+                  initialValue: controller.selectedClientTarget.value,
                   decoration: InputDecoration(
                     labelText: 'Client cible',
                     border: OutlineInputBorder(
@@ -76,7 +76,7 @@ class DevenirTailleurView extends GetView<ProfileController> {
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
-                    controller.selectedClientCible.value = newValue!;
+                    controller.selectedClientTarget.value = newValue!;
                   },
                 ),
               ),
@@ -135,7 +135,7 @@ class DevenirTailleurView extends GetView<ProfileController> {
               SizedBox(
                 height: 55,
                 child: DropdownButtonFormField<String>(
-                  initialValue: controller.isHasAgent.value ? 'Oui' : 'Non',
+                  initialValue: controller.hasWorkers.value ? 'Oui' : 'Non',
                   decoration: InputDecoration(
                     labelText: 'Des gens travaillent pour vous ?',
                     border: OutlineInputBorder(
@@ -149,20 +149,20 @@ class DevenirTailleurView extends GetView<ProfileController> {
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
-                    controller.isHasAgent.value = newValue == 'Oui';
+                    controller.hasWorkers.value = newValue == 'Oui';
                     if (newValue == 'Non') {
-                      controller.selectedNombreTravailleur.clear();
+                      controller.workerCount.clear();
                     }
                   },
                 ),
               ),
               3.hs,
               Obx(() => Visibility(
-                    visible: controller.isHasAgent.value,
+                    visible: controller.hasWorkers.value,
                     child: SizedBox(
                       height: 55,
                       child: TextField(
-                        controller: controller.selectedNombreTravailleur,
+                        controller: controller.workerCount,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
                           labelText: 'Nombre de travailleurs',
@@ -176,7 +176,7 @@ class DevenirTailleurView extends GetView<ProfileController> {
                 height: 50,
                 child: Obx(() => ElevatedButton(
                     onPressed: () {
-                      controller.becomeTailleur();
+                      controller.submit();
                     },
                     child: controller.isLoading.value
                         ? circularProgress()

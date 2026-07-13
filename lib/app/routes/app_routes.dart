@@ -2,36 +2,38 @@ part of 'app_pages.dart';
 
 abstract class Routes {
   Routes._();
-  static const HOME = _Paths.HOME;
-  static const AUTH = _Paths.AUTH;
-  static const ACCUEIL = _Paths.ACCUEIL;
-  static const COMMANDE = _Paths.COMMANDE;
-  static const FAVORIE = _Paths.FAVORIE;
-  static const MESURES = _Paths.MESURES;
-  static const PROFILE = _Paths.PROFILE;
-  static const AJOUT_MODELE = _Paths.AJOUT_MODELE;
+  static const home = _Paths.home;
+  static const auth = _Paths.auth;
+  static const accueil = _Paths.accueil;
+  static const commande = _Paths.commande;
+  static const favorie = _Paths.favorie;
+  static const mesures = _Paths.mesures;
+  static const cameraMesure = _Paths.cameraMesure;
+  static const profile = _Paths.profile;
+  static const ajoutModele = _Paths.ajoutModele;
   // static const AJOUT_COMMANDE = _Paths.AJOUT_COMMANDE;
-  static const MESSAGE = _Paths.MESSAGE;
-  static const DISCUSSION = _Paths.DISCUSSION;
-  static const DETAIL_MODELE = _Paths.DETAIL_MODELE;
-  static const SEARCH_PAGE = _Paths.SEARCH_PAGE;
-  static const ADMIN_PANEL = _Paths.ADMIN_PANEL;
+  static const message = _Paths.message;
+  static const discussion = _Paths.discussion;
+  static const detailModele = _Paths.detailModele;
+  static const searchPage = _Paths.searchPage;
+  static const adminPanel = _Paths.adminPanel;
 }
 
 abstract class _Paths {
   _Paths._();
-  static const HOME = '/home';
-  static const AUTH = '/auth';
-  static const ACCUEIL = '/accueil';
-  static const COMMANDE = '/commande';
-  static const FAVORIE = '/favorie';
-  static const MESURES = '/mesures';
-  static const PROFILE = '/profile';
-  static const AJOUT_MODELE = '/ajout-modele';
+  static const home = '/home';
+  static const auth = '/auth';
+  static const accueil = '/accueil';
+  static const commande = '/commande';
+  static const favorie = '/favorie';
+  static const mesures = '/mesures';
+  static const cameraMesure = '/mesures/camera';
+  static const profile = '/profile';
+  static const ajoutModele = '/ajout-modele';
   // static const AJOUT_COMMANDE = '/ajout-commande';
-  static const MESSAGE = '/message';
-  static const DISCUSSION = '/discussion';
-  static const DETAIL_MODELE = '/detail-modele';
-  static const SEARCH_PAGE = '/search-page';
-  static const ADMIN_PANEL = '/admin-panel';
+  static const message = '/message';
+  static const discussion = '/discussion';
+  static const detailModele = '/detail-modele';
+  static const searchPage = '/search-page';
+  static const adminPanel = '/admin-panel';
 }

@@ -245,6 +245,7 @@ class _HybridHomeBodyState extends State<_HybridHomeBody> {
                         () => CategoryFeedView(
                           modeles: categoryModeles,
                           initialIndex: feedIndex >= 0 ? feedIndex : 0,
+                          controller: widget.controller,
                         ),
                         transition: Transition.cupertino,
                       );

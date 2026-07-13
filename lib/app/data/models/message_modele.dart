@@ -1,30 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MessageModel {
-  String? from_avatar,
-      from_name,
-      from_id,
-      to_avatar,
-      to_name,
-      to_id,
+  String? fromAvatar,
+      fromName,
+      fromId,
+      toAvatar,
+      toName,
+      toId,
       message,
-      modele_img,
-      last_msg;
-  int? msg_num;
-  Timestamp? last_time;
+      modeleImg,
+      lastMsg;
+  int? msgNum;
+  Timestamp? lastTime;
 
   MessageModel({
-    this.from_avatar,
-    this.from_name,
-    this.from_id,
-    this.to_avatar,
-    this.to_name,
-    this.to_id,
+    this.fromAvatar,
+    this.fromName,
+    this.fromId,
+    this.toAvatar,
+    this.toName,
+    this.toId,
     this.message,
-    this.modele_img,
-    this.last_msg,
-    this.msg_num = 0,
-    this.last_time,
+    this.modeleImg,
+    this.lastMsg,
+    this.msgNum = 0,
+    this.lastTime,
   });
 
   factory MessageModel.fromMap(
@@ -33,33 +33,33 @@ class MessageModel {
   ) {
     final data = snapshot.data();
     return MessageModel(
-      from_avatar: data?['from_avatar'],
-      from_name: data?['from_name'],
-      from_id: data?['from_id'],
-      to_avatar: data?['to_avatar'],
-      to_name: data?['to_name'],
-      to_id: data?['to_id'],
-      modele_img: data?['modele_img'],
+      fromAvatar: data?['from_avatar'],
+      fromName: data?['from_name'],
+      fromId: data?['from_id'],
+      toAvatar: data?['to_avatar'],
+      toName: data?['to_name'],
+      toId: data?['to_id'],
+      modeleImg: data?['modele_img'],
       message: data?['message'],
-      last_msg: data?['last_msg'],
-      msg_num: data?['msg_num'],
-      last_time: data?['last_time'],
+      lastMsg: data?['last_msg'],
+      msgNum: data?['msg_num'],
+      lastTime: data?['last_time'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      if (from_avatar != null) 'from_avatar': from_avatar,
-      if (from_name != null) 'from_name': from_name,
-      if (from_id != null) 'from_id': from_id,
-      if (to_avatar != null) 'to_avatar': to_avatar,
-      if (to_name != null) 'to_name': to_name,
-      if (to_id != null) 'to_id': to_id,
+      if (fromAvatar != null) 'from_avatar': fromAvatar,
+      if (fromName != null) 'from_name': fromName,
+      if (fromId != null) 'from_id': fromId,
+      if (toAvatar != null) 'to_avatar': toAvatar,
+      if (toName != null) 'to_name': toName,
+      if (toId != null) 'to_id': toId,
       if (message != null) 'message': message,
-      if (modele_img != null) 'modele_img': modele_img,
-      if (last_msg != null) 'last_msg': last_msg,
-      if (msg_num != null) 'msg_num': msg_num,
-      if (last_time != null) 'last_time': last_time,
+      if (modeleImg != null) 'modele_img': modeleImg,
+      if (lastMsg != null) 'last_msg': lastMsg,
+      if (msgNum != null) 'msg_num': msgNum,
+      if (lastTime != null) 'last_time': lastTime,
     };
   }
 }
@@ -68,7 +68,7 @@ class MsgContent {
   final String? id, content, type;
   final Timestamp? addtime;
 
-  MsgContent({ this.id, this.content, this.type, this.addtime});
+  MsgContent({this.id, this.content, this.type, this.addtime});
 
   factory MsgContent.fromMap(
     DocumentSnapshot<Map<String, dynamic>> snapshot,

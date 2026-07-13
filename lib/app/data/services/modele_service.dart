@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -209,7 +210,7 @@ class ModeleService {
       }
       return models;
     } catch (e) {
-      print('Erreur lors de l\'exécution de la requête : $e');
+      debugPrint('Erreur lors de l\'exécution de la requête : $e');
       return [];
     }
   }

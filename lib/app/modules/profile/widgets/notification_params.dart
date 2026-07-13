@@ -8,7 +8,7 @@ class NotificationParam extends StatefulWidget {
   const NotificationParam({super.key});
 
   @override
-  _NotificationParamState createState() => _NotificationParamState();
+  State<NotificationParam> createState() => _NotificationParamState();
 }
 
 class _NotificationParamState extends State<NotificationParam> {

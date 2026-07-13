@@ -197,7 +197,7 @@ class Modele {
     );
   }
 
-  final firestore = FirebaseFirestore.instance;
+  FirebaseFirestore get firestore => FirebaseFirestore.instance;
 
   // Crée un nouveau document dans la collection "modele"
   Future<void> create() async {
@@ -222,7 +222,6 @@ class Modele {
       await FirebaseStorage.instance.ref(path).delete();
     }
     await docRef.delete();
-    print('Document supprimé');
   }
 
   Future<Modele> getModele(String id) async {

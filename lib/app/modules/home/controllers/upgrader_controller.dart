@@ -8,8 +8,10 @@ class UpgraderController extends GetxController {
     languageCode: 'fr',
     storeController: UpgraderStoreController(),
     durationUntilAlertAgain: const Duration(days: 1),
-    willDisplayUpgrade: ({required bool display, String? installedVersion, UpgraderVersionInfo? versionInfo}) {
-    },
+    willDisplayUpgrade: (
+        {required bool display,
+        String? installedVersion,
+        UpgraderVersionInfo? versionInfo}) {},
   );
 
   @override

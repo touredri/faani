@@ -12,6 +12,6 @@ class AuthMiddleware extends GetMiddleware {
     if (auth.currentUser != null) {
       return null;
     }
-    return const RouteSettings(name: Routes.AUTH);
+    return const RouteSettings(name: Routes.auth);
   }
 }

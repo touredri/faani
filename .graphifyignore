@@ -1,0 +1,37 @@
+# Dépendances, caches et sorties générées
+.git/
+.dart_tool/
+.pub-cache/
+build/
+android/.gradle/
+ios/Pods/
+ios/Flutter/ephemeral/
+graphify-out/
+
+# Fichiers générés
+lib/generated/
+lib/firebase_options.dart
+android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+
+# Secrets et signatures — ne jamais indexer
+android/app/google-services.json
+android/key.properties
+android/local.properties
+android/app/*.keystore
+ios/Runner/GoogleService-Info.plist
+ios/firebase_app_id_file.json
+
+# Binaires et ressources visuelles non nécessaires au graphe de code
+assets/
+android/app/src/main/res/mipmap-*/
+ios/Runner/Assets.xcassets/
+*.jar
+*.ttf
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif

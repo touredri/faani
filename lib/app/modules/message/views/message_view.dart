@@ -144,29 +144,29 @@ class MessageView extends GetView<MessageController> {
                     const SizedBox(height: AppSpacing.sm),
                 itemBuilder: (context, index) {
                   final message = messages[index];
-                  final isIncoming = user?.uid == message.to_id;
+                  final isIncoming = user?.uid == message.toId;
                   final contactName = isIncoming
-                      ? (message.from_name ?? 'Contact')
-                      : (message.to_name ?? 'Contact');
-                  final preview = (message.last_msg ?? '').trim().isEmpty
+                      ? (message.fromName ?? 'Contact')
+                      : (message.toName ?? 'Contact');
+                  final preview = (message.lastMsg ?? '').trim().isEmpty
                       ? 'Nouvelle discussion'
-                      : message.last_msg!.trim();
-                  final time = message.last_time != null
+                      : message.lastMsg!.trim();
+                  final time = message.lastTime != null
                       ? DateFormat('HH:mm', 'fr_FR')
-                          .format(message.last_time!.toDate())
+                          .format(message.lastTime!.toDate())
                       : '--:--';
 
                   return InkWell(
                     borderRadius: AppRadius.radiusLg,
                     onTap: () async {
                       final contactId = isIncoming
-                          ? message.from_id ?? ''
-                          : message.to_id ?? '';
+                          ? message.fromId ?? ''
+                          : message.toId ?? '';
                       if (contactId.isEmpty) return;
                       final toUser = await UserService().getUser(contactId);
                       await messageController.goChat(
                         toUser,
-                        modeleImg: message.modele_img ?? '',
+                        modeleImg: message.modeleImg ?? '',
                       );
                     },
                     child: Ink(
@@ -188,7 +188,7 @@ class MessageView extends GetView<MessageController> {
                                 height: 54,
                                 child: imageCacheNetwork(
                                   context,
-                                  message.modele_img ?? '',
+                                  message.modeleImg ?? '',
                                 ),
                               ),
                             ),

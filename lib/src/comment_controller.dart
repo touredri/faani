@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/modules/globale_widgets/message_field/message_field_controller.dart';
 import 'package:faani/app/modules/utils/utils.dart';
@@ -55,7 +56,7 @@ class CommentController extends MessageFieldController {
         clear();
       });
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       onSendLoading.value = false;
     }
     imageFile = null;
@@ -87,7 +88,7 @@ class CommentController extends MessageFieldController {
         clear();
       });
     } on Exception catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     onRecordStop();
     recordPath.value = '';

@@ -35,11 +35,13 @@ class GererCompte extends GetView<ProfileController> {
               invalidNumberMessage: 'Numéro invalide',
               decoration: InputDecoration(
                 errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+                  borderSide:
+                      BorderSide(color: Colors.red.withValues(alpha: 0.3)),
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                 ),
                 focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+                  borderSide:
+                      BorderSide(color: Colors.red.withValues(alpha: 0.3)),
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                 ),
                 labelText: 'Numéro de téléphone',
@@ -60,11 +62,13 @@ class GererCompte extends GetView<ProfileController> {
               invalidNumberMessage: 'Numéro invalide',
               decoration: InputDecoration(
                 errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+                  borderSide:
+                      BorderSide(color: Colors.red.withValues(alpha: 0.3)),
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                 ),
                 focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+                  borderSide:
+                      BorderSide(color: Colors.red.withValues(alpha: 0.3)),
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                 ),
                 labelText: 'Numéro de téléphone',

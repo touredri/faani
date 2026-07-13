@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/models/user_role.dart';
 import 'package:faani/app/data/services/access_control_service.dart';
+import 'package:faani/app/data/services/getx_session_coordinator.dart';
+import 'package:faani/app/data/services/session_coordinator.dart';
 import 'package:faani/app/data/services/user_identity_binding_service.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -19,11 +21,6 @@ import '../../../routes/app_pages.dart';
 import '../../../data/services/users_service.dart';
 import '../../../firebase/global_function.dart';
 import '../../home/controllers/user_controller.dart';
-import '../../home/controllers/home_controller.dart';
-import '../../accueil/controllers/accueil_controller.dart';
-import '../../commande/controllers/commande_controller.dart';
-import '../../favorie/controllers/favorie_controller.dart';
-import '../../profile/controllers/profile_controller.dart';
 import '../views/otp_view.dart';
 import '../views/sign_up_view.dart';
 
@@ -40,6 +37,7 @@ class AuthController extends GetxController {
   final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
   final UserIdentityBindingService _identityBindingService =
       UserIdentityBindingService();
+  late final SessionCoordinator _sessionCoordinator;
   RxString phoneNumber = ''.obs;
   RxString verificationId = ''.obs;
   RxBool isCodeSent = false.obs;
@@ -58,6 +56,11 @@ class AuthController extends GetxController {
   TextEditingController passwordController = TextEditingController();
   TextEditingController repeatPasswordController = TextEditingController();
   final String defaultProfileImage = getRandomProfileImageUrl();
+
+  AuthController({SessionCoordinator? sessionCoordinator}) {
+    _sessionCoordinator =
+        sessionCoordinator ?? GetxSessionCoordinator.standard();
+  }
 
   // open url
   void openUrl(String link) async {
@@ -283,7 +286,7 @@ class AuthController extends GetxController {
         message: "Welcome ${newUser.nomPrenom} !",
         backgroundColor: Colors.green,
       );
-      Get.offAllNamed(Routes.HOME, arguments: {'isNewUser': true});
+      Get.offAllNamed(Routes.home, arguments: {'isNewUser': true});
       loading.value = false;
     }).catchError((error) {
       showCustomSnackbar(
@@ -301,7 +304,7 @@ class AuthController extends GetxController {
 
   Future<void> signOut() async {
     try {
-      await _disposeHomeFlowControllers();
+      await _sessionCoordinator.closeFeatureScope();
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('isAdmin');
@@ -312,7 +315,7 @@ class AuthController extends GetxController {
       }
       await AccessControlService().clearCachedRoleForCurrentUser();
 
-      Get.offAllNamed(Routes.AUTH);
+      Get.offAllNamed(Routes.auth);
       await Future.delayed(const Duration(milliseconds: 120));
 
       await GoogleSignIn().signOut();
@@ -320,27 +323,6 @@ class AuthController extends GetxController {
       showCustomSnackbar(message: "Déconnecté avec succès");
     } catch (e) {
       showCustomSnackbar(message: e.toString());
-    }
-  }
-
-  Future<void> _disposeHomeFlowControllers() async {
-    if (Get.isRegistered<ProfileController>()) {
-      Get.delete<ProfileController>(force: true);
-    }
-    if (Get.isRegistered<CommandeController>()) {
-      Get.delete<CommandeController>(force: true);
-    }
-    if (Get.isRegistered<FavorieController>()) {
-      Get.delete<FavorieController>(force: true);
-    }
-    if (Get.isRegistered<AccueilController>()) {
-      Get.delete<AccueilController>(force: true);
-    }
-    if (Get.isRegistered<HomeController>()) {
-      Get.delete<HomeController>(force: true);
-    }
-    if (Get.isRegistered<UserController>()) {
-      Get.delete<UserController>(force: true);
     }
   }
 
@@ -378,7 +360,7 @@ class AuthController extends GetxController {
       backgroundColor: Colors.green,
     );
     setUser();
-    Get.offAllNamed(Routes.HOME);
+    Get.offAllNamed(Routes.home);
   }
 
 // Connexion avec Google
@@ -615,7 +597,7 @@ class AuthController extends GetxController {
 
     debugPrint('[Auth] Opening home');
     setUser();
-    Get.offAllNamed(Routes.HOME);
+    Get.offAllNamed(Routes.home);
   }
 
   bool _isTestPhoneNumber(String value) {

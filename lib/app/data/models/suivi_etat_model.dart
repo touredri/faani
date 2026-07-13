@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class SuiviEtat {
   String id;
@@ -39,7 +40,7 @@ class SuiviEtat {
 
   // update
   Future<void> update() async {
-    print('update suivi etat');
+    debugPrint('update suivi etat');
     await collection.doc(id).update(toMap());
   }
 }

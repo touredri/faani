@@ -13,7 +13,7 @@ class AudioPlayer extends StatefulWidget {
   final String source;
 
   @override
-  _AudioPlayer createState() => _AudioPlayer();
+  State<AudioPlayer> createState() => _AudioPlayer();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -50,7 +50,7 @@ class _AudioPlayer extends State<AudioPlayer> {
   }
 
   ap.AudioSource _getAudioSource() {
-    return ap.LockCachingAudioSource(Uri.parse(widget.source));
+    return ap.AudioSource.uri(Uri.parse(widget.source));
   }
 
   Future<void> _init() async {
@@ -88,13 +88,13 @@ class _AudioPlayer extends State<AudioPlayer> {
 
     if (_audioPlayer.playerState.playing) {
       icon = const Icon(Icons.pause, color: Colors.red, size: 30);
-      color = Colors.red.withOpacity(0.1);
+      color = Colors.red.withValues(alpha: 0.1);
     } else {
       final ThemeData theme = Theme.of(context);
       icon = Icon(Icons.play_arrow,
           color: (_fromCache ? Colors.green : theme.primaryColor), size: 30);
       color = (_fromCache ? Colors.green : Theme.of(context).primaryColor)
-          .withOpacity(0.1);
+          .withValues(alpha: 0.1);
     }
 
     return ClipOval(

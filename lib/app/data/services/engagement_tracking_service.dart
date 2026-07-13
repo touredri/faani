@@ -391,8 +391,8 @@ class EngagementTrackingService {
           weights[categoryId] = score / maxWeightedScore;
         });
       } else {
-        rawCounts.forEach((categoryId, count) {
-          weights[categoryId] = count / maxCount;
+        rawCounts.forEach((categoryId, clickCount) {
+          weights[categoryId] = clickCount / maxCount;
         });
       }
 

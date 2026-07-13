@@ -3,16 +3,16 @@ import 'package:faani/app/modules/ajout_modele/widgets/modele_form.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/globale_widgets/list_categorie.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
-import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
+import 'package:faani/app/modules/profile/controllers/tailor_portfolio_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../style/app_colors.dart';
 
-class MesModelesView extends GetView {
+class MesModelesView extends GetView<TailorPortfolioController> {
   const MesModelesView({super.key});
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ProfileController());
+    final controller = Get.find<TailorPortfolioController>();
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -39,7 +39,7 @@ class MesModelesView extends GetView {
                   color: AppColors.primary,
                   width: MediaQuery.of(context).size.width,
                   height: 35,
-                  child: CategorieFiltre<ProfileController>(
+                  child: CategorieFiltre<TailorPortfolioController>(
                     controller: controller,
                   ),
                 )),
@@ -55,8 +55,10 @@ class MesModelesView extends GetView {
                           Icons.accessibility_rounded,
                           color: Colors.white,
                         ),
-                        Text(controller.myTotalModeleNumber.toString(),
-                            style: const TextStyle(color: Colors.white))
+                        Obx(() => Text(
+                              controller.total.value.toString(),
+                              style: const TextStyle(color: Colors.white),
+                            )),
                       ],
                     ),
                     const Column(
@@ -83,9 +85,7 @@ class MesModelesView extends GetView {
             ),
           ),
           SliverFillRemaining(
-            child: GetBuilder<ProfileController>(
-              init: ProfileController(),
-              initState: (_) {},
+            child: GetBuilder<TailorPortfolioController>(
               id: 'mesModeles',
               builder: (_) {
                 return customMansoryGridView(

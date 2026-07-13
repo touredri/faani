@@ -50,7 +50,7 @@ abstract class MessageFieldController extends GetxController {
       await _recorder!.openRecorder();
       _isRecorderInitialized = true;
     } else {
-      print("Microphone permission not granted");
+      debugPrint("Microphone permission not granted");
     }
   }
 
@@ -58,7 +58,7 @@ abstract class MessageFieldController extends GetxController {
     await _player!.openPlayer().then((_) {
       _isPlayerInitialized = true; // Player is ready to use
     }).catchError((error) {
-      print("Error initializing player: $error");
+      debugPrint("Error initializing player: $error");
     });
   }
 
@@ -97,7 +97,7 @@ abstract class MessageFieldController extends GetxController {
 
   Future<void> onRecordStart() async {
     if (!_isRecorderInitialized) return;
-    print("Start recording");
+    debugPrint("Start recording");
     Directory tempDir = await getTemporaryDirectory();
     String path = '${tempDir.path}/temp.aac';
     await _recorder!.startRecorder(toFile: path);
@@ -158,7 +158,7 @@ abstract class MessageFieldController extends GetxController {
 
   Future<void> onRecordPause() async {
     if (!_isRecorderInitialized || !isRecordStart.value) {
-      print("Recorder is not initialized or not recording");
+      debugPrint("Recorder is not initialized or not recording");
       return;
     }
     try {
@@ -166,7 +166,7 @@ abstract class MessageFieldController extends GetxController {
       isRecordPause.value = true;
       _stopTimer();
     } catch (e) {
-      print("Failed to pause recorder: $e");
+      debugPrint("Failed to pause recorder: $e");
     }
   }
 
@@ -202,7 +202,7 @@ abstract class MessageFieldController extends GetxController {
     audioFile = File(recordPath.value);
     onRecordPause();
     if (audioFile == null) {
-      print("No audio file to upload");
+      debugPrint("No audio file to upload");
       return;
     }
   }

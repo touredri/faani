@@ -1,4 +1,3 @@
-
 import 'package:timeago/timeago.dart';
 
 class ShortFrMessages implements LookupMessages {

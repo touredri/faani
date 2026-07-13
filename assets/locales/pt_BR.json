@@ -6,5 +6,54 @@
     "sign_in_fb": "Entrar com o Facebook",
     "sign_in_google": "Entrar com o Google",
     "sign_in_apple": "Entrar com a  Apple"
+  },
+  "mesures": {
+    "camera": {
+      "title": "Mesure par caméra",
+      "intro_title": "Mesure par caméra",
+      "intro_body": "Nous estimons localement les mesures à partir des silhouettes de face et de profil. Vérifiez chaque résultat avant de sauvegarder.",
+      "height_label": "Votre taille (cm)",
+      "start": "Commencer",
+      "switch": "Changer de caméra",
+      "countdown": "Restez immobile… {seconds}",
+      "capturing": "Capture en cours…",
+      "estimating": "Calcul des mesures…",
+      "front_view": "Vue de face : gardez les bras légèrement écartés",
+      "profile_view": "Vue de profil : tournez-vous à droite",
+      "permission_denied": "Autorisez la caméra pour estimer vos mesures.",
+      "open_settings": "Ouvrir les réglages",
+      "retry_permission": "Réessayer",
+      "invalid_height_title": "Taille invalide",
+      "invalid_height_body": "Entrez une taille entre 120 et 230 cm.",
+      "tip_distance": "Placez-vous à environ 2 m du téléphone.",
+      "tip_clothes": "Portez des vêtements ajustés et un fond dégagé.",
+      "tip_light": "Privilégiez une pièce bien éclairée.",
+      "guidance_move_closer": "Avancez légèrement",
+      "guidance_move_back": "Reculez légèrement",
+      "guidance_raise_phone": "Relevez le téléphone",
+      "guidance_lower_phone": "Abaissez le téléphone",
+      "guidance_center_body": "Centrez-vous dans le cadre",
+      "guidance_body_incomplete": "Corps incomplet : incluez tête et pieds",
+      "guidance_pose_not_detected": "Aucune silhouette détectée",
+      "guidance_stay_still": "Restez immobile…",
+      "guidance_ready": "Parfait, restez dans le cadre"
+    },
+    "manual": {
+      "title": "Compléter les mesures",
+      "continue": "Continuer",
+      "review": "Revoir"
+    },
+    "review": {
+      "title": "Vérifier les mesures",
+      "name_label": "Nom de la fiche",
+      "camera_estimate": "Estimé par caméra",
+      "save": "Enregistrer",
+      "name_required_title": "Nom requis",
+      "name_required_body": "Donnez un nom à cette fiche de mesures.",
+      "incomplete_title": "Mesures incomplètes",
+      "incomplete_body": "Renseignez toutes les valeurs avant d'enregistrer.",
+      "save_error_title": "Erreur",
+      "save_error_body": "Impossible d'enregistrer la mesure."
+    }
   }
 }

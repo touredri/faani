@@ -1,27 +1,42 @@
+import 'package:faani/app/data/repositories/firestore_mesure_repository.dart';
+import 'package:faani/app/domain/mesures/mesure_repository.dart';
 import 'package:faani/app/modules/mesures/controllers/mesures_controller.dart';
+import 'package:faani/app/modules/mesures/views/mesures_view.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 import '../../../../data/models/mesure_model.dart';
 import '../../../../firebase/global_function.dart';
 
-void dialogBox(BuildContext context, TextEditingController nameController,
-    MesuresController mesureController) {
+Future<void> saveMesureDialog({
+  required BuildContext context,
+  required TextEditingController nameController,
+  required MesuresController mesureController,
+  MesureRepository? repository,
+}) async {
   final navigatorContext = Navigator.of(context, rootNavigator: true).context;
-  showDialog(
+  final mesureRepository = repository ?? FirestoreMesureRepository();
+
+  await showDialog<void>(
     context: navigatorContext,
     useRootNavigator: true,
-    builder: (context) {
+    builder: (dialogContext) {
       return AlertDialog(
         title: const Text('Entrer un nom pour la mesure'),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(hintText: "Nom"),
+          decoration: const InputDecoration(hintText: 'Nom'),
         ),
-        actions: <Widget>[
+        actions: [
           TextButton(
             child: const Text('Enregistrer'),
-            onPressed: () {
-              String name = nameController.text;
-              Mesure newMesure = Mesure(
+            onPressed: () async {
+              final name = nameController.text.trim();
+              if (name.isEmpty) {
+                return;
+              }
+
+              final mesure = Mesure(
                 bras: int.tryParse(mesureController.brasController.text) ?? 0,
                 epaule:
                     int.tryParse(mesureController.epauleController.text) ?? 0,
@@ -42,16 +57,34 @@ void dialogBox(BuildContext context, TextEditingController nameController,
                 id: '',
                 date: DateTime.now(),
               );
-              newMesure.create();
-              MesuresController().isLastPage.value = false;
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
+
+              await mesureRepository.create(mesure);
               mesureController.resetController();
+              if (dialogContext.mounted) {
+                Navigator.of(dialogContext).pop();
+              }
+              Get.until((route) =>
+                  route.settings.name == '/mesures' || route.isFirst);
+              if (Get.currentRoute != '/mesures') {
+                Get.off(() => const MesuresView());
+              }
             },
           ),
         ],
       );
     },
+  );
+}
+
+// Backward-compatible alias for existing imports.
+void dialogBox(
+  BuildContext context,
+  TextEditingController nameController,
+  MesuresController mesureController,
+) {
+  saveMesureDialog(
+    context: context,
+    nameController: nameController,
+    mesureController: mesureController,
   );
 }

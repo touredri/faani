@@ -163,7 +163,7 @@ class ReceivedRequest extends StatefulWidget {
   const ReceivedRequest({super.key});
 
   @override
-  _ReceivedRequestState createState() => _ReceivedRequestState();
+  State<ReceivedRequest> createState() => _ReceivedRequestState();
 }
 
 class _ReceivedRequestState extends State<ReceivedRequest>
@@ -1723,7 +1723,7 @@ class _ReceivedRequestState extends State<ReceivedRequest>
         .map((point) => point['count'] as int)
         .fold<int>(1, (current, next) => next > current ? next : current);
     final total =
-        points.fold<int>(0, (sum, point) => sum + (point['count'] as int));
+        points.fold<int>(0, (total, point) => total + (point['count'] as int));
     final isUp = (evolutionPercent ?? 0) >= 0;
     final trendColor = isUp ? Colors.green : theme.colorScheme.error;
     final trendAlert = _buildAuditTrendAlert(

@@ -60,7 +60,7 @@ class IconDownloadState extends State<IconDownload> {
         return true; // Succès
       }
     } catch (e) {
-      print("Erreur lors de la sauvegarde : $e");
+      debugPrint("Erreur lors de la sauvegarde : $e");
     }
     return false; // Échec
   }

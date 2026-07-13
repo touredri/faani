@@ -6,5 +6,54 @@
     "sign_in_fb": "Sign-in with Facebook",
     "sign_in_google": "Sign-in with Google",
     "sign_in_apple": "Sign-in with Apple"
+  },
+  "mesures": {
+    "camera": {
+      "title": "Camera measurement",
+      "intro_title": "Camera measurement",
+      "intro_body": "We estimate measurements locally from front and side silhouettes. Confirm every result before saving.",
+      "height_label": "Your height (cm)",
+      "start": "Start",
+      "switch": "Switch camera",
+      "countdown": "Hold still… {seconds}",
+      "capturing": "Capturing…",
+      "estimating": "Calculating measurements…",
+      "front_view": "Front view: keep your arms slightly apart",
+      "profile_view": "Side view: turn to your right",
+      "permission_denied": "Allow camera access to estimate your measurements.",
+      "open_settings": "Open settings",
+      "retry_permission": "Try again",
+      "invalid_height_title": "Invalid height",
+      "invalid_height_body": "Enter a height between 120 and 230 cm.",
+      "tip_distance": "Stand about 2 m from the phone.",
+      "tip_clothes": "Wear fitted clothes against a clear background.",
+      "tip_light": "Use a well-lit room.",
+      "guidance_move_closer": "Move a little closer",
+      "guidance_move_back": "Move a little back",
+      "guidance_raise_phone": "Raise the phone",
+      "guidance_lower_phone": "Lower the phone",
+      "guidance_center_body": "Center yourself in the frame",
+      "guidance_body_incomplete": "Full body not visible",
+      "guidance_pose_not_detected": "No silhouette detected",
+      "guidance_stay_still": "Hold still…",
+      "guidance_ready": "Perfect, stay in the frame"
+    },
+    "manual": {
+      "title": "Complete measurements",
+      "continue": "Continue",
+      "review": "Review"
+    },
+    "review": {
+      "title": "Review measurements",
+      "name_label": "Profile name",
+      "camera_estimate": "Estimated by camera",
+      "save": "Save",
+      "name_required_title": "Name required",
+      "name_required_body": "Give this measurement profile a name.",
+      "incomplete_title": "Incomplete measurements",
+      "incomplete_body": "Fill in every value before saving.",
+      "save_error_title": "Error",
+      "save_error_body": "Unable to save the measurement."
+    }
   }
 }

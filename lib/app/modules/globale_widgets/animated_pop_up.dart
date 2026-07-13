@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-Future<void> animatedPopUp(BuildContext context, double height, double width, Widget child) {
+Future<void> animatedPopUp(
+    BuildContext context, double height, double width, Widget child) {
   return showGeneralDialog(
     context: context,
     barrierDismissible: true,

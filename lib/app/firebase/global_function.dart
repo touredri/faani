@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 
 final auth = FirebaseAuth.instance;
 User? get user => auth.currentUser;
@@ -36,16 +37,17 @@ Future<void> sendNotification(String token, String title, String body) async {
     );
 
     if (response.statusCode == 200) {
-      print('Notification sent successfully');
+      debugPrint('Notification sent successfully');
     } else {
-      print('Failed to send notification: ${response.statusCode}');
+      debugPrint('Failed to send notification: ${response.statusCode}');
     }
   } catch (error) {
-    print('Error sending notification: $error');
+    debugPrint('Error sending notification: $error');
   }
 }
 
-Future<void> sendProgrammingNotification(String tToken, String cToken, String title, String body, DateTime date) async {
+Future<void> sendProgrammingNotification(String tToken, String cToken,
+    String title, String body, DateTime date) async {
   final url = Uri.parse('https://my-faani-admin.onrender.com/api/sendAfter');
 
   try {
@@ -64,11 +66,11 @@ Future<void> sendProgrammingNotification(String tToken, String cToken, String ti
     );
 
     if (response.statusCode == 200) {
-      print('Notification sent successfully');
+      debugPrint('Notification sent successfully');
     } else {
-      print('Failed to send notification: ${response.statusCode}');
+      debugPrint('Failed to send notification: ${response.statusCode}');
     }
   } catch (error) {
-    print('Error sending notification: $error');
+    debugPrint('Error sending notification: $error');
   }
 }

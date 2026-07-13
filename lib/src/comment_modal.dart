@@ -21,7 +21,7 @@ class CommentModal extends StatefulWidget {
   const CommentModal({super.key, required this.idModele});
 
   @override
-  _CommentModalState createState() => _CommentModalState();
+  State<CommentModal> createState() => _CommentModalState();
 }
 
 class _CommentModalState extends State<CommentModal> {

@@ -207,22 +207,27 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 60),
                     ),
-                    onPressed: () async {
-                      await controller.createModel();
-                      Get.defaultDialog(
-                        title: 'Modèle ajouté',
-                        middleText: '👍 Votre modèle a été ajouté avec succès',
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Get.back();
-                              Get.back();
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : () async {
+                            final success = await controller.createModel();
+                            if (success) {
+                              Get.defaultDialog(
+                                title: 'Modèle ajouté',
+                                middleText:
+                                    '👍 Votre modèle a été ajouté avec succès',
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Get.back();
+                                      Get.back();
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            }
+                          },
                     child: controller.isLoading.value
                         ? circularProgress()
                         : Text(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:faani/app/data/models/categorie_model.dart';
@@ -8,11 +9,13 @@ import 'package:faani/app/modules/ajout_modele/widgets/modele_form.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_editor_plus/image_editor_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AjoutModeleController extends GetxController {
   final images = RxList<XFile>();
@@ -21,8 +24,9 @@ class AjoutModeleController extends GetxController {
   RxString selectedGender = 'Homme'.obs;
   RxBool isPublic = true.obs;
   RxBool isLoading = false.obs;
-  List<Categorie> categorieList = <Categorie>[];
+  RxList<Categorie> categorieList = <Categorie>[].obs;
   final TextEditingController detailTextController = TextEditingController();
+  StreamSubscription? _categorySubscription;
 
   void pickOrTakeImage(BuildContext context, bool isMultiSelection) async {
     final ImagePicker picker = ImagePicker();
@@ -35,20 +39,37 @@ class AjoutModeleController extends GetxController {
       pickedImages = image != null ? [image] : [];
     }
     if (pickedImages.isEmpty) return; // Handle no selection case
+    if (!context.mounted) return;
     final List<XFile> newImages = [];
     for (final XFile image in pickedImages) {
       final Uint8List bytes = await image.readAsBytes();
+      if (!context.mounted) return;
       final editedImage = await pushWithoutNavBar(
         context,
         MaterialPageRoute(builder: (context) => ImageEditor(image: bytes)),
       );
       if (editedImage != null) {
-        // Save the edited image to a temporary file
         final tempDir = await getTemporaryDirectory();
-        final tempFile = File(
-            '${tempDir.path}/modele${DateTime.now().millisecondsSinceEpoch}.jpg');
-        await tempFile.writeAsBytes(editedImage);
-        newImages.add(XFile(tempFile.path));
+        final String tempPath =
+            '${tempDir.path}/modele_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+        // Compress image before saving
+        final XFile? compressedFile =
+            await FlutterImageCompress.compressAndGetFile(
+          image.path,
+          tempPath,
+          quality: 80,
+          minWidth: 1080,
+          minHeight: 1080,
+        );
+
+        if (compressedFile != null) {
+          newImages.add(compressedFile);
+        } else {
+          final tempFile = File(tempPath);
+          await tempFile.writeAsBytes(editedImage);
+          newImages.add(XFile(tempFile.path));
+        }
       }
     }
     images.addAll(newImages);
@@ -56,14 +77,19 @@ class AjoutModeleController extends GetxController {
     update();
   }
 
-  Future<List<Map<String, String>>> uploadImages(List<File> image) async {
+  Future<List<Map<String, String>>> uploadImages(List<File> imageFiles) async {
     List<Map<String, String>> imageInfo = [];
-    for (var image in image) {
+    final String uid = user?.uid ?? 'anonymous';
+    for (var image in imageFiles) {
+      final String fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}';
       final ref = FirebaseStorage.instance
           .ref()
           .child('images')
           .child('models')
-          .child(image.path.split('/').last);
+          .child(uid)
+          .child(fileName);
+
       await ref.putFile(image);
       final url = await ref.getDownloadURL();
       imageInfo.add({
@@ -74,39 +100,61 @@ class AjoutModeleController extends GetxController {
     return imageInfo;
   }
 
-  Future<void> createModel() async {
-    isLoading.value = true;
-    List<File> imageFiles = images.map((e) => File(e.path)).toList();
-    List<Map<String, String>> imageInfo = await uploadImages(imageFiles);
-    if (imageFiles.isEmpty ||
-        imageFiles.length > 2 ||
-        selectedGender.value.isEmpty ||
-        selectedCategoryId.value.isEmpty) {
-      showCustomSnackbar(message: "veuillez remplir tous les champs !!");
-      return;
+  Future<bool> createModel() async {
+    if (images.isEmpty) {
+      showCustomSnackbar(message: "Veuillez ajouter au moins une image !");
+      return false;
     }
-    final Modele modele = Modele(
-        id: '',
-        detail: detailTextController.text.isNotEmpty
-            ? detailTextController.text
-            : 'Description non disponible pour le moment ! Le tailleur n\'a pas ajouté de description',
-        fichier: imageInfo.map((info) => info['downloadUrl']).toList(),
-        imagePath: imageInfo.map((info) => info['path']).toList(),
-        genreHabit: selectedGender.value,
-        idTailleur: user!.uid,
-        idCategorie: selectedCategoryId.value,
-        isApproved: false,
-        isPublic: isPublic.value);
-    await modele.create();
-    images.clear();
-    isLoading.value = false;
+
+    if (user == null) {
+      showCustomSnackbar(
+          message: "Vous devez être connecté pour ajouter un modèle.");
+      return false;
+    }
+
+    if (selectedGender.value.isEmpty || selectedCategoryId.value.isEmpty) {
+      showCustomSnackbar(
+          message: "Veuillez remplir tous les champs obligatoires !");
+      return false;
+    }
+
+    isLoading.value = true;
+    try {
+      List<File> imageFiles = images.map((e) => File(e.path)).toList();
+      List<Map<String, String>> imageInfo = await uploadImages(imageFiles);
+
+      final Modele modele = Modele(
+          id: '',
+          detail: detailTextController.text.isNotEmpty
+              ? detailTextController.text
+              : 'Description non disponible pour le moment ! Le tailleur n\'a pas ajouté de description',
+          fichier: imageInfo.map((info) => info['downloadUrl']).toList(),
+          imagePath: imageInfo.map((info) => info['path']).toList(),
+          genreHabit: selectedGender.value,
+          idTailleur: user!.uid,
+          idCategorie: selectedCategoryId.value,
+          isApproved: false,
+          isPublic: isPublic.value,
+          createdAt: Timestamp.now());
+
+      await modele.create();
+      images.clear();
+      detailTextController.clear();
+      return true;
+    } catch (e) {
+      debugPrint('Error creating model: $e');
+      showCustomSnackbar(
+          message: "Une erreur est survenue lors de la création du modèle.");
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void fetchCategories() async {
-    CategorieService().getCategorie().listen((event) {
-      for (var element in event) {
-        categorieList.add(element);
-      }
+  void fetchCategories() {
+    _categorySubscription?.cancel();
+    _categorySubscription = CategorieService().getCategorie().listen((event) {
+      categorieList.assignAll(event);
       categorieList.removeWhere((cat) => cat.id == "1");
       categorieList.removeWhere((cat) => cat.id == "8");
     });
@@ -120,7 +168,8 @@ class AjoutModeleController extends GetxController {
 
   @override
   void onClose() {
-    super.onClose();
+    _categorySubscription?.cancel();
     categorieList.clear();
+    super.onClose();
   }
 }

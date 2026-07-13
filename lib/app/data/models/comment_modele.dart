@@ -20,7 +20,8 @@ class Comment {
     this.tailleur,
   });
 
-  factory Comment.fromMap(Map<String, dynamic> data, DocumentReference documentId) {
+  factory Comment.fromMap(
+      Map<String, dynamic> data, DocumentReference documentId) {
     return Comment(
       idUser: data['idUser'],
       idModele: data['idModele'],
@@ -43,7 +44,7 @@ class Comment {
 
   // create a new comment
   Future<void> createComment() async {
-    final docRef =  await collection.add(toMap());
+    final docRef = await collection.add(toMap());
     await docRef.update({'id': docRef.id});
   }
 

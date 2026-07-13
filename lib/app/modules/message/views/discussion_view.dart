@@ -35,10 +35,11 @@ class DiscussionView extends GetView<DiscussionController> {
                   leading: const Icon(Icons.copy_all_outlined),
                   title: const Text('Copier ID de la discussion'),
                   onTap: () async {
+                    final navigator = Navigator.of(sheetContext);
                     await Clipboard.setData(
-                      ClipboardData(text: controller.doc_id.value),
+                      ClipboardData(text: controller.docId.value),
                     );
-                    Navigator.of(sheetContext).pop();
+                    navigator.pop();
                     Get.snackbar(
                       'Copié',
                       'ID de discussion copié',
@@ -168,7 +169,7 @@ class DiscussionView extends GetView<DiscussionController> {
                   child: CachedNetworkImage(
                     width: 36,
                     height: 36,
-                    imageUrl: discussionController.to_avatar.value,
+                    imageUrl: discussionController.toAvatar.value,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => shimmer(),
                     errorWidget: (context, url, error) =>
@@ -184,7 +185,7 @@ class DiscussionView extends GetView<DiscussionController> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    discussionController.to_name.value,
+                    discussionController.toName.value,
                     style: AppTypography.titleSmall.copyWith(
                       color: theme.colorScheme.onSurface,
                     ),
@@ -244,7 +245,7 @@ class DiscussionView extends GetView<DiscussionController> {
               child: SizedBox(
                 height: 58,
                 child: MessageField<DiscussionController>(
-                  discussionController.doc_id.value,
+                  discussionController.docId.value,
                 ),
               ),
             ),

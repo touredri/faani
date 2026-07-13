@@ -8,7 +8,7 @@ class MesureDialog extends StatefulWidget {
   const MesureDialog({super.key, required this.mesures});
 
   @override
-  _MesureDialogState createState() => _MesureDialogState();
+  State<MesureDialog> createState() => _MesureDialogState();
 }
 
 class _MesureDialogState extends State<MesureDialog> {

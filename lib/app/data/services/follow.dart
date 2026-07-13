@@ -72,7 +72,10 @@ class FollowService {
 
   // check if user is following another user
   Future<bool> isFollowing(String currentUserId, String targetUserId) async {
-    final doc = await FirebaseFirestore.instance.collection('users').doc(currentUserId).get();
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserId)
+        .get();
     final data = doc.data();
     if (doc.exists && data != null) {
       final following = List<String>.from(data['following'] ?? []);

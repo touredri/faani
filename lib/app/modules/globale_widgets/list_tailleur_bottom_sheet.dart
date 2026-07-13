@@ -205,7 +205,11 @@ void showTailleurModalBottomSheet(BuildContext context, Modele modele) {
                                           'Vous devez vous connecter pour faire une commande',
                                     );
                                   } else {
-                                    Get.to(() => AjoutCommandePage(modele),
+                                    Get.to(
+                                        () => AjoutCommandePage(
+                                              modele,
+                                              tailleur: tailleur,
+                                            ),
                                         transition: Transition.rightToLeft);
                                   }
                                 },

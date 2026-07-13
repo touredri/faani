@@ -18,7 +18,9 @@ class MesureService {
 
   // get mesure count for a user
   Stream<int> getMesureCount(String idUser) {
-    return collection.where('idUser', isEqualTo: idUser).snapshots().map(
-        (querySnapshot) => querySnapshot.docs.length);
+    return collection
+        .where('idUser', isEqualTo: idUser)
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.length);
   }
 }

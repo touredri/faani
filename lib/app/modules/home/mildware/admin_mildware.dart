@@ -10,7 +10,7 @@ class AdminMiddleware extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
     if (!Get.isRegistered<HomeController>()) {
-      return const RouteSettings(name: Routes.PROFILE);
+      return const RouteSettings(name: Routes.profile);
     }
 
     final homeController = Get.find<HomeController>();
@@ -18,6 +18,6 @@ class AdminMiddleware extends GetMiddleware {
       return null;
     }
 
-    return const RouteSettings(name: Routes.PROFILE);
+    return const RouteSettings(name: Routes.profile);
   }
 }

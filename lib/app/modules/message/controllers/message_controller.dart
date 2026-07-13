@@ -76,8 +76,8 @@ class MessageController extends GetxController {
       (List<MessageModel> list1, List<MessageModel> list2) {
         final merged = <String, MessageModel>{};
         for (final message in [...list1, ...list2]) {
-          final fromId = message.from_id ?? '';
-          final toId = message.to_id ?? '';
+          final fromId = message.fromId ?? '';
+          final toId = message.toId ?? '';
           if (fromId.isEmpty || toId.isEmpty) {
             continue;
           }
@@ -88,8 +88,8 @@ class MessageController extends GetxController {
             merged[key] = message;
             continue;
           }
-          final previousTime = previous.last_time?.millisecondsSinceEpoch ?? 0;
-          final currentTime = message.last_time?.millisecondsSinceEpoch ?? 0;
+          final previousTime = previous.lastTime?.millisecondsSinceEpoch ?? 0;
+          final currentTime = message.lastTime?.millisecondsSinceEpoch ?? 0;
           if (currentTime > previousTime) {
             merged[key] = message;
           }
@@ -97,8 +97,8 @@ class MessageController extends GetxController {
 
         final result = merged.values.toList()
           ..sort(
-            (a, b) => (b.last_time?.millisecondsSinceEpoch ?? 0)
-                .compareTo(a.last_time?.millisecondsSinceEpoch ?? 0),
+            (a, b) => (b.lastTime?.millisecondsSinceEpoch ?? 0)
+                .compareTo(a.lastTime?.millisecondsSinceEpoch ?? 0),
           );
         return result;
       },
@@ -112,9 +112,9 @@ class MessageController extends GetxController {
     }
 
     return messages.where((message) {
-      final fromName = (message.from_name ?? '').toLowerCase();
-      final toName = (message.to_name ?? '').toLowerCase();
-      final lastMsg = (message.last_msg ?? '').toLowerCase();
+      final fromName = (message.fromName ?? '').toLowerCase();
+      final toName = (message.toName ?? '').toLowerCase();
+      final lastMsg = (message.lastMsg ?? '').toLowerCase();
       return fromName.contains(query) ||
           toName.contains(query) ||
           lastMsg.contains(query);
@@ -160,17 +160,17 @@ class MessageController extends GetxController {
     }
 
     final msgData = MessageModel(
-      from_avatar: currentUser.photoURL ?? '',
-      from_name: currentUser.displayName,
-      from_id: currentUser.uid,
-      to_avatar: toUser.profileImage,
-      to_name: toUser.nomPrenom,
-      to_id: toUser.id,
-      modele_img: modeleImg,
+      fromAvatar: currentUser.photoURL ?? '',
+      fromName: currentUser.displayName,
+      fromId: currentUser.uid,
+      toAvatar: toUser.profileImage,
+      toName: toUser.nomPrenom,
+      toId: toUser.id,
+      modeleImg: modeleImg,
       message: '',
-      last_msg: '',
-      last_time: Timestamp.now(),
-      msg_num: 0,
+      lastMsg: '',
+      lastTime: Timestamp.now(),
+      msgNum: 0,
     );
 
     final created = await collection.add(msgData);

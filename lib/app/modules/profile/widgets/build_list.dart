@@ -46,7 +46,7 @@ Widget listBuild(ProfileController controller, BuildContext context) {
               title: 'S\'inscrire',
               subTitle: 'Créer un compte pour plus de fonctionnalités',
               onTap: () => Get.toNamed(
-                Routes.AUTH,
+                Routes.auth,
                 preventDuplicates: false,
               ),
             ),
@@ -67,7 +67,7 @@ Widget listBuild(ProfileController controller, BuildContext context) {
               title: 'Gestion tailleurs',
               subTitle: 'Gérer les demandes et comptes tailleurs',
               onTap: () => Get.toNamed(
-                Routes.ADMIN_PANEL,
+                Routes.adminPanel,
                 preventDuplicates: false,
               ),
             ),

@@ -5,10 +5,9 @@ class CategorieService {
   final collection = FirebaseFirestore.instance.collection('categorie');
   // get all categorie
   Stream<List<Categorie>> getCategorie() {
-    return collection.snapshots().map(
-        (snapshot) => snapshot.docs
-            .map((doc) => Categorie.fromMap(doc.data(), doc.reference))
-            .toList());
+    return collection.snapshots().map((snapshot) => snapshot.docs
+        .map((doc) => Categorie.fromMap(doc.data(), doc.reference))
+        .toList());
   }
 
   // get a categorie by id

@@ -33,7 +33,4 @@ class DetailModeleController extends GetxController {
         .updateFollowStatus(auth.currentUser!.uid, id, !currentStatus);
     isFollowing.value = !currentStatus;
   }
-
-
-
 }

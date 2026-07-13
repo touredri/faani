@@ -161,7 +161,7 @@ class AuthView extends GetView<AuthController> {
                                 final anonyme =
                                     await controller.signInAnonymously();
                                 if (anonyme != null) {
-                                  Get.offAllNamed(Routes.HOME);
+                                  Get.offAllNamed(Routes.home);
                                 }
                               } finally {
                                 controller.isLoading.value = false;

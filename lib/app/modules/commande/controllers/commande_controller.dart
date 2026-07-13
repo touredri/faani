@@ -1,20 +1,17 @@
-import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
-import 'package:faani/app/data/models/suivi_etat_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
+import 'package:faani/app/data/services/firebase_order_services.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:faani/app/data/services/users_service.dart';
+import 'package:faani/app/domain/order/create_order_use_case.dart';
 import 'package:faani/app/firebase/global_function.dart';
-import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/globale_widgets/animated_pop_up.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -39,6 +36,22 @@ class CommandeController extends GetxController {
   final TextEditingController nomController = TextEditingController();
   final TextEditingController numeroController = TextEditingController();
   RxList<String> listSelectedCategorie = <String>[].obs;
+  late final CreateOrderUseCase _createOrder;
+  late final OrderRepository _orderRepository;
+
+  CommandeController({
+    CreateOrderUseCase? createOrder,
+    OrderRepository? orderRepository,
+  }) {
+    _orderRepository = orderRepository ?? FirestoreOrderRepository();
+    _createOrder = createOrder ??
+        CreateOrderUseCase(
+          orderRepository: _orderRepository,
+          mediaService: FirebaseOrderMediaService(),
+          trackingService: FirebaseOrderTrackingService(suiviEtatService),
+          notificationService: const FirebaseOrderNotificationService(),
+        );
+  }
 
   Future<List<dynamic>> fetchCommandeData(Commande commande) async {
     return Future.wait([
@@ -92,28 +105,8 @@ class CommandeController extends GetxController {
     prixController.clear();
   }
 
-  //upload photo habit to firebase storage
-  Future<List<Map<String, String>>> uploadPhoto(XFile image) async {
-    List<Map<String, String>> imageInfo = [];
-    if (image.path.isNotEmpty) {
-      final File file = File(image.path);
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('images')
-          .child('habits')
-          .child(file.path.split('/').last);
-      await ref.putFile(file);
-      final url = await ref.getDownloadURL();
-      imageInfo.add({
-        'downloadUrl': url,
-        'path': ref.fullPath,
-      });
-    }
-    return imageInfo;
-  }
-
   // create a new commande
-  Future<void> createCommande(Modele modele, BuildContext context) async {
+  Future<void> createCommande(Modele modele, {UserModel? tailleur}) async {
     if (image.value == null) {
       showCustomSnackbar(message: 'Veuillez ajouter une photo de l\'habit');
       return;
@@ -153,96 +146,73 @@ class CommandeController extends GetxController {
       }
     }
 
-    final selectedTailleur =
-        Get.find<AccueilController>().selectedTailleur.value;
-    if (!isTailleurFlow && selectedTailleur == null) {
+    if (!isTailleurFlow && tailleur == null) {
       showCustomSnackbar(message: 'Veuillez choisir un tailleur');
       return;
     }
 
     isSending.value = true;
-    List<Map<String, String>> imageInfo = await uploadPhoto(image.value!);
-    // give app logo as default photo if no photo is uploaded
-    if (imageInfo.isEmpty) {
-      imageInfo.add({
-        'downloadUrl':
-            'https://firebasestorage.googleapis.com/v0/b/faani-afrique.appspot.com/o/images%2Fhabits%2Ffaani.png?alt=media&token=313edafa-f89f-438a-be5e-468ece978058',
-        'path': 'images/habits/faani.png',
-      });
-    }
-    final Commande newCommande = Commande(
-      idMesure: mesure.value!.id!,
-      idModele: modele.id!,
-      isSelfAdded: isTailleurFlow ? true : false,
-      idTailleur: isTailleurFlow ? resolvedUserId : selectedTailleur!.id!,
-      numeroClient: isTailleurFlow
-          ? int.tryParse(numeroController.text) ?? 0
-          : int.parse(userController.currentUser.value.phoneNumber!),
-      nomClient: isTailleurFlow
-          ? nomController.text
-          : userController.currentUser.value.nomPrenom!,
-      photoHabit: imageInfo[0]['downloadUrl']!,
-      refPhotoHabit: imageInfo[0]['path']!,
-      prix: prixController.text.isNotEmpty ? int.parse(prixController.text) : 0,
-      idCategorie: modele.idCategorie!,
-      modeleImage: modele.fichier[0]!,
-      id: '',
-      idUser: !isTailleurFlow ? resolvedUserId : '',
-      datePrevue: DateTime.parse(selectedDate.value),
-      dateModifier: DateTime.parse(selectedDate.value),
-    );
-    final String newCommandeId = await newCommande.create();
-    animatedPopUp(
-        Get.context!,
-        0.2,
-        0.8,
-        Column(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 50),
-            const SizedBox(
-              height: 20,
-            ),
-            Text(
-              userController.isTailleur.value
-                  ? 'Enregistrer avec succès'
-                  : 'Envoyé au tailleur avec succès',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+    try {
+      final currentProfile = userController.currentUser.value;
+      await _createOrder.execute(
+        CreateOrderInput(
+          requestId:
+              '$resolvedUserId-${modele.id}-${DateTime.now().microsecondsSinceEpoch}',
+          modele: modele,
+          measureId: mesure.value!.id!,
+          expectedDate: DateTime.parse(selectedDate.value),
+          garmentFilePath: image.value!.path,
+          currentUserId: resolvedUserId,
+          currentUserName: currentProfile.nomPrenom ?? '',
+          currentUserPhone: currentProfile.phoneNumber ?? '',
+          currentUserToken: currentProfile.token ?? '',
+          isTailorFlow: isTailleurFlow,
+          selectedTailor: tailleur,
+          manualClientName: nomController.text,
+          manualClientPhone: numeroController.text,
+          price: int.tryParse(prixController.text) ?? 0,
+        ),
+      );
+      animatedPopUp(
+          Get.context!,
+          0.2,
+          0.8,
+          Column(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 50),
+              const SizedBox(
+                height: 20,
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            TextButton(
-                onPressed: () {
-                  Get.back();
-                  Get.back();
-                  Get.back();
-                },
-                child: const Text('Ok'))
-          ],
-        ));
-    clearForm();
-    isSending.value = false;
-    final SuiviEtat newSuiviEtat = SuiviEtat(
-      id: '',
-      idCommande: newCommandeId,
-      idEtat: '1',
-      date: Timestamp.fromDate(DateTime.now()),
-    );
-    await SuiviEtatService().createSuiviEtat(newSuiviEtat);
-    if (!isTailleurFlow) {
-      final UserModel tailleur =
-          await userService.getUser(newCommande.idTailleur);
-      await sendNotification(tailleur.token!, 'Nouvelle commande',
-          'Vous avez une nouvelle commande de ${userController.currentUser.value.nomPrenom}');
-      sendProgrammingNotification(
-          tailleur.token!,
-          userController.currentUser.value.token!,
-          'Alert date Prevue',
-          'La date prevue pour l\'habit de ${userController.currentUser.value.nomPrenom} est arrivé',
-          newCommande.datePrevue);
+              Text(
+                userController.isTailleur.value
+                    ? 'Enregistrer avec succès'
+                    : 'Envoyé au tailleur avec succès',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              TextButton(
+                  onPressed: () {
+                    Get.back();
+                    Get.back();
+                    Get.back();
+                  },
+                  child: const Text('Ok'))
+            ],
+          ));
+      clearForm();
+    } on CreateOrderException catch (error) {
+      showCustomSnackbar(message: error.message);
+    } catch (_) {
+      showCustomSnackbar(
+        message: 'La commande n\'a pas pu être créée. Veuillez réessayer.',
+      );
+    } finally {
+      isSending.value = false;
     }
   }
 
@@ -324,10 +294,7 @@ class CommandeController extends GetxController {
 
   void acceptCommande(Commande commande) async {
     if (userController.isTailleur.value && user!.uid == commande.idTailleur) {
-      await FirebaseFirestore.instance
-          .collection('commandes')
-          .doc(commande.id)
-          .update({'isAccepted': true});
+      await _orderRepository.accept(commande.id!);
       update(['commande']);
     }
   }

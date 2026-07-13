@@ -18,7 +18,7 @@ class DiscussionController extends MessageFieldController {
   CollectionReference<Map<String, dynamic>> get collection => _rawCollection;
 
   CollectionReference<MsgContent> get messageCollection => _rawCollection
-      .doc(doc_id.value)
+      .doc(docId.value)
       .collection('msglist')
       .withConverter<MsgContent>(
         fromFirestore: (snapshot, options) =>
@@ -28,10 +28,10 @@ class DiscussionController extends MessageFieldController {
 
   final UserController userController = Get.find();
   final RxList<MsgContent> msgcontentlist = <MsgContent>[].obs;
-  final RxString doc_id = ''.obs;
-  final RxString to_id = ''.obs;
-  final RxString to_name = ''.obs;
-  final RxString to_avatar = ''.obs;
+  final RxString docId = ''.obs;
+  final RxString toId = ''.obs;
+  final RxString toName = ''.obs;
+  final RxString toAvatar = ''.obs;
   final RxString modeleImage = ''.obs;
   final RxString token = ''.obs;
   StreamSubscription<QuerySnapshot<MsgContent>>? listener;
@@ -42,10 +42,10 @@ class DiscussionController extends MessageFieldController {
     super.onInit();
     final args = Get.arguments;
     if (args != null) {
-      doc_id.value = args['doc_id'];
-      to_id.value = args['to_id'];
-      to_name.value = args['to_name'];
-      to_avatar.value = args['to_avatar'];
+      docId.value = args['doc_id'];
+      toId.value = args['to_id'];
+      toName.value = args['to_name'];
+      toAvatar.value = args['to_avatar'];
       modeleImage.value = args['modele_img'];
       token.value = args['token'];
     }
@@ -64,7 +64,7 @@ class DiscussionController extends MessageFieldController {
       msgcontentlist.assignAll(items);
       _scrollToBottom();
     }, onError: (e) {
-      print("Listing Error: $e");
+      debugPrint("Listing Error: $e");
     });
   }
 
@@ -87,7 +87,7 @@ class DiscussionController extends MessageFieldController {
   }
 
   Future<void> _updateThreadMeta(String lastMessage) async {
-    await collection.doc(doc_id.value).update({
+    await collection.doc(docId.value).update({
       'last_msg': lastMessage,
       'last_time': Timestamp.now(),
     });
@@ -111,7 +111,7 @@ class DiscussionController extends MessageFieldController {
 
   Future<void> deleteConversation() async {
     await clearConversationMessages();
-    await collection.doc(doc_id.value).delete();
+    await collection.doc(docId.value).delete();
   }
 
   Future<void> uploadImage() async {
@@ -134,7 +134,7 @@ class DiscussionController extends MessageFieldController {
       await _updateThreadMeta('New Image');
       _scrollToBottom();
     } on Exception catch (e) {
-      print(e);
+      debugPrint(e.toString());
     } finally {
       imageFile = null;
     }
@@ -183,7 +183,7 @@ class DiscussionController extends MessageFieldController {
       onRecordStop();
       _scrollToBottom();
     } catch (e) {
-      print("Failed to upload audio file: $e");
+      debugPrint("Failed to upload audio file: $e");
     } finally {
       onSendLoading.value = false;
     }

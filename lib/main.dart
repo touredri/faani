@@ -1,3 +1,4 @@
+import 'package:faani/app/data/services/connectivity/connectivity_service.dart';
 import 'package:faani/app/routes/app_pages.dart';
 import 'package:faani/app/style/app_theme.dart';
 import 'package:faani/generated/locales.g.dart';
@@ -19,6 +20,7 @@ const bool _enableDebugAppCheck =
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  Get.put(ConnectivityService());
   await _initIntl();
   await _initFirebase();
   _configureFirebaseAuthForDev();
@@ -75,6 +77,14 @@ Future<void> _initFirebase() async {
             ? AndroidProvider.playIntegrity
             : AndroidProvider.debug,
       );
+      if (!kReleaseMode) {
+        try {
+          final token = await FirebaseAppCheck.instance.getToken();
+          debugPrint('Firebase App Check Debug Token: $token');
+        } catch (e) {
+          debugPrint('Failed to get App Check token: $e');
+        }
+      }
     } else {
       debugPrint('Firebase App Check skipped for local debug build.');
     }
@@ -99,7 +109,7 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: ThemeMode.system,
-          initialRoute: AppPages.INITIAL,
+          initialRoute: AppPages.initial,
           getPages: AppPages.routes,
           translationsKeys: AppTranslation.translations,
           fallbackLocale: const Locale('en', 'US'),

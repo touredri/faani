@@ -7,6 +7,7 @@ import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/services/access_control_service.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/data/services/notifications_service.dart';
+import 'package:faani/app/data/services/session_coordinator.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/views/accueil_view.dart';
 import 'package:faani/app/modules/commande/views/commande_view.dart';
@@ -73,7 +74,7 @@ class HomeController extends GetxController {
           messenger?.showSnackBar(
             SnackBar(
               content: Text('Appuyez de nouveau pour quitter'),
-              backgroundColor: Colors.black.withOpacity(0.8),
+              backgroundColor: Colors.black.withValues(alpha: 0.8),
             ),
           );
         });
@@ -160,9 +161,6 @@ class HomeController extends GetxController {
 
   @override
   void onInit() {
-    if (!Get.isRegistered<ModeleService>()) {
-      Get.put(ModeleService());
-    }
     modeleService = Get.find<ModeleService>();
     _checkNetworkStatus();
     _monitorNetworkChanges();
@@ -280,18 +278,15 @@ class HomeController extends GetxController {
     }
 
     _deviceSessionSubscription?.cancel();
+    await Get.find<SessionCoordinator>().closeFeatureScope();
     await GoogleSignIn().signOut();
     await FirebaseAuth.instance.signOut();
-    Get.offAllNamed(Routes.AUTH);
+    Get.offAllNamed(Routes.auth);
 
-    final context = Get.overlayContext ?? Get.context;
-    final messenger =
-        context == null ? null : ScaffoldMessenger.maybeOf(context);
-    messenger?.showSnackBar(
-      const SnackBar(
-        content: Text(
-            'Session déplacée vers un autre téléphone. Veuillez vous reconnecter.'),
-      ),
+    Get.snackbar(
+      'Session expirée',
+      'Session déplacée vers un autre téléphone. Veuillez vous reconnecter.',
+      snackPosition: SnackPosition.TOP,
     );
   }
 

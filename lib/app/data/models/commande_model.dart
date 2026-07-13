@@ -13,7 +13,7 @@ class Commande {
       idCategorie,
       etatLibelle,
       modeleImage;
-      final DateTime dateAjout;
+  final DateTime dateAjout;
   DateTime datePrevue, dateModifier;
   int? numeroClient;
   int prix;
@@ -86,7 +86,8 @@ class Commande {
     };
   }
 
-  final collection = FirebaseFirestore.instance.collection('commandes');
+  CollectionReference<Map<String, dynamic>> get collection =>
+      FirebaseFirestore.instance.collection('commandes');
 
   // create
   Future<String> create() async {

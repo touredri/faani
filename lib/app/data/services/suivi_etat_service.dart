@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/suivi_etat_model.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 class SuiviEtatService {
   final collection = FirebaseFirestore.instance.collection('suiviEtat');
@@ -63,7 +64,7 @@ class NotificationSettings {
     try {
       await _channel.invokeMethod('openNotificationSettings');
     } on PlatformException catch (e) {
-      print("Failed to open notification settings: '${e.message}'.");
+      debugPrint("Failed to open notification settings: '${e.message}'.");
     }
   }
 }

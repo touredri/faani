@@ -98,7 +98,7 @@ class SignUpView extends GetView<AuthController> {
                             snackPosition: SnackPosition.BOTTOM,
                           );
                           authController.setUser();
-                          Get.offAllNamed(Routes.HOME);
+                          Get.offAllNamed(Routes.home);
                         } else {
                           authController.saveUserInFirestore(
                               authController.phoneNumber.value);
@@ -172,11 +172,11 @@ class SignUpView extends GetView<AuthController> {
           invalidNumberMessage: 'Numéro invalide',
           decoration: InputDecoration(
             errorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+              borderSide: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
               borderRadius: const BorderRadius.all(Radius.circular(10)),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red.withOpacity(0.3)),
+              borderSide: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
               borderRadius: const BorderRadius.all(Radius.circular(10)),
             ),
             labelText: 'Numéro de téléphone',

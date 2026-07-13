@@ -45,8 +45,7 @@ abstract final class AppSpacing {
   // ── Page padding (standard content inset) ──────────────────────────
   static const EdgeInsets pagePadding =
       EdgeInsets.symmetric(horizontal: lg, vertical: lg);
-  static const EdgeInsets pageHorizontal =
-      EdgeInsets.symmetric(horizontal: lg);
+  static const EdgeInsets pageHorizontal = EdgeInsets.symmetric(horizontal: lg);
 
   // ── Gap helpers (for use in Column / Row) ──────────────────────────
   static const SizedBox gapH4 = SizedBox(width: xs);

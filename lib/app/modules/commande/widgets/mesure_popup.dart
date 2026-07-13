@@ -79,7 +79,8 @@ Future<void> mesuresPopUp(
                   subtitle: Text(
                     mesures[index].updateDate!.toString().split(' ')[0],
                     style: TextStyle(
-                        color: Colors.black.withOpacity(0.5), fontSize: 14),
+                        color: Colors.black.withValues(alpha: 0.5),
+                        fontSize: 14),
                   ),
                   onTap: () {
                     onMesureSelected(mesures[index]);

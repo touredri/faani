@@ -443,7 +443,7 @@ class _TailorClientsViewState extends State<TailorClientsView> {
                                   );
                                 }
 
-                                if (mounted) {
+                                if (context.mounted) {
                                   Navigator.of(context).pop();
                                 }
                                 _showSnack(
@@ -454,7 +454,7 @@ class _TailorClientsViewState extends State<TailorClientsView> {
                                 _showSnack(
                                     'Erreur lors de la création du client');
                               } finally {
-                                if (mounted) {
+                                if (context.mounted) {
                                   setSheetState(() {
                                     isSaving = false;
                                   });
@@ -600,7 +600,7 @@ class _TailorClientsViewState extends State<TailorClientsView> {
 
                                 await _clientService
                                     .updateClient(updatedClient);
-                                if (mounted) {
+                                if (context.mounted) {
                                   Navigator.of(context).pop();
                                 }
                                 _showSnack(

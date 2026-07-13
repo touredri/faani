@@ -48,10 +48,11 @@ Future editModal(BuildContext context, Modele modele) {
                     TextButton(
                       onPressed: () async {
                         // delete logic here
+                        final navigator = Navigator.of(context);
                         await ModeleService().delete(modele.id!);
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
+                        navigator.pop();
+                        navigator.pop();
+                        navigator.pop();
                       },
                       child: const Text('Oui'),
                     ),

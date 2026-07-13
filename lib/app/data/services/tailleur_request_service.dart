@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/tailleur_request.dart';
 
 class TailleurRequestService {
@@ -17,7 +18,7 @@ class TailleurRequestService {
         return TailleurRequest.fromMap(doc.data() as Map<String, dynamic>);
       }
     } on Exception catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null;
     }
     return null;
@@ -25,13 +26,15 @@ class TailleurRequestService {
 
   // get request by tailleur id
   Future<TailleurRequest?> getRequestByUserId(String userId) async {
-    final querySnapshot = await _tailleurRef.where('userId', isEqualTo: userId).get();
+    final querySnapshot =
+        await _tailleurRef.where('userId', isEqualTo: userId).get();
     if (querySnapshot.docs.isNotEmpty) {
       final doc = querySnapshot.docs.first;
       return TailleurRequest.fromMap(doc.data() as Map<String, dynamic>);
     }
     return null;
   }
+
   // get all requests by isApproved status
   Stream<List<TailleurRequest>> getRequestsByApprovalStatus(bool isApproved) {
     return _tailleurRef
@@ -64,10 +67,8 @@ class TailleurRequestService {
 
   // is request already exist by userId
   Future<bool> isRequestExist(String userId) async {
-    final QuerySnapshot query = await _tailleurRef
-        .where('userId', isEqualTo: userId)
-        .limit(1)
-        .get();
+    final QuerySnapshot query =
+        await _tailleurRef.where('userId', isEqualTo: userId).limit(1).get();
     return query.docs.isNotEmpty;
   }
 }

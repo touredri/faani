@@ -18,6 +18,7 @@ import '../modules/home/views/home_view.dart';
 import '../modules/message/bindings/message_binding.dart';
 import '../modules/message/views/message_view.dart';
 import '../modules/mesures/bindings/mesures_binding.dart';
+import '../modules/mesures/views/camera_mesure_intro_view.dart';
 import '../modules/mesures/views/mesures_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
@@ -30,67 +31,73 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.HOME;
+  static const initial = Routes.home;
 
   static final routes = [
     GetPage(
-      name: _Paths.HOME,
+      name: _Paths.home,
       page: () => const HomeView(),
       binding: HomeBinding(),
       middlewares: [AuthMiddleware()],
     ),
     GetPage(
-      name: _Paths.ACCUEIL,
+      name: _Paths.accueil,
       page: () => const AccueilView(),
       binding: AccueilBinding(),
     ),
     GetPage(
-      name: _Paths.AUTH,
+      name: _Paths.auth,
       page: () => const AuthView(),
       binding: AuthBinding(),
     ),
     GetPage(
-      name: _Paths.COMMANDE,
+      name: _Paths.commande,
       page: () => const CommandeView(),
       binding: CommandeBinding(),
     ),
     GetPage(
-      name: _Paths.FAVORIE,
+      name: _Paths.favorie,
       page: () => const FavorieView(),
       binding: FavorieBinding(),
     ),
     GetPage(
-        name: _Paths.MESURES,
+        name: _Paths.mesures,
         page: () => const MesuresView(),
         binding: MesuresBinding(),
         transition: Transition.rightToLeft),
     GetPage(
-      name: _Paths.PROFILE,
+      name: _Paths.cameraMesure,
+      page: () => const CameraMesureIntroView(),
+      binding: MesuresBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: _Paths.profile,
       page: () => const ProfileView(),
       binding: ProfileBinding(),
     ),
     GetPage(
-      name: _Paths.AJOUT_MODELE,
+      name: _Paths.ajoutModele,
       page: () => const AjoutModeleView(),
       binding: AjoutModeleBinding(),
     ),
     GetPage(
-      name: _Paths.MESSAGE,
+      name: _Paths.message,
       page: () => const MessageView(),
       binding: MessageBinding(),
     ),
     GetPage(
-      name: _Paths.DISCUSSION,
+      name: _Paths.discussion,
       page: () => const DiscussionView(),
       binding: MessageBinding(),
     ),
     GetPage(
-      name: _Paths.SEARCH_PAGE,
+      name: _Paths.searchPage,
       page: () => const SearchPageView(),
       binding: SearchPageBinding(),
     ),
     GetPage(
-      name: _Paths.ADMIN_PANEL,
+      name: _Paths.adminPanel,
       page: () => const ReceivedRequest(),
       middlewares: [AuthMiddleware(), AdminMiddleware()],
     ),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
+import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/mesure_service.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/widgets/mesure_popup.dart';
@@ -15,7 +16,8 @@ import 'package:intl/intl.dart';
 
 class AjoutCommandePage extends GetView<CommandeController> {
   final Modele modele;
-  const AjoutCommandePage(this.modele, {super.key});
+  final UserModel? tailleur;
+  const AjoutCommandePage(this.modele, {this.tailleur, super.key});
 
   void _pickImages() async {
     // Open the image picker
@@ -293,7 +295,10 @@ class AjoutCommandePage extends GetView<CommandeController> {
                       width: MediaQuery.sizeOf(context).width * 0.7,
                       child: ElevatedButton(
                         onPressed: () async {
-                          controller.createCommande(modele, context);
+                          controller.createCommande(
+                            modele,
+                            tailleur: tailleur,
+                          );
                         },
                         child: controller.isSending.value
                             ? circularProgress()

@@ -370,7 +370,7 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
                     updatedAt: DateTime.now(),
                   );
                   await _measureService.updateMeasure(updated);
-                  if (mounted) {
+                  if (context.mounted) {
                     Navigator.of(context).pop();
                   }
                   _showClientDetailSnack(
@@ -619,7 +619,7 @@ class _TailorClientDetailViewState extends State<TailorClientDetailView> {
                   );
 
                   await _measureService.createMeasure(measure);
-                  if (mounted) {
+                  if (context.mounted) {
                     Navigator.of(context).pop();
                   }
                   _showClientDetailSnack(

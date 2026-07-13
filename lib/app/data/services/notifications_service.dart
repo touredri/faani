@@ -42,7 +42,7 @@ class PushNotifications {
     String? token = await _firebaseMessaging.getToken();
     UserService().updateUserToken(auth.currentUser!.uid, token);
     _firebaseMessaging.onTokenRefresh.listen((newToken) async {
-      print("Token refreshed: $newToken");
+      debugPrint("Token refreshed: $newToken");
       bool isUserLoggedin = auth.currentUser != null;
       if (isUserLoggedin) {
         await UserController().updateUserToken(token);
@@ -51,14 +51,14 @@ class PushNotifications {
 
     // Handle foreground message display
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print(
+      debugPrint(
           "Message received: ${message.notification?.title}, ${message.notification?.body}");
       _showForegroundNotification(message);
     });
 
     // Handle when the app is opened from a notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print(
+      debugPrint(
           "Message opened: ${message.notification?.title}, ${message.notification?.body}");
       _handleMessageOpen(Get.context ?? context, message.data);
     });
@@ -79,9 +79,9 @@ class PushNotifications {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print("User granted permission");
+      debugPrint("User granted permission");
     } else {
-      print("User denied permission");
+      debugPrint("User denied permission");
     }
   }
 
@@ -110,11 +110,11 @@ class PushNotifications {
   }
 
   void _handleMessageOpen(BuildContext context, Map<String, dynamic>? data) {
-    Get.toNamed(Routes.HOME);
+    Get.toNamed(Routes.home);
     Future.delayed(const Duration(milliseconds: 500), () {
       // Get.to(() => NotificationPage());
       data?.entries.forEach((entry) {
-        print("Key: ${entry.key}, Value: ${entry.value}");
+        debugPrint("Key: ${entry.key}, Value: ${entry.value}");
       });
     });
   }

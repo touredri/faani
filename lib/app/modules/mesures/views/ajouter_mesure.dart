@@ -1,4 +1,5 @@
 import 'package:faani/app/style/app_colors.dart';
+import 'package:faani/app/modules/mesures/views/camera_mesure_intro_view.dart';
 import 'package:faani/app/modules/mesures/views/widgets/mesure_page_view.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
@@ -65,25 +66,11 @@ class AjoutMesure extends GetView {
                   2.hs,
                   TextButton(
                       onPressed: () {
-                        final navigatorContext =
-                            Navigator.of(context, rootNavigator: true).context;
-                        showDialog(
-                          context: navigatorContext,
-                          useRootNavigator: true,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Fonctionnalité en cours'),
-                              content: const Text('Arrive bientôt!  😊'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                        pushWithoutNavBar(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CameraMesureIntroView(),
+                          ),
                         );
                       },
                       child: Container(

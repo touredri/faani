@@ -3,7 +3,6 @@ import 'package:faani/app/data/services/modele_service.dart';
 import 'package:faani/app/modules/commande/views/ajouter_commande.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/globale_widgets/list_tailleur_bottom_sheet.dart';
-import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/style/app_radius.dart';
 import 'package:faani/app/style/app_colors.dart';
@@ -19,7 +18,8 @@ import '../controllers/accueil_controller.dart';
 
 class HomeItem extends StatefulWidget {
   final Modele modele;
-  const HomeItem(this.modele, {super.key});
+  final AccueilController controller;
+  const HomeItem(this.modele, {required this.controller, super.key});
 
   @override
   State<HomeItem> createState() => _HomeItemState();
@@ -27,7 +27,7 @@ class HomeItem extends StatefulWidget {
 
 class _HomeItemState extends State<HomeItem>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
-  final AccueilController controller = Get.find<AccueilController>();
+  AccueilController get controller => widget.controller;
   late final AnimationController _doubleTapController;
   late final Animation<double> _doubleTapScale;
   bool _showHeart = false;
@@ -175,7 +175,7 @@ class _HomeItemState extends State<HomeItem>
                 icon: controller.sewingIcon,
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  final userController = Get.find<UserController>();
+                  final userController = controller.userController;
                   if (userController.isTailleur.value) {
                     Get.to(() => AjoutCommandePage(widget.modele),
                         transition: Transition.rightToLeft);

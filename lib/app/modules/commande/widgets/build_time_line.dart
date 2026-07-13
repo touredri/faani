@@ -11,7 +11,7 @@ TimelineTile buildTimelineTile({
     alignment: TimelineAlign.manual,
     lineXY: 0.4,
     beforeLineStyle:
-        LineStyle(color: Colors.white.withOpacity(0.7), thickness: 5),
+        LineStyle(color: Colors.white.withValues(alpha: 0.7), thickness: 5),
     indicatorStyle: IndicatorStyle(
       indicatorXY: 0.4,
       drawGap: true,
@@ -54,7 +54,7 @@ class IconIndicator extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
           ),
         ),
         Positioned.fill(
@@ -66,7 +66,7 @@ class IconIndicator extends StatelessWidget {
               child: Icon(
                 iconData,
                 size: 30,
-                color: const Color(0xFF9E3773).withOpacity(0.7),
+                color: const Color(0xFF9E3773).withValues(alpha: 0.7),
               ),
             ),
           ),
