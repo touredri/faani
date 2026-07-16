@@ -9,8 +9,23 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/admin/$(request.auth.uid));
+    }
+
     function phoneIndexPath(phoneE164) {
       return /databases/$(database)/documents/phone_index/$(phoneE164);
+    }
+
+    function hasCompletedOrderWith(tailorId, orderId) {
+      return exists(/databases/$(database)/documents/commandes/$(orderId))
+        && get(/databases/$(database)/documents/commandes/$(orderId)).data.idUser == request.auth.uid
+        && get(/databases/$(database)/documents/commandes/$(orderId)).data.idTailleur == tailorId
+        && (
+          get(/databases/$(database)/documents/commandes/$(orderId)).data.etatLibelle == 'Terminer'
+          || get(/databases/$(database)/documents/commandes/$(orderId)).data.etatLibele == 'Terminer'
+        );
     }
 
     // Identity mapping: one phoneE164 -> one uid
@@ -28,15 +43,56 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow read: if isSignedIn();
-      allow create, update: if isSelf(uid)
+      allow create: if isSelf(uid)
         && request.resource.data.id == uid;
-      allow delete: if isSelf(uid);
+      allow update: if isAdmin()
+        || (isSelf(uid)
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.isTailleur == resource.data.isTailleur);
+      allow delete: if isSelf(uid) || isAdmin();
+    }
+
+    match /users/{uid}/favoriteCollections/{collectionId} {
+      allow read, write: if isSelf(uid);
+    }
+
+    match /users/{uid}/notifications/{notificationId} {
+      allow read: if isSelf(uid);
+      allow update: if isSelf(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'isRead',
+          'readAt'
+        ]);
+      allow create, delete: if false;
+    }
+
+    match /phoneOtp/{phoneOtpId} {
+      allow read, write: if false;
     }
 
     match /modele/{modeleId} {
       allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && resource.data.idTailleur == request.auth.uid;
+      allow create: if isAdmin()
+        || (isSignedIn()
+          && request.resource.data.idTailleur == request.auth.uid
+          && (!('isFaaniContent' in request.resource.data)
+            || request.resource.data.isFaaniContent == false));
+      allow update, delete: if isAdmin()
+        || (isSignedIn()
+          && resource.data.idTailleur == request.auth.uid
+          && request.resource.data.idTailleur == resource.data.idTailleur
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'isApproved',
+            'isRejected',
+            'moderationReason',
+            'moderatedBy',
+            'moderatedAt',
+            'isFaaniContent'
+          ]));
+    }
+
+    match /modele/{modeleId}/{subcollection}/{documentId} {
+      allow read, write: if isSignedIn();
     }
 
     match /categorie/{catId} {
@@ -44,8 +100,86 @@ service cloud.firestore {
       allow write: if false; // Admin only via console
     }
 
-    match /{document=**} {
-      allow read, write: if isSignedIn();
+    match /tailleurRequest/{requestId} {
+      allow read: if isAdmin() || isSelf(resource.data.userId);
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    match /admin/{adminId} {
+      allow read: if isSelf(adminId) || isAdmin();
+      allow write: if false;
+    }
+
+    match /adminAuditLogs/{logId} {
+      allow read, create: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    match /notificationRequests/{requestId} {
+      allow create: if isSignedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.body is string
+        && request.resource.data.body.size() > 0
+        && request.resource.data.body.size() <= 500
+        && request.resource.data.category is string
+        && request.resource.data.category.size() <= 40
+        && request.resource.data.tokens is list
+        && request.resource.data.tokens.size() > 0
+        && request.resource.data.tokens.size() <= 2;
+      allow read: if isSelf(resource.data.createdBy) || isAdmin();
+      allow update, delete: if false;
+    }
+
+    match /tailorReviews/{reviewId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.reviewerId == request.auth.uid
+        && request.resource.data.tailorId is string
+        && request.resource.data.orderId is string
+        && hasCompletedOrderWith(
+          request.resource.data.tailorId,
+          request.resource.data.orderId
+        )
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() <= 500;
+      allow update: if isSignedIn()
+        && resource.data.reviewerId == request.auth.uid
+        && request.resource.data.reviewerId == request.auth.uid
+        && request.resource.data.tailorId == resource.data.tailorId
+        && request.resource.data.orderId == resource.data.orderId
+        && hasCompletedOrderWith(
+          request.resource.data.tailorId,
+          request.resource.data.orderId
+        )
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() <= 500;
+      allow delete: if isSignedIn() && resource.data.reviewerId == request.auth.uid;
+    }
+
+    // Legacy collections still use the authenticated fallback. Reviews are
+    // deliberately excluded so their ownership and rating validation above
+    // cannot be bypassed by an overlapping match.
+    match /{collectionId}/{document=**} {
+      allow read, write: if isSignedIn()
+        && collectionId != 'tailorReviews'
+        && collectionId != 'users'
+        && collectionId != 'modele'
+        && collectionId != 'categorie'
+        && collectionId != 'tailleurRequest'
+        && collectionId != 'admin'
+        && collectionId != 'adminAuditLogs';
     }
   }
 }

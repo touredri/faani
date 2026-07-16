@@ -61,11 +61,14 @@ class CameraMesureController extends GetxController
   final Rx<BodyCaptureView> captureView = BodyCaptureView.front.obs;
   final Rxn<MesureDraft> resultDraft = Rxn<MesureDraft>();
 
+  static const _maxAnalysisFailures = 15;
+
   Timer? _countdownTimer;
   var _isStreaming = false;
   var _frameCounter = 0;
   var _hasFinished = false;
   var _isAnalyzing = false;
+  var _analysisFailures = 0;
   final List<BodyLandmarks> _frontLandmarks = [];
   final List<BodyContourFrame> _frontContours = [];
   final List<BodyContourFrame> _activeContours = [];
@@ -85,8 +88,7 @@ class CameraMesureController extends GetxController
     }
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.paused) {
-      unawaited(controller.stopImageStream());
-      _isStreaming = false;
+      unawaited(_stopStream());
     } else if (state == AppLifecycleState.resumed &&
         phase.value != CameraCapturePhase.completed) {
       unawaited(_startStream());
@@ -127,12 +129,14 @@ class CameraMesureController extends GetxController
   Future<void> _setupCamera({required bool useFront}) async {
     await cameraController?.dispose();
     final description = _pickCamera(useFront: useFront);
+    // NV21 sur Android et BGRA8888 sur iOS : les deux seuls formats mono-plan
+    // acceptés par ML Kit (`InputImage.fromBytes`).
     final controller = CameraController(
       description,
       ResolutionPreset.medium,
       enableAudio: false,
       imageFormatGroup:
-          Platform.isIOS ? ImageFormatGroup.bgra8888 : ImageFormatGroup.yuv420,
+          Platform.isIOS ? ImageFormatGroup.bgra8888 : ImageFormatGroup.nv21,
     );
     cameraController = controller;
     await controller.initialize();
@@ -149,9 +153,9 @@ class CameraMesureController extends GetxController
 
   Future<void> switchCamera() async {
     useFrontCamera.value = !useFrontCamera.value;
-    await cameraController?.stopImageStream();
-    _isStreaming = false;
+    await _stopStream();
     await _setupCamera(useFront: useFrontCamera.value);
+    _activeContours.clear();
     _stateMachine.startAligning();
     phase.value = CameraCapturePhase.aligning;
     await _startStream();
@@ -164,6 +168,19 @@ class CameraMesureController extends GetxController
     }
     _isStreaming = true;
     await controller.startImageStream(_onCameraImage);
+  }
+
+  Future<void> _stopStream() async {
+    final controller = cameraController;
+    _isStreaming = false;
+    if (controller == null || !controller.value.isStreamingImages) {
+      return;
+    }
+    try {
+      await controller.stopImageStream();
+    } on CameraException catch (error) {
+      debugPrint('CameraMesure: arrêt du flux impossible ($error)');
+    }
   }
 
   Future<void> _onCameraImage(CameraImage image) async {
@@ -198,15 +215,16 @@ class CameraMesureController extends GetxController
 
       final bodyFillRatio =
           landmarks == null ? 0.0 : computeBodyFillRatio(landmarks).toDouble();
-      final frameGuidance = contour == null
-          ? CaptureGuidance.poseNotDetected
-          : evaluateCaptureGuidance(
-              landmarks: landmarks,
-              bodyFillRatio: bodyFillRatio,
-            );
+      // Le guidage et la capture sont pilotés par la pose seule : le contour
+      // de silhouette est opportuniste (les circonférences retombent en
+      // saisie manuelle si trop peu de contours sont exploitables).
+      final frameGuidance = evaluateCaptureGuidance(
+        landmarks: landmarks,
+        bodyFillRatio: bodyFillRatio,
+      );
       final capturedBefore = _stateMachine.capturedFrames;
       _stateMachine.onFrame(
-        landmarks: contour == null ? null : landmarks,
+        landmarks: landmarks,
         frameGuidance: frameGuidance,
         bodyFillRatio: bodyFillRatio,
       );
@@ -227,6 +245,18 @@ class CameraMesureController extends GetxController
       if (_stateMachine.phase == CameraCapturePhase.estimating &&
           !_hasFinished) {
         await _finishCapture();
+      }
+      _analysisFailures = 0;
+    } catch (error, stackTrace) {
+      debugPrint(
+          'CameraMesure: analyse de frame échouée ($error)\n$stackTrace');
+      _analysisFailures++;
+      if (_analysisFailures >= _maxAnalysisFailures) {
+        await _stopStream();
+        errorMessage.value =
+            'L\'analyse de la caméra a échoué. Réessayez ou utilisez l\'ajout manuel.';
+        _stateMachine.markError(errorMessage.value);
+        phase.value = CameraCapturePhase.error;
       }
     } finally {
       _isAnalyzing = false;
@@ -250,8 +280,7 @@ class CameraMesureController extends GetxController
       return;
     }
     _hasFinished = true;
-    await cameraController?.stopImageStream();
-    _isStreaming = false;
+    await _stopStream();
 
     if (captureView.value == BodyCaptureView.front) {
       _frontLandmarks
@@ -290,6 +319,13 @@ class CameraMesureController extends GetxController
     _stateMachine.markCompleted();
     phase.value = CameraCapturePhase.completed;
     resultDraft.value = draft;
+  }
+
+  /// Consomme le brouillon de résultat (une seule fois) pour la navigation.
+  MesureDraft? takeResultDraft() {
+    final draft = resultDraft.value;
+    resultDraft.value = null;
+    return draft;
   }
 
   Future<void> retryPermission() async {

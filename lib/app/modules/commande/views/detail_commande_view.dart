@@ -136,8 +136,9 @@ class DetailCommandeView extends GetView<CommandeController> {
                     builder: (_) {
                       final accepted = commande.isAccepted;
                       return TextButton.icon(
-                        onPressed: () =>
-                            commandeController.acceptCommande(commande),
+                        onPressed: !isTailleur || accepted
+                            ? null
+                            : () => commandeController.acceptCommande(commande),
                         icon: Icon(
                           accepted
                               ? Icons.check_circle_rounded
@@ -361,6 +362,8 @@ class DetailCommandeView extends GetView<CommandeController> {
                                 ? modele.fichier[0]
                                 : '') ??
                             '',
+                        commandeId: commande.id,
+                        commandeTitle: modele.detail ?? '',
                       );
                     },
                     icon: const Icon(

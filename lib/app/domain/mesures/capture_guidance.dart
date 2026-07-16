@@ -62,27 +62,30 @@ CaptureGuidance evaluateCaptureGuidance({
     return CaptureGuidance.bodyNotFullyVisible;
   }
 
-  if (bodyFillRatio < 0.55) {
+  // Seuils volontairement tolérants : un cadrage approximatif mais complet
+  // vaut mieux qu'un guidage impossible à satisfaire. L'échelle en cm est
+  // recalculée par frame, un corps légèrement décentré reste mesurable.
+  if (bodyFillRatio < 0.45) {
     return CaptureGuidance.moveCloser;
   }
-  if (bodyFillRatio > 0.88) {
+  if (bodyFillRatio > 0.92) {
     return CaptureGuidance.moveBack;
   }
 
   final nose = landmarks[BodyLandmarkType.nose];
   final leftAnkle = landmarks[BodyLandmarkType.leftAnkle]!;
   final rightAnkle = landmarks[BodyLandmarkType.rightAnkle]!;
-  if (nose != null && nose.y > 0.18) {
+  if (nose != null && nose.y > 0.30) {
     return CaptureGuidance.raisePhone;
   }
-  if (leftAnkle.y < 0.92 || rightAnkle.y < 0.92) {
+  if (leftAnkle.y < 0.80 || rightAnkle.y < 0.80) {
     return CaptureGuidance.lowerPhone;
   }
 
   final centerX = (landmarks[BodyLandmarkType.leftShoulder]!.x +
           landmarks[BodyLandmarkType.rightShoulder]!.x) /
       2;
-  if (centerX < 0.38 || centerX > 0.62) {
+  if (centerX < 0.32 || centerX > 0.68) {
     return CaptureGuidance.centerBody;
   }
 

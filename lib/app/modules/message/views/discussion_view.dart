@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/modules/globale_widgets/message_field/message_field.dart';
 import 'package:faani/app/modules/globale_widgets/shimmer.dart';
 import 'package:faani/app/modules/message/controllers/discussion_controller.dart';
+import 'package:faani/app/modules/commande/views/detail_commande_view.dart';
 import 'package:faani/app/modules/message/views/widgets/chat_list.dart';
 import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/app_radius.dart';
@@ -192,10 +193,21 @@ class DiscussionView extends GetView<DiscussionController> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (discussionController.commandeTitle.value.isNotEmpty)
+                    Text(
+                      discussionController.commandeTitle.value,
+                      style: AppTypography.labelSmall.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   Text(
-                    'En ligne',
+                    discussionController.commandeId.value.isEmpty
+                        ? 'Discussion'
+                        : 'Discussion liée à une commande',
                     style: AppTypography.labelSmall.copyWith(
-                      color: AppColors.success,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -218,6 +230,66 @@ class DiscussionView extends GetView<DiscussionController> {
         top: false,
         child: Column(
           children: [
+            Obx(() {
+              final commande = discussionController.commande.value;
+              if (discussionController.commandeId.value.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              if (discussionController.isCommandeLoading.value) {
+                return const LinearProgressIndicator(minHeight: 2);
+              }
+              if (commande == null) {
+                return const SizedBox.shrink();
+              }
+              return InkWell(
+                onTap: () => Get.to(() => DetailCommandeView(commande)),
+                child: Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    AppSpacing.sm,
+                    AppSpacing.md,
+                    AppSpacing.xs,
+                  ),
+                  padding: AppSpacing.paddingAllSm,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: AppRadius.radiusSm,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.receipt_long_outlined,
+                        color: theme.colorScheme.primary,
+                      ),
+                      AppSpacing.gapH8,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              discussionController.commandeTitle.value.isEmpty
+                                  ? 'Commande en cours'
+                                  : discussionController.commandeTitle.value,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.labelLarge,
+                            ),
+                            Text(
+                              commande.etatLibelle,
+                              style: AppTypography.labelSmall.copyWith(
+                                color: theme.colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right),
+                    ],
+                  ),
+                ),
+              );
+            }),
             const Expanded(
               child: Padding(
                 padding: EdgeInsets.only(bottom: AppSpacing.xs),

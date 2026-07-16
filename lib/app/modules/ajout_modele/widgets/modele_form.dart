@@ -23,6 +23,35 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
           () => SingleChildScrollView(
             child: Column(
               children: [
+                if (controller.hasDraft.value)
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 9,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.restore_rounded,
+                            color: AppColors.primary, size: 18),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Brouillon local restauré',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: controller.clearDraft,
+                          child: const Text('Effacer'),
+                        ),
+                      ],
+                    ),
+                  ),
                 SizedBox(
                   height: MediaQuery.sizeOf(context).height * 0.47,
                   child: Stack(
@@ -91,6 +120,7 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                                     controller.images.removeAt(controller
                                         .pageController.page!
                                         .toInt());
+                                    controller.scheduleDraftSave();
                                     controller.update();
                                     if (controller.images.isEmpty) {
                                       Get.back();
@@ -128,12 +158,16 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                     children: [
                       TextField(
                         controller: controller.detailTextController,
+                        onChanged: (_) => controller.scheduleDraftSave(),
+                        maxLines: 3,
+                        maxLength: 160,
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 15,
                         ),
                         decoration: const InputDecoration(
-                          labelText: 'Petit détail du modèle',
+                          labelText: 'Description du modèle',
+                          hintText: 'Décrivez la coupe, le tissu ou l’occasion',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -148,7 +182,13 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                           labelText: 'Catégorie',
                           border: OutlineInputBorder(),
                         ),
-                        initialValue: controller.selectedCategoryId.value,
+                        initialValue: controller.categorieList.any(
+                                (categorie) =>
+                                    categorie.id ==
+                                    controller.selectedCategoryId.value)
+                            ? controller.selectedCategoryId.value
+                            : null,
+                        hint: const Text('Choisir une catégorie'),
                         items:
                             controller.categorieList.map((Categorie categorie) {
                           return DropdownMenuItem<String>(
@@ -157,7 +197,9 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                           );
                         }).toList(),
                         onChanged: (String? value) {
-                          controller.selectedCategoryId.value = value!;
+                          if (value == null) return;
+                          controller.selectedCategoryId.value = value;
+                          controller.scheduleDraftSave();
                         },
                       ),
                       const SizedBox(height: 15),
@@ -172,6 +214,10 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
+                        initialValue: ['Homme', 'Femme']
+                                .contains(controller.selectedGender.value)
+                            ? controller.selectedGender.value
+                            : null,
                         items: <String>['Homme', 'Femme'].map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -181,6 +227,7 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                         onChanged: (String? newValue) {
                           if (newValue != null) {
                             controller.selectedGender.value = newValue;
+                            controller.scheduleDraftSave();
                           }
                         },
                       ),
@@ -194,6 +241,7 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                         value: controller.isPublic.value,
                         onChanged: (bool value) {
                           controller.isPublic.value = value;
+                          controller.scheduleDraftSave();
                         },
                       )
                     ],
@@ -210,12 +258,20 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
                     onPressed: controller.isLoading.value
                         ? null
                         : () async {
+                            final shouldSubmit = await _showPublishReview(
+                              context,
+                              controller,
+                            );
+                            if (!shouldSubmit) return;
                             final success = await controller.createModel();
                             if (success) {
                               Get.defaultDialog(
-                                title: 'Modèle ajouté',
-                                middleText:
-                                    '👍 Votre modèle a été ajouté avec succès',
+                                title: controller.isPublic.value
+                                    ? 'Publication envoyée'
+                                    : 'Contenu masqué enregistré',
+                                middleText: controller.isPublic.value
+                                    ? 'Votre modèle est en attente de modération avant sa mise en ligne.'
+                                    : 'Votre modèle est enregistré comme contenu masqué.',
                                 actions: [
                                   TextButton(
                                     onPressed: () {
@@ -245,5 +301,145 @@ class AjoutModeleForm extends GetView<AjoutModeleController> {
             ),
           ),
         ));
+  }
+}
+
+Future<bool> _showPublishReview(
+  BuildContext context,
+  AjoutModeleController controller,
+) async {
+  if (controller.images.isEmpty) {
+    showCustomSnackbar(
+        message: 'Ajoutez au moins une image avant de continuer.');
+    return false;
+  }
+
+  String categoryName = 'Catégorie non sélectionnée';
+  for (final category in controller.categorieList) {
+    if (category.id == controller.selectedCategoryId.value) {
+      categoryName = category.libelle;
+      break;
+    }
+  }
+
+  return await showModalBottomSheet<bool>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (sheetContext) => _PublishReviewSheet(
+          controller: controller,
+          categoryName: categoryName,
+        ),
+      ) ??
+      false;
+}
+
+class _PublishReviewSheet extends StatelessWidget {
+  const _PublishReviewSheet({
+    required this.controller,
+    required this.categoryName,
+  });
+
+  final AjoutModeleController controller;
+  final String categoryName;
+
+  @override
+  Widget build(BuildContext context) {
+    final description = controller.detailTextController.text.trim();
+    final theme = Theme.of(context);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Vérifier avant de publier',
+              style: theme.textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Votre contenu sera soumis avec les informations suivantes.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    File(controller.images.first.path),
+                    width: 72,
+                    height: 72,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _ReviewRow(
+                          label: 'Images',
+                          value: '${controller.images.length}'),
+                      _ReviewRow(label: 'Catégorie', value: categoryName),
+                      _ReviewRow(
+                        label: 'Visibilité',
+                        value: controller.isPublic.value
+                            ? 'Public après modération'
+                            : 'Masqué',
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (description.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Text(
+                description,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => Navigator.of(context).pop(true),
+                icon: Icon(controller.isPublic.value
+                    ? Icons.send_rounded
+                    : Icons.save_outlined),
+                label: Text(controller.isPublic.value
+                    ? 'Soumettre à la modération'
+                    : 'Enregistrer sans publier'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReviewRow extends StatelessWidget {
+  const _ReviewRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text(
+        '$label : $value',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
 }

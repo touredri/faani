@@ -7,9 +7,11 @@ import 'package:faani/app/data/services/access_control_service.dart';
 import 'package:faani/app/data/services/getx_session_coordinator.dart';
 import 'package:faani/app/data/services/session_coordinator.dart';
 import 'package:faani/app/data/services/user_identity_binding_service.dart';
+import 'package:faani/app/data/services/phone_otp_service.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_udid/flutter_udid.dart';
@@ -37,6 +39,7 @@ class AuthController extends GetxController {
   final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
   final UserIdentityBindingService _identityBindingService =
       UserIdentityBindingService();
+  final PhoneOtpService _phoneOtpService = PhoneOtpService();
   late final SessionCoordinator _sessionCoordinator;
   RxString phoneNumber = ''.obs;
   RxString verificationId = ''.obs;
@@ -47,7 +50,6 @@ class AuthController extends GetxController {
   RxBool googleLoading = false.obs;
   RxBool resend = false.obs;
   RxInt count = 60.obs;
-  bool _phoneVerificationRetriedWithRecaptcha = false;
   Timer? timer;
   TextEditingController smsCodeController = TextEditingController();
   TextEditingController nameController = TextEditingController();
@@ -92,10 +94,9 @@ class AuthController extends GetxController {
     smsCodeController.clear();
     smsCode.value = '';
     try {
-      if (_isTestPhoneNumber(phoneNumber)) {
+      if (kDebugMode && _isTestPhoneNumber(phoneNumber)) {
         verificationId.value = 'test-verification-id';
         isCodeSent.value = true;
-        _phoneVerificationRetriedWithRecaptcha = false;
         smsCodeController.text = _testOtpCode;
         smsCode.value = _testOtpCode;
         loading.value = false;
@@ -103,50 +104,15 @@ class AuthController extends GetxController {
         return;
       }
 
-      FirebaseAuth.instance.setLanguageCode('fr');
-      await auth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // Auto-verification succeeded (instant validation on some devices).
-          if (auth.currentUser != null) {
-            await auth.currentUser!.linkWithCredential(credential);
-          } else {
-            await auth.signInWithCredential(credential);
-          }
-
-          await _routeAfterSuccessfulAuth();
-          _phoneVerificationRetriedWithRecaptcha = false;
-          loading.value = false;
-        },
-        verificationFailed: (FirebaseAuthException e) async {
-          if (_shouldRetryWithRecaptcha(e) &&
-              !_phoneVerificationRetriedWithRecaptcha) {
-            _phoneVerificationRetriedWithRecaptcha = true;
-            await FirebaseAuth.instance.setSettings(forceRecaptchaFlow: true);
-            await verifyPhoneNumber(phoneNumber);
-            return;
-          }
-
-          showCustomSnackbar(
-            message: _buildAuthErrorMessage(e, context: 'phone'),
-            backgroundColor: Colors.red,
-          );
-          isCodeSent.value = false;
-          loading.value = false;
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          // Store verification ID and set code sent flag
-          this.verificationId.value = verificationId;
-          isCodeSent.value = true;
-          _phoneVerificationRetriedWithRecaptcha = false;
-          loading.value = false;
-          Get.to(() => const OtpView()); // navigate to otp view to enter code
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Handle auto-retrieval timeout
-          this.verificationId.value = verificationId;
-        },
-      );
+      // Firebase Phone Auth is intentionally not used here. AfrikSMS sends
+      // the OTP through the callable function; Firebase only receives the
+      // custom token after the code has been verified server-side.
+      await _phoneOtpService.requestCode(phoneNumber);
+      this.phoneNumber.value = phoneNumber;
+      isCodeSent.value = true;
+      loading.value = false;
+      decreaseCounter();
+      Get.to(() => const OtpView());
     } catch (e) {
       showCustomSnackbar(
         message: e.toString(),
@@ -161,7 +127,6 @@ class AuthController extends GetxController {
     smsCodeController.clear();
     resend.value = false;
     count.value = 60;
-    _phoneVerificationRetriedWithRecaptcha = false;
     decreaseCounter();
     verifyPhoneNumber(phoneNumber.value);
   }
@@ -170,7 +135,7 @@ class AuthController extends GetxController {
   Future<void> signInWithVerificationCode(String code) async {
     loading.value = true;
     try {
-      if (_isTestPhoneNumber(phoneNumber.value)) {
+      if (kDebugMode && _isTestPhoneNumber(phoneNumber.value)) {
         if (code.trim() != _testOtpCode) {
           showCustomSnackbar(
             message: 'Code OTP de test invalide.',
@@ -192,15 +157,11 @@ class AuthController extends GetxController {
         return;
       }
 
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationId.value,
-        smsCode: code,
+      final customToken = await _phoneOtpService.verifyCode(
+        phoneNumber: phoneNumber.value,
+        code: code,
       );
-      if (auth.currentUser != null) {
-        await auth.currentUser!.linkWithCredential(credential);
-      } else {
-        await auth.signInWithCredential(credential);
-      }
+      await auth.signInWithCustomToken(customToken);
       showCustomSnackbar(
           message: "Numéro de téléphone vérifié avec succès",
           backgroundColor: Colors.green);
@@ -433,16 +394,6 @@ class AuthController extends GetxController {
       googleLoading.value = false;
       debugPrint('[Auth][Google] Google sign-in flow ended');
     }
-  }
-
-  bool _shouldRetryWithRecaptcha(FirebaseAuthException e) {
-    final code = e.code.toLowerCase();
-    final msg = (e.message ?? '').toLowerCase();
-    return code.contains('invalid-app-credential') ||
-        code == '39' ||
-        msg.contains('code 39') ||
-        msg.contains('invalid app credential') ||
-        msg.contains('app credential');
   }
 
   String _buildAuthErrorMessage(Object error, {required String context}) {

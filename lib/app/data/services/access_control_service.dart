@@ -43,13 +43,6 @@ class AccessControlService {
 
     await prefs.setString(cacheKey, appUserRoleToString(role));
 
-    if (userDoc.exists && roleRaw != appUserRoleToString(role)) {
-      await userDoc.reference.update({
-        'role': appUserRoleToString(role),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-    }
-
     return role;
   }
 

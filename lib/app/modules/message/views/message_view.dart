@@ -35,42 +35,47 @@ class MessageView extends GetView<MessageController> {
         systemOverlayStyle: theme.brightness == Brightness.dark
             ? SystemUiOverlayStyle.light
             : SystemUiOverlayStyle.dark,
-        title: Row(
-          children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                borderRadius: AppRadius.radiusMd,
-              ),
-              child: Icon(
-                Icons.chat_bubble_rounded,
-                size: 18,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Discussions',
-                    style: AppTypography.titleLarge.copyWith(
-                      color: theme.colorScheme.onSurface,
+        title: Obx(
+          () => messageController.isSearching.value
+              ? const SizedBox.shrink()
+              : Row(
+                  children: [
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color:
+                            theme.colorScheme.primary.withValues(alpha: 0.12),
+                        borderRadius: AppRadius.radiusMd,
+                      ),
+                      child: Icon(
+                        Icons.chat_bubble_rounded,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Messagerie avec vos clients et tailleurs',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Discussions',
+                            style: AppTypography.titleLarge.copyWith(
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          Text(
+                            'Messagerie avec vos clients et tailleurs',
+                            style: AppTypography.bodySmall.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+                  ],
+                ),
         ),
         actions: [
           GetBuilder<MessageController>(
@@ -85,12 +90,13 @@ class MessageView extends GetView<MessageController> {
               );
             },
           ),
-          IconButton(
-            onPressed: () => Get.back(),
-            icon: const Icon(Icons.keyboard_arrow_down_rounded),
-            iconSize: 32,
-            tooltip: 'Fermer',
-          ),
+          // IconButton(
+          //   onPressed: () => Get.back(),
+          //   icon: const Icon(Icons.keyboard_arrow_down_rounded),
+          //   iconSize: 32,
+          //   tooltip: 'Fermer',
+          // ),
+          Padding(padding: EdgeInsets.all(AppSpacing.sm),)
         ],
       ),
       body: GestureDetector(
@@ -155,6 +161,7 @@ class MessageView extends GetView<MessageController> {
                       ? DateFormat('HH:mm', 'fr_FR')
                           .format(message.lastTime!.toDate())
                       : '--:--';
+                  final isUnread = message.unreadFor.contains(user?.uid);
 
                   return InkWell(
                     borderRadius: AppRadius.radiusLg,
@@ -167,6 +174,8 @@ class MessageView extends GetView<MessageController> {
                       await messageController.goChat(
                         toUser,
                         modeleImg: message.modeleImg ?? '',
+                        commandeId: message.commandeId,
+                        commandeTitle: message.commandeTitle,
                       );
                     },
                     child: Ink(
@@ -205,6 +214,21 @@ class MessageView extends GetView<MessageController> {
                                       color: theme.colorScheme.onSurface,
                                     ),
                                   ),
+                                  if ((message.commandeTitle ?? '').isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: AppSpacing.xxs,
+                                      ),
+                                      child: Text(
+                                        message.commandeTitle!,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style:
+                                            AppTypography.labelSmall.copyWith(
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ),
+                                    ),
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     preview,
@@ -229,11 +253,21 @@ class MessageView extends GetView<MessageController> {
                                   ),
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
-                                Icon(
-                                  Icons.done_all_rounded,
-                                  size: 16,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
+                                if (isUnread)
+                                  Container(
+                                    width: 9,
+                                    height: 9,
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  )
+                                else
+                                  Icon(
+                                    Icons.done_all_rounded,
+                                    size: 16,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
                               ],
                             ),
                           ],

@@ -38,7 +38,10 @@ class _CommandeViewState extends State<CommandeView>
   @override
   Widget build(BuildContext context) {
     final UserController controller = Get.find();
-    final CommandeController commandeController = Get.put(CommandeController());
+    final CommandeController commandeController =
+        Get.isRegistered<CommandeController>()
+            ? Get.find<CommandeController>()
+            : Get.put(CommandeController());
     final theme = Theme.of(context);
     final isTailleur = controller.isTailleur.value;
 
@@ -65,27 +68,32 @@ class _CommandeViewState extends State<CommandeView>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'A Coudre',
-                            style: AppTypography.headlineMedium.copyWith(
-                              color: theme.colorScheme.onSurface,
+                    Obx(
+                      () => commandeController.isSearching.value
+                          ? const SizedBox.shrink()
+                          : Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'A Coudre',
+                                    style:
+                                        AppTypography.headlineMedium.copyWith(
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    isTailleur
+                                        ? 'Gérez vos commandes reçues et enregistrées'
+                                        : 'Suivez vos commandes et trouvez des tailleurs',
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            isTailleur
-                                ? 'Gérez vos commandes reçues et enregistrées'
-                                : 'Suivez vos commandes et trouvez des tailleurs',
-                            style: AppTypography.bodySmall.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     GetBuilder<CommandeController>(

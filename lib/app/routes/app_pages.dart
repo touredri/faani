@@ -22,6 +22,7 @@ import '../modules/mesures/views/camera_mesure_intro_view.dart';
 import '../modules/mesures/views/mesures_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
+import '../modules/profile/views/notification_center_view.dart';
 import '../modules/profile/widgets/received_request.dart';
 import '../modules/search_page/bindings/search_page_binding.dart';
 import '../modules/search_page/views/search_page_view.dart';
@@ -100,6 +101,11 @@ class AppPages {
       name: _Paths.adminPanel,
       page: () => const ReceivedRequest(),
       middlewares: [AuthMiddleware(), AdminMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.notifications,
+      page: () => const NotificationCenterView(),
+      middlewares: [AuthMiddleware()],
     ),
   ];
 }

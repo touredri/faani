@@ -10,10 +10,20 @@ class MesureService {
 
   //get all mesure for a user
   Stream<List<Mesure>> getAllUserMesure(String idUser) {
-    return collection.where('idUser', isEqualTo: idUser).snapshots().map(
-        (querySnapshot) => querySnapshot.docs
-            .map((doc) => Mesure.fromMap(doc.data(), doc.reference))
-            .toList());
+    return collection
+        .where('idUser', isEqualTo: idUser)
+        .snapshots()
+        .map((querySnapshot) {
+      final mesures = querySnapshot.docs
+          .map((doc) => Mesure.fromMap(doc.data(), doc.reference))
+          .toList();
+      mesures.sort((left, right) {
+        final leftDate = left.updateDate ?? left.date ?? DateTime(0);
+        final rightDate = right.updateDate ?? right.date ?? DateTime(0);
+        return rightDate.compareTo(leftDate);
+      });
+      return mesures;
+    });
   }
 
   // get mesure count for a user

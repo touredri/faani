@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/mesure_model.dart';
@@ -5,9 +7,12 @@ import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/firebase_order_services.dart';
 import 'package:faani/app/data/services/modele_service.dart';
+import 'package:faani/app/data/services/mesure_service.dart';
+import 'package:faani/app/data/services/order_draft_store.dart';
 import 'package:faani/app/data/services/suivi_etat_service.dart';
 import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/domain/order/create_order_use_case.dart';
+import 'package:faani/app/domain/order/order_form_draft.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/animated_pop_up.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
@@ -27,6 +32,8 @@ class CommandeController extends GetxController {
   final String currentEtat = 'En cours';
   final RxBool isExpanded = false.obs;
   final RxBool isSending = false.obs;
+  final RxBool isDraftLoading = false.obs;
+  final RxInt orderFormStep = 0.obs;
   final ScrollController scrollController = ScrollController();
   final List<Modele> modeles = [];
   Rx<XFile?> image = Rx<XFile?>(null);
@@ -38,12 +45,15 @@ class CommandeController extends GetxController {
   RxList<String> listSelectedCategorie = <String>[].obs;
   late final CreateOrderUseCase _createOrder;
   late final OrderRepository _orderRepository;
+  late final OrderDraftStore _draftStore;
 
   CommandeController({
     CreateOrderUseCase? createOrder,
     OrderRepository? orderRepository,
+    OrderDraftStore? draftStore,
   }) {
     _orderRepository = orderRepository ?? FirestoreOrderRepository();
+    _draftStore = draftStore ?? OrderDraftStore();
     _createOrder = createOrder ??
         CreateOrderUseCase(
           orderRepository: _orderRepository,
@@ -103,24 +113,84 @@ class CommandeController extends GetxController {
     nomController.clear();
     numeroController.clear();
     prixController.clear();
+    orderFormStep.value = 0;
+  }
+
+  Future<void> prepareOrderForm(Modele modele, {UserModel? tailleur}) async {
+    final currentUser = auth.currentUser;
+    if (currentUser == null) return;
+    isDraftLoading.value = true;
+    try {
+      final draft = await _draftStore.read(currentUser.uid);
+      if (draft == null ||
+          draft.modeleId != (modele.id ?? '') ||
+          draft.tailleurId != (tailleur?.id ?? '')) {
+        clearForm();
+        return;
+      }
+
+      image.value =
+          draft.photoPath.isEmpty || !File(draft.photoPath).existsSync()
+              ? null
+              : XFile(draft.photoPath);
+      selectedDate.value = draft.expectedDate;
+      nomController.text = draft.clientName;
+      numeroController.text = draft.clientPhone;
+      prixController.text = draft.price;
+      orderFormStep.value = draft.photoPath.isEmpty ? 0 : 1;
+      if (draft.mesureId.isNotEmpty) {
+        try {
+          mesure.value = await MesureService().getById(draft.mesureId).first;
+        } catch (_) {
+          mesure.value = null;
+        }
+      }
+    } finally {
+      isDraftLoading.value = false;
+    }
+  }
+
+  Future<void> saveOrderDraft(Modele modele, {UserModel? tailleur}) async {
+    final currentUser = auth.currentUser;
+    if (currentUser == null) return;
+    await _draftStore.save(
+      currentUser.uid,
+      OrderFormDraft(
+        modeleId: modele.id ?? '',
+        tailleurId: tailleur?.id ?? '',
+        photoPath: image.value?.path ?? '',
+        mesureId: mesure.value?.id ?? '',
+        expectedDate: selectedDate.value,
+        clientName: nomController.text.trim(),
+        clientPhone: numeroController.text.trim(),
+        price: prixController.text.trim(),
+      ),
+    );
+  }
+
+  Future<void> clearOrderDraft() async {
+    final currentUser = auth.currentUser;
+    if (currentUser != null) {
+      await _draftStore.clear(currentUser.uid);
+    }
   }
 
   // create a new commande
-  Future<void> createCommande(Modele modele, {UserModel? tailleur}) async {
-    if (image.value == null) {
+  Future<bool> createCommande(Modele modele, {UserModel? tailleur}) async {
+    if (image.value == null || !File(image.value!.path).existsSync()) {
       showCustomSnackbar(message: 'Veuillez ajouter une photo de l\'habit');
-      return;
+      return false;
     }
 
     if (mesure.value?.id == null || selectedDate.value.isEmpty) {
       showCustomSnackbar(message: 'Veuillez renseigner les mesures et la date');
-      return;
+      return false;
     }
 
     final currentUser = auth.currentUser;
     if (currentUser == null) {
       showCustomSnackbar(message: 'Veuillez vous reconnecter');
-      return;
+      return false;
     }
 
     if (userController.currentUser.value.id == null ||
@@ -142,13 +212,13 @@ class CommandeController extends GetxController {
         showCustomSnackbar(
           message: 'Veuillez renseigner un nom et un numéro client valide',
         );
-        return;
+        return false;
       }
     }
 
     if (!isTailleurFlow && tailleur == null) {
       showCustomSnackbar(message: 'Veuillez choisir un tailleur');
-      return;
+      return false;
     }
 
     isSending.value = true;
@@ -173,6 +243,7 @@ class CommandeController extends GetxController {
           price: int.tryParse(prixController.text) ?? 0,
         ),
       );
+      await clearOrderDraft();
       animatedPopUp(
           Get.context!,
           0.2,
@@ -205,12 +276,15 @@ class CommandeController extends GetxController {
             ],
           ));
       clearForm();
+      return true;
     } on CreateOrderException catch (error) {
       showCustomSnackbar(message: error.message);
+      return false;
     } catch (_) {
       showCustomSnackbar(
         message: 'La commande n\'a pas pu être créée. Veuillez réessayer.',
       );
+      return false;
     } finally {
       isSending.value = false;
     }
@@ -247,14 +321,28 @@ class CommandeController extends GetxController {
             1.hs,
             ElevatedButton(
               onPressed: () async {
-                commande.prix = int.parse(prix.text);
+                final value = int.tryParse(prix.text.trim());
+                if (value == null || value < 0) {
+                  showCustomSnackbar(message: 'Veuillez saisir un prix valide');
+                  return;
+                }
+                commande.prix = value;
                 await commande.update();
                 Get.snackbar('Succèss', 'Le prix à été modifier avec succès 👍',
                     snackPosition: SnackPosition.BOTTOM);
                 if (commande.idUser.isNotEmpty) {
                   UserModel client = await userService.getUser(commande.idUser);
-                  await sendNotification(client.token!, 'Prix modifié',
-                      'Le tailleur ${userController.currentUser.value.nomPrenom} a modifié le prix de votre commande à ${prix.text} FCFA');
+                  final token = client.token;
+                  if (token != null && token.isNotEmpty) {
+                    await sendNotification(
+                      token,
+                      'Prix modifié',
+                      'Le tailleur ${userController.currentUser.value.nomPrenom} a modifié le prix de votre commande à ${prix.text} FCFA',
+                      category: 'order',
+                      targetType: 'commande',
+                      targetId: commande.id ?? '',
+                    );
+                  }
                 }
                 Get.back();
                 update();
@@ -282,6 +370,7 @@ class CommandeController extends GetxController {
       );
       if (date != null) {
         commande.datePrevue = date;
+        await commande.update();
         Get.snackbar('Succèss', 'La date prevue à été changé avec succès 👍',
             snackPosition: SnackPosition.BOTTOM);
       }
@@ -292,9 +381,10 @@ class CommandeController extends GetxController {
     update();
   }
 
-  void acceptCommande(Commande commande) async {
+  Future<void> acceptCommande(Commande commande) async {
     if (userController.isTailleur.value && user!.uid == commande.idTailleur) {
       await _orderRepository.accept(commande.id!);
+      commande.isAccepted = true;
       update(['commande']);
     }
   }

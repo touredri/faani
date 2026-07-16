@@ -1,5 +1,6 @@
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
+import 'package:faani/app/domain/profile/tailor_availability.dart';
 import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,6 +19,13 @@ class ModifierProfileView extends GetView<ProfileController> {
               "Ville, Quartier";
       controller.selectedGenreCible.value =
           controller.userController.currentUser.value.sex ?? "Genre";
+      controller.tailorBioController.text =
+          controller.userController.currentUser.value.tailorBio;
+      controller.tailorSpecialtiesController.text = controller
+          .userController.currentUser.value.tailorSpecialties
+          .join(', ');
+      controller.tailorAvailability.value =
+          controller.userController.currentUser.value.tailorAvailability;
     }
     return Scaffold(
       appBar: AppBar(
@@ -27,7 +35,6 @@ class ModifierProfileView extends GetView<ProfileController> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.8,
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
@@ -50,6 +57,51 @@ class ModifierProfileView extends GetView<ProfileController> {
                       ),
                     ),
                   ),
+                  if (controller.userController.isTailleur.value) ...[
+                    2.5.hs,
+                    Obx(
+                      () => DropdownButtonFormField<TailorAvailability>(
+                        key: ValueKey(controller.tailorAvailability.value),
+                        initialValue: controller.tailorAvailability.value,
+                        decoration: const InputDecoration(
+                          labelText: 'Disponibilité',
+                        ),
+                        items: TailorAvailability.values
+                            .map(
+                              (availability) => DropdownMenuItem(
+                                value: availability,
+                                child: Text(availability.label),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (availability) {
+                          if (availability != null) {
+                            controller.tailorAvailability.value = availability;
+                          }
+                        },
+                      ),
+                    ),
+                    2.5.hs,
+                    TextField(
+                      controller: controller.tailorSpecialtiesController,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: const InputDecoration(
+                        labelText: 'Spécialités',
+                        hintText: 'Ex. Boubou, robe, costume',
+                      ),
+                    ),
+                    2.5.hs,
+                    TextField(
+                      controller: controller.tailorBioController,
+                      minLines: 3,
+                      maxLines: 5,
+                      maxLength: 500,
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: const InputDecoration(
+                        labelText: 'Présentation de l\'atelier',
+                      ),
+                    ),
+                  ],
                   2.5.hs,
                   SizedBox(
                     height: 55,

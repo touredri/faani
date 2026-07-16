@@ -1,5 +1,6 @@
 import 'package:faani/app/modules/ajout_modele/controllers/ajout_modele_controller.dart';
 import 'package:faani/app/modules/ajout_modele/widgets/modele_form.dart';
+import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/modules/globale_widgets/list_categorie.dart';
 import 'package:faani/app/modules/globale_widgets/modele_card.dart';
@@ -61,28 +62,50 @@ class MesModelesView extends GetView<TailorPortfolioController> {
                             )),
                       ],
                     ),
-                    const Column(
-                      children: [
-                        Icon(
-                          Icons.sms,
-                          color: Colors.white,
-                        ),
-                        Text('10 ', style: TextStyle(color: Colors.white))
-                      ],
-                    ),
-                    const Column(
-                      children: [
-                        Icon(
-                          Icons.favorite,
-                          color: Colors.white,
-                        ),
-                        Text('25', style: TextStyle(color: Colors.white))
-                      ],
-                    ),
+                    Obx(() => _PortfolioMetric(
+                          icon: Icons.visibility_outlined,
+                          value: controller.totalViews.value,
+                          label: 'Vues',
+                        )),
+                    Obx(() => _PortfolioMetric(
+                          icon: Icons.favorite_border,
+                          value: controller.totalLikes.value,
+                          label: 'J\'aime',
+                        )),
                   ],
                 ),
               ),
             ),
+          ),
+          SliverToBoxAdapter(
+            child: Obx(() {
+              final pending = controller.pendingModeration.value;
+              if (pending == 0) return const SizedBox.shrink();
+              return Container(
+                margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.hourglass_top_rounded,
+                        color: Colors.orange, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '$pending modèle${pending > 1 ? 's' : ''} en attente de modération',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
           ),
           SliverFillRemaining(
             child: GetBuilder<TailorPortfolioController>(
@@ -93,14 +116,23 @@ class MesModelesView extends GetView<TailorPortfolioController> {
                   controller.mesModelesList.value.length,
                   (context, index) {
                     final modele = controller.mesModelesList.value[index];
-                    return buildCard(modele!, context: context, onTap: () {
-                      Get.to(
-                          () => DetailModeleView(
-                                modele,
-                                previousIsProfile: true,
-                              ),
-                          arguments: modele);
-                    });
+                    return Stack(
+                      children: [
+                        buildCard(modele!, context: context, onTap: () {
+                          Get.to(
+                              () => DetailModeleView(
+                                    modele,
+                                    previousIsProfile: true,
+                                  ),
+                              arguments: modele);
+                        }),
+                        Positioned(
+                          top: 8,
+                          left: 8,
+                          child: _ModerationBadge(modele: modele),
+                        ),
+                      ],
+                    );
                   },
                   scrollController: controller.scrollController,
                   padding: 10,
@@ -117,6 +149,71 @@ class MesModelesView extends GetView<TailorPortfolioController> {
           Get.to(() => const AjoutModeleForm());
         },
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class _PortfolioMetric extends StatelessWidget {
+  const _PortfolioMetric({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
+
+  final IconData icon;
+  final int value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white),
+        Text(
+          value.toString(),
+          style: const TextStyle(color: Colors.white),
+        ),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 10),
+        ),
+      ],
+    );
+  }
+}
+
+class _ModerationBadge extends StatelessWidget {
+  const _ModerationBadge({required this.modele});
+
+  final Modele modele;
+
+  @override
+  Widget build(BuildContext context) {
+    final (label, color) = switch (modele) {
+      Modele(isRejected: true) => ('Refusé', Colors.red.shade700),
+      Modele(isApproved: true, isPublic: true) => (
+          'Publié',
+          Colors.green.shade700
+        ),
+      Modele(isApproved: true) => ('Masqué', Colors.blueGrey.shade700),
+      _ => ('En revue', Colors.orange.shade800),
+    };
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
     );
   }

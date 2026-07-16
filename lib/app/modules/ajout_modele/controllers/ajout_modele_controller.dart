@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:faani/app/data/models/categorie_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/services/categorie_service.dart';
+import 'package:faani/app/data/services/model_draft_store.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/ajout_modele/widgets/modele_form.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
@@ -18,6 +20,12 @@ import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AjoutModeleController extends GetxController {
+  static const int maxImages = 6;
+
+  AjoutModeleController({ModelDraftStore? draftStore})
+      : _draftStore = draftStore ?? const ModelDraftStore();
+
+  final ModelDraftStore _draftStore;
   final images = RxList<XFile>();
   final PageController pageController = PageController();
   RxString selectedCategoryId = '2'.obs;
@@ -26,7 +34,68 @@ class AjoutModeleController extends GetxController {
   RxBool isLoading = false.obs;
   RxList<Categorie> categorieList = <Categorie>[].obs;
   final TextEditingController detailTextController = TextEditingController();
+  final RxBool hasDraft = false.obs;
   StreamSubscription? _categorySubscription;
+  Timer? _draftSaveTimer;
+
+  String? get _draftUserId => user?.uid;
+
+  void scheduleDraftSave() {
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = Timer(const Duration(milliseconds: 450), saveDraft);
+  }
+
+  Future<void> saveDraft() async {
+    final userId = _draftUserId;
+    if (userId == null || userId.isEmpty || user?.isAnonymous == true) return;
+    final detail = detailTextController.text.trim();
+    if (detail.isEmpty && images.isEmpty) {
+      await _draftStore.clear(userId);
+      hasDraft.value = false;
+      return;
+    }
+    await _draftStore.save(
+      userId,
+      ModelPublicationDraft(
+        detail: detailTextController.text,
+        categoryId: selectedCategoryId.value,
+        gender: selectedGender.value,
+        isPublic: isPublic.value,
+        imagePaths: images.map((image) => image.path).toList(),
+      ),
+    );
+    hasDraft.value = true;
+  }
+
+  Future<void> restoreDraft() async {
+    final userId = _draftUserId;
+    if (userId == null || userId.isEmpty || user?.isAnonymous == true) return;
+    final draft = await _draftStore.load(userId);
+    if (draft == null) return;
+    detailTextController.text = draft.detail;
+    selectedCategoryId.value = draft.categoryId;
+    selectedGender.value = draft.gender;
+    isPublic.value = draft.isPublic;
+    images.assignAll(
+      draft.imagePaths.where((path) => File(path).existsSync()).map(XFile.new),
+    );
+    hasDraft.value = true;
+    update();
+  }
+
+  Future<void> clearDraft() async {
+    final userId = _draftUserId;
+    if (userId != null && userId.isNotEmpty) {
+      await _draftStore.clear(userId);
+    }
+    images.clear();
+    detailTextController.clear();
+    selectedCategoryId.value = '2';
+    selectedGender.value = 'Homme';
+    isPublic.value = true;
+    hasDraft.value = false;
+    update();
+  }
 
   void pickOrTakeImage(BuildContext context, bool isMultiSelection) async {
     final ImagePicker picker = ImagePicker();
@@ -39,6 +108,12 @@ class AjoutModeleController extends GetxController {
       pickedImages = image != null ? [image] : [];
     }
     if (pickedImages.isEmpty) return; // Handle no selection case
+    final remainingSlots = maxImages - images.length;
+    if (remainingSlots <= 0) {
+      showCustomSnackbar(
+          message: 'Vous avez atteint la limite de $maxImages images.');
+      return;
+    }
     if (!context.mounted) return;
     final List<XFile> newImages = [];
     for (final XFile image in pickedImages) {
@@ -72,17 +147,22 @@ class AjoutModeleController extends GetxController {
         }
       }
     }
-    images.addAll(newImages);
+    images.addAll(newImages.take(remainingSlots));
+    if (newImages.length > remainingSlots) {
+      showCustomSnackbar(
+          message: 'Seules $maxImages images peuvent être publiées.');
+    }
+    scheduleDraftSave();
     Get.to(() => const AjoutModeleForm(), transition: Transition.zoom);
     update();
   }
 
-  Future<List<Map<String, String>>> uploadImages(List<File> imageFiles) async {
-    List<Map<String, String>> imageInfo = [];
+  Future<List<Map<String, dynamic>>> uploadImages(List<File> imageFiles) async {
+    List<Map<String, dynamic>> imageInfo = [];
     final String uid = user?.uid ?? 'anonymous';
-    for (var image in imageFiles) {
+    for (final imageFile in imageFiles) {
       final String fileName =
-          '${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}';
+          '${DateTime.now().millisecondsSinceEpoch}_${imageFile.path.split('/').last}';
       final ref = FirebaseStorage.instance
           .ref()
           .child('images')
@@ -90,11 +170,15 @@ class AjoutModeleController extends GetxController {
           .child(uid)
           .child(fileName);
 
-      await ref.putFile(image);
+      await ref.putFile(imageFile);
       final url = await ref.getDownloadURL();
+      final codec =
+          await ui.instantiateImageCodec(await imageFile.readAsBytes());
+      final frame = await codec.getNextFrame();
       imageInfo.add({
         'downloadUrl': url,
         'path': ref.fullPath,
+        'aspectRatio': frame.image.width / frame.image.height,
       });
     }
     return imageInfo;
@@ -121,23 +205,31 @@ class AjoutModeleController extends GetxController {
     isLoading.value = true;
     try {
       List<File> imageFiles = images.map((e) => File(e.path)).toList();
-      List<Map<String, String>> imageInfo = await uploadImages(imageFiles);
+      List<Map<String, dynamic>> imageInfo = await uploadImages(imageFiles);
 
       final Modele modele = Modele(
           id: '',
           detail: detailTextController.text.isNotEmpty
               ? detailTextController.text
               : 'Description non disponible pour le moment ! Le tailleur n\'a pas ajouté de description',
-          fichier: imageInfo.map((info) => info['downloadUrl']).toList(),
-          imagePath: imageInfo.map((info) => info['path']).toList(),
+          fichier:
+              imageInfo.map((info) => info['downloadUrl'] as String?).toList(),
+          imagePath: imageInfo.map((info) => info['path'] as String?).toList(),
           genreHabit: selectedGender.value,
           idTailleur: user!.uid,
           idCategorie: selectedCategoryId.value,
           isApproved: false,
           isPublic: isPublic.value,
-          createdAt: Timestamp.now());
+          createdAt: Timestamp.now(),
+          mediaAspectRatios:
+              imageInfo.map((info) => info['aspectRatio'] as double).toList());
 
       await modele.create();
+      final userId = _draftUserId;
+      if (userId != null) {
+        await _draftStore.clear(userId);
+      }
+      hasDraft.value = false;
       images.clear();
       detailTextController.clear();
       return true;
@@ -164,12 +256,17 @@ class AjoutModeleController extends GetxController {
   void onInit() {
     super.onInit();
     fetchCategories();
+    restoreDraft();
   }
 
   @override
   void onClose() {
     _categorySubscription?.cancel();
+    _draftSaveTimer?.cancel();
+    unawaited(saveDraft());
     categorieList.clear();
+    detailTextController.dispose();
+    pageController.dispose();
     super.onClose();
   }
 }

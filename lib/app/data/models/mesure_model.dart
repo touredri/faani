@@ -40,20 +40,32 @@ class Mesure {
 
   factory Mesure.fromMap(
       Map<String, dynamic> map, DocumentReference reference) {
+    int? asInt(dynamic value) {
+      if (value is int) return value;
+      if (value is num) return value.round();
+      return int.tryParse(value?.toString() ?? '');
+    }
+
+    DateTime? asDate(dynamic value) {
+      if (value is Timestamp) return value.toDate();
+      if (value is DateTime) return value;
+      return null;
+    }
+
     return Mesure(
-      bras: map['bras'],
-      epaule: map['epaule'],
-      hanche: map['hanche'],
-      idUser: map['idUser'],
-      longueur: map['longueur'],
-      poitrine: map['poitrine'],
-      nom: map['nom'],
+      bras: asInt(map['bras']),
+      epaule: asInt(map['epaule']),
+      hanche: asInt(map['hanche']),
+      idUser: map['idUser']?.toString(),
+      longueur: asInt(map['longueur']),
+      poitrine: asInt(map['poitrine']),
+      nom: map['nom']?.toString(),
       id: reference.id,
-      taille: map['taille'],
-      ventre: map['ventre'],
-      poignet: map['poignet'],
-      date: (map['date'] as Timestamp).toDate(),
-      updateDate: (map['updateDate'] as Timestamp).toDate(),
+      taille: asInt(map['taille']),
+      ventre: asInt(map['ventre']),
+      poignet: asInt(map['poignet']),
+      date: asDate(map['date']),
+      updateDate: asDate(map['updateDate']),
     );
   }
 

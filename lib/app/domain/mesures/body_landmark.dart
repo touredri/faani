@@ -35,21 +35,30 @@ class PoseLandmarkPoint {
 }
 
 class BodyLandmarks {
-  const BodyLandmarks({required this.points});
+  const BodyLandmarks({required this.points, this.aspectRatio = 1.0});
 
   final Map<BodyLandmarkType, PoseLandmarkPoint> points;
+
+  /// Rapport largeur/hauteur de l'image redressée d'où viennent les points.
+  ///
+  /// Les x sont normalisés par la largeur et les y par la hauteur : sans ce
+  /// ratio, une distance mixant les deux axes serait faussée sur toute image
+  /// non carrée.
+  final double aspectRatio;
 
   PoseLandmarkPoint? operator [](BodyLandmarkType type) => points[type];
 
   bool hasReliable(BodyLandmarkType type) => points[type]?.isReliable ?? false;
 
+  /// Distance exprimée en unités de hauteur d'image (comparable aux écarts
+  /// verticaux normalisés utilisés pour l'échelle taille utilisateur).
   double? distance(BodyLandmarkType a, BodyLandmarkType b) {
     final left = points[a];
     final right = points[b];
     if (left == null || right == null) {
       return null;
     }
-    final dx = left.x - right.x;
+    final dx = (left.x - right.x) * aspectRatio;
     final dy = left.y - right.y;
     return math.sqrt(dx * dx + dy * dy);
   }

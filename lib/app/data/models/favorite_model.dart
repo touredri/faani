@@ -4,42 +4,45 @@ class Favorie {
   final String? id;
   final String? idModele;
   final String? idUtilisateur;
+  final List<String> collectionIds;
 
   Favorie({
     required this.id,
     required this.idModele,
     required this.idUtilisateur,
+    this.collectionIds = const <String>[],
   });
 
   factory Favorie.fromMap(
       Map<String, dynamic> data, DocumentReference documentReference) {
-    final id = documentReference.id;
+    return Favorie.fromData(id: documentReference.id, data: data);
+  }
+
+  factory Favorie.fromData({
+    required String id,
+    required Map<String, dynamic> data,
+  }) {
     final idModele = data['idModele'] as String;
-    final idUtilisateur = data['idUtilisateur'] as String;
+    final idUtilisateur =
+        (data['idUtilisateur'] ?? data['idUser'] ?? '').toString();
+    final rawCollectionIds = data['collectionIds'];
+    final collectionIds = rawCollectionIds is List
+        ? rawCollectionIds.map((value) => value.toString()).toList()
+        : const <String>[];
 
     return Favorie(
       id: id,
       idModele: idModele,
       idUtilisateur: idUtilisateur,
+      collectionIds: collectionIds,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'idModele': idModele,
-      'idUser': idUtilisateur,
+      'idUtilisateur': idUtilisateur,
+      'collectionIds': collectionIds,
     };
-  }
-
-  final collection = FirebaseFirestore.instance.collection('favorie');
-
-  Future<void> create() async {
-    final docRef = await collection.add(toMap());
-    await docRef.update({'id': docRef.id});
-  }
-
-  Future<void> delete() async {
-    final documentReference = collection.doc(id);
-    await documentReference.delete();
   }
 }

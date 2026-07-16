@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_selfie_segmentation/google_mlkit_selfie_segmentation.dart';
 
+import 'package:faani/app/data/services/mlkit_camera_image_converter.dart';
 import 'package:faani/app/domain/mesures/body_contour_frame.dart';
 import 'package:faani/app/domain/mesures/body_landmark.dart';
 
@@ -41,15 +40,15 @@ class MlKitBodySilhouetteDetector implements BodySilhouetteDetector {
     }
     _isProcessing = true;
     try {
-      final inputImage = _convertCameraImage(
-        cameraImage,
-        camera,
-        deviceOrientation,
+      final converted = convertCameraImageForMlKit(
+        cameraImage: cameraImage,
+        camera: camera,
+        deviceOrientation: deviceOrientation,
       );
-      if (inputImage == null) {
+      if (converted == null) {
         return null;
       }
-      final mask = await _segmenter.processImage(inputImage);
+      final mask = await _segmenter.processImage(converted.inputImage);
       if (mask == null) {
         return null;
       }
@@ -81,6 +80,12 @@ class MlKitBodySilhouetteDetector implements BodySilhouetteDetector {
       BodyContourRegion.hanche:
           _centerSpan(mask, anchors.hipY, anchors.centerX),
     };
+    // Le torse est indispensable ; bras et poignet sont des zones fines et
+    // souvent ratées par le masque : on les garde quand ils sont disponibles
+    // sans invalider la frame entière.
+    if (torso.values.any((span) => span == null)) {
+      return null;
+    }
     final arm = _averageSpan(
       mask,
       [anchors.leftArm, anchors.rightArm],
@@ -89,13 +94,12 @@ class MlKitBodySilhouetteDetector implements BodySilhouetteDetector {
       mask,
       [anchors.leftWrist, anchors.rightWrist],
     );
-    if (torso.values.any((span) => span == null) ||
-        arm == null ||
-        wrist == null) {
-      return null;
-    }
 
-    final spans = [...torso.values.whereType<_MaskSpan>(), arm, wrist];
+    final spans = [
+      ...torso.values.whereType<_MaskSpan>(),
+      if (arm != null) arm,
+      if (wrist != null) wrist,
+    ];
     final confidence = spans
             .map((span) => span.confidence)
             .reduce((sum, value) => sum + value) /
@@ -108,8 +112,8 @@ class MlKitBodySilhouetteDetector implements BodySilhouetteDetector {
       confidence: confidence,
       widths: {
         for (final entry in torso.entries) entry.key: entry.value!.width,
-        BodyContourRegion.bras: arm.width,
-        BodyContourRegion.poignet: wrist.width,
+        if (arm != null) BodyContourRegion.bras: arm.width,
+        if (wrist != null) BodyContourRegion.poignet: wrist.width,
       },
     );
   }
@@ -160,8 +164,10 @@ class MlKitBodySilhouetteDetector implements BodySilhouetteDetector {
     }
     final confidence =
         pixels.reduce((sum, value) => sum + value) / pixels.length;
+    // Largeur exprimée en unités de hauteur d'image pour rester homogène
+    // avec `bodyHeight` (normalisé en y) lors de la mise à l'échelle en cm.
     return _MaskSpan(
-      width: (right - left + 1) / mask.width,
+      width: (right - left + 1) / mask.height,
       confidence: confidence,
     );
   }
@@ -172,74 +178,6 @@ class MlKitBodySilhouetteDetector implements BodySilhouetteDetector {
       return 0;
     }
     return mask.confidences[index];
-  }
-
-  InputImage? _convertCameraImage(
-    CameraImage image,
-    CameraDescription camera,
-    DeviceOrientation orientation,
-  ) {
-    if (image.planes.isEmpty) {
-      return null;
-    }
-    final rotation = _rotationFromOrientation(
-      orientation: orientation,
-      camera: camera,
-    );
-    if (Platform.isIOS) {
-      if (image.planes.length != 1) {
-        return null;
-      }
-      return InputImage.fromBytes(
-        bytes: image.planes.first.bytes,
-        metadata: InputImageMetadata(
-          size: Size(image.width.toDouble(), image.height.toDouble()),
-          rotation: rotation,
-          format: InputImageFormat.bgra8888,
-          bytesPerRow: image.planes.first.bytesPerRow,
-        ),
-      );
-    }
-    final format = InputImageFormatValue.fromRawValue(image.format.raw);
-    if (format == null) {
-      return null;
-    }
-    final buffer = WriteBuffer();
-    for (final plane in image.planes) {
-      buffer.putUint8List(plane.bytes);
-    }
-    return InputImage.fromBytes(
-      bytes: buffer.done().buffer.asUint8List(),
-      metadata: InputImageMetadata(
-        size: Size(image.width.toDouble(), image.height.toDouble()),
-        rotation: rotation,
-        format: format,
-        bytesPerRow: image.planes.first.bytesPerRow,
-      ),
-    );
-  }
-
-  InputImageRotation _rotationFromOrientation({
-    required DeviceOrientation orientation,
-    required CameraDescription camera,
-  }) {
-    var degrees = switch (orientation) {
-      DeviceOrientation.portraitUp => 0,
-      DeviceOrientation.landscapeLeft => 90,
-      DeviceOrientation.portraitDown => 180,
-      DeviceOrientation.landscapeRight => 270,
-    };
-    if (camera.lensDirection == CameraLensDirection.front) {
-      degrees = (360 - degrees) % 360;
-    } else {
-      degrees = (degrees + 90) % 360;
-    }
-    return switch (degrees) {
-      90 => InputImageRotation.rotation90deg,
-      180 => InputImageRotation.rotation180deg,
-      270 => InputImageRotation.rotation270deg,
-      _ => InputImageRotation.rotation0deg,
-    };
   }
 }
 

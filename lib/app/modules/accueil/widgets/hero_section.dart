@@ -2,15 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/services/engagement_tracking_service.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
-import 'package:faani/app/modules/globale_widgets/list_tailleur_bottom_sheet.dart';
-import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
-import 'dart:async';
 import 'package:video_player/video_player.dart';
 import '../../../style/app_colors.dart';
 
@@ -30,17 +27,14 @@ class HeroSection extends StatefulWidget {
   State<HeroSection> createState() => _HeroSectionState();
 }
 
-class _HeroSectionState extends State<HeroSection>
-    with SingleTickerProviderStateMixin {
+class _HeroSectionState extends State<HeroSection> {
   late final PageController _pageController;
-  Timer? _autoScrollTimer;
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(viewportFraction: 1.0);
-    _startAutoScroll();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final first = widget.modeles.isNotEmpty ? widget.modeles.first : null;
       if (first?.id != null) {
@@ -53,24 +47,8 @@ class _HeroSectionState extends State<HeroSection>
     });
   }
 
-  void _startAutoScroll() {
-    _autoScrollTimer?.cancel();
-    if (widget.modeles.length <= 1) return;
-
-    _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted || !_pageController.hasClients) return;
-      final nextIndex = (_currentIndex + 1) % widget.modeles.length;
-      _pageController.animateToPage(
-        nextIndex,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    });
-  }
-
   @override
   void dispose() {
-    _autoScrollTimer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
@@ -80,7 +58,6 @@ class _HeroSectionState extends State<HeroSection>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.modeles.length != widget.modeles.length) {
       _currentIndex = 0;
-      _startAutoScroll();
     }
   }
 
@@ -169,55 +146,25 @@ class _HeroSectionState extends State<HeroSection>
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      const SizedBox(height: AppSpacing.xxl),
-                      Row(
-                        children: [
-                          _HeroCta(
-                            label: 'Voir le modèle',
-                            filled: true,
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              if (modele.id != null) {
-                                EngagementTrackingService.instance.trackOpen(
-                                  modele.id!,
-                                  source: 'hero_cta',
-                                  categoryId: modele.idCategorie,
-                                );
-                              }
-                              widget.onModelOpened?.call(modele);
-                              Get.to(
-                                () => DetailModeleView(modele),
-                                transition: Transition.rightToLeft,
-                              );
-                            },
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          _HeroCta(
-                            label: 'Trouver un tailleur',
-                            filled: false,
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              if (modele.id != null) {
-                                EngagementTrackingService.instance
-                                    .trackOrderIntent(
-                                  modele.id!,
-                                  source: 'hero_cta',
-                                  categoryId: modele.idCategorie,
-                                );
-                              }
-                              final userController = Get.find<UserController>();
-                              if (userController.isTailleur.value) {
-                                widget.onModelOpened?.call(modele);
-                                Get.to(
-                                  () => DetailModeleView(modele),
-                                  transition: Transition.rightToLeft,
-                                );
-                              } else {
-                                showTailleurModalBottomSheet(context, modele);
-                              }
-                            },
-                          ),
-                        ],
+                      const SizedBox(height: AppSpacing.lg),
+                      _HeroCta(
+                        label: 'home_view_model'.tr,
+                        filled: true,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          if (modele.id != null) {
+                            EngagementTrackingService.instance.trackOpen(
+                              modele.id!,
+                              source: 'hero_cta',
+                              categoryId: modele.idCategorie,
+                            );
+                          }
+                          widget.onModelOpened?.call(modele);
+                          Get.to(
+                            () => DetailModeleView(modele),
+                            transition: Transition.rightToLeft,
+                          );
+                        },
                       ),
                     ],
                   ),

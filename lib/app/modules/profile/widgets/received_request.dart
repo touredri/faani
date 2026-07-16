@@ -12,7 +12,7 @@ import 'package:faani/app/data/services/admin_audit_service.dart';
 import 'package:faani/app/data/services/tailleur_request_service.dart';
 import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
-import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
+import 'package:faani/app/modules/profile/widgets/admin_model_catalog.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/style/app_radius.dart';
@@ -39,22 +39,24 @@ class TailleurRequestController extends GetxController {
     return service.getRequestsByApprovalStatus(status);
   }
 
+  Stream<List<TailleurRequest>> getPendingRequests() {
+    return service.getPendingRequests();
+  }
+
   Future<bool> isCurrentUserAdmin() async {
     return AccessControlService().isCurrentUserAdmin();
   }
 
   Future<void> approveRequest(TailleurRequest request) async {
     if (request.id == null) return;
-    await service.updateRequestApprovalStatus(request.id!, true);
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(request.userId)
-        .update({
-      'isTailleur': true,
-      'role': appUserRoleToString(AppUserRole.tailor),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    final adminId = auth.currentUser?.uid;
+    if (adminId == null || adminId.isEmpty) {
+      throw const FormatException('Session administrateur expirée.');
+    }
+    await service.approveRequestAndPromoteUser(
+      request: request,
+      adminId: adminId,
+    );
 
     final target = await _usersService.getIfUser(request.userId);
     final token = target?.token;
@@ -77,9 +79,17 @@ class TailleurRequestController extends GetxController {
     );
   }
 
-  Future<void> rejectAndDeleteRequest(TailleurRequest request) async {
+  Future<void> rejectRequest(TailleurRequest request, String reason) async {
+    final adminId = auth.currentUser?.uid;
+    if (adminId == null || adminId.isEmpty) {
+      throw const FormatException('Session administrateur expirée.');
+    }
+    await service.rejectRequest(
+      request: request,
+      adminId: adminId,
+      reason: reason,
+    );
     if (request.id == null) return;
-    await service.deleteRequest(request.id!);
     await _auditService.logAction(
       action: 'reject_tailor_request',
       targetType: 'tailorRequest',
@@ -87,6 +97,7 @@ class TailleurRequestController extends GetxController {
       metadata: {
         'userId': request.userId,
         'atelier': request.nomAtelier,
+        'reason': reason.trim(),
       },
     );
   }
@@ -111,7 +122,11 @@ class TailleurRequestController extends GetxController {
   Future<void> approveModel(Modele model) async {
     final id = model.id;
     if (id == null || id.isEmpty) return;
-    await ModeleService().updateModelApprovalStatus(id, true);
+    await ModeleService().updateModelModeration(
+      modeleId: id,
+      isApproved: true,
+      adminId: auth.currentUser?.uid ?? '',
+    );
     await _auditService.logAction(
       action: 'approve_model',
       targetType: 'modele',
@@ -122,16 +137,22 @@ class TailleurRequestController extends GetxController {
     );
   }
 
-  Future<void> rejectModel(Modele model) async {
+  Future<void> rejectModel(Modele model, String reason) async {
     final id = model.id;
     if (id == null || id.isEmpty) return;
-    await ModeleService().updateModelApprovalStatus(id, false);
+    await ModeleService().updateModelModeration(
+      modeleId: id,
+      isApproved: false,
+      adminId: auth.currentUser?.uid ?? '',
+      reason: reason,
+    );
     await _auditService.logAction(
       action: 'reject_model',
       targetType: 'modele',
       targetId: id,
       metadata: {
         'tailorId': model.idTailleur,
+        'reason': reason.trim(),
       },
     );
   }
@@ -227,6 +248,68 @@ class _ReceivedRequestState extends State<ReceivedRequest>
     super.dispose();
   }
 
+  Future<bool> _confirmAction({
+    required String title,
+    required String message,
+    required String confirmLabel,
+  }) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Annuler'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(confirmLabel),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  Future<String?> _requestRejectionReason(String title) async {
+    final reasonController = TextEditingController();
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: TextField(
+          controller: reasonController,
+          minLines: 2,
+          maxLines: 4,
+          maxLength: 500,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(
+            labelText: 'Motif de refus',
+            hintText: 'Expliquez la décision pour la traçabilité',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final reason = reasonController.text.trim();
+              if (reason.isEmpty) return;
+              Navigator.pop(context, reason);
+            },
+            child: const Text('Confirmer le refus'),
+          ),
+        ],
+      ),
+    );
+    reasonController.dispose();
+    return reason;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -278,7 +361,7 @@ class _ReceivedRequestState extends State<ReceivedRequest>
               _buildRequestsTab(_tailleurRequestController),
               _buildUsersTab(),
               _buildOrdersTab(),
-              _buildUnapprovedModelsTab(_modeleService),
+              AdminModelCatalog(modeleService: _modeleService),
               _buildBroadcastTab(),
               _buildAuditTab(),
             ],
@@ -313,8 +396,7 @@ class _ReceivedRequestState extends State<ReceivedRequest>
                 : ((acceptedOrders / commandes.length) * 100).round();
 
             return StreamBuilder<List<TailleurRequest>>(
-              stream:
-                  _tailleurRequestController.getRequestsByApprovalStatus(false),
+              stream: _tailleurRequestController.getPendingRequests(),
               builder: (context, requestsSnapshot) {
                 final pendingRequests =
                     (requestsSnapshot.data ?? <TailleurRequest>[]).length;
@@ -449,7 +531,7 @@ class _ReceivedRequestState extends State<ReceivedRequest>
   Widget _buildRequestsTab(
       TailleurRequestController tailleurRequestController) {
     return StreamBuilder<List<TailleurRequest>>(
-      stream: tailleurRequestController.getRequestsByApprovalStatus(false),
+      stream: tailleurRequestController.getPendingRequests(),
       builder: (context, snapshot) {
         final theme = Theme.of(context);
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -574,8 +656,14 @@ class _ReceivedRequestState extends State<ReceivedRequest>
                               ),
                               TextButton(
                                 onPressed: () async {
-                                  await tailleurRequestController
-                                      .rejectAndDeleteRequest(request);
+                                  final reason = await _requestRejectionReason(
+                                    'Refuser la demande',
+                                  );
+                                  if (reason == null) return;
+                                  await tailleurRequestController.rejectRequest(
+                                    request,
+                                    reason,
+                                  );
                                   showCustomSnackbar(
                                     message: 'Demande refusée',
                                     backgroundColor: Colors.orange,
@@ -585,6 +673,13 @@ class _ReceivedRequestState extends State<ReceivedRequest>
                               ),
                               ElevatedButton.icon(
                                 onPressed: () async {
+                                  final confirmed = await _confirmAction(
+                                    title: 'Approuver cet atelier ?',
+                                    message:
+                                        'Le compte recevra immédiatement le rôle tailleur.',
+                                    confirmLabel: 'Approuver',
+                                  );
+                                  if (!confirmed) return;
                                   await tailleurRequestController
                                       .approveRequest(request);
                                   showCustomSnackbar(
@@ -2052,117 +2147,6 @@ class _ReceivedRequestState extends State<ReceivedRequest>
         });
       }
     }
-  }
-
-  Widget _buildUnapprovedModelsTab(ModeleService modeleService) {
-    return StreamBuilder<List<Modele>>(
-      stream: modeleService.getUnapprovedModels(),
-      builder: (context, snapshot) {
-        final theme = Theme.of(context);
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final models = snapshot.data ?? <Modele>[];
-
-        if (models.isEmpty) {
-          return Center(
-            child: Text(
-              'Aucun modèle en attente de validation',
-              style: AppTypography.bodyMedium.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          );
-        }
-
-        return GridView.builder(
-          padding: AppSpacing.pagePadding,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: AppSpacing.sm,
-            crossAxisSpacing: AppSpacing.sm,
-            childAspectRatio: 0.72,
-          ),
-          itemCount: models.length,
-          itemBuilder: (context, index) {
-            final model = models[index];
-            final mediaUrl =
-                model.fichier.isNotEmpty ? (model.fichier.first ?? '') : '';
-            return InkWell(
-              onTap: () {
-                Get.to(() => DetailModeleView(model));
-              },
-              child: Card(
-                shape: RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
-                clipBehavior: Clip.antiAlias,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: mediaUrl.isEmpty
-                          ? Container(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Icons.image_not_supported_outlined,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            )
-                          : Image.network(
-                              mediaUrl,
-                              fit: BoxFit.cover,
-                            ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
-                        color: Colors.black.withValues(alpha: 0.5),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  _tailleurRequestController.rejectModel(model);
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 6),
-                                  side: const BorderSide(color: Colors.white70),
-                                ),
-                                child: const Text(
-                                  'Refuser',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            AppSpacing.gapH8,
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _tailleurRequestController
-                                      .approveModel(model);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 6),
-                                ),
-                                child: const Text('Approuver'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 
   DateTime? _extractAuditDate(Map<String, dynamic> entry) {

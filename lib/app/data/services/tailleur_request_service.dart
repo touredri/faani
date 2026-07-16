@@ -46,6 +46,59 @@ class TailleurRequestService {
             .toList());
   }
 
+  Stream<List<TailleurRequest>> getPendingRequests() {
+    return _tailleurRef.where('isApproved', isEqualTo: false).snapshots().map(
+          (event) => event.docs
+              .map((doc) =>
+                  TailleurRequest.fromMap(doc.data() as Map<String, dynamic>))
+              .where((request) => !request.isRejected)
+              .toList(),
+        );
+  }
+
+  Future<void> approveRequestAndPromoteUser({
+    required TailleurRequest request,
+    required String adminId,
+  }) async {
+    final requestId = request.id;
+    if (requestId == null || requestId.isEmpty) {
+      throw const FormatException('Demande tailleur introuvable.');
+    }
+    final batch = FirebaseFirestore.instance.batch();
+    batch.update(_tailleurRef.doc(requestId), {
+      'isApproved': true,
+      'isRejected': false,
+      'rejectionReason': '',
+      'reviewedBy': adminId,
+      'reviewedAt': FieldValue.serverTimestamp(),
+    });
+    batch.update(
+        FirebaseFirestore.instance.collection('users').doc(request.userId), {
+      'isTailleur': true,
+      'role': 'tailor',
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    await batch.commit();
+  }
+
+  Future<void> rejectRequest({
+    required TailleurRequest request,
+    required String adminId,
+    required String reason,
+  }) {
+    final requestId = request.id;
+    if (requestId == null || requestId.isEmpty) {
+      throw const FormatException('Demande tailleur introuvable.');
+    }
+    return _tailleurRef.doc(requestId).update({
+      'isApproved': false,
+      'isRejected': true,
+      'rejectionReason': reason.trim(),
+      'reviewedBy': adminId,
+      'reviewedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   Future<void> updateRequest(String id, TailleurRequest request) {
     return _tailleurRef.doc(id).update(request.toMap());
   }

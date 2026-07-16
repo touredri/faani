@@ -33,7 +33,8 @@ class MesuresView extends GetView<MesuresController> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const LoadingStateWidget();
           }
-          if (snapshot.data!.isEmpty) {
+          final data = snapshot.data ?? <Mesure>[];
+          if (data.isEmpty) {
             return EmptyStateWidget(
               iconData: Icons.straighten_outlined,
               title: 'Aucune mesure disponible',
@@ -44,7 +45,6 @@ class MesuresView extends GetView<MesuresController> {
               ),
             );
           }
-          final data = snapshot.data!;
           return ListView.separated(
             padding: AppSpacing.paddingVSm,
             itemCount: data.length,
@@ -63,14 +63,25 @@ class MesuresView extends GetView<MesuresController> {
                   ),
                 ),
                 subtitle: Text(
-                  DateFormat('d MMMM yyyy', 'fr_FR').format(mesure.date!),
+                  '${DateFormat('d MMMM yyyy', 'fr_FR').format(mesure.date ?? DateTime.now())} · '
+                  'Poitrine ${mesure.poitrine ?? '-'} cm · Taille ${mesure.taille ?? '-'} cm',
                   style: AppTypography.bodySmall.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                trailing: Icon(
-                  Icons.chevron_right,
-                  color: theme.colorScheme.onSurfaceVariant,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.straighten_outlined,
+                      color: theme.colorScheme.primary,
+                    ),
+                    AppSpacing.gapH8,
+                    Icon(
+                      Icons.chevron_right,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ],
                 ),
               );
             },

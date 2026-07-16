@@ -9,7 +9,11 @@ class MessageModel {
       toId,
       message,
       modeleImg,
-      lastMsg;
+      lastMsg,
+      commandeId,
+      commandeTitle;
+  List<String> unreadFor;
+  String? lastSenderId;
   int? msgNum;
   Timestamp? lastTime;
 
@@ -23,6 +27,10 @@ class MessageModel {
     this.message,
     this.modeleImg,
     this.lastMsg,
+    this.commandeId,
+    this.commandeTitle,
+    this.unreadFor = const [],
+    this.lastSenderId,
     this.msgNum = 0,
     this.lastTime,
   });
@@ -44,6 +52,10 @@ class MessageModel {
       lastMsg: data?['last_msg'],
       msgNum: data?['msg_num'],
       lastTime: data?['last_time'],
+      commandeId: data?['commande_id'],
+      commandeTitle: data?['commande_title'],
+      unreadFor: List<String>.from(data?['unread_for'] ?? const []),
+      lastSenderId: data?['last_sender_id'],
     );
   }
 
@@ -60,6 +72,10 @@ class MessageModel {
       if (lastMsg != null) 'last_msg': lastMsg,
       if (msgNum != null) 'msg_num': msgNum,
       if (lastTime != null) 'last_time': lastTime,
+      if (commandeId != null) 'commande_id': commandeId,
+      if (commandeTitle != null) 'commande_title': commandeTitle,
+      'unread_for': unreadFor,
+      if (lastSenderId != null) 'last_sender_id': lastSenderId,
     };
   }
 }

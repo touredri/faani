@@ -6,14 +6,13 @@ import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/modules/accueil/controllers/accueil_controller.dart';
 import 'package:faani/app/modules/globale_widgets/message_field/audio.dart';
 import 'package:faani/app/modules/globale_widgets/message_field/message_field.dart';
-import 'package:faani/app/style/spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:faani/app/data/services/modele_service.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
 import '../app/firebase/global_function.dart';
 import 'comment_controller.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class CommentModal extends StatefulWidget {
   final String idModele;
@@ -39,19 +38,49 @@ class _CommentModalState extends State<CommentModal> {
     return StreamBuilder<List<Comment>>(
       stream: _commentController.commentsStream.value,
       builder: (context, snapshot) {
-        return Scaffold(
-          resizeToAvoidBottomInset: true,
-          body: Column(
-            children: [
-              Expanded(
-                child: CommentsList(
-                  commentsSnapshot: snapshot,
-                  idModele: widget.idModele,
+        final theme = Theme.of(context);
+        return Material(
+          color: theme.colorScheme.surface,
+          child: SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 12, 10),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Commentaires',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        tooltip: 'Fermer',
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              MessageField<CommentController>(widget.idModele),
-              1.hs,
-            ],
+                Divider(
+                  height: 1,
+                  color: theme.dividerColor.withValues(alpha: 0.45),
+                ),
+                Expanded(
+                  child: CommentsList(
+                    commentsSnapshot: snapshot,
+                    idModele: widget.idModele,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.viewInsetsOf(context).bottom,
+                  ),
+                  child: MessageField<CommentController>(widget.idModele),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -72,14 +101,33 @@ class CommentsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (commentsSnapshot.hasData) {
+      final comments = commentsSnapshot.data!;
+      if (comments.isEmpty) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.forum_outlined, size: 42, color: Colors.grey),
+                SizedBox(height: 12),
+                Text('Aucun commentaire'),
+                SizedBox(height: 4),
+                Text('Soyez le premier à réagir à ce modèle.'),
+              ],
+            ),
+          ),
+        );
+      }
       return ListView.builder(
-        itemCount: commentsSnapshot.data!.length,
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+        itemCount: comments.length,
         itemBuilder: (context, index) {
-          var comment = commentsSnapshot.data![index];
+          final comment = comments[index];
           final String imgUrl = getRandomProfileImageUrl();
           return GestureDetector(
             onLongPress: () {
-              if (comment.idUser == auth.currentUser!.uid) {
+              if (comment.idUser == auth.currentUser?.uid) {
                 showModalBottomSheet(
                   context: context,
                   useRootNavigator: true,
@@ -124,66 +172,73 @@ class CommentsList extends StatelessWidget {
                   );
                 }
                 final user = snapshot.data!;
-                final formattedDate = timeago.format(
-                    (comment.createdAt ?? Timestamp.now()).toDate(),
-                    locale: 'fr_short');
-                return Padding(
-                  padding:
-                      const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+                final formattedDate = _formatCommentDate(comment.createdAt);
+                final displayName = (user.nomPrenom ?? '').trim().isEmpty
+                    ? 'Utilisateur'
+                    : user.nomPrenom!.trim();
+                final profileImage = (user.profileImage ?? '').trim();
+                final ImageProvider<Object> avatarProvider =
+                    profileImage.isNotEmpty
+                        ? CachedNetworkImageProvider(profileImage)
+                            as ImageProvider<Object>
+                        : NetworkImage(imgUrl) as ImageProvider<Object>;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(user.profileImage ?? imgUrl),
-                              ),
-                              2.5.ws,
-                              Text(
-                                '${user.nomPrenom}',
-                              ),
-                            ],
+                          CircleAvatar(
+                            radius: 18,
+                            backgroundImage: avatarProvider,
                           ),
-                          Text(formattedDate,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              displayName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                          if (formattedDate.isNotEmpty)
+                            Text(
+                              formattedDate,
                               style: TextStyle(
-                                color: Colors.grey,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                                 fontSize: 12,
-                              ))
+                              ),
+                            ),
                         ],
                       ),
-                      1.hs,
+                      const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: comment.type == "text" || comment.type == null
-                            ? Container(
-                                constraints: BoxConstraints(
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.8,
-                                ),
-                                child: Text(
-                                  overflow: TextOverflow.clip,
-                                  comment.comment,
-                                ),
-                              )
-                            : comment.type == "audio"
+                        padding: const EdgeInsets.only(left: 46),
+                        child: comment.type == 'text' || comment.type == null
+                            ? Text(comment.comment)
+                            : comment.type == 'audio'
                                 ? SizedBox(
                                     height: 45,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.7,
                                     child: AudioPlayer(source: comment.file!))
-                                : SizedBox(
-                                    height: 150,
-                                    width: 100,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: CachedNetworkImage(
-                                          imageUrl: comment.file!,
-                                          fit: BoxFit.cover),
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      imageUrl: comment.file!,
+                                      height: 150,
+                                      width: 110,
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                       ),
@@ -203,6 +258,22 @@ class CommentsList extends StatelessWidget {
       return Center(child: CircularProgressIndicator());
     }
   }
+}
+
+String _formatCommentDate(Timestamp? timestamp) {
+  if (timestamp == null) return '';
+  final date = timestamp.toDate().toLocal();
+  final now = DateTime.now();
+  final difference = now.difference(date);
+  if (difference.inMinutes < 1) return "à l'instant";
+  if (difference.inHours < 1) return 'il y a ${difference.inMinutes} min';
+  if (DateUtils.isSameDay(now, date)) {
+    return DateFormat('HH:mm', 'fr_FR').format(date);
+  }
+  if (difference.inDays < 7) {
+    return DateFormat('EEE HH:mm', 'fr_FR').format(date);
+  }
+  return DateFormat('d MMM yyyy', 'fr_FR').format(date);
 }
 
 Widget commentShimmer() {

@@ -7,4 +7,11 @@ abstract interface class UserProfileRepository {
   });
 
   Future<void> updateClientTarget(String userId, String clientTarget);
+
+  Future<void> updateTailorPublicProfile(
+    String userId, {
+    required String bio,
+    required List<String> specialties,
+    required String availability,
+  });
 }

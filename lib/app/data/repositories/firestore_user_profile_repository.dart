@@ -27,4 +27,19 @@ class FirestoreUserProfileRepository implements UserProfileRepository {
       'sex': sex,
     });
   }
+
+  @override
+  Future<void> updateTailorPublicProfile(
+    String userId, {
+    required String bio,
+    required List<String> specialties,
+    required String availability,
+  }) {
+    return _firestore.collection('users').doc(userId).update({
+      'tailorBio': bio,
+      'tailorSpecialties': specialties,
+      'tailorAvailability': availability,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
 }

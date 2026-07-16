@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:faani/app/data/models/commande_model.dart';
 import 'package:faani/app/data/models/message_modele.dart';
+import 'package:faani/app/data/services/commande_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/message_field/message_field_controller.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
@@ -34,6 +36,10 @@ class DiscussionController extends MessageFieldController {
   final RxString toAvatar = ''.obs;
   final RxString modeleImage = ''.obs;
   final RxString token = ''.obs;
+  final RxString commandeId = ''.obs;
+  final RxString commandeTitle = ''.obs;
+  final Rx<Commande?> commande = Rx<Commande?>(null);
+  final RxBool isCommandeLoading = false.obs;
   StreamSubscription<QuerySnapshot<MsgContent>>? listener;
   final ScrollController msgScrolling = ScrollController();
 
@@ -48,6 +54,8 @@ class DiscussionController extends MessageFieldController {
       toAvatar.value = args['to_avatar'];
       modeleImage.value = args['modele_img'];
       token.value = args['token'];
+      commandeId.value = (args['commande_id'] ?? '').toString();
+      commandeTitle.value = (args['commande_title'] ?? '').toString();
     }
   }
 
@@ -66,6 +74,8 @@ class DiscussionController extends MessageFieldController {
     }, onError: (e) {
       debugPrint("Listing Error: $e");
     });
+    markThreadAsRead();
+    loadCommandeContext();
   }
 
   @override
@@ -90,7 +100,29 @@ class DiscussionController extends MessageFieldController {
     await collection.doc(docId.value).update({
       'last_msg': lastMessage,
       'last_time': Timestamp.now(),
+      'last_sender_id': user?.uid ?? '',
+      'unread_for': FieldValue.arrayUnion([toId.value]),
     });
+  }
+
+  Future<void> markThreadAsRead() async {
+    final currentUserId = user?.uid;
+    if (currentUserId == null || docId.value.isEmpty) return;
+    await collection.doc(docId.value).update({
+      'unread_for': FieldValue.arrayRemove([currentUserId]),
+    });
+  }
+
+  Future<void> loadCommandeContext() async {
+    if (commandeId.value.isEmpty) return;
+    isCommandeLoading.value = true;
+    try {
+      commande.value = await CommandeService().getCommande(commandeId.value);
+    } catch (_) {
+      commande.value = null;
+    } finally {
+      isCommandeLoading.value = false;
+    }
   }
 
   Future<void> clearConversationMessages() async {
@@ -206,6 +238,9 @@ class DiscussionController extends MessageFieldController {
               token.value,
               'Nouveau message de ${userController.currentUser.value.nomPrenom}',
               comment.text,
+              category: 'message',
+              targetType: 'discussion',
+              targetId: docId.value,
             ),
             comment.clear(),
           });

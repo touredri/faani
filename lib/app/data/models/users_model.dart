@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/user_role.dart';
+import 'package:faani/app/domain/profile/tailor_availability.dart';
 
 class Follower {
   String idUser;
@@ -19,7 +20,11 @@ class UserModel {
       activeDeviceLabel,
       token,
       sex;
+  String tailorBio;
+  List<String> tailorSpecialties;
+  TailorAvailability tailorAvailability;
   List<String> authProviders;
+  Map<String, bool> notificationPreferences;
   AppUserRole role;
   bool isTailleur;
   DateTime? createdAt, updatedAt, lastLoginAt, identityBoundAt;
@@ -40,8 +45,12 @@ class UserModel {
       this.isTailleur = false,
       this.sex = '',
       this.token,
+      this.tailorBio = '',
+      this.tailorSpecialties = const [],
+      this.tailorAvailability = TailorAvailability.available,
       this.role = AppUserRole.client,
       this.authProviders = const [],
+      this.notificationPreferences = const {},
       this.followers = const [],
       this.following = const [],
       this.lastLoginAt,
@@ -65,7 +74,18 @@ class UserModel {
     final roleRaw = data['role']?.toString();
     final sex = data['sex'];
     final token = data['token'];
+    final tailorBio = data['tailorBio']?.toString() ?? '';
+    final tailorSpecialties =
+        List<String>.from(data['tailorSpecialties'] ?? const []);
+    final tailorAvailability = TailorAvailabilityValue.fromStorage(
+        data['tailorAvailability']?.toString());
     final authProviders = List<String>.from(data['authProviders'] ?? []);
+    final notificationPreferences = Map<String, bool>.from(
+      (data['notificationPreferences'] as Map?)?.map(
+            (key, value) => MapEntry(key.toString(), value == true),
+          ) ??
+          const <String, bool>{},
+    );
     final followers = List<String>.from(data['followers'] ?? []);
     final following = List<String>.from(data['following'] ?? []);
     final createdAtTs = data['createdAt'];
@@ -98,7 +118,11 @@ class UserModel {
           : (isTailleur == true ? AppUserRole.tailor : AppUserRole.client),
       sex: sex,
       token: token,
+      tailorBio: tailorBio,
+      tailorSpecialties: tailorSpecialties,
+      tailorAvailability: tailorAvailability,
       authProviders: authProviders,
+      notificationPreferences: notificationPreferences,
       followers: followers,
       following: following,
       lastLoginAt: lastLoginAt,
@@ -123,7 +147,11 @@ class UserModel {
       'role': appUserRoleToString(role),
       'sex': sex,
       'token': token,
+      'tailorBio': tailorBio,
+      'tailorSpecialties': tailorSpecialties,
+      'tailorAvailability': tailorAvailability.storageValue,
       'authProviders': authProviders,
+      'notificationPreferences': notificationPreferences,
       'followers': followers,
       'following': following,
       'lastLoginAt': lastLoginAt,
@@ -147,10 +175,14 @@ class UserModel {
     bool? isTailleur,
     AppUserRole? role,
     List<String>? authProviders,
+    Map<String, bool>? notificationPreferences,
     List<String>? followers,
     List<String>? following,
     String? sex,
     String? token,
+    String? tailorBio,
+    List<String>? tailorSpecialties,
+    TailorAvailability? tailorAvailability,
     DateTime? lastLoginAt,
     DateTime? identityBoundAt,
     DateTime? createdAt,
@@ -170,10 +202,15 @@ class UserModel {
       isTailleur: isTailleur ?? this.isTailleur,
       role: role ?? this.role,
       authProviders: authProviders ?? this.authProviders,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,
       followers: followers ?? this.followers,
       following: following ?? this.following,
       sex: sex ?? this.sex,
       token: token ?? this.token,
+      tailorBio: tailorBio ?? this.tailorBio,
+      tailorSpecialties: tailorSpecialties ?? this.tailorSpecialties,
+      tailorAvailability: tailorAvailability ?? this.tailorAvailability,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       identityBoundAt: identityBoundAt ?? this.identityBoundAt,
       createdAt: createdAt ?? this.createdAt,

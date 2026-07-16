@@ -13,6 +13,9 @@ class TailorPortfolioController extends GetxController {
   final Rx<List<Modele?>> mesModelesList = Rx<List<Modele?>>([]);
   final RxList<String> selectedCategoryIds = <String>[].obs;
   final RxInt total = 0.obs;
+  final RxInt totalLikes = 0.obs;
+  final RxInt totalViews = 0.obs;
+  final RxInt pendingModeration = 0.obs;
   final ScrollController scrollController = ScrollController();
   RxList<String> get listSelectedCategorie => selectedCategoryIds;
 
@@ -56,7 +59,12 @@ class TailorPortfolioController extends GetxController {
   }
 
   Future<void> _initialize() async {
-    total.value = await _modeleService.getTotalModeleCount(user?.uid ?? '');
+    final userId = user?.uid ?? '';
+    final stats = await _modeleService.getTailorPortfolioStats(userId);
+    total.value = stats['total'] ?? 0;
+    totalLikes.value = stats['likes'] ?? 0;
+    totalViews.value = stats['views'] ?? 0;
+    pendingModeration.value = stats['pending'] ?? 0;
     await loadMore();
   }
 

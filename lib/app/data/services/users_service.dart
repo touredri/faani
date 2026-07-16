@@ -76,6 +76,16 @@ class UserService {
     });
   }
 
+  Future<void> updateNotificationPreferences(
+    String id,
+    Map<String, bool> preferences,
+  ) {
+    return _usersRef.doc(id).update({
+      'notificationPreferences': preferences,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   Future<void> updateUserRole(String id, AppUserRole role) {
     final isTailleur = role == AppUserRole.tailor;
     return _usersRef.doc(id).update({

@@ -3,6 +3,7 @@ import 'package:faani/app/data/repositories/firestore_user_profile_repository.da
 import 'package:faani/app/data/services/external_app_service.dart';
 import 'package:faani/app/data/services/follow.dart';
 import 'package:faani/app/domain/profile/user_profile_repository.dart';
+import 'package:faani/app/domain/profile/tailor_availability.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,11 @@ class ProfileController extends GetxController {
   final TextEditingController nomPrenomController = TextEditingController();
   final TextEditingController villeQuartierController = TextEditingController();
   final TextEditingController telephoneController = TextEditingController();
+  final TextEditingController tailorBioController = TextEditingController();
+  final TextEditingController tailorSpecialtiesController =
+      TextEditingController();
+  final Rx<TailorAvailability> tailorAvailability =
+      TailorAvailability.available.obs;
   RxBool isTailleur = false.obs;
   RxString selectedLanguage = 'Français'.obs;
   final List<String> languages = [
@@ -94,6 +100,21 @@ class ProfileController extends GetxController {
             : villeQuartierController.text,
         sex: selectedGenreCible.value,
       );
+      if (userController.isTailleur.value) {
+        final specialties = tailorSpecialtiesController.text
+            .split(',')
+            .map((value) => value.trim())
+            .where((value) => value.isNotEmpty)
+            .toSet()
+            .toList(growable: false);
+        await _profileRepository.updateTailorPublicProfile(
+          user!.uid,
+          bio: tailorBioController.text.trim(),
+          specialties: specialties,
+          availability: tailorAvailability.value.storageValue,
+        );
+      }
+      await userController.init();
 
       showCustomSnackbar(
         message: 'Profil mis à jour avec succès',
@@ -121,6 +142,8 @@ class ProfileController extends GetxController {
   @override
   void onClose() {
     _followStatsSubscription?.cancel();
+    tailorBioController.dispose();
+    tailorSpecialtiesController.dispose();
     super.onClose();
   }
 }

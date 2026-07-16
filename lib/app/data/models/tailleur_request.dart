@@ -1,8 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class TailleurRequest {
   String? id;
   String userId, nomAtelier, clientCible, pays, ville, quartier;
   int nombreTravailleur, numAtelier;
   bool isApproved; // New property
+  bool isRejected;
+  String rejectionReason;
+  String? reviewedBy;
+  DateTime? reviewedAt;
 
   TailleurRequest({
     this.id,
@@ -15,6 +21,10 @@ class TailleurRequest {
     required this.nombreTravailleur,
     required this.numAtelier,
     this.isApproved = false,
+    this.isRejected = false,
+    this.rejectionReason = '',
+    this.reviewedBy,
+    this.reviewedAt,
   });
 
   factory TailleurRequest.fromMap(Map<String, dynamic> map) {
@@ -29,6 +39,12 @@ class TailleurRequest {
       nombreTravailleur: map['nombreTravailleur'],
       numAtelier: map['numAtelier'],
       isApproved: map['isApproved'] ?? false,
+      isRejected: map['isRejected'] ?? false,
+      rejectionReason: map['rejectionReason']?.toString() ?? '',
+      reviewedBy: map['reviewedBy']?.toString(),
+      reviewedAt: map['reviewedAt'] is Timestamp
+          ? (map['reviewedAt'] as Timestamp).toDate()
+          : null,
     );
   }
 
@@ -44,6 +60,10 @@ class TailleurRequest {
       'nombreTravailleur': nombreTravailleur,
       'numAtelier': numAtelier,
       'isApproved': isApproved,
+      'isRejected': isRejected,
+      'rejectionReason': rejectionReason,
+      'reviewedBy': reviewedBy,
+      'reviewedAt': reviewedAt,
     };
   }
 }

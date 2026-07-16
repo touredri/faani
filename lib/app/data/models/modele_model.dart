@@ -82,6 +82,10 @@ class Modele {
   final String? idCategorie;
   final bool? isPublic;
   final bool isApproved;
+  final bool isRejected;
+  final bool isFaaniContent;
+  final String moderationReason;
+  final List<double> mediaAspectRatios;
 
   Modele({
     required this.id,
@@ -96,6 +100,10 @@ class Modele {
     required this.idCategorie,
     required this.isPublic,
     this.isApproved = false,
+    this.isRejected = false,
+    this.isFaaniContent = false,
+    this.moderationReason = '',
+    this.mediaAspectRatios = const <double>[],
   });
 
   factory Modele.fromMap(
@@ -113,6 +121,13 @@ class Modele {
     final idCategorie = data['idCategorie'] as String;
     final isPublic = data['isPublic'] as bool? ?? false;
     final isApproved = data['isApproved'] as bool? ?? false; // New property
+    final isRejected = data['isRejected'] as bool? ?? false;
+    final isFaaniContent = data['isFaaniContent'] as bool? ?? false;
+    final moderationReason = data['moderationReason']?.toString() ?? '';
+    final mediaAspectRatios = (data['mediaAspectRatios'] as List?)
+            ?.map((value) => (value as num).toDouble())
+            .toList() ??
+        const <double>[];
 
     return Modele(
       id: id,
@@ -127,6 +142,10 @@ class Modele {
       idCategorie: idCategorie,
       isPublic: isPublic,
       isApproved: isApproved, // New property
+      isRejected: isRejected,
+      isFaaniContent: isFaaniContent,
+      moderationReason: moderationReason,
+      mediaAspectRatios: mediaAspectRatios,
     );
   }
 
@@ -143,6 +162,11 @@ class Modele {
       'idCategorie': idCategorie,
       'isPublic': isPublic,
       'isApproved': isApproved, // New property
+      'isRejected': isRejected,
+      'isFaaniContent': isFaaniContent,
+      'moderationReason': moderationReason,
+      'searchText': searchableText,
+      if (mediaAspectRatios.isNotEmpty) 'mediaAspectRatios': mediaAspectRatios,
     };
   }
 
@@ -180,6 +204,13 @@ class Modele {
         : null;
 
     final createdAt = data['createdAt'] as Timestamp?;
+    final rawAspectRatios = data['mediaAspectRatios'];
+    final mediaAspectRatios = rawAspectRatios is List
+        ? rawAspectRatios
+            .map((value) => value is num ? value.toDouble() : null)
+            .whereType<double>()
+            .toList()
+        : const <double>[];
 
     return Modele(
       id: doc.id,
@@ -194,16 +225,25 @@ class Modele {
       idCategorie: asString(data['idCategorie']),
       isPublic: asBool(data['isPublic']),
       isApproved: asBool(data['isApproved']), // New property
+      isRejected: asBool(data['isRejected']),
+      isFaaniContent: asBool(data['isFaaniContent']),
+      moderationReason: asString(data['moderationReason']),
+      mediaAspectRatios: mediaAspectRatios,
     );
   }
 
   FirebaseFirestore get firestore => FirebaseFirestore.instance;
+
+  String get searchableText => _normalizeSearchText(
+        '${detail ?? ''} $genreHabit $idCategorie',
+      );
 
   // Crée un nouveau document dans la collection "modele"
   Future<void> create() async {
     final collection = firestore.collection('modele');
     final docRef = await collection.add(toMap());
     id = docRef.id;
+    await docRef.update({'id': id});
   }
 
   // Met à jour le document dans la collection "modele"
@@ -228,4 +268,29 @@ class Modele {
     final doc = await firestore.collection('modele').doc(id).get();
     return Modele.fromMap(doc.data()!, doc.reference);
   }
+}
+
+String _normalizeSearchText(String value) {
+  const replacements = <String, String>{
+    'à': 'a',
+    'â': 'a',
+    'ä': 'a',
+    'é': 'e',
+    'è': 'e',
+    'ê': 'e',
+    'ë': 'e',
+    'î': 'i',
+    'ï': 'i',
+    'ô': 'o',
+    'ö': 'o',
+    'ù': 'u',
+    'û': 'u',
+    'ü': 'u',
+    'ç': 'c',
+  };
+  var normalized = value.toLowerCase().trim();
+  replacements.forEach((source, target) {
+    normalized = normalized.replaceAll(source, target);
+  });
+  return normalized.replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
 }

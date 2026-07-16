@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/commande_model.dart';
-import 'package:faani/app/data/services/suivi_etat_service.dart';
+import 'package:faani/app/domain/order/order_stage.dart';
 import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:get/get.dart';
 import '../../firebase/global_function.dart';
 
 class CommandeService {
   final collection = FirebaseFirestore.instance.collection('commandes');
-  SuiviEtatService suiviEtatService = SuiviEtatService();
   DocumentSnapshot? lastDocument;
 
   // get a commande
@@ -55,30 +54,24 @@ class CommandeService {
 
   // get all commande by status and take 1 for receive and 2 for finish
   Stream<List<Commande>> getAllCommandeByEtat(int number) {
-    return getAllCommande().asyncMap((commandes) async {
-      List<Commande> finishCommandes = [];
-      List<Commande> inProgressCommandes = [];
-      List<Commande> selfSaveCommandes = [];
-
-      for (Commande element in commandes) {
-        String etat = await suiviEtatService.getEtatLibelle(element.id!);
-        if (etat == 'Terminer') {
-          finishCommandes.add(element);
-        } else {
-          if (!element.isSelfAdded) {
-            inProgressCommandes.add(element);
-          } else {
-            selfSaveCommandes.add(element);
-          }
-        }
+    return getAllCommande().map((commandes) {
+      final sorted = List<Commande>.from(commandes)
+        ..sort((left, right) => right.dateAjout.compareTo(left.dateAjout));
+      if (number == 2) {
+        return sorted
+            .where((commande) => commande.stage == OrderStage.draft)
+            .toList();
       }
-
-      if (number == 1) {
-        return inProgressCommandes;
-      } else if (number == 2) {
-        return selfSaveCommandes;
+      if (number == 0) {
+        return sorted
+            .where((commande) => commande.stage == OrderStage.completed)
+            .toList();
       }
-      return finishCommandes;
+      return sorted
+          .where((commande) =>
+              commande.stage != OrderStage.completed &&
+              commande.stage != OrderStage.draft)
+          .toList();
     });
   }
 

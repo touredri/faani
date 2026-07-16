@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../globale_widgets/custom_app_bar.dart';
 import '../widgets/change_langue.dart';
 import '../widgets/notification_params.dart';
+import 'notification_center_view.dart';
 
 class ParametreView extends GetView {
   const ParametreView({super.key});
@@ -25,6 +26,11 @@ class ParametreView extends GetView {
             _buildSection(
               title: 'Compte',
               items: [
+                _buildItem(
+                  icon: Icons.notifications_active_outlined,
+                  text: 'Activité',
+                  onTap: () => Get.to(() => const NotificationCenterView()),
+                ),
                 _buildItem(
                   icon: Icons.account_circle_outlined,
                   text: 'Gerer le compte',

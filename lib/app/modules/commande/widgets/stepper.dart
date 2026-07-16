@@ -27,6 +27,7 @@ class _MyStepState extends State<MyStep> {
   double progress = 0.2;
   RxInt stepperCurrentIndex = 0.obs;
   Rx<SuiviEtat?> currentSuiviEtat = Rx<SuiviEtat?>(null);
+  late Future<void> _trackingFuture;
 
   void increaseProgress() {
     if (progress < 1) {
@@ -37,56 +38,70 @@ class _MyStepState extends State<MyStep> {
   }
 
   Future<void> setStepperCureentIndex(String commandeId) async {
-    final suiviEtat =
-        await SuiviEtatService().getSuiviEtatByCommandeId(commandeId);
-    final etat = await SuiviEtatService().getEtatLibelle(commandeId);
-    stepperCurrentIndex.value = getStepperIndex(etat);
-    currentSuiviEtat.value = suiviEtat;
+    try {
+      final suiviEtat =
+          await SuiviEtatService().getSuiviEtatByCommandeId(commandeId);
+      final etat = await SuiviEtatService().getEtatLibelle(commandeId);
+      stepperCurrentIndex.value = getStepperIndex(etat);
+      currentSuiviEtat.value = suiviEtat;
+    } catch (_) {
+      // Les commandes historiques peuvent ne pas avoir de suivi associé.
+      stepperCurrentIndex.value = getStepperIndex(widget.commande.etatLibelle);
+    }
   }
 
   // take stepper index from commande etat
   int getStepperIndex(String etat) {
-    switch (etat) {
-      case 'En cours':
+    switch (etat.trim().toLowerCase()) {
+      case 'en cours':
         return 0;
-      case 'Decoupes':
+      case 'decoupes':
         return 1;
-      case 'Assemblage':
+      case 'assemblage':
         return 2;
-      case 'Paiement':
+      case 'paiement':
         return 3;
-      case 'Recuperer':
+      case 'recuperer':
         return 4;
-      case 'Terminer':
+      case 'terminer':
         return 5;
       default:
         return 0;
     }
   }
 
-  void updateCommande() async {
-    await widget.commande.update();
+  Future<void> updateCommande() {
+    return widget.commande.update();
   }
 
-  void sendNotif() async {
+  Future<void> sendNotif() async {
     if (widget.commande.idUser.isNotEmpty) {
       final UserModel client =
           await UserService().getUser(widget.commande.idUser);
-      await sendNotification(client.token!, 'Etat Commande modifié',
-          'Letat de votre commande a été modifiée par le tailleur à ${widget.commande.etatLibelle}');
+      final token = client.token;
+      if (token == null || token.isEmpty) return;
+      await sendNotification(
+        token,
+        'Etat Commande modifié',
+        'L’état de votre commande a été modifié par le tailleur : ${widget.commande.etatLibelle}',
+        category: 'order',
+        targetType: 'commande',
+        targetId: widget.commande.id ?? '',
+      );
     }
   }
 
   @override
   void initState() {
     super.initState();
+    _trackingFuture = setStepperCureentIndex(widget.commande.id!);
   }
 
   @override
   Widget build(BuildContext context) {
     final userController = Get.find<UserController>();
     return FutureBuilder<void>(
-        future: setStepperCureentIndex(widget.commande.id!),
+        future: _trackingFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -131,50 +146,34 @@ class _MyStepState extends State<MyStep> {
                         icon: Icon(Icons.check_circle_outline),
                       ),
                     ],
-                    onStepReached: (index) => {
-                          if (userController.isTailleur.value &&
-                              widget.commande.idTailleur ==
-                                  userController.currentUser.value.id)
-                            {
-                              if (index == 0)
-                                {
-                                  widget.commande.etatLibelle = 'En cours',
-                                  currentSuiviEtat.value!.idEtat = '1',
-                                }
-                              else if (index == 1)
-                                {
-                                  widget.commande.etatLibelle = 'Decoupes',
-                                  currentSuiviEtat.value!.idEtat = '2',
-                                }
-                              else if (index == 2)
-                                {
-                                  widget.commande.etatLibelle = 'assemblage',
-                                  currentSuiviEtat.value!.idEtat = '3',
-                                }
-                              else if (index == 3)
-                                {
-                                  widget.commande.etatLibelle = 'Paiement',
-                                  currentSuiviEtat.value!.idEtat = '4',
-                                }
-                              else if (index == 4)
-                                {
-                                  widget.commande.etatLibelle = 'Recuperer',
-                                  currentSuiviEtat.value!.idEtat = '5',
-                                }
-                              else if (index == 5)
-                                {
-                                  widget.commande.etatLibelle = 'Terminer',
-                                  currentSuiviEtat.value!.idEtat = '6',
-                                },
-                              currentSuiviEtat.value!.dateModifier =
-                                  Timestamp.fromDate(DateTime.now()),
-                              SuiviEtatService()
-                                  .updateSuiviEtat(currentSuiviEtat.value!),
-                              updateCommande(),
-                              sendNotif(),
-                              setState(() => stepperCurrentIndex.value = index),
-                            },
-                        }),
+                    onStepReached: (index) async {
+                      if (!userController.isTailleur.value ||
+                          widget.commande.idTailleur !=
+                              userController.currentUser.value.id ||
+                          currentSuiviEtat.value == null) {
+                        return;
+                      }
+
+                      const labels = [
+                        'En cours',
+                        'Decoupes',
+                        'Assemblage',
+                        'Paiement',
+                        'Recuperer',
+                        'Terminer',
+                      ];
+                      widget.commande.etatLibelle = labels[index];
+                      currentSuiviEtat.value!.idEtat = '${index + 1}';
+                      currentSuiviEtat.value!.dateModifier =
+                          Timestamp.fromDate(DateTime.now());
+                      await SuiviEtatService()
+                          .updateSuiviEtat(currentSuiviEtat.value!);
+                      await updateCommande();
+                      await sendNotif();
+                      if (mounted) {
+                        setState(() => stepperCurrentIndex.value = index);
+                      }
+                    }),
               ],
             );
           }

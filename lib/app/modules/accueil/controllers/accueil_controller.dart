@@ -1,6 +1,7 @@
 import 'package:faani/app/data/repositories/modele_feed_repository.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/engagement_tracking_service.dart';
+import 'package:faani/app/data/services/follow.dart';
 import 'package:faani/app/data/services/feed_analytics_adapter.dart';
 import 'package:faani/app/data/services/shared_preferences_feed_history_store.dart';
 import 'package:faani/app/domain/feed/feed_analytics.dart';
@@ -8,6 +9,7 @@ import 'package:faani/app/domain/feed/feed_history_store.dart';
 import 'package:faani/app/domain/feed/feed_loader.dart';
 import 'package:faani/app/domain/feed/feed_ranking_policy.dart';
 import 'package:faani/app/domain/feed/feed_repository.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/home/controllers/home_controller.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
@@ -17,12 +19,19 @@ import 'package:pull_to_refresh_new/pull_to_refresh.dart';
 import 'dart:async';
 import '../../../data/models/categorie_model.dart';
 import '../../../data/models/modele_model.dart';
+import '../../../data/services/categorie_service.dart';
+
+enum HomeFeedMode { forYou, following }
 
 class AccueilController extends GetxController {
   RxList<Modele> modeles = <Modele>[].obs;
   final RxBool isInitialized = false.obs;
   final RxBool isRefreshingCache = false.obs;
   final RxBool isLoadingMore = false.obs;
+  final Rx<HomeFeedMode> feedMode = HomeFeedMode.forYou.obs;
+  final RxList<Modele> followingModeles = <Modele>[].obs;
+  final RxBool isFollowingLoading = false.obs;
+  final RxString followingError = ''.obs;
   final RxMap<String, double> userCategoryWeights = <String, double>{}.obs;
   final PageController pageController =
       PageController(initialPage: 0, viewportFraction: 1.0);
@@ -35,6 +44,10 @@ class AccueilController extends GetxController {
   final userController = Get.find<UserController>();
   final homeController = Get.find<HomeController>();
   final Rx<Comment?> selectedComment = Rx<Comment?>(null);
+  final RxList<Categorie> categories = <Categorie>[].obs;
+  final RxBool isCategoriesLoading = true.obs;
+  final RxBool hasCategoriesError = false.obs;
+  StreamSubscription<List<Categorie>>? _categorySubscription;
   final List<String> _recentOpenedModeleIds = <String>[];
   final Map<String, DateTime> _recentOpenedAtById = <String, DateTime>{};
   final List<String> _recentShownModeleIds = <String>[];
@@ -51,11 +64,13 @@ class AccueilController extends GetxController {
   late final FeedLoader _feedLoader;
   late final FeedHistoryStore _historyStore;
   late final FeedAnalytics _analytics;
+  late final FollowService _followService;
 
   AccueilController({
     FeedRepository? feedRepository,
     FeedHistoryStore? historyStore,
     FeedAnalytics? analytics,
+    FollowService? followService,
   }) {
     _feedRepository =
         feedRepository ?? ModeleFeedRepository(homeController.modeleService);
@@ -63,12 +78,61 @@ class AccueilController extends GetxController {
     _historyStore = historyStore ?? SharedPreferencesFeedHistoryStore();
     _analytics = analytics ??
         EngagementFeedAnalytics(EngagementTrackingService.instance);
+    _followService = followService ?? FollowService();
     sewingIcon = SvgPicture.asset(
       sewing,
       colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
       width: 30,
       height: 30,
     );
+  }
+
+  bool get isFollowingMode => feedMode.value == HomeFeedMode.following;
+
+  Future<void> selectFeedMode(HomeFeedMode mode) async {
+    if (feedMode.value == mode) return;
+    feedMode.value = mode;
+    if (mode == HomeFeedMode.following && followingModeles.isEmpty) {
+      await loadFollowingFeed();
+    }
+    update();
+  }
+
+  Future<void> loadFollowingFeed() async {
+    final currentUser = auth.currentUser;
+    if (currentUser == null || currentUser.isAnonymous) {
+      followingModeles.clear();
+      followingError.value = 'home_following_auth_required'.tr;
+      update();
+      return;
+    }
+    if (isFollowingLoading.value) return;
+    isFollowingLoading.value = true;
+    followingError.value = '';
+    try {
+      final followingIds =
+          await _followService.getFollowingOnce(currentUser.uid);
+      final modelsByTailor = await Future.wait(
+        followingIds.take(30).map(
+              (tailorId) => homeController.modeleService
+                  .getDiscoverableByTailleur(tailorId),
+            ),
+      );
+      final merged = modelsByTailor.expand((models) => models).toList()
+        ..sort((left, right) => (right.createdAt?.millisecondsSinceEpoch ?? 0)
+            .compareTo(left.createdAt?.millisecondsSinceEpoch ?? 0));
+      final unique = <String, Modele>{};
+      for (final modele in merged) {
+        if (modele.id != null) unique[modele.id!] = modele;
+      }
+      followingModeles.assignAll(unique.values.take(60));
+    } catch (error) {
+      followingModeles.clear();
+      followingError.value = error.toString();
+    } finally {
+      isFollowingLoading.value = false;
+      update();
+    }
   }
 
   void _jumpToFirstPageIfAttached() {
@@ -187,11 +251,6 @@ class AccueilController extends GetxController {
       return result.items;
     }
 
-    final target = limit ?? result.candidateCount;
-    _registerShownBatch(
-      result.items,
-      maxTracked: target < 12 ? target : 12,
-    );
     if (result.penaltyCapHits > 0) {
       _analytics.trackRankingSignal(
         'exploration_penalty_cap_hit',
@@ -203,6 +262,26 @@ class AccueilController extends GetxController {
       );
     }
     return result.items;
+  }
+
+  void registerExplorationVisible(List<Modele> items, {int maxTracked = 12}) {
+    _registerShownBatch(items, maxTracked: maxTracked);
+  }
+
+  void _listenToCategories() {
+    _categorySubscription?.cancel();
+    isCategoriesLoading.value = true;
+    hasCategoriesError.value = false;
+    _categorySubscription = CategorieService().getCategorie().listen(
+      (items) {
+        categories.assignAll(items);
+        isCategoriesLoading.value = false;
+      },
+      onError: (_, __) {
+        hasCategoriesError.value = true;
+        isCategoriesLoading.value = false;
+      },
+    );
   }
 
   void _registerShownBatch(List<Modele> items, {int maxTracked = 12}) {
@@ -458,12 +537,14 @@ class AccueilController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _listenToCategories();
     init();
   }
 
   @override
   void onClose() {
     _persistRecentOpenedTimer?.cancel();
+    _categorySubscription?.cancel();
     _persistRecentOpenedMemory();
     pageController.dispose();
     refreshController.dispose();

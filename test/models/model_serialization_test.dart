@@ -50,7 +50,11 @@ void main() {
         'role': 'tailor',
         'sex': 'F',
         'token': 'token-1',
+        'tailorBio': '',
+        'tailorSpecialties': <String>[],
+        'tailorAvailability': 'available',
         'authProviders': ['phone', 'google'],
+        'notificationPreferences': <String, bool>{},
         'followers': ['follower-1'],
         'following': ['following-1'],
         'lastLoginAt': lastLoginAt,
@@ -111,6 +115,10 @@ void main() {
       'idCategorie': 'categorie-1',
       'isPublic': true,
       'isApproved': true,
+      'isRejected': false,
+      'isFaaniContent': false,
+      'moderationReason': '',
+      'searchText': 'boubou brode femme categorie 1',
     });
   });
 
@@ -157,6 +165,7 @@ void main() {
       'isAccepted': true,
       'modeleImage': 'modele.jpg',
       'etatLibele': 'Acceptée',
+      'etatLibelle': 'Acceptée',
     });
   });
 }

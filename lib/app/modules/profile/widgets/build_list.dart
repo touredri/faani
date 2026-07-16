@@ -4,6 +4,8 @@ import 'package:faani/app/modules/profile/controllers/profile_controller.dart';
 import 'package:faani/app/modules/profile/views/about.dart';
 import 'package:faani/app/modules/profile/views/aide_view.dart';
 import 'package:faani/app/modules/profile/views/mes_modeles_view.dart';
+import 'package:faani/app/modules/favorie/views/favorie_view.dart';
+import 'package:faani/app/modules/profile/views/mon_atelier.dart';
 import 'package:faani/app/modules/profile/views/parametre_view.dart';
 import 'package:faani/app/modules/profile/views/tailor_clients_view.dart';
 import 'package:faani/app/modules/profile/widgets/commentaire_bottom_sheet.dart';
@@ -52,6 +54,16 @@ Widget listBuild(ProfileController controller, BuildContext context) {
             ),
           const CustomDivider(),
           CustomListTile(
+            leadingIcon: const Icon(Icons.favorite_border, color: Colors.red),
+            title: 'Mes favoris',
+            subTitle: 'Retrouver les modèles enregistrés',
+            onTap: () => Get.to(
+              () => const FavorieView(),
+              transition: Transition.rightToLeft,
+            ),
+          ),
+          const CustomDivider(),
+          CustomListTile(
             leadingIcon: controller.measureIcon,
             title: 'Mes mesures',
             subTitle: 'Voir mes mesures',
@@ -69,6 +81,18 @@ Widget listBuild(ProfileController controller, BuildContext context) {
               onTap: () => Get.toNamed(
                 Routes.adminPanel,
                 preventDuplicates: false,
+              ),
+            ),
+          if (controller.userController.isTailleur.value) const CustomDivider(),
+          if (controller.userController.isTailleur.value)
+            CustomListTile(
+              leadingIcon:
+                  const Icon(Icons.dashboard_outlined, color: Colors.teal),
+              title: 'Mon atelier',
+              subTitle: 'Commandes, clients et modèles en un coup d\'oeil',
+              onTap: () => Get.to(
+                () => const MonAtelierView(),
+                transition: Transition.rightToLeft,
               ),
             ),
           if (controller.userController.isTailleur.value) const CustomDivider(),

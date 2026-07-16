@@ -34,10 +34,11 @@ class CameraMesureView extends GetView<CameraMesureController> {
 
       if (controller.phase.value == CameraCapturePhase.completed &&
           controller.resultDraft.value != null) {
-        final draft = controller.resultDraft.value!;
-        controller.resultDraft.value = null;
+        // La consommation du brouillon est différée hors du build ;
+        // takeResultDraft ne retourne le résultat qu'une seule fois.
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) {
+          final draft = controller.takeResultDraft();
+          if (draft == null || !context.mounted) {
             return;
           }
           Get.off(() => MesureManualCaptureView(initialDraft: draft));

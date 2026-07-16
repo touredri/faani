@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/firebase/global_function.dart';
+import 'package:faani/app/domain/order/order_stage.dart';
 
 class Commande {
   String? id;
@@ -42,15 +43,21 @@ class Commande {
 
   factory Commande.fromMap(
       Map<String, dynamic> data, DocumentReference docRef) {
+    DateTime asDate(dynamic value) {
+      if (value is Timestamp) return value.toDate();
+      if (value is DateTime) return value;
+      return DateTime.now();
+    }
+
     return Commande(
       id: docRef.id,
-      dateAjout: (data['dateAjout'] as Timestamp).toDate(),
-      datePrevue: (data['datePrevue'] as Timestamp).toDate(),
-      dateModifier: (data['dateModifier'] as Timestamp).toDate(),
-      idUser: data['idUser'],
-      idMesure: data['idMesure'],
-      idModele: data['idModele'],
-      idTailleur: data['idTailleur'],
+      dateAjout: asDate(data['dateAjout']),
+      datePrevue: asDate(data['datePrevue']),
+      dateModifier: asDate(data['dateModifier']),
+      idUser: (data['idUser'] ?? '').toString(),
+      idMesure: (data['idMesure'] ?? '').toString(),
+      idModele: (data['idModele'] ?? '').toString(),
+      idTailleur: (data['idTailleur'] ?? '').toString(),
       numeroClient: data['numeroClient'],
       nomClient: data['nomClient'],
       photoHabit: data['photoHabit'],
@@ -60,7 +67,8 @@ class Commande {
       isSelfAdded: data['isSelfAdded'],
       isAccepted: data['isAccepted'],
       modeleImage: data['modeleImage'] ?? '',
-      etatLibelle: data['etatLibele'] ?? 'En cours',
+      etatLibelle:
+          (data['etatLibelle'] ?? data['etatLibele'] ?? 'En cours').toString(),
     );
   }
 
@@ -83,8 +91,12 @@ class Commande {
       'isAccepted': isAccepted,
       'modeleImage': modeleImage,
       'etatLibele': etatLibelle,
+      'etatLibelle': etatLibelle,
     };
   }
+
+  OrderStage get stage =>
+      OrderStageParsing.fromStoredValue(etatLibelle, isSelfAdded: isSelfAdded);
 
   CollectionReference<Map<String, dynamic>> get collection =>
       FirebaseFirestore.instance.collection('commandes');

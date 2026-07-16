@@ -29,6 +29,7 @@ class HomeView extends GetView<HomeController> {
       ),
       child: Scaffold(
         extendBody: true,
+        resizeToAvoidBottomInset: false,
         body: PopScope(
           canPop: false,
           onPopInvokedWithResult: (didPop, result) {
@@ -38,6 +39,7 @@ class HomeView extends GetView<HomeController> {
           child: Obx(
             () => PersistentTabView(
               controller: controller.tabController,
+              resizeToAvoidBottomInset: false,
               backgroundColor: theme.scaffoldBackgroundColor,
               tabs: controller.tabs(
                 isHomeTabActive: controller.selectedNavIndex.value == 0,

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faani/app/data/models/message_modele.dart';
 import 'package:faani/app/data/models/users_model.dart';
+import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/message/views/discussion_view.dart';
 import 'package:flutter/material.dart';
@@ -81,8 +82,9 @@ class MessageController extends GetxController {
           if (fromId.isEmpty || toId.isEmpty) {
             continue;
           }
-          final key =
+          final participants =
               fromId.compareTo(toId) <= 0 ? '$fromId|$toId' : '$toId|$fromId';
+          final key = '$participants|${message.commandeId ?? 'general'}';
           final previous = merged[key];
           if (previous == null) {
             merged[key] = message;
@@ -115,13 +117,20 @@ class MessageController extends GetxController {
       final fromName = (message.fromName ?? '').toLowerCase();
       final toName = (message.toName ?? '').toLowerCase();
       final lastMsg = (message.lastMsg ?? '').toLowerCase();
+      final commandeTitle = (message.commandeTitle ?? '').toLowerCase();
       return fromName.contains(query) ||
           toName.contains(query) ||
-          lastMsg.contains(query);
+          lastMsg.contains(query) ||
+          commandeTitle.contains(query);
     }).toList();
   }
 
-  Future<void> goChat(UserModel toUser, {String modeleImg = ''}) async {
+  Future<void> goChat(
+    UserModel toUser, {
+    String modeleImg = '',
+    String? commandeId,
+    String? commandeTitle,
+  }) async {
     final currentUser = user;
     if (currentUser == null) {
       return;
@@ -137,15 +146,25 @@ class MessageController extends GetxController {
         .where('to_id', isEqualTo: user!.uid)
         .get();
 
-    final existingDocId = fromMessage.docs.isNotEmpty
-        ? fromMessage.docs.first.id
-        : (toMessage.docs.isNotEmpty ? toMessage.docs.first.id : null);
+    final existingThreads = [...fromMessage.docs, ...toMessage.docs];
+    final existing = existingThreads
+        .where((thread) {
+          final existingCommandeId = thread.data().commandeId;
+          return commandeId == null
+              ? existingCommandeId == null || existingCommandeId.isEmpty
+              : existingCommandeId == commandeId;
+        })
+        .cast<QueryDocumentSnapshot<MessageModel>>()
+        .firstOrNull;
+    final existingDocId = existing?.id;
 
     if (existingDocId != null) {
       _openDiscussion(
         docId: existingDocId,
         toUser: toUser,
         modeleImg: modeleImg,
+        commandeId: commandeId,
+        commandeTitle: commandeTitle,
       );
       return;
     }
@@ -171,6 +190,9 @@ class MessageController extends GetxController {
       lastMsg: '',
       lastTime: Timestamp.now(),
       msgNum: 0,
+      commandeId: commandeId,
+      commandeTitle: commandeTitle,
+      unreadFor: const [],
     );
 
     final created = await collection.add(msgData);
@@ -178,13 +200,39 @@ class MessageController extends GetxController {
       docId: created.id,
       toUser: toUser,
       modeleImg: modeleImg,
+      commandeId: commandeId,
+      commandeTitle: commandeTitle,
     );
+  }
+
+  Future<bool> openThread(String threadId) async {
+    if (threadId.isEmpty || user == null) return false;
+    final snapshot = await collection.doc(threadId).get();
+    final thread = snapshot.data();
+    if (!snapshot.exists || thread == null) return false;
+
+    final contactId = thread.fromId == user!.uid
+        ? (thread.toId ?? '')
+        : (thread.fromId ?? '');
+    if (contactId.isEmpty) return false;
+
+    final contact = await UserService().getUser(contactId);
+    _openDiscussion(
+      docId: snapshot.id,
+      toUser: contact,
+      modeleImg: thread.modeleImg ?? '',
+      commandeId: thread.commandeId,
+      commandeTitle: thread.commandeTitle,
+    );
+    return true;
   }
 
   void _openDiscussion({
     required String docId,
     required UserModel toUser,
     required String modeleImg,
+    String? commandeId,
+    String? commandeTitle,
   }) {
     Get.to(
       () => const DiscussionView(),
@@ -196,6 +244,8 @@ class MessageController extends GetxController {
         'to_avatar': toUser.profileImage,
         'modele_img': modeleImg,
         'token': toUser.token,
+        'commande_id': commandeId ?? '',
+        'commande_title': commandeTitle ?? '',
       },
     );
   }

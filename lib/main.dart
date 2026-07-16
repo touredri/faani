@@ -109,6 +109,10 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: ThemeMode.system,
+          // GetX returns the translation key when Get.locale is null. Set it
+          // explicitly so the device locale and the fallback table are used
+          // from the first frame.
+          locale: Get.deviceLocale ?? const Locale('fr', 'FR'),
           initialRoute: AppPages.initial,
           getPages: AppPages.routes,
           translationsKeys: AppTranslation.translations,

@@ -100,6 +100,9 @@ class FirebaseOrderNotificationService implements OrderNotificationService {
       token,
       'Nouvelle commande',
       'Vous avez une nouvelle commande de $clientName',
+      category: 'order',
+      targetType: 'commande',
+      targetId: commande.id ?? '',
     );
     await sendProgrammingNotification(
       token,
@@ -107,6 +110,8 @@ class FirebaseOrderNotificationService implements OrderNotificationService {
       'Alert date Prevue',
       'La date prevue pour l\'habit de $clientName est arrivé',
       commande.datePrevue,
+      targetType: 'commande',
+      targetId: commande.id ?? '',
     );
   }
 }

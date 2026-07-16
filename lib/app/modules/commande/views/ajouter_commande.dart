@@ -1,315 +1,423 @@
 import 'dart:io';
+
 import 'package:faani/app/data/models/mesure_model.dart';
 import 'package:faani/app/data/models/modele_model.dart';
 import 'package:faani/app/data/models/users_model.dart';
 import 'package:faani/app/data/services/mesure_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/commande/controllers/commande_controller.dart';
 import 'package:faani/app/modules/commande/widgets/mesure_popup.dart';
 import 'package:faani/app/modules/globale_widgets/circular_progress.dart';
-import 'package:faani/app/style/app_colors.dart';
-import 'package:faani/app/style/spacer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:faani/app/style/app_spacing.dart';
+import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-class AjoutCommandePage extends GetView<CommandeController> {
-  final Modele modele;
-  final UserModel? tailleur;
+class AjoutCommandePage extends StatefulWidget {
   const AjoutCommandePage(this.modele, {this.tailleur, super.key});
 
-  void _pickImages() async {
-    // Open the image picker
-    final ImagePicker picker = ImagePicker();
-    final List<XFile> image = await picker.pickMultiImage();
-    // Add the selected image to the list
-    if (image.isNotEmpty) {
-      controller.image.value = image.first;
-    }
+  final Modele modele;
+  final UserModel? tailleur;
+
+  @override
+  State<AjoutCommandePage> createState() => _AjoutCommandePageState();
+}
+
+class _AjoutCommandePageState extends State<AjoutCommandePage> {
+  late final CommandeController _controller;
+  final MesureService _mesureService = MesureService();
+
+  bool get _isTailleur => _controller.userController.isTailleur.value;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.isRegistered<CommandeController>()
+        ? Get.find<CommandeController>()
+        : Get.put(CommandeController());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.prepareOrderForm(widget.modele, tailleur: widget.tailleur);
+    });
   }
 
-  void _takePhotos() async {
-    // Open the image picker
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.camera,
-    );
+  Future<void> _pickImage(ImageSource source) async {
+    final image = await ImagePicker().pickImage(source: source);
+    if (image == null) return;
+    _controller.image.value = image;
+    await _controller.saveOrderDraft(widget.modele, tailleur: widget.tailleur);
+  }
 
-    // Add the taken image to the list
-    if (image != null) {
-      controller.image.value = image;
+  Future<void> _selectMesure() async {
+    var userId = _controller.userController.currentUser.value.id;
+    if (userId == null || userId.isEmpty) {
+      await _controller.userController.init();
+      userId = _controller.userController.currentUser.value.id;
     }
+    userId ??= auth.currentUser?.uid;
+    if (userId == null || userId.isEmpty) {
+      showCustomSnackbar(message: 'Reconnectez-vous pour charger les mesures.');
+      return;
+    }
+
+    final mesures = await _mesureService.getAllUserMesure(userId).first;
+    if (!mounted) return;
+    if (mesures.isEmpty) {
+      showCustomSnackbar(message: 'Aucune mesure disponible pour ce compte.');
+      return;
+    }
+    mesuresPopUp(
+      context: context,
+      mesures: mesures,
+      onMesureSelected: (Mesure mesure) async {
+        _controller.mesure.value = mesure;
+        await _controller.saveOrderDraft(widget.modele,
+            tailleur: widget.tailleur);
+      },
+    );
+  }
+
+  Future<void> _selectDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(DateTime.now().year + 2),
+    );
+    if (date == null) return;
+    _controller.selectedDate.value = DateFormat('yyyy-MM-dd').format(date);
+    await _controller.saveOrderDraft(widget.modele, tailleur: widget.tailleur);
+  }
+
+  Future<void> _continue() async {
+    final step = _controller.orderFormStep.value;
+    if (step == 0 && _controller.image.value == null) {
+      showCustomSnackbar(message: 'Ajoutez une photo de l\'habit à réaliser.');
+      return;
+    }
+    if (step == 1) {
+      if (_isTailleur &&
+          (_controller.nomController.text.trim().isEmpty ||
+              int.tryParse(_controller.numeroController.text.trim()) == null)) {
+        showCustomSnackbar(
+            message: 'Renseignez le nom et le numéro du client.');
+        return;
+      }
+      if (_controller.mesure.value == null ||
+          _controller.selectedDate.value.isEmpty) {
+        showCustomSnackbar(
+            message: 'Choisissez les mesures et la date prévue.');
+        return;
+      }
+    }
+    await _controller.saveOrderDraft(widget.modele, tailleur: widget.tailleur);
+    _controller.orderFormStep.value = step + 1;
+  }
+
+  Future<void> _saveDraftSilently() async {
+    await _controller.saveOrderDraft(widget.modele, tailleur: widget.tailleur);
   }
 
   @override
   Widget build(BuildContext context) {
-    Get.put(CommandeController());
-    final MesureService mesureService = MesureService();
-    final bool isTailleur = controller.userController.isTailleur.value;
-    final String? phoneNumber =
-        controller.userController.currentUser.value.phoneNumber;
-    final String maskedPhone = (phoneNumber != null && phoneNumber.length >= 7)
-        ? '${phoneNumber.substring(0, 7)}XXXX'
-        : (phoneNumber?.isNotEmpty ?? false)
-            ? phoneNumber!
-            : 'Numéro du client';
-    return Scaffold(
+    final theme = Theme.of(context);
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _saveDraftSilently();
+      },
+      child: Scaffold(
         appBar: AppBar(
-          toolbarHeight: 0,
-          backgroundColor: AppColors.primary,
+          title: const Text('Nouvelle commande'),
+          actions: [
+            Tooltip(
+              message: 'Enregistrer le brouillon',
+              child: IconButton(
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  await _controller.saveOrderDraft(
+                    widget.modele,
+                    tailleur: widget.tailleur,
+                  );
+                  if (mounted) {
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('Brouillon enregistré.')),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.save_outlined),
+              ),
+            ),
+          ],
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              1.5.hs,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: Obx(() {
+          if (_controller.isDraftLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return Stepper(
+            currentStep: _controller.orderFormStep.value,
+            type: StepperType.horizontal,
+            onStepTapped: (step) {
+              if (step <= _controller.orderFormStep.value) {
+                _controller.orderFormStep.value = step;
+              }
+            },
+            controlsBuilder: (context, details) => Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.lg),
+              child: Row(
                 children: [
-                  IconButton(
-                    padding: const EdgeInsets.only(left: 15),
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      size: 30,
+                  if (_controller.orderFormStep.value > 0)
+                    IconButton(
+                      tooltip: 'Étape précédente',
+                      onPressed: () => _controller.orderFormStep.value--,
+                      icon: const Icon(Icons.arrow_back),
                     ),
-                    onPressed: () {
-                      Get.back();
-                    },
-                  ),
-                  const Text(
-                    'Habit à coudre',
-                    style: TextStyle(
-                      // color: primaryColor,
-                      fontSize: 18,
+                  const Spacer(),
+                  if (_controller.orderFormStep.value < 2)
+                    FilledButton.icon(
+                      onPressed: _continue,
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text('Continuer'),
+                    )
+                  else
+                    Obx(
+                      () => FilledButton.icon(
+                        onPressed: _controller.isSending.value
+                            ? null
+                            : () => _controller.createCommande(
+                                  widget.modele,
+                                  tailleur: widget.tailleur,
+                                ),
+                        icon: _controller.isSending.value
+                            ? circularProgress()
+                            : const Icon(Icons.send_outlined),
+                        label: Text(_isTailleur ? 'Enregistrer' : 'Envoyer'),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 50),
                 ],
               ),
-              6.hs,
-              Container(
-                height: 100,
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                width: MediaQuery.sizeOf(context).width * 0.95,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+            ),
+            steps: [
+              Step(
+                title: const Text('Habit'),
+                isActive: _controller.orderFormStep.value >= 0,
+                content: _PhotoStep(
+                  image: _controller.image.value,
+                  onCamera: () => _pickImage(ImageSource.camera),
+                  onGallery: () => _pickImage(ImageSource.gallery),
                 ),
-                child: Obx(() => Row(
-                      children: [
-                        const Expanded(
-                            child: Text(
-                          'Prendre une photo de l\'habit',
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                          overflow: TextOverflow.clip,
-                        )),
-                        2.hs,
-                        controller.image.value != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(15.0),
-                                child: Image.file(
-                                  File(controller.image.value!.path),
-                                  fit: BoxFit.cover,
-                                  height: double.infinity,
-                                  width: 100,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.image,
-                                size: 100,
-                              ),
-                        2.hs,
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.camera_alt_outlined),
-                              onPressed: _takePhotos,
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.photo_outlined),
-                              onPressed: _pickImages,
-                            ),
-                          ],
-                        ),
-                      ],
-                    )),
               ),
-              5.hs,
-              // form to fill habit details
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
-                width: MediaQuery.sizeOf(context).width * 0.95,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+              Step(
+                title: const Text('Détails'),
+                isActive: _controller.orderFormStep.value >= 1,
+                content: _DetailsStep(
+                  controller: _controller,
+                  isTailleur: _isTailleur,
+                  onSelectMesure: _selectMesure,
+                  onSelectDate: _selectDate,
                 ),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: controller.nomController,
-                      enabled: isTailleur ? true : false,
-                      decoration: InputDecoration(
-                        labelText: isTailleur
-                            ? 'Nom du client'
-                            : controller
-                                .userController.currentUser.value.nomPrenom!,
-                        border: const OutlineInputBorder(),
-                      ),
-                    ),
-                    2.hs,
-                    TextField(
-                      controller: controller.numeroController,
-                      enabled: isTailleur ? true : false,
-                      keyboardType: TextInputType.number,
-                      maxLength: 10,
-                      decoration: InputDecoration(
-                        counterText: '',
-                        labelText:
-                            isTailleur ? 'Numéro du client' : maskedPhone,
-                        border: const OutlineInputBorder(),
-                      ),
-                    ),
-                    2.hs,
-                    GestureDetector(
-                      onTap: () async {
-                        String? userId =
-                            controller.userController.currentUser.value.id;
-
-                        if (userId == null || userId.isEmpty) {
-                          await controller.userController.init();
-                          userId =
-                              controller.userController.currentUser.value.id;
-                        }
-
-                        userId ??= FirebaseAuth.instance.currentUser?.uid;
-
-                        if (userId == null || userId.isEmpty) {
-                          showCustomSnackbar(
-                            message:
-                                'Veuillez vous reconnecter pour charger vos mesures',
-                          );
-                          return;
-                        }
-
-                        final List<Mesure> mesures =
-                            await mesureService.getAllUserMesure(userId).first;
-
-                        if (!context.mounted) return;
-
-                        if (mesures.isEmpty) {
-                          showCustomSnackbar(
-                            message: 'Aucune mesure trouvée pour ce compte',
-                          );
-                          return;
-                        }
-
-                        mesuresPopUp(
-                          context: context,
-                          mesures: mesures,
-                          onMesureSelected: (Mesure mesure) {
-                            controller.mesure.value = mesure;
-                          },
-                        );
-                      },
-                      child: Container(
-                        width: MediaQuery.sizeOf(context).width * 0.9,
-                        height: 60,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Obx(() => Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                    controller.mesure.value == null
-                                        ? 'Mesure'
-                                        : controller.mesure.value!.nom!,
-                                    style: const TextStyle(
-                                      // color: Colors.grey[600],
-                                      fontSize: 14,
-                                    )),
-                                const Icon(Icons.keyboard_arrow_down_rounded)
-                              ],
-                            )),
-                      ),
-                    ),
-                    2.hs,
-                    GestureDetector(
-                      onTap: () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(DateTime.now().year + 2),
-                        );
-                        if (date != null) {
-                          // Format the date as you want and set it to the controller
-                          controller.selectedDate.value =
-                              DateFormat('yyyy-MM-dd').format(date);
-                        }
-                      },
-                      child: Container(
-                        width: MediaQuery.sizeOf(context).width * 0.9,
-                        height: 60,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Obx(() => Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                    controller.selectedDate.value.isEmpty
-                                        ? 'Date prevue'
-                                        : controller.selectedDate.value,
-                                    style: const TextStyle(
-                                      // color: Colors.grey[600],
-                                      fontSize: 14,
-                                    )),
-                                const Icon(Icons.calendar_month_rounded)
-                              ],
-                            )),
-                      ),
-                    ),
-                    2.hs,
-                    if (isTailleur)
-                      TextField(
-                        controller: controller.prixController,
-                        keyboardType: TextInputType.number,
-                        maxLength: 10,
-                        decoration: const InputDecoration(
-                          counterText: '',
-                          labelText: 'Prix',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    7.hs,
-                    SizedBox(
-                      width: MediaQuery.sizeOf(context).width * 0.7,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          controller.createCommande(
-                            modele,
-                            tailleur: tailleur,
-                          );
-                        },
-                        child: controller.isSending.value
-                            ? circularProgress()
-                            : Text(isTailleur ? 'Enregistrer' : 'Envoyer'),
-                      ),
-                    ),
-                  ],
+              ),
+              Step(
+                title: const Text('Vérifier'),
+                isActive: _controller.orderFormStep.value >= 2,
+                content: _ReviewStep(
+                  controller: _controller,
+                  modele: widget.modele,
+                  isTailleur: _isTailleur,
+                  colorScheme: theme.colorScheme,
                 ),
               ),
             ],
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _PhotoStep extends StatelessWidget {
+  const _PhotoStep({
+    required this.image,
+    required this.onCamera,
+    required this.onGallery,
+  });
+
+  final XFile? image;
+  final VoidCallback onCamera;
+  final VoidCallback onGallery;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Photo de l\'habit', style: AppTypography.titleMedium),
+        AppSpacing.gapV4,
+        Text(
+          'Ajoutez une référence claire de la coupe ou du tissu à réaliser.',
+          style: AppTypography.bodySmall,
+        ),
+        AppSpacing.gapV16,
+        AspectRatio(
+          aspectRatio: 4 / 3,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: image == null
+                ? const Center(
+                    child: Icon(Icons.add_a_photo_outlined, size: 48))
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      File(image!.path),
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Center(
+                        child: Icon(Icons.broken_image_outlined, size: 48),
+                      ),
+                    ),
+                  ),
           ),
-        ));
+        ),
+        AppSpacing.gapV8,
+        Row(
+          children: [
+            IconButton(
+              tooltip: 'Prendre une photo',
+              onPressed: onCamera,
+              icon: const Icon(Icons.camera_alt_outlined),
+            ),
+            IconButton(
+              tooltip: 'Choisir dans la galerie',
+              onPressed: onGallery,
+              icon: const Icon(Icons.photo_library_outlined),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _DetailsStep extends StatelessWidget {
+  const _DetailsStep({
+    required this.controller,
+    required this.isTailleur,
+    required this.onSelectMesure,
+    required this.onSelectDate,
+  });
+
+  final CommandeController controller;
+  final bool isTailleur;
+  final VoidCallback onSelectMesure;
+  final VoidCallback onSelectDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        if (isTailleur) ...[
+          TextField(
+            controller: controller.nomController,
+            textCapitalization: TextCapitalization.words,
+            decoration: const InputDecoration(labelText: 'Nom du client'),
+          ),
+          AppSpacing.gapV12,
+          TextField(
+            controller: controller.numeroController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(labelText: 'Numéro du client'),
+          ),
+          AppSpacing.gapV12,
+        ],
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.straighten_outlined),
+          title: const Text('Mesures'),
+          subtitle: Obx(() => Text(
+                controller.mesure.value?.nom ?? 'Choisir une fiche de mesures',
+              )),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: onSelectMesure,
+        ),
+        const Divider(),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.event_outlined),
+          title: const Text('Date prévue'),
+          subtitle: Obx(() => Text(
+                controller.selectedDate.value.isEmpty
+                    ? 'Choisir une date'
+                    : DateFormat('d MMMM yyyy', 'fr_FR')
+                        .format(DateTime.parse(controller.selectedDate.value)),
+              )),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: onSelectDate,
+        ),
+        if (isTailleur) ...[
+          AppSpacing.gapV12,
+          TextField(
+            controller: controller.prixController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: 'Prix convenu (FCFA)'),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ReviewStep extends StatelessWidget {
+  const _ReviewStep({
+    required this.controller,
+    required this.modele,
+    required this.isTailleur,
+    required this.colorScheme,
+  });
+
+  final CommandeController controller;
+  final Modele modele;
+  final bool isTailleur;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = <(IconData, String, String)>[
+      (
+        Icons.checkroom_outlined,
+        'Modèle',
+        modele.detail ?? 'Modèle sélectionné'
+      ),
+      (
+        Icons.straighten_outlined,
+        'Mesures',
+        controller.mesure.value?.nom ?? '-'
+      ),
+      (Icons.event_outlined, 'Date prévue', controller.selectedDate.value),
+      if (isTailleur)
+        (Icons.person_outline, 'Client', controller.nomController.text.trim()),
+      if (isTailleur)
+        (
+          Icons.payments_outlined,
+          'Prix',
+          '${controller.prixController.text.trim()} FCFA'
+        ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Vérifiez avant l\'envoi', style: AppTypography.titleMedium),
+        AppSpacing.gapV8,
+        ...rows.map(
+          (row) => ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(row.$1, color: colorScheme.primary),
+            title: Text(row.$2),
+            subtitle: Text(row.$3.isEmpty ? '-' : row.$3),
+          ),
+        ),
+      ],
+    );
   }
 }

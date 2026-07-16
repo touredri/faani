@@ -45,7 +45,8 @@ class AjoutModele extends GetView<AjoutModeleController> {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primary),
                     ),
-                    onPressed: () => controller.images.length < 2
+                    onPressed: () => controller.images.length <
+                            AjoutModeleController.maxImages
                         ? controller.pickOrTakeImage(context, true)
                         : showDialog(
                             context: Navigator.of(context, rootNavigator: true)
@@ -68,7 +69,8 @@ class AjoutModele extends GetView<AjoutModeleController> {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primary),
                     ),
-                    onPressed: () => controller.images.length < 2
+                    onPressed: () => controller.images.length <
+                            AjoutModeleController.maxImages
                         ? controller.pickOrTakeImage(context, false)
                         : showDialog(
                             context: Navigator.of(context, rootNavigator: true)
@@ -105,8 +107,8 @@ class MyAlertDialog extends StatelessWidget {
         Icons.warning,
         color: AppColors.primary,
       ),
-      title: const Text(
-        'Vous ne pouvez pas ajouter plus de 2 images',
+      title: Text(
+        'Vous ne pouvez pas ajouter plus de ${AjoutModeleController.maxImages} images',
         style: TextStyle(fontSize: 15),
       ),
       actions: [

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:faani/app/data/services/users_service.dart';
 import 'package:faani/app/firebase/global_function.dart';
-import 'package:faani/app/modules/home/controllers/user_controller.dart';
 import 'package:faani/app/routes/app_pages.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -40,12 +39,15 @@ class PushNotifications {
 
     // Get the device token
     String? token = await _firebaseMessaging.getToken();
-    UserService().updateUserToken(auth.currentUser!.uid, token);
+    final userId = auth.currentUser?.uid;
+    if (userId != null) {
+      UserService().updateUserToken(userId, token);
+    }
     _firebaseMessaging.onTokenRefresh.listen((newToken) async {
       debugPrint("Token refreshed: $newToken");
-      bool isUserLoggedin = auth.currentUser != null;
-      if (isUserLoggedin) {
-        await UserController().updateUserToken(token);
+      final refreshedUserId = auth.currentUser?.uid;
+      if (refreshedUserId != null) {
+        UserService().updateUserToken(refreshedUserId, newToken);
       }
     });
 
@@ -105,11 +107,16 @@ class PushNotifications {
       message.notification?.title,
       message.notification?.body,
       platformChannelSpecifics,
-      payload: 'Notification Payload Data',
+      payload: jsonEncode(message.data),
     );
   }
 
   void _handleMessageOpen(BuildContext context, Map<String, dynamic>? data) {
+    final notificationId = data?['notificationId']?.toString() ?? '';
+    if (notificationId.isNotEmpty) {
+      Get.toNamed(Routes.notifications);
+      return;
+    }
     Get.toNamed(Routes.home);
     Future.delayed(const Duration(milliseconds: 500), () {
       // Get.to(() => NotificationPage());

@@ -17,6 +17,7 @@ abstract class Routes {
   static const detailModele = _Paths.detailModele;
   static const searchPage = _Paths.searchPage;
   static const adminPanel = _Paths.adminPanel;
+  static const notifications = _Paths.notifications;
 }
 
 abstract class _Paths {
@@ -36,4 +37,5 @@ abstract class _Paths {
   static const detailModele = '/detail-modele';
   static const searchPage = '/search-page';
   static const adminPanel = '/admin-panel';
+  static const notifications = '/notifications';
 }

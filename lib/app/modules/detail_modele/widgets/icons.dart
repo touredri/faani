@@ -41,11 +41,15 @@ Widget iconMessage(Modele modele, BuildContext context, Color color) {
               backgroundColor: const Color.fromARGB(255, 252, 248, 248),
               context: context,
               builder: (context) {
-                return Container(
-                  height: 800,
-                  padding: const EdgeInsets.only(top: 20, left: 8, right: 8),
-                  child: CommentModal(
-                    idModele: modele.id!,
+                return DraggableScrollableSheet(
+                  initialChildSize: 0.78,
+                  minChildSize: 0.45,
+                  maxChildSize: 0.94,
+                  expand: false,
+                  builder: (context, scrollController) => ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(24)),
+                    child: CommentModal(idModele: modele.id!),
                   ),
                 );
               });

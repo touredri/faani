@@ -20,7 +20,6 @@ void main() {
       home: Scaffold(
         body: MasonryGridItem(
           modele: modele,
-          height: 220,
           onTap: () => taps++,
         ),
       ),

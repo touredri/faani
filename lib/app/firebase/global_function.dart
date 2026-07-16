@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'dart:math';
-import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 
 final auth = FirebaseAuth.instance;
 User? get user => auth.currentUser;
@@ -20,57 +18,53 @@ Future<void> deleteImage(String imagePath) async {
   await firebaseStorageRef.delete();
 }
 
-Future<void> sendNotification(String token, String title, String body) async {
-  final url = Uri.parse('https://my-faani-admin.onrender.com/api/send');
-
-  try {
-    final response = await http.post(
-      url,
-      body: jsonEncode({
-        'token': token,
-        'title': title,
-        'body': body,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      debugPrint('Notification sent successfully');
-    } else {
-      debugPrint('Failed to send notification: ${response.statusCode}');
-    }
-  } catch (error) {
-    debugPrint('Error sending notification: $error');
+Future<void> sendNotification(
+  String token,
+  String title,
+  String body, {
+  String category = 'general',
+  String targetType = '',
+  String targetId = '',
+}) async {
+  final normalizedToken = token.trim();
+  final normalizedTitle = title.trim();
+  final normalizedBody = body.trim();
+  if (normalizedToken.isEmpty ||
+      normalizedTitle.isEmpty ||
+      normalizedBody.isEmpty) {
+    return;
   }
+  await FirebaseFirestore.instance.collection('notificationRequests').add({
+    'tokens': [normalizedToken],
+    'title': normalizedTitle,
+    'body': normalizedBody,
+    'category': category,
+    'targetType': targetType,
+    'targetId': targetId,
+    'status': 'pending',
+    'createdBy': auth.currentUser?.uid ?? '',
+    'createdAt': FieldValue.serverTimestamp(),
+  });
 }
 
-Future<void> sendProgrammingNotification(String tToken, String cToken,
-    String title, String body, DateTime date) async {
-  final url = Uri.parse('https://my-faani-admin.onrender.com/api/sendAfter');
-
-  try {
-    final response = await http.post(
-      url,
-      body: jsonEncode({
-        't_token': tToken,
-        'c_token': cToken,
-        'title': title,
-        'body': body,
-        'date': date.toIso8601String(),
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      debugPrint('Notification sent successfully');
-    } else {
-      debugPrint('Failed to send notification: ${response.statusCode}');
-    }
-  } catch (error) {
-    debugPrint('Error sending notification: $error');
-  }
+Future<void> sendProgrammingNotification(
+    String tToken, String cToken, String title, String body, DateTime date,
+    {String targetType = '', String targetId = ''}) async {
+  final tokens = [tToken.trim(), cToken.trim()]
+      .where((token) => token.isNotEmpty)
+      .toSet()
+      .toList();
+  if (tokens.isEmpty || title.trim().isEmpty || body.trim().isEmpty) return;
+  await FirebaseFirestore.instance.collection('notificationRequests').add({
+    'tokens': tokens,
+    'title': title.trim(),
+    'body': body.trim(),
+    'category': 'order',
+    'targetType': targetType,
+    'targetId': targetId,
+    'status': 'pending',
+    'scheduledAt': Timestamp.fromDate(date),
+    'createdBy': auth.currentUser?.uid ?? '',
+    'createdAt': FieldValue.serverTimestamp(),
+  });
 }

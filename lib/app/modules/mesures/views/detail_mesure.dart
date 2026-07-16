@@ -20,7 +20,7 @@ class DetailMesure extends StatefulWidget {
 class _DetailMesureState extends State<DetailMesure> {
   @override
   Widget build(BuildContext context) {
-    final MesuresController mesureController = Get.put(MesuresController());
+    final MesuresController mesureController = Get.find<MesuresController>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Détail de la mesure'),
@@ -133,43 +133,40 @@ class _DetailMesureState extends State<DetailMesure> {
                     // list value of mesures
                     Expanded(
                       child: SingleChildScrollView(
-                        child: SizedBox(
-                          height: 600,
-                          child: Column(children: [
-                            MesureListTile(
-                              name: 'Epaule',
-                              value: mesure.epaule.toString(),
-                            ),
-                            MesureListTile(
-                              name: 'Bras',
-                              value: mesure.bras.toString(),
-                            ),
-                            MesureListTile(
-                              name: 'Poignet',
-                              value: mesure.poignet.toString(),
-                            ),
-                            MesureListTile(
-                              name: 'Poitrine',
-                              value: mesure.poitrine.toString(),
-                            ),
-                            MesureListTile(
-                              name: 'Taille',
-                              value: mesure.taille.toString(),
-                            ),
-                            MesureListTile(
-                              name: 'Hanche',
-                              value: mesure.hanche.toString(),
-                            ),
-                            MesureListTile(
-                              name: 'Ventre',
-                              value: mesure.ventre.toString(),
-                            ),
-                            MesureListTile(
-                              name: 'Longueur',
-                              value: mesure.longueur.toString(),
-                            ),
-                          ]),
-                        ),
+                        child: Column(children: [
+                          MesureListTile(
+                            name: 'Epaule',
+                            value: mesure.epaule.toString(),
+                          ),
+                          MesureListTile(
+                            name: 'Bras',
+                            value: mesure.bras.toString(),
+                          ),
+                          MesureListTile(
+                            name: 'Poignet',
+                            value: mesure.poignet.toString(),
+                          ),
+                          MesureListTile(
+                            name: 'Poitrine',
+                            value: mesure.poitrine.toString(),
+                          ),
+                          MesureListTile(
+                            name: 'Taille',
+                            value: mesure.taille.toString(),
+                          ),
+                          MesureListTile(
+                            name: 'Hanche',
+                            value: mesure.hanche.toString(),
+                          ),
+                          MesureListTile(
+                            name: 'Ventre',
+                            value: mesure.ventre.toString(),
+                          ),
+                          MesureListTile(
+                            name: 'Longueur',
+                            value: mesure.longueur.toString(),
+                          ),
+                        ]),
                       ),
                     )
                   ],

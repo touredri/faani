@@ -1,7 +1,7 @@
-// import 'package:android_intent_plus/android_intent.dart';
-// import 'package:android_intent_plus/flag.dart';
+import 'package:faani/app/data/services/users_service.dart';
+import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/globale_widgets/custom_app_bar.dart';
-import 'package:faani/app/style/spacer.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class NotificationParam extends StatefulWidget {
@@ -12,173 +12,118 @@ class NotificationParam extends StatefulWidget {
 }
 
 class _NotificationParamState extends State<NotificationParam> {
-  bool _notificationsEnabled = true;
-  bool _likenotification = true;
-  bool _restacknot = false;
-  bool _replinot = false;
-  bool _directMessage = false;
-  bool _newModeleAdded = false;
+  final _userService = UserService();
+  var _loading = true;
+  var _saving = false;
+  Map<String, bool> _preferences = _defaults;
 
-  void openNotificationSettings() {
-    // const intent = AndroidIntent(
-    //   action: 'android.settings.APP_NOTIFICATION_SETTINGS',
-    //   flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
-    //   arguments: <String, dynamic>{
-    //     'android.provider.extra.APP_PACKAGE': 'com.touredri.faani',
-    //   },
-    // );
-    // intent.launch();
-    // NotificationSettings.openNotificationSettings();
+  static const _defaults = <String, bool>{
+    'pushEnabled': true,
+    'messageEnabled': true,
+    'orderEnabled': true,
+    'modelModerationEnabled': true,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
   }
 
-  Widget _buildSwitchListTile({
-    required IconData icon,
-    required String title,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.grey),
-      title: Text(
-        title,
-        style: const TextStyle(fontSize: 13),
-      ),
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-      ),
+  Future<void> _loadPreferences() async {
+    final userId = auth.currentUser?.uid;
+    if (userId == null) return;
+    final user = await _userService.getIfUser(userId);
+    final raw = user == null ? null : user.toMap()['notificationPreferences'];
+    final stored = raw is Map ? raw : const <String, dynamic>{};
+    if (!mounted) return;
+    setState(() {
+      _preferences = {
+        for (final entry in _defaults.entries)
+          entry.key: stored[entry.key] is bool
+              ? stored[entry.key] as bool
+              : entry.value,
+      };
+      _loading = false;
+    });
+  }
+
+  Future<void> _setPreference(String key, bool value) async {
+    final userId = auth.currentUser?.uid;
+    if (userId == null || _saving) return;
+    setState(() {
+      _preferences = {..._preferences, key: value};
+      _saving = true;
+    });
+    try {
+      await _userService.updateNotificationPreferences(userId, _preferences);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _preferences = {..._preferences, key: !value});
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _requestPermission() async {
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return Scaffold(
+        appBar: customAppBar('Notifications'),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
-      appBar: customAppBar(
-        ('Notifications'),
+      appBar: customAppBar('Notifications'),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          ListTile(
+            leading: const Icon(Icons.notifications_active_outlined),
+            title: const Text('Autorisation système'),
+            subtitle: const Text('Autoriser les alertes sur cet appareil'),
+            trailing: TextButton(
+              onPressed: _requestPermission,
+              child: const Text('Autoriser'),
+            ),
+          ),
+          const Divider(),
+          _switchTile(
+            'Notifications push',
+            'Conserver les activités dans l’application sans alerte appareil.',
+            'pushEnabled',
+          ),
+          const Divider(),
+          _switchTile(
+              'Messages directs', 'Nouveaux messages reçus.', 'messageEnabled'),
+          _switchTile('Commandes', 'Créations et changements de commande.',
+              'orderEnabled'),
+          _switchTile(
+            'Modération des modèles',
+            'Décisions de publication et de refus.',
+            'modelModerationEnabled',
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(6),
-        child: Column(
-          children: [
-            2.hs,
-            Card(
-              elevation: 0,
-              child: ListTile(
-                title: const Text('Push Notification',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                subtitle: const Text(
-                  'Autoriser pour recevoir les alertes',
-                  style: TextStyle(fontSize: 13),
-                ),
-                trailing: TextButton(
-                  onPressed: () {
-                    openNotificationSettings();
-                  },
-                  child: const Text('Paramètre'),
-                ),
-                onTap: openNotificationSettings,
-              ),
-            ),
-            1.hs,
-            Card(
-              elevation: 0,
-              child: ListTile(
-                title: const Text(
-                  'Activer les notifications',
-                  style: TextStyle(fontSize: 14),
-                ),
-                trailing: SizedBox(
-                  height: 25,
-                  child: Switch(
-                    splashRadius: 5,
-                    value: _notificationsEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        _notificationsEnabled = value;
-                      });
-                    },
-                  ),
-                ),
-              ),
-            ),
-            1.hs,
-            Card(
-              elevation: 0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const Padding(
-                    padding: EdgeInsets.only(top: 15.0, left: 17),
-                    child: Text(
-                      'Personnalisez',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  3.5.hs,
-                  _buildSwitchListTile(
-                    icon: Icons.favorite_border_sharp,
-                    title: 'J\'aimes',
-                    value: _likenotification,
-                    onChanged: (value) {
-                      setState(() {
-                        _likenotification = value;
-                      });
-                    },
-                  ),
-                  3.hs,
-                  _buildSwitchListTile(
-                    icon: Icons.comment_outlined,
-                    title: 'Commentaires',
-                    value: _restacknot,
-                    onChanged: (value) {
-                      setState(() {
-                        _restacknot = value;
-                      });
-                    },
-                  ),
-                  3.hs,
-                  _buildSwitchListTile(
-                    icon: Icons.people_alt_outlined,
-                    title: 'Nouveau follower',
-                    value: _replinot,
-                    onChanged: (value) {
-                      setState(() {
-                        _replinot = value;
-                      });
-                    },
-                  ),
-                  3.hs,
-                  _buildSwitchListTile(
-                    icon: Icons.send_and_archive_outlined,
-                    title: 'Message direct',
-                    value: _directMessage,
-                    onChanged: (value) {
-                      setState(() {
-                        _directMessage = value;
-                      });
-                    },
-                  ),
-                  3.hs,
-                  _buildSwitchListTile(
-                    icon: Icons.image_outlined,
-                    title: 'Modèle ajouter d\'un compte suivie',
-                    value: _newModeleAdded,
-                    onChanged: (value) {
-                      setState(() {
-                        _newModeleAdded = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    );
+  }
+
+  Widget _switchTile(String title, String subtitle, String key) {
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(title),
+      subtitle: Text(subtitle),
+      value: _preferences[key] ?? true,
+      onChanged: _saving ? null : (value) => _setPreference(key, value),
     );
   }
 }

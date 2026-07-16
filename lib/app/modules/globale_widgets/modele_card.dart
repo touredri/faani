@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:faani/app/modules/detail_modele/controllers/detail_modele_controller.dart';
 import 'package:faani/app/modules/detail_modele/views/detail_modele_view.dart';
 import 'package:faani/app/style/app_colors.dart';
 import 'package:faani/app/style/app_radius.dart';
@@ -8,7 +7,6 @@ import 'package:faani/app/style/app_spacing.dart';
 import 'package:faani/app/style/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../data/models/modele_model.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
@@ -25,8 +23,6 @@ Widget buildCard(Modele modele,
     child: GestureDetector(
       onTap: onTap == null
           ? () {
-              final controller = Get.put(DetailModeleController());
-              controller.getModeleOwner(modele.idTailleur);
               pushWithoutNavBar(
                 context,
                 MaterialPageRoute(

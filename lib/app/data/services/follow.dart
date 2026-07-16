@@ -29,6 +29,18 @@ class FollowService {
     });
   }
 
+  Future<List<String>> getFollowingOnce(String userId) async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    final rawFollowing = snapshot.data()?['following'];
+    if (rawFollowing is! List) return <String>[];
+    return rawFollowing
+        .map((value) => value.toString().trim())
+        .where((value) => value.isNotEmpty)
+        .toSet()
+        .toList();
+  }
+
   Future<void> updateFollowStatus(
       String currentUserId, String targetUserId, bool isFollowing) async {
     final usersRef = FirebaseFirestore.instance.collection('users');
@@ -41,9 +53,12 @@ class FollowService {
       'following': action,
     });
 
-    // Update "followers" of targetUserId
+    // The target receives the current user in their followers list.
+    final followerAction = isFollowing
+        ? FieldValue.arrayUnion([currentUserId])
+        : FieldValue.arrayRemove([currentUserId]);
     await usersRef.doc(targetUserId).update({
-      'followers': action,
+      'followers': followerAction,
     });
   }
 

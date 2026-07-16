@@ -12,9 +12,12 @@ enum CameraCapturePhase {
 }
 
 class CameraCaptureStateMachine {
+  // Fenêtre et tolérance calibrées pour ~5-8 frames analysées par seconde :
+  // ~1 s d'immobilité avec une marge qui absorbe le balancement naturel
+  // du corps et le bruit de détection.
   CameraCaptureStateMachine({
-    this.stabilityWindow = 12,
-    this.stabilityThreshold = 0.012,
+    this.stabilityWindow = 8,
+    this.stabilityThreshold = 0.025,
     this.countdownSeconds = 3,
     this.captureFrameTarget = 8,
   });

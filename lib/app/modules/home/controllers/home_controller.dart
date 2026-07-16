@@ -11,10 +11,10 @@ import 'package:faani/app/data/services/session_coordinator.dart';
 import 'package:faani/app/firebase/global_function.dart';
 import 'package:faani/app/modules/accueil/views/accueil_view.dart';
 import 'package:faani/app/modules/commande/views/commande_view.dart';
-import 'package:faani/app/modules/favorie/views/favorie_view.dart';
+import 'package:faani/app/modules/message/views/message_view.dart';
 import 'package:faani/app/modules/home/controllers/user_controller.dart';
-import 'package:faani/app/modules/mesures/views/ajouter_mesure.dart';
 import 'package:faani/app/modules/profile/views/profile_view.dart';
+import 'package:faani/app/modules/search_page/views/search_page_view.dart';
 import 'package:faani/app/routes/app_pages.dart';
 import 'package:faani/app/style/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,6 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../ajout_modele/views/ajout_modele_view.dart';
 
 class HomeController extends GetxController {
   PersistentTabController tabController =
@@ -106,44 +105,36 @@ class HomeController extends GetxController {
           ),
         ),
         PersistentTabConfig(
+          screen: const SearchPageView(),
+          item: ItemConfig(
+            activeForegroundColor:
+                isHomeTabActive ? AppColors.white : AppColors.primary,
+            inactiveForegroundColor:
+                isHomeTabActive ? AppColors.white : Colors.grey,
+            icon: const Icon(Icons.search),
+            inactiveIcon: const Icon(Icons.search_outlined),
+          ),
+        ),
+        PersistentTabConfig(
           screen: const CommandeView(),
           item: ItemConfig(
             activeForegroundColor:
                 isHomeTabActive ? AppColors.white : AppColors.primary,
             inactiveForegroundColor:
-                isHomeTabActive ? AppColors.white : Colors.grey,
-            icon: const Icon(Icons.content_cut),
-            inactiveIcon: const Icon(Icons.content_cut_outlined),
-          ),
-        ),
-        PersistentTabConfig(
-          screen: (userController.isTailleur.value || isAdmin.value)
-              ? const AjoutModeleView()
-              : const AjoutMesure(),
-          item: ItemConfig(
-            activeForegroundColor:
-                isHomeTabActive ? AppColors.transparent : AppColors.white,
-            inactiveForegroundColor:
                 isHomeTabActive ? AppColors.white : AppColors.primary,
-            icon: Icon(
-              Icons.add_circle_outline,
-              color: isHomeTabActive ? AppColors.white : AppColors.primary,
-            ),
-            inactiveIcon: Icon(
-              Icons.add_circle_outline,
-              color: isHomeTabActive ? AppColors.white : AppColors.primary,
-            ),
+            icon: const Icon(Icons.receipt_long),
+            inactiveIcon: const Icon(Icons.receipt_long_outlined),
           ),
         ),
         PersistentTabConfig(
-          screen: const FavorieView(),
+          screen: const MessageView(),
           item: ItemConfig(
             activeForegroundColor:
                 isHomeTabActive ? AppColors.white : AppColors.primary,
             inactiveForegroundColor:
                 isHomeTabActive ? AppColors.white : Colors.grey,
-            icon: const Icon(Icons.favorite),
-            inactiveIcon: const Icon(Icons.favorite_border),
+            icon: const Icon(Icons.forum),
+            inactiveIcon: const Icon(Icons.forum_outlined),
           ),
         ),
         PersistentTabConfig(

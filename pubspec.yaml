@@ -1,5 +1,5 @@
 name: faani
-version: 1.1.8+29
+version: 1.1.8+30
 publish_to: none
 description: An application to connect tailor and customer, it promote traditional suit. We can book inside and follow best tailor
 environment:
@@ -13,6 +13,7 @@ dependencies:
   cloud_firestore: ^5.4.5
   firebase_storage: ^12.3.5
   firebase_messaging: ^15.1.4
+  cloud_functions: ^5.1.3
   firebase_in_app_messaging: ^0.8.0+9
   # firebase_app_check: ^0.3.1+6
   provider: ^6.0.5
